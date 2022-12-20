@@ -5,7 +5,7 @@ $hash = '68294cf2dcf09372f59e46bacf9e4fa2dc0822c0ed8d45b0b351f83789625b06';
 if (empty($_REQUEST['key']) || hash('sha256', $_REQUEST['key']) != $hash) {
     echo '<head><title>Log in</title></head><body>
         <form method="post">
-            <input type="text" name="key" value="' . htmlspecialchars($_REQUEST['key']) . '"></input>
+            <input type="text" name="key" value=""></input>
             <button type="submit">Log in</button>
         </form></body></html>';
     exit();

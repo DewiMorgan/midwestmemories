@@ -11,7 +11,7 @@ friendlyOutput();
 exit();
 
 /**
- * Build a query to describe the inoming query, and log it.
+ * Build a string to describe the inoming query, and log it.
  * @return string The data that was logged.
  * Note: MUST NOT echo anything to headers or stdout, or validate() will break.
  */
