@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
+/* No longer needed as we're using .htpasswd instead.
 $hash = '68294cf2dcf09372f59e46bacf9e4fa2dc0822c0ed8d45b0b351f83789625b06';
 if (empty($_REQUEST['key']) || hash('sha256', $_REQUEST['key']) != $hash) {
     echo '<head><title>Log in</title></head><body>
@@ -10,6 +11,7 @@ if (empty($_REQUEST['key']) || hash('sha256', $_REQUEST['key']) != $hash) {
         </form></body></html>';
     exit();
 }
+*/
 
 $cmd = '';
 if (!empty($_POST['cmd'])) {
@@ -33,7 +35,7 @@ if (!empty($_POST['cmd'])) {
 }
 
 /**
- * Build a string to describe the inoming query, and log it.
+ * Build a string to describe the incoming query, and log it.
  * @return string The data that was logged.
  * Note: MUST NOT echo anything to headers or stdout, or validate() will break.
  */

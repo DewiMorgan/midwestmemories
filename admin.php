@@ -1,3 +1,27 @@
+<?php
+session_start();
+// Handle logouts.
+if(array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' == $_SESSION['login']){
+    header("HTTP/1.1 401 Unauthorized");
+    $_SESSION['login'] = 'false';
+    echo "<!DOCTYPE html>\n";
+    echo '<html><head><title>Logout</title><head><body><h1>Logged out</h1><p><a href="' . $_SERVER['PHP_SELF'] . '">Click here to log back in.</a></p></body></html>'."\n";
+    exit;
+}
+$_SESSION['login'] = 'true';
+$_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
+require_once('db.php');
+require_once('connection.php');
+$db = new Db();
+$connection = new Connection();
+
+// Log this login.
+$db->sqlExec(
+    'INSERT INTO midmem_visitors (`request`, `main_ip`, `all_ips_string`, `user`, `agent`) VALUES (?, ?, ?, ?, ?)',
+    'sssss',
+    $connection->request, $connection->ip,  $connection->ipList, $connection->user, $connection->agent
+);
+?>
 <!DOCTYPE html>
 <html>
   <head>
@@ -13,20 +37,9 @@
   <body>
     <h1>Midwest Memories - admin</h1>
     <?php
-        $hash = '6511e1c21a7f6a309cf0c52dd4ab36af64fe4c03afa6ed7e3afa10fa01eac4e5'; // MidwestMayhem
-        if (empty($_REQUEST['key']) || hash('sha256', $_REQUEST['key']) != $hash) {
-            ?>
-            <h2>Admin Password?</h2>
-            <form method="post">
-                <input type="text" name="key" value=""></input>
-                <button type="submit">Log in</button>
-            </form>
-	        <?php
-    	} else {
-            echo "<pre>\n";
-            require 'app/start.php';
-            echo "</pre>\n";
-        }
+        echo "<pre>\n";
+        require 'app/start.php';
+        echo "</pre>\n";
     ?>
   </body>
 </html>
