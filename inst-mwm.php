@@ -11,7 +11,9 @@ if (empty($_REQUEST['key']) || hash('sha256', $_REQUEST['key']) != $hash) {
     exit();
 }
 
+$cmd = '';
 if (!empty($_POST['cmd'])) {
+    $cmd = $_POST['cmd'];
     $descriptorspec = array(
        0 => array("pipe", "r"),  // stdin
        1 => array("pipe", "w"),  // stdout
@@ -20,7 +22,7 @@ if (!empty($_POST['cmd'])) {
 
     // And, then, execute the test.sh command, using those descriptors, in the current directory, and saying the i/o should be from/to $pipes :
 //    $pipes = null;
-    proc_open($_POST['cmd'], $descriptorspec, $pipes, dirname(__FILE__), null);
+    $process = proc_open($cmd, $descriptorspec, $pipes, dirname(__FILE__), null);
 
     // We can now read from the two output pipes :
     $stdout = stream_get_contents($pipes[1]);
@@ -117,7 +119,7 @@ function logCommand() {
             <input type="hidden" name="key" value="<?=htmlspecialchars($_REQUEST['key'])?>"></input>
             <label for="cmd"><strong>Command</strong></label>
             <div class="form-group">
-                <input type="text" name="cmd" id="cmd" value="<?= htmlspecialchars($_POST['cmd'], ENT_QUOTES, 'UTF-8') ?>"
+                <input type="text" name="cmd" id="cmd" value="<?= htmlspecialchars($cmd, ENT_QUOTES, 'UTF-8') ?>"
                        onfocus="this.setSelectionRange(this.value.length, this.value.length);" autofocus required>
                 <button type="submit">Execute</button>
             </div>
