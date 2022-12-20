@@ -18,7 +18,7 @@
             ?>
             <h2>Admin Password?</h2>
             <form method="post">
-                <input type="text" name="key" value="<?=htmlspecialchars($_REQUEST['key'])?>"></input>
+                <input type="text" name="key" value=""></input>
                 <button type="submit">Log in</button>
             </form>
 	        <?php
