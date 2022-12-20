@@ -12,10 +12,6 @@
   </head>
   <body>
     <h1>Midwest Memories - index</h1>
-    <pre>
-    <?php
-require 'app/start.php';
-    ?></pre>
   </body>
 </html>
 

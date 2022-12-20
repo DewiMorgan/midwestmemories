@@ -12,7 +12,22 @@
   </head>
   <body>
     <h1>Midwest Memories - admin</h1>
+    <?php
+        $hash = '6511e1c21a7f6a309cf0c52dd4ab36af64fe4c03afa6ed7e3afa10fa01eac4e5'; // MidwestMayhem
+        if (empty($_REQUEST['key']) || hash('sha256', $_REQUEST['key']) != $hash) {
+            ?>
+            <h2>Admin Password?</h2>
+            <form method="post">
+                <input type="text" name="key" value="<?=htmlspecialchars($_REQUEST['key'])?>"></input>
+                <button type="submit">Log in</button>
+            </form>
+	        <?php
+    	} else {
+            echo "<pre>\n";
+            require 'app/start.php';
+            echo "</pre>\n";
+        }
+    ?>
   </body>
 </html>
 
-<?php
