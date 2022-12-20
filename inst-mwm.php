@@ -21,8 +21,7 @@ if (!empty($_POST['cmd'])) {
     );
 
     // And, then, execute the test.sh command, using those descriptors, in the current directory, and saying the i/o should be from/to $pipes :
-//    $pipes = null;
-    $process = proc_open($cmd, $descriptorspec, $pipes, dirname(__FILE__), null);
+    proc_open($cmd, $descriptorspec, $pipes, dirname(__FILE__), null);
 
     // We can now read from the two output pipes :
     $stdout = stream_get_contents($pipes[1]);
