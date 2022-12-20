@@ -11,7 +11,7 @@
     <meta charset="UTF-8">
   </head>
   <body>
-    <h1>Midwest Memories</h1>
+    <h1>Midwest Memories - index</h1>
   </body>
 </html>
 
