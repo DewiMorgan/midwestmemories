@@ -3,6 +3,7 @@ namespace app;
 
 use GuzzleHttp\Client as HttpClient;
 use Spatie\Dropbox\TokenProvider;
+use \Exception;
 
 class TokenRefresher implements TokenProvider
 {

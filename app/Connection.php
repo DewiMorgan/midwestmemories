@@ -5,6 +5,9 @@ namespace app;
 // isBot to use BotSign table.
 // Do something with the ipLookup table.
 // Timestamps with timezone-aware display.
+// Make admin levels more DB-configurable.
+// Ability to register accounts (with authorization)
+// Ability to change passwords
 
 class Connection {
     public $request = '';
@@ -14,6 +17,8 @@ class Connection {
     public $agent = '';
     public $user = '';
     public $isBot = false;
+    public $isAdmin = false;
+    public $isSuperAdmin = false;
     public $target = '';
 
     public function __construct() {
@@ -61,12 +66,24 @@ class Connection {
         }
         if (!empty($_SERVER['PHP_AUTH_USER'])) {
             $this->user .= 'auth:' . $_SERVER['PHP_AUTH_USER'] . ',';
-            $this->isAdmin = ('myself' === $_SERVER['PHP_AUTH_USER']);
-            // This means isAdmin can't be revoked 'til the session's killed.
-            $_SESSION['isAdmin'] = true;
+            if ('myself' === $_SERVER['PHP_AUTH_USER']) {
+                $this->isAdmin = true;
+                $this->isSuperAdmin = true;
+                // This means these permissions can't be revoked 'til the session's killed.
+                $_SESSION['isAdmin'] = true;
+                $_SESSION['isSuperAdmin'] = true;
+            }
+            if ('auora' === $_SERVER['PHP_AUTH_USER']) {
+                $this->isAdmin = true;
+                // This means isAdmin can't be revoked 'til the session's killed.
+                $_SESSION['isAdmin'] = true;
+            }
         }
         if (array_key_exists('isAdmin', $_SESSION) && $_SESSION['isAdmin']) {
             $this->isAdmin = true;
+        }
+        if (array_key_exists('isSuperAdmin', $_SESSION) && $_SESSION['isSuperAdmin']) {
+            $this->isSuperAdmin = true;
         }
         if (!empty($_SESSION['name'])) {
             $this->user .= 'sess:' . $_SESSION['name'] . ',';
@@ -161,6 +178,7 @@ class Connection {
             'user' => $this->user,
             'isBot' => $this->isBot,
             'isAdmin' => $this->isAdmin,
+            'isSuperAdmin' => $this->isSuperAdmin,
         ], true);
     }
 

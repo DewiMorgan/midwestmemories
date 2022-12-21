@@ -17,7 +17,7 @@ class Db {
             exit;
         }
         if (!$this->db) {
-            exit("DB is empty: " . var_export($db, true));
+            exit("DB is empty: " . var_export($this->db, true));
         }
     }
     function sqlExec($sql, string ...$items) {
@@ -125,7 +125,7 @@ class Db {
         global $connection;
         $message = "ADBG: $str" . (is_null($obj) ? "." : ": " . var_export($obj, true));
         fwrite(STDERR, "$message\n");
-        if ($connection->isAdmin) {
+        if ($connection->isSuperAdmin) {
             echo "<pre>$message</pre>\n";
         }
     }
