@@ -56,9 +56,11 @@ $db->sqlExec(
         echo "<h2>Full List</h2>\n<pre>";
         $list = $fp->getRecursiveList($client);
     }
-    var_export($list);
+    $cursor = $fp->cursor ?? $cursor;
+
+    echo "<pre>" . var_export($list, true) . "</pre>";
+
     ?>
-    </pre>
         <form method="post">
             <input type="text" name="cursor" value="<?php echo "$cursor"; ?>"></input>
             <button type="submit">Full List</button>
