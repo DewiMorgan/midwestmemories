@@ -2,13 +2,6 @@
 date_default_timezone_set("US/Central");
 session_start();
 
-require __DIR__ . '/../vendor/autoload.php';
-require 'TokenRefresher.php';
-
-use app\Db;
-use app\Connection;
-use app\InitDropbox;
-
 // Handle logouts.
 if(array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' == $_SESSION['login']){
     header("HTTP/1.1 401 Unauthorized");
@@ -19,6 +12,12 @@ if(array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' == $_S
 }
 $_SESSION['login'] = 'true';
 $_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
+
+use app\Db;
+use app\Connection;
+use app\InitDropbox;
+
+require_once __DIR__ . '/vendor/autoload.php';
 require_once('app/Db.php');
 require_once('app/Connection.php');
 require_once('app/InitDropbox.php');

@@ -1,6 +1,8 @@
 <?php
 namespace app;
 
+require_once 'TokenRefresher.php';
+
 use \Exception;
 use Spatie\Dropbox\Client;
 
