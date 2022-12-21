@@ -9,6 +9,24 @@ use Spatie\Dropbox\Client;
 
 $client = initDropbox();
 $list = getRecursiveList($client);
+/*
+foreach ($list as $fileEntry) {
+    switch ($fileEntry['.tag']) {
+        case 'folder';
+            echo "Folder: {$fileEntry['name']}\n";
+            break;
+
+        case 'file':
+            echo "File: {$fileEntry['name']}\n";
+
+            break;
+
+        default:
+            Db::adminDebug('Unknown value for $fileEntry[.tag]', $fileEntry);
+            break;
+    }
+}
+*/
 var_export($list);
 
 function initDropbox() {
@@ -37,7 +55,7 @@ function getRecursiveList(Client $client): array {
         while (array_key_exists('has_more', $list) && $list['has_more'] && $cursor) {
             $list = $client->listFolderContinue($cursor);
             if (array_key_exists('entries', $list)) {
-                $result []= $list['entries'];
+                $result = array_merge($result, $list['entries']);
                 $result['iterations'] ++;
             }
         }
