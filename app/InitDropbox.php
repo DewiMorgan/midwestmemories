@@ -9,6 +9,7 @@ use Spatie\Dropbox\Client;
 class InitDropbox {
     private $client;
     public $cursor;
+    public $rootCursor;
     public $entries;
     public $iterations;
     private const DROPBOX_PATH = '/midwestmemories';
@@ -28,46 +29,69 @@ class InitDropbox {
         $this->iterations = 0;
         $this->entries = 1;
         $result = [];
+        $endTime = time() + 20;
         try {
             $list = $this->client->listFolder('', true);
-            echo "<p>";
             if (array_key_exists('entries', $list)) {
                 $this->iterations = 1;
                 $this->cursor = $list['cursor'];
                 foreach ($list['entries'] as $fileEntry) {
                     $this->entries++;
-                    if (0 === $this->entries % 100) {
-                        echo '#\n';
-                        ob_flush();
-                    }
                     if ('file' === $fileEntry['.tag'] && preg_match('#^/midwestmemories/#', $fileEntry['path_lower'])) {
                         $result []= $fileEntry['path_display'];
                     }
                 }
             }
-            while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor) {
+            while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
                 $list = $this->client->listFolderContinue($this->cursor);
                 $this->cursor = $list['cursor'];
                 $this->iterations ++;
                 if (array_key_exists('entries', $list)) {
                     foreach ($list['entries'] as $fileEntry) {
-                        $this->entries++;
-                        if (0 === $this->entries % 100) {
-                            echo '#\n';
-                            ob_flush();
-                        }
+                        $this->entries ++;
                         if ('file' === $fileEntry['.tag'] && preg_match('#^/midwestmemories/#', $fileEntry['path_lower'])) {
                             $result []= $fileEntry['path_display'];
                         }
                     }
                 }
             }
-            echo "</p>";
             return $result;
         } catch (Exception $e) {
             die(var_export($e));
         }
     }
+
+    /**
+     * Get the recursive list of all files for this website. Might be LONG.
+     * @return string of file details.
+     */
+    function continueRootCursor($cursor, $entriesSoFar): array {
+        $this->iterations = 0;
+        $this->entries = $entriesSoFar;
+        $this->cursor = $cursor;
+        $result = [];
+        $endTime = time() + 20;
+        try {
+            $list = ['has_more' => true];
+            while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
+                $list = $this->client->listFolderContinue($this->cursor);
+                $this->cursor = $list['cursor'];
+                $this->iterations ++;
+                if (array_key_exists('entries', $list)) {
+                    foreach ($list['entries'] as $fileEntry) {
+                        $this->entries ++;
+                        if ('file' === $fileEntry['.tag'] && preg_match('#^/midwestmemories/#', $fileEntry['path_lower'])) {
+                            $result []= $fileEntry['path_display'];
+                        }
+                    }
+                }
+            }
+            return $result;
+        } catch (Exception $e) {
+            die(var_export($e));
+        }
+    }
+
 
     /**
      * Get the recursive list of all files for this website. Might be LONG.
