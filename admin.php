@@ -62,7 +62,7 @@ $db->sqlExec(
 
     ?>
         <form method="post">
-            <input type="text" name="cursor" value="<?php echo "$cursor"; ?>"></input>
+            <input type="text" name="cursor" value="<?=htmlspecialchars($cursor)?>"></input>
             <button type="submit">Full List</button>
         </form>
         <form method="post">
