@@ -9,6 +9,7 @@ use Spatie\Dropbox\Client;
 class InitDropbox {
     private $client;
     public $cursor;
+    public $entries;
     public $iterations;
     private const DROPBOX_PATH = '/midwestmemories';
 
@@ -25,6 +26,7 @@ class InitDropbox {
      */
     function initRootCursor(): array {
         $this->iterations = 0;
+        $this->entries = 1;
         $result = [];
         try {
             $list = $this->client->listFolder(self::DROPBOX_PATH, true);
@@ -32,6 +34,7 @@ class InitDropbox {
                 $this->iterations = 1;
                 $this->cursor = $list['cursor'];
                 foreach ($list['entries'] as $fileEntry) {
+                    $this->entries++;
                     if ('file' === $fileEntry['.tag'] && preg_match('/^[\\/]?midwestmemories/', $fileEntry['path_lower'])) {
                         $result []= $fileEntry['path_lower'] . ':' . $fileEntry['name'];
                     }
@@ -43,6 +46,7 @@ class InitDropbox {
                 $this->iterations ++;
                 if (array_key_exists('entries', $list)) {
                     foreach ($list['entries'] as $fileEntry) {
+                        $this->entries++;
                         if ('file' === $fileEntry['.tag'] && preg_match('/^[\\/]?midwestmemories/', $fileEntry['path_lower'])) {
                             $result []= $fileEntry['path_lower'] . ':' . $fileEntry['name'];
                         }

@@ -40,7 +40,7 @@ $db->sqlExec(
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="icon" href ="/favicon.ico">
     <link rel="manifest" href="/site.webmanifest">
-    <title>Midwest Memories</title>
+    <title>Admin: Midwest Memories</title>
     <meta charset="UTF-8">
   </head>
   <body>
@@ -62,6 +62,7 @@ $db->sqlExec(
     }
     $cursor = $fp->cursor ?? $cursor;
     echo "<p>Finished reading. Cursor reassigned to '$cursor'.</p>";
+    echo "<p>Finished reading. Cursor reassigned to '$cursor'. Iterations: {$fp->iterations}. Entries: {$fp->entries}.</p>";
     echo "<pre>" . var_export($list, true) . "</pre>";
     ?>
         <form method="post">
