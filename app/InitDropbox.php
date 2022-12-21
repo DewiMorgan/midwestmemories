@@ -23,6 +23,42 @@ class InitDropbox {
      * Get the recursive list of all files for this website. Might be LONG.
      * @return string of file details.
      */
+    function initRootCursor(): array {
+        $this->iterations = 0;
+        $result = [];
+        try {
+            $list = $this->client->listFolder(self::DROPBOX_PATH, true);
+            if (array_key_exists('entries', $list)) {
+                $this->iterations = 1;
+                $this->cursor = $list['cursor'];
+                foreach ($list['entries'] as $fileEntry) {
+                    if ('file' === $fileEntry['.tag'] && preg_match('/^[\\/]?midwestmemories/', $fileEntry['path_lower'])) {
+                        $result []= $fileEntry['path_lower'] . ':' . $fileEntry['name'];
+                    }
+                }
+            }
+            while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor) {
+                $list = $this->client->listFolderContinue($this->cursor);
+                $this->cursor = $list['cursor'];
+                $this->iterations ++;
+                if (array_key_exists('entries', $list)) {
+                    foreach ($list['entries'] as $fileEntry) {
+                        if ('file' === $fileEntry['.tag'] && preg_match('/^[\\/]?midwestmemories/', $fileEntry['path_lower'])) {
+                            $result []= $fileEntry['path_lower'] . ':' . $fileEntry['name'];
+                        }
+                    }
+                }
+            }
+            return $result;
+        } catch (Exception $e) {
+            die(var_export($e));
+        }
+    }
+
+    /**
+     * Get the recursive list of all files for this website. Might be LONG.
+     * @return string of file details.
+     */
     function getRecursiveList(): array {
         $this->iterations = 0;
         try {

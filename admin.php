@@ -47,20 +47,22 @@ $db->sqlExec(
     <h1>Midwest Memories - admin</h1>
     <?php
     $cursor = $_REQUEST['cursor'] ?? null;
+    $initRoot = $_REQUEST['initroot'] ?? false;
     echo "<p>Starting. Cursor='$cursor', Request=".var_export($_REQUEST,true)."</p>";
     $fp = new InitDropbox();
     if ($cursor) {
         echo "<h2>Updates from cursor</h2>\n";
         $list = $fp->getUpdates($cursor);
+    } elseif($initRoot) {
+        echo "<h2>Initialize root cursor</h2>\n";
+        $list = $fp->initRootCursor($cursor);
     } else {
         echo "<h2>Full List</h2>\n";
         $list = $fp->getRecursiveList();
     }
     $cursor = $fp->cursor ?? $cursor;
     echo "<p>Finished reading. Cursor reassigned to '$cursor'.</p>";
-
     echo "<pre>" . var_export($list, true) . "</pre>";
-
     ?>
         <form method="post">
             <input type="text" name="cursor" value="<?=htmlspecialchars($cursor)?>"></input>
@@ -68,6 +70,10 @@ $db->sqlExec(
         </form>
         <form method="post">
             <button type="submit">Full List</button>
+        </form>
+        <form method="post">
+            <input type="text" name="initroot" value="1"></input>
+            <button type="submit">Initialize root cursor</button>
         </form>
   </body>
 </html>
