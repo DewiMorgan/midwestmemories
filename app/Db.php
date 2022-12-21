@@ -1,7 +1,12 @@
 <?php
+namespace app;
+
+use \mysqli;
+use Exception;
+
 class Db {
     private $db;
-    
+
     function __construct() {
         try {
             require_once('.dblocal.php');
@@ -78,7 +83,7 @@ class Db {
             self::adminDebug('get_result failed, qerr', $query->error);
             return [];
         }
-        
+
         $row = $result->fetch_assoc();
         $result->free();
         self::adminDebug('sqlGetRow success', $row);

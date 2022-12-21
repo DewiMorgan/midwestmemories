@@ -1,4 +1,5 @@
 <?php
+namespace app;
 
 use GuzzleHttp\Client as HttpClient;
 use Spatie\Dropbox\TokenProvider;

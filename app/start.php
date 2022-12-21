@@ -1,12 +1,16 @@
 <?php
+namespace app;
 
 require __DIR__ . '/../vendor/autoload.php';
 require 'TokenRefresher.php';
 
+use \Exception;
+use Spatie\Dropbox\Client;
+
 $tokenRefresher = new TokenRefresher();
 $token = $tokenRefresher->getToken();
 
-$client = new Spatie\Dropbox\Client($token);
+$client = new Client($token);
 
 try {
     $list = $client->listFolder('/midwestmemories', false);

@@ -1,4 +1,6 @@
 <?php
+namespace app;
+
 // ToDo:
 // isBot to use BotSign table.
 // Do something with the ipLookup table.
@@ -19,15 +21,15 @@ class Connection {
         if (!empty($_SERVER['REQUEST_URI'])) {
             $this->request = $_SERVER['REQUEST_URI'];
         }
-        
+
         // $date.
         $this->date = gmdate('c');
 
-        // $ip (set by fn) and $ipList.        
+        // $ip (set by fn) and $ipList.
         $ips = $this->getIpData();
         $this->ipList = implode(',', $ips);
 
-        // $agent.    
+        // $agent.
         if (!empty($_SERVER['HTTP_USER_AGENT'])) {
             $this->agent .= 'agent:' . $_SERVER['HTTP_USER_AGENT'] . ', ';
         }
@@ -44,7 +46,7 @@ class Connection {
         if (empty($this->agent)) {
             $this->agent = '?';
         }
-    
+
         // $user, $isAdmin and $isBot
         if (preg_match('/facebookexternalhit/', $this->agent)) {
             $this->user .= 'bot:facebook,';
@@ -83,7 +85,7 @@ class Connection {
         global $db;
         return $db->sqlGetRow('SELECT `id`, `target` FROM snoopy_links WHERE deleted=false and alias=?', 's', $aliasName);
     }
-   
+
     /**
     * Extract all possible IP addresses, given many possible proxy headers.
     * The first one is taken as the "most valid" one, so they should probably be ordered from best to worst.
@@ -115,7 +117,7 @@ class Connection {
         }
         return array_keys($ipArray);
     }
- 
+
     /**
     * Ensures an IP address is both a valid IP address and does not fall within
     * a private network range.
@@ -125,14 +127,14 @@ class Connection {
     private function validate_public_ip($ip) {
         return filter_var(
             $ip,
-            FILTER_VALIDATE_IP, 
-            FILTER_FLAG_IPV4 | 
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_IPV4 |
             FILTER_FLAG_IPV6 |
-            FILTER_FLAG_NO_PRIV_RANGE | 
+            FILTER_FLAG_NO_PRIV_RANGE |
             FILTER_FLAG_NO_RES_RANGE
         );
     }
-    
+
     /** Just check that an IP address really is one.
     * @param string $ip The ip unmber to check.
     * @return bool True if the IP is a valid IP.
@@ -140,8 +142,8 @@ class Connection {
     private function validate_ip($ip) {
         return filter_var(
             $ip,
-            FILTER_VALIDATE_IP, 
-            FILTER_FLAG_IPV4 | 
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_IPV4 |
             FILTER_FLAG_IPV6
         );
     }
@@ -161,7 +163,7 @@ class Connection {
             'isAdmin' => $this->isAdmin,
         ], true);
     }
-    
+
     // Function to normalize IPv4 and IPv6 addresses with port
     function normalize_ip($ip){
         if (strpos($ip, ':') !== false && substr_count($ip, '.') == 3 && strpos($ip, '[') === false){

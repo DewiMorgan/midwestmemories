@@ -1,5 +1,9 @@
 <?php
+date_default_timezone_set("US/Central");
 session_start();
+use app\Db;
+use app\Connection;
+
 // Handle logouts.
 if(array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' == $_SESSION['login']){
     header("HTTP/1.1 401 Unauthorized");
@@ -10,8 +14,8 @@ if(array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' == $_S
 }
 $_SESSION['login'] = 'true';
 $_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
-require_once('db.php');
-require_once('connection.php');
+require_once('app/db.php');
+require_once('app/connection.php');
 $db = new Db();
 $connection = new Connection();
 
