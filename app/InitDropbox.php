@@ -30,6 +30,7 @@ class InitDropbox {
         $result = [];
         try {
             $list = $this->client->listFolder('', true);
+            echo "<p>"
             if (array_key_exists('entries', $list)) {
                 $this->iterations = 1;
                 $this->cursor = $list['cursor'];
@@ -37,6 +38,10 @@ class InitDropbox {
                     $this->entries++;
                     if ('file' === $fileEntry['.tag'] && preg_match('#^/midwestmemories/#', $fileEntry['path_lower'])) {
                         $result []= $fileEntry['path_display'];
+                    }
+                    if (0 === $this->entries % 100) {
+                        echo '#\n';
+                        ob_flush();
                     }
                 }
             }
@@ -53,6 +58,7 @@ class InitDropbox {
                     }
                 }
             }
+            echo "</p>";
             return $result;
         } catch (Exception $e) {
             die(var_export($e));
