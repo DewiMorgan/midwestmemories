@@ -40,11 +40,25 @@ $db->sqlExec(
   </head>
   <body>
     <h1>Midwest Memories - admin</h1>
+    <pre>
     <?php
-        echo "<pre>\n";
-        require 'app/start.php';
-        echo "</pre>\n";
+    global $client;
+    require 'app/start.php';
+    $cursor = $_REQUEST['cursor'] ?? null;
+    if ($cursor) {
+        $list = getUpdates($client, $cursor);
+    } else {
+        $list = getRecursiveList($client);
+    }
+    var_export($list);
     ?>
+    </pre>
+        <form method="post">
+            <input type="text" name="cursor" value="<?php echo "$cursor"; ?>"></input>
+            <button type="submit">Full List</button>
+        </form>
+        <form method="post">
+            <button type="submit">Updates Only</button>
+        </form>
   </body>
 </html>
-

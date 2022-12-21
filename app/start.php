@@ -8,7 +8,7 @@ use \Exception;
 use Spatie\Dropbox\Client;
 
 $client = initDropbox();
-$list = getRecursiveList($client);
+//$list = getRecursiveList($client);
 /*
 foreach ($list as $fileEntry) {
     switch ($fileEntry['.tag']) {
@@ -27,7 +27,7 @@ foreach ($list as $fileEntry) {
     }
 }
 */
-var_export($list);
+//var_export($list);
 
 function initDropbox() {
     $tokenRefresher = new TokenRefresher();
@@ -53,13 +53,38 @@ function getRecursiveList(Client $client): array {
         }
         while (array_key_exists('has_more', $list) && $list['has_more'] && $result['cursor']) {
             $list = $client->listFolderContinue($result['cursor']);
+            $result['cursor'] = $list['cursor'];
             if (array_key_exists('entries', $list)) {
                 $result = array_merge($result, $list['entries']);
                 $result['iterations'] ++;
             }
         }
+        return $result;
     } catch (Exception $e) {
         die(var_export($e));
     }
-    return $result;
+}
+
+/**
+ * Get the recursive list of all files for this website. Might be LONG.
+ * @param Client $client
+ * @param string $cursor The cursor that we want to get updates relative to.
+ * @return string of file details.
+ */
+function getUpdates(Client $client, string $cursor): array {
+    try {
+        $result = ['iterations' => 0, 'cursor' => $cursor];
+        $list = ['has_more' => true];
+        while (array_key_exists('has_more', $list) && $list['has_more'] && $result['cursor']) {
+            $list = $client->listFolderContinue($result['cursor']);
+            $result['cursor'] = $list['cursor'];
+            if (array_key_exists('entries', $list)) {
+                $result = array_merge($result, $list['entries']);
+                $result['iterations'] ++;
+            }
+        }
+        return $result;
+    } catch (Exception $e) {
+        die(var_export($e));
+    }
 }
