@@ -1,6 +1,10 @@
 <?php
 date_default_timezone_set("US/Central");
 session_start();
+
+require __DIR__ . '/../vendor/autoload.php';
+require 'TokenRefresher.php';
+
 use app\Db;
 use app\Connection;
 use app\InitDropbox;
@@ -17,6 +21,7 @@ $_SESSION['login'] = 'true';
 $_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
 require_once('app/Db.php');
 require_once('app/Connection.php');
+require_once('app/InitDropbox.php');
 $db = new Db();
 $connection = new Connection();
 

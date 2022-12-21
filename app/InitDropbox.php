@@ -1,9 +1,6 @@
 <?php
 namespace app;
 
-require __DIR__ . '/../vendor/autoload.php';
-require 'TokenRefresher.php';
-
 use \Exception;
 use Spatie\Dropbox\Client;
 
