@@ -50,10 +50,10 @@ $db->sqlExec(
     $cursor = $_REQUEST['cursor'] ?? null;
     $fp = new InitDropbox();
     if ($cursor) {
-        echo "<h2>Updates from cursor</h2>\n<pre>";
+        echo "<h2>Updates from cursor</h2>\n";
         $list = $fp->getUpdates($client, $cursor);
     } else {
-        echo "<h2>Full List</h2>\n<pre>";
+        echo "<h2>Full List</h2>\n";
         $list = $fp->getRecursiveList($client);
     }
     $cursor = $fp->cursor ?? $cursor;
