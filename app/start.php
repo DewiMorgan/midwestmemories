@@ -26,14 +26,21 @@ function initDropbox() {
  */
 function getRecursiveList(Client $client): array {
     $result = ['iterations' => 0];
+    $cursor = '';
     try {
         $list = ['has_more' => true];
-        while (array_key_exists('has_more', $list) && $list['has_more']) {
-            $list = $client->listFolder('/midwestmemories', true);
+        $list = $client->listFolder('/midwestmemories', true);
+        if (array_key_exists('entries', $list)) {
+            $result []= $list['entries'];
+            $result['iterations'] ++;
+            $cursor = $list['cursor'];
+        }
+        while (array_key_exists('has_more', $list) && $list['has_more'] && $cursor) {
+            $list = $client->listFolderContinue($cursor);
             if (array_key_exists('entries', $list)) {
                 $result []= $list['entries'];
+                $result['iterations'] ++;
             }
-            $result['iterations'] ++;
         }
     } catch (Exception $e) {
         die(var_export($e));
