@@ -8,8 +8,8 @@ use Spatie\Dropbox\Client;
 
 class InitDropbox {
     private $client;
-    private $cursor;
-    private $iterations;
+    public $cursor;
+    public $iterations;
     private const DROPBOX_PATH = '/midwestmemories';
 
     public function __construct() {
