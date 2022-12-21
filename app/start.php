@@ -43,17 +43,16 @@ function initDropbox() {
  * @return string of file details.
  */
 function getRecursiveList(Client $client): array {
-    $result = ['iterations' => 0];
-    $cursor = '';
     try {
+        $cursor = '';
         $list = $client->listFolder('/midwestmemories', true);
         if (array_key_exists('entries', $list)) {
-            $result []= $list['entries'];
-            $result['iterations'] ++;
-            $cursor = $list['cursor'];
+            $result = $list['entries'];
+            $result['iterations'] = 1;
+            $result['cursor'] = $list['cursor'];
         }
-        while (array_key_exists('has_more', $list) && $list['has_more'] && $cursor) {
-            $list = $client->listFolderContinue($cursor);
+        while (array_key_exists('has_more', $list) && $list['has_more'] && $result['cursor']) {
+            $list = $client->listFolderContinue($result['cursor']);
             if (array_key_exists('entries', $list)) {
                 $result = array_merge($result, $list['entries']);
                 $result['iterations'] ++;
