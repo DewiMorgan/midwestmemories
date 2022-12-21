@@ -8,7 +8,7 @@ use \Exception;
 use Spatie\Dropbox\Client;
 
 $client = initDropbox();
-$list = getRecursiveList($cient);
+$list = getRecursiveList($client);
 var_export($list);
 
 function initDropbox() {
