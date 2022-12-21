@@ -61,7 +61,6 @@ $db->sqlExec(
         $list = $fp->getRecursiveList();
     }
     $cursor = $fp->cursor ?? $cursor;
-    echo "<p>Finished reading. Cursor reassigned to '$cursor'.</p>";
     echo "<p>Finished reading. Cursor reassigned to '$cursor'. Iterations: {$fp->iterations}. Entries: {$fp->entries}.</p>";
     echo "<pre>" . var_export($list, true) . "</pre>";
     ?>
