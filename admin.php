@@ -63,10 +63,10 @@ $db->sqlExec(
     ?>
         <form method="post">
             <input type="text" name="cursor" value="<?=htmlspecialchars($cursor)?>"></input>
-            <button type="submit">Full List</button>
+            <button type="submit">Updates Only</button>
         </form>
         <form method="post">
-            <button type="submit">Updates Only</button>
+            <button type="submit">Full List</button>
         </form>
   </body>
 </html>
