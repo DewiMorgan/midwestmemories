@@ -14,8 +14,8 @@ if(array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' == $_S
 }
 $_SESSION['login'] = 'true';
 $_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
-require_once('app/db.php');
-require_once('app/connection.php');
+require_once('app/Db.php');
+require_once('app/Connection.php');
 $db = new Db();
 $connection = new Connection();
 
