@@ -48,6 +48,8 @@ $db->sqlExec(
     <?php
     $cursor = $_REQUEST['cursor'] ?? null;
     $initRoot = $_REQUEST['initroot'] ?? false;
+    $continueRoot = $_REQUEST['continueroot'] ?? false;
+    $entriessofar = $_REQUEST['entriessofar'] ?? 0;
     echo "<p>Starting. Cursor='$cursor', Request=".var_export($_REQUEST,true)."</p>";
     $fp = new InitDropbox();
     if ($cursor) {
@@ -55,7 +57,10 @@ $db->sqlExec(
         $list = $fp->getUpdates($cursor);
     } elseif($initRoot) {
         echo "<h2>Initialize root cursor</h2>\n";
-        $list = $fp->initRootCursor($cursor);
+        $list = $fp->initRootCursor();
+    } elseif($continueRoot) {
+        echo "<h2>Continuing with the root cursor</h2>\n";
+        $list = $fp->continueRootCursor($cursor, $entriessofar);
     } else {
         echo "<h2>Full List</h2>\n";
         $list = $fp->getRecursiveList();
@@ -78,7 +83,7 @@ $db->sqlExec(
         </form><br>
         <form method="post">
             <input type="text" name="entriessofar" value="<?=htmlspecialchars($entriessofar)?>"></input>
-            <input type="text" name="initroot" value="1"></input>
+            <input type="text" name="continueroot" value="<?=htmlspecialchars($cursor)?>"></input>
             <button type="submit">Continue root cursor</button>
         </form>
   </body>
