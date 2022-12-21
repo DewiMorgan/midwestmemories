@@ -48,6 +48,7 @@ $db->sqlExec(
     <?php
     global $client;
     $cursor = $_REQUEST['cursor'] ?? null;
+    echo "<p>Starting. Cursor='$cursor', Request=".var_export($_REQUEST,true)."</p>";
     $fp = new InitDropbox();
     if ($cursor) {
         echo "<h2>Updates from cursor</h2>\n";
@@ -57,6 +58,7 @@ $db->sqlExec(
         $list = $fp->getRecursiveList($client);
     }
     $cursor = $fp->cursor ?? $cursor;
+    echo "<p>Finished reading. Cursor reassigned to '$cursor'.</p>";
 
     echo "<pre>" . var_export($list, true) . "</pre>";
 
