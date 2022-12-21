@@ -9,7 +9,7 @@ class Db {
 
     function __construct() {
         try {
-            require_once('.dblocal.php');
+            require_once('DbAuth.php');
             $this->db = new mysqli(DbAuth::DB_HOST, DbAuth::DB_NAME, DbAuth::DB_USER, DbAuth::DB_PASS, DbAuth::DB_PORT);
         }
         catch (Exception $e) {
