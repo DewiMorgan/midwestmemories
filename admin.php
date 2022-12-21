@@ -46,16 +46,15 @@ $db->sqlExec(
   <body>
     <h1>Midwest Memories - admin</h1>
     <?php
-    global $client;
     $cursor = $_REQUEST['cursor'] ?? null;
     echo "<p>Starting. Cursor='$cursor', Request=".var_export($_REQUEST,true)."</p>";
     $fp = new InitDropbox();
     if ($cursor) {
         echo "<h2>Updates from cursor</h2>\n";
-        $list = $fp->getUpdates($client, $cursor);
+        $list = $fp->getUpdates($cursor);
     } else {
         echo "<h2>Full List</h2>\n";
-        $list = $fp->getRecursiveList($client);
+        $list = $fp->getRecursiveList();
     }
     $cursor = $fp->cursor ?? $cursor;
     echo "<p>Finished reading. Cursor reassigned to '$cursor'.</p>";
