@@ -20,7 +20,7 @@ function initDropbox() {
 }
 
 /**
- * Get the list of all files for this website. Might be LONG.
+ * Get the recursive list of all files for this website. Might be LONG.
  * @param Client $client
  * @return string of file details.
  */
@@ -28,7 +28,6 @@ function getRecursiveList(Client $client): array {
     $result = ['iterations' => 0];
     $cursor = '';
     try {
-        $list = ['has_more' => true];
         $list = $client->listFolder('/midwestmemories', true);
         if (array_key_exists('entries', $list)) {
             $result []= $list['entries'];
