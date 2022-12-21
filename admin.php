@@ -3,6 +3,7 @@ date_default_timezone_set("US/Central");
 session_start();
 use app\Db;
 use app\Connection;
+use app\InitDropbox;
 
 // Handle logouts.
 if(array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' == $_SESSION['login']){
@@ -43,12 +44,12 @@ $db->sqlExec(
     <pre>
     <?php
     global $client;
-    require 'app/start.php';
     $cursor = $_REQUEST['cursor'] ?? null;
+    $fp = new InitDropbox();
     if ($cursor) {
-        $list = getUpdates($client, $cursor);
+        $list = $fp->getUpdates($client, $cursor);
     } else {
-        $list = getRecursiveList($client);
+        $list = $fp->getRecursiveList($client);
     }
     var_export($list);
     ?>
