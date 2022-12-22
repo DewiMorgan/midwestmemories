@@ -81,9 +81,9 @@ class InitDropbox {
         if (array_key_exists('entries', $list)) {
             foreach ($list['entries'] as $fileEntry) {
                 $this->entries++;
-                if (preg_match('#^/midwestmemories/#', $fileEntry['path_lower'])) {
+//                if (preg_match('#^/midwestmemories/#', $fileEntry['path_lower'])) {
                     $result []= $fileEntry;
-                }
+//                }
             }
         }
         return $result;
