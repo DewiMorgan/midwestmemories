@@ -152,7 +152,7 @@ echo "<p>Directory $dir already exists in $cwd.<br>\n";
 echo "<p>Calling download API.<br>\n";
             $file = $this->client->download($entry['full_path']);
             //Save file contents to disk
-            $fileContents = $file->getContents()
+            $fileContents = $file->getContents();
 echo "<p>Read file contents:<br><pre>" . var_export($fileContents, true) . "</pre><br>\n";
 echo "<p>Saving file contents to {$entry['full_path']}.<br>\n";
             $result = file_put_contents($entry['full_path'], $fileContents);
