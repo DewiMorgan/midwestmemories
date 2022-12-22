@@ -124,23 +124,43 @@ class DropboxManager {
 
     public function processFilesFromDb(): void {
         $endTime = time() + 20;
+        $cwd = getcwd();
+echo "<p>Starting to process files. Endtime set to:$endTime, running in $cwd.<br>\n";
         $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue`");
+echo "<p>Obtained list from database:<br><pre>" . var_export($list, true) . "</pre><br>\n";
         foreach ($list as $entry) {
             // Drop out early if we hit the time limit.
             if (time() < $endTime) {
+echo "<p>$endTime has passed, at " . time() . "<br>\n";
                 return;
             }
+echo "<p>Not yet at timeout of $endTime, only at " . time() . "<br>\n";
             // If the dir doesn't exist, then create it.
             $dir = dirname($entry['full_path']);
+echo "<p>Extracted directory name '$dir' from full path '{$entry['full_path']}'.<br>\n";
             if (!dir_exist($dir)) {
-                mkdir($dir, 0700, true);
+echo "<p>It didn't exist: creating it.<br>\n";
+                if (mkdir($dir, 0700, true)) {
+echo "<p>Successfully created $dir in $cwd.<br>\n";
+                } else {
+echo "<p>Failed to create the folder $dir in $cwd.<br>\n";
+                }
+            } else {
+echo "<p>Directory $dir already exists in $cwd.<br>\n";
             }
             // Download the file from Dropbox. If it already exists, it might've been edited, so we get it anyway.
+echo "<p>Calling download API.<br>\n";
             $file = $this->client->download($entry['full_path']);
             //Save file contents to disk
-            file_put_contents($entry['full_path'], $file->getContents());
+            $fileContents = $file->getContents()
+echo "<p>Read file contents:<br><pre>" . var_export($fileContents, true) . "</pre><br>\n";
+echo "<p>Saving file contents to {$entry['full_path']}.<br>\n";
+            $result = file_put_contents($entry['full_path'], $fileContents);
+echo "<p>Got result '" . var_export($result, true) . "'.<br>\n";
+echo "<p>Saving file metadata to {$entry['full_path']}.txt.<br>\n";
             //Save File Metadata
             file_put_contents($entry['full_path'].".txt", $file->getMetadata());
+echo "<p>Got result '" . var_export($result, true) . "'.<br>\n";
         }
     }
 
