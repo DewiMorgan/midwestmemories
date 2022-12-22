@@ -12,7 +12,7 @@ class InitDropbox {
     public $entries;
     public $iterations;
     private const DROPBOX_PATH = '/midwestmemories';
-    private const DROPBOX_USER_ID = '';
+    private const DROPBOX_USER_ID = 16181197;
 
     public function __construct() {
         $tokenRefresher = new TokenRefresher();
@@ -106,7 +106,7 @@ class InitDropbox {
     function saveCursor(): void {
         $m_userid = Db::escape(self::DROPBOX_USER_ID);
         $m_cursor = Db::escape($this->cursor);
-        Db::sqlExec("INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`) VALUES ('$m_userid', '$m_cursor') ON DUPLICATE KEY UPDATE `cursor_id` = '$m_cursor'");
+        Db::sqlExec("INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `cursor_id` = ?", 'dss', '$m_userid', '$m_cursor', '$m_cursor');
     }
 
     /** Load the current cursor from the DB. */

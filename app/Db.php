@@ -34,7 +34,9 @@ class Db {
         self::adminDebug('sqlExec', $sql);
         $db = self::getInstance()->db;
         if ($query = $db->prepare($sql)) {
-            call_user_func_array(array($query, "bind_param"), self::mkRefArray($items));
+            if (!empty($items)) {
+                call_user_func_array(array($query, "bind_param"), self::mkRefArray($items));
+            }
             $query->execute();
         }
     }
