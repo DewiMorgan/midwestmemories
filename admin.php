@@ -57,7 +57,7 @@ Db::sqlExec(
         $list = $fp->initRootCursor();
     } elseif($continueRoot) {
         echo "<h2>Continuing with the root cursor</h2>\n";
-        $list = $fp->continueRootCursor($cursor, $entriessofar);
+        $list = $fp->continueRootCursor($entriessofar);
     } else {
         echo "<h2>No command yet given.</h2>\n";
     }
