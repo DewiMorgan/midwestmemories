@@ -130,7 +130,7 @@ echo "<p>Starting to process files. Endtime set to:$endTime, running in $cwd.<br
 echo "<p>Obtained list from database:<br><pre>" . var_export($list, true) . "</pre><br>\n";
         foreach ($list as $entry) {
             // Drop out early if we hit the time limit.
-            if (time() < $endTime) {
+            if (time() > $endTime) {
 echo "<p>$endTime has passed, at " . time() . "<br>\n";
                 return;
             }
