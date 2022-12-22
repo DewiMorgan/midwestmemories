@@ -26,12 +26,14 @@ class Db {
             exit;
         }
         if (!$this->db) {
-            exit("DB is empty: " . var_export(self::$instance->db, true));
+            exit("DB is empty: " . var_export($this->db, true));
         }
     }
 
     public static function sqlExec($sql, string ...$items) {
-        if ($query = self::$instance->db->prepare($sql)) {
+        self::adminDebug('sqlExec', $sql);
+        $db = self::getInstance()->db;
+        if ($query = $db->prepare($sql)) {
             call_user_func_array(array($query, "bind_param"), self::mkRefArray($items));
             $query->execute();
         }
@@ -40,27 +42,28 @@ class Db {
     // Return the requested item or null.
     public static function sqlGetItem($sql, $field, string ...$items) {
         self::adminDebug('sqlGetItem', $sql);
-        if (!($query = self::$instance->db->prepare($sql))) {
-            self::adminDebug('prepare failed, dberr', self::$instance->db->error);
+        $db = self::getInstance()->db;
+        if (!($query = $db->prepare($sql))) {
+            self::adminDebug('prepare failed, dberr', $db->error);
             return null;
         }
         if (!call_user_func_array(array($query, "bind_param"), self::mkRefArray($items))) {
-            self::adminDebug('bind_param failed, dberr', self::$instance->db->error);
+            self::adminDebug('bind_param failed, dberr', $db->error);
             self::adminDebug('bind_param failed, qerr', $query->error);
             return null;
         }
         if (!$query->execute()) {
-            self::adminDebug('execute failed, dberr', self::$instance->db->error);
+            self::adminDebug('execute failed, dberr', $db->error);
             self::adminDebug('execute failed, qerr', $query->error);
             return null;
         }
         if (!($result = $query->get_result())) {
-            self::adminDebug('get_result failed, dberr', self::$instance->db->error);
+            self::adminDebug('get_result failed, dberr', $db->error);
             self::adminDebug('get_result failed, qerr', $query->error);
             return [];
         }
         if (!($row = $result->fetch_assoc())) {
-            self::adminDebug('fetch_assoc failed, dberr', self::$instance->db->error);
+            self::adminDebug('fetch_assoc failed, dberr', $db->error);
             self::adminDebug('fetch_assoc failed, qerr', $query->error);
             self::adminDebug('fetch_assoc failed, rerr', $result->error);
             $result->free();
@@ -74,22 +77,23 @@ class Db {
 
     public static function sqlGetRow($sql, string ...$items) {
         self::adminDebug('sqlGetRow', $sql);
-        if (!($query = self::$instance->db->prepare($sql))) {
-            self::adminDebug('prepare failed, dberr', self::$instance->db->error);
+        $db = self::getInstance()->db;
+        if (!($query = $db->prepare($sql))) {
+            self::adminDebug('prepare failed, dberr', $db->error);
             return [];
         }
         if (!call_user_func_array(array($query, "bind_param"), self::mkRefArray($items))) {
-            self::adminDebug('bind_param failed, dberr', self::$instance->db->error);
+            self::adminDebug('bind_param failed, dberr', $db->error);
             self::adminDebug('bind_param failed, qerr', $query->error);
             return [];
         }
         if (!$query->execute()) {
-            self::adminDebug('execute failed, dberr', self::$instance->db->error);
+            self::adminDebug('execute failed, dberr', $db->error);
             self::adminDebug('execute failed, qerr', $query->error);
             return [];
         }
         if (!($result = $query->get_result())) {
-            self::adminDebug('get_result failed, dberr', self::$instance->db->error);
+            self::adminDebug('get_result failed, dberr', $db->error);
             self::adminDebug('get_result failed, qerr', $query->error);
             return [];
         }
@@ -102,7 +106,8 @@ class Db {
 
     public static function sqlGetTable($sql, string ...$items) {
         self::adminDebug('sqlGetTable', $sql);
-        if ($result = self::$instance->db->query($sql)) {
+        $db = self::getInstance()->db;
+        if ($result = $db->query($sql)) {
             $table = [];
             while ($row = $result->fetch_assoc()) {
                 $table []= $row;
@@ -110,7 +115,7 @@ class Db {
             $result->free();
             return $table;
         } else {
-            self::adminDebug('query failed, dberr', self::$instance->db->error);
+            self::adminDebug('query failed, dberr', $db->error);
         }
         return [];
     }
@@ -148,7 +153,7 @@ class Db {
     function sqlGetTable($sql, string ...$items) {
         $query='unused';
         $result='unused';
-        if ($query = self::$instance->db->prepare($sql)) {
+        if ($query = $db->prepare($sql)) {
             if (empty($items) || call_user_func_array(array($query, "bind_param"), self::mkRefArray($items))) {
                 if ($result = $query->get_result()) {
                     $table = [];
@@ -156,26 +161,26 @@ class Db {
                         $table []= $row;
                     }
 echo "<pre>sGTable($sql):\n" . var_export($table, true) . "</pre>\n";
-echo "<pre>sGTable() dberr:\n" . var_export(self::$instance->db->error, true) . "</pre>\n";
+echo "<pre>sGTable() dberr:\n" . var_export($db->error, true) . "</pre>\n";
 echo "<pre>sGTable() qerr:\n" . var_export($query->error, true) . "</pre>\n";
 echo "<pre>sGTable() rerr:\n" . var_export($result->error, true) . "</pre>\n";
                     $result->free();
                     return $table;
                 } else {
 echo "<pre>sGTable($sql):\nget_result failed.</pre>\n";
-echo "<pre>sGTable() dberr:\n" . var_export(self::$instance->db->error, true) . "</pre>\n";
+echo "<pre>sGTable() dberr:\n" . var_export($db->error, true) . "</pre>\n";
 echo "<pre>sGTable() qerr:\n" . var_export($query->error, true) . "</pre>\n";
 echo "<pre>sGTable() rerr:\n" . var_export($result->error, true) . "</pre>\n";
                 }
             } else {
 echo "<pre>sGTable($sql):\nbind_param failed.</pre>\n";
-echo "<pre>sGTable() dberr:\n" . var_export(self::$instance->db->error, true) . "</pre>\n";
+echo "<pre>sGTable() dberr:\n" . var_export($db->error, true) . "</pre>\n";
 echo "<pre>sGTable() qerr:\n" . var_export($query->error, true) . "</pre>\n";
 echo "<pre>sGTable() rerr:\n" . var_export($result->error, true) . "</pre>\n";
             }
         } else {
 echo "<pre>sGTable($sql):\nprepare failed.</pre>\n";
-echo "<pre>sGTable() dberr:\n" . var_export(self::$instance->db->error, true) . "</pre>\n";
+echo "<pre>sGTable() dberr:\n" . var_export($db->error, true) . "</pre>\n";
 echo "<pre>sGTable() qerr:\n" . var_export($query->error, true) . "</pre>\n";
 echo "<pre>sGTable() rerr:\n" . var_export($result->error, true) . "</pre>\n";
         }
