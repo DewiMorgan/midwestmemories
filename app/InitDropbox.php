@@ -109,7 +109,7 @@ class InitDropbox {
 
     /** Load the current cursor from the DB. */
     function loadCursor(): string {
-        $this->cursor = Db::sqlGetItem("SELECT `cursor_id` FROM `midmem_dropbox_users` LIMIT 1`", 'cursor_id');
+        $this->cursor = Db::sqlGetItem("SELECT `cursor_id` FROM `midmem_dropbox_users` LIMIT 1", 'cursor_id');
     }
 
 /**
