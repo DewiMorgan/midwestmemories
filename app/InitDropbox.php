@@ -9,7 +9,7 @@ use Spatie\Dropbox\Client;
 class InitDropbox {
     private $client;
     public $cursor;
-    public $entries;
+    public $entries = 0;
     public $iterations;
     private const DROPBOX_PATH = '/midwestmemories';
     private const DROPBOX_USER_ID = 16181197;
@@ -51,9 +51,10 @@ class InitDropbox {
 
     /**
      * Get the list of updated files for the given cursor, up to a timeout.
+     * @param int $entriesSoFar How many antries have already been processed in this run of the script.
      * @return string of file details.
      */
-    function continueRootCursor($entriesSoFar): array {
+    function continueRootCursor(int $entriesSoFar): array {
         self::loadCursor();
         $this->iterations = 0;
         $this->entries = $entriesSoFar;
@@ -75,8 +76,8 @@ class InitDropbox {
 
     /**
      * Do whatever is needed with an entry within the midwestmemories subfolder.
-     * @param array result
-     * @param array list
+     * @param array $result The result to append to
+     * @param array $list The data array to pull the entries from.
      * @return array
      */
     private function handleEntries($result, $list): array {

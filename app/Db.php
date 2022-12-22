@@ -185,7 +185,7 @@ class Db {
         }
     }
 
-/* Overcomplicated, we never use params.
+/* Overcomplicated, as we never use params.
     function sqlGetTable($sql, string ...$items) {
         $query='unused';
         $result='unused';
