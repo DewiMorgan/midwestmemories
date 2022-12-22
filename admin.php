@@ -21,7 +21,6 @@ require_once __DIR__ . '/vendor/autoload.php';
 require_once('app/Db.php');
 require_once('app/Connection.php');
 require_once('app/InitDropbox.php');
-$db = new Db();
 $connection = new Connection();
 
 // Log this login.
