@@ -47,12 +47,13 @@ $db->sqlExec(
     <h1>Midwest Memories - admin</h1>
     <?php
     $cursor = $_REQUEST['cursor'] ?? null;
+    $updatesOnly = $_REQUEST['updatesonly'] ?? false;
     $initRoot = $_REQUEST['initroot'] ?? false;
     $continueRoot = $_REQUEST['continueroot'] ?? false;
     $entriessofar = $_REQUEST['entriessofar'] ?? 0;
     echo "<p>Starting. Cursor='$cursor', Request=".var_export($_REQUEST,true)."</p>";
     $fp = new InitDropbox();
-    if ($cursor) {
+    if ($updatesOnly) {
         echo "<h2>Updates from cursor</h2>\n";
         $list = $fp->getUpdates($cursor);
     } elseif($initRoot) {
@@ -71,20 +72,22 @@ $db->sqlExec(
     echo "<pre>" . var_export($list, true) . "</pre>";
     ?>
         <form method="post">
+            <input type="hidden" name="updateonly" value="1"></input>
             <input type="text" name="cursor" value="<?=htmlspecialchars($cursor)?>"></input>
             <button type="submit">Updates Only</button>
         </form><br>
         <form method="post">
+            <input type="hidden" name="fulllist" value="1"></input>
             <button type="submit">Full List</button>
         </form><br>
         <form method="post">
-            <input type="text" name="initroot" value="1"></input>
+            <input type="hidden" name="initroot" value="1"></input>
             <button type="submit">Initialize root cursor</button>
         </form><br>
         <form method="post">
             <input type="text" name="entriessofar" value="<?=htmlspecialchars($entriessofar)?>"></input>
             <input type="text" name="cursor" value="<?=htmlspecialchars($cursor)?>"></input>
-            <input type="text" name="continueroot" value="1"></input>
+            <input type="hidden" name="continueroot" value="1"></input>
             <button type="submit">Continue root cursor</button>
         </form>
   </body>
