@@ -12,7 +12,7 @@ class InitDropbox {
     public $entries;
     public $iterations;
     private const DROPBOX_PATH = '/midwestmemories';
-
+    private const DROPBOX_USER_ID = '';
     public function __construct() {
         $tokenRefresher = new TokenRefresher();
         $token = $tokenRefresher->getToken();
@@ -33,26 +33,14 @@ class InitDropbox {
             $list = $this->client->listFolder('', true);
             if (array_key_exists('entries', $list)) {
                 $this->iterations = 1;
-                $this->cursor = $list['cursor'];
-                foreach ($list['entries'] as $fileEntry) {
-                    $this->entries++;
-                    if ('file' === $fileEntry['.tag'] && preg_match('#^/midwestmemories/#', $fileEntry['path_lower'])) {
-                        $result []= $fileEntry['path_display'];
-                    }
-                }
+                $this->saveCusorFromList($list);
+                $result = $this->handleEntries($result, $list);
             }
             while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
                 $list = $this->client->listFolderContinue($this->cursor);
-                $this->cursor = $list['cursor'];
+                $this->saveCusorFromList($list);
+                $result = $this->handleEntries($result, $list);
                 $this->iterations ++;
-                if (array_key_exists('entries', $list)) {
-                    foreach ($list['entries'] as $fileEntry) {
-                        $this->entries ++;
-                        if ('file' === $fileEntry['.tag'] && preg_match('#^/midwestmemories/#', $fileEntry['path_lower'])) {
-                            $result []= $fileEntry['path_display'];
-                        }
-                    }
-                }
             }
             return $result;
         } catch (Exception $e) {
@@ -64,26 +52,19 @@ class InitDropbox {
      * Get the list of updated files for the given cursor, up to a timeout.
      * @return string of file details.
      */
-    function continueRootCursor($cursor, $entriesSoFar): array {
+    function continueRootCursor($entriesSoFar): array {
+        self::loadCursor();
         $this->iterations = 0;
         $this->entries = $entriesSoFar;
-        $this->cursor = $cursor;
         $result = [];
         $endTime = time() + 20;
         try {
             $list = ['has_more' => true];
             while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
                 $list = $this->client->listFolderContinue($this->cursor);
-                $this->cursor = $list['cursor'];
+                $this->saveCusorFromList($list);
+                $this->handleEntries($result, $list);
                 $this->iterations ++;
-                if (array_key_exists('entries', $list)) {
-                    foreach ($list['entries'] as $fileEntry) {
-                        $this->entries ++;
-                        if ('file' === $fileEntry['.tag'] && preg_match('#^/midwestmemories/#', $fileEntry['path_lower'])) {
-                            $result []= $fileEntry;
-                        }
-                    }
-                }
             }
             return $result;
         } catch (Exception $e) {
@@ -91,8 +72,47 @@ class InitDropbox {
         }
     }
 
+    /**
+     * Do whatever is needed with an entry within the midwestmemories subfolder.
+     * @param result
+     * @param list
+     */
+    private function handleEntries($result, $list) {
+        if (array_key_exists('entries', $list)) {
+            foreach ($list['entries'] as $fileEntry) {
+                $this->entries++;
+                if (preg_match('#^/midwestmemories/#', $fileEntry['path_lower'])) {
+                    $result []= $fileEntry;
+                }
+            }
+        }
+        return $result;
+    }
 
     /**
+     * Save the array elenent 'cursor', if any.
+     * @param list an array that might have an element 'cursor'.
+     */
+     private function saveCusorFromList($list) {
+        if (!empty($list['cursor']) && $this->cursor != $list['cursor']) {
+            $this->cursor = $list['cursor'];
+            self::saveCursor();
+        }
+    }
+
+    /** save the current cursor to the DB. */
+    function saveCursor() {
+        $m_userid = Db::escape(self::DROPBOX_USER_ID);
+        $m_cursor = Db::escape($this->cursor);
+        Db::sqlExec("INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`) VALUES ('$m_userid', '$m_cursor') ON DUPLICATE KEY UPDATE `cursor_id` = '$m_cursor'");
+    }
+
+    /** Load the current cursor from the DB. */
+    function loadCursor(): string {
+        $this->cursor = Db::sqlGetItem("SELECT `cursor_id` FROM `midmem_dropbox_users` LIMIT 1`", 'cursor_id');
+    }
+
+/**
      * Get the recursive list of all files for this website, up to a timeout.
      * @return string of file details.
      */

@@ -95,14 +95,6 @@ class Connection {
         }
     }
 
-    /** Get the alias information from the DB, if non-deleted.
-     * @return array[] of [$aliasId, $target], or an empty array.
-    */
-    private function getTargetDataByAlias($aliasName) {
-        global $db;
-        return $db->sqlGetRow('SELECT `id`, `target` FROM snoopy_links WHERE deleted=false and alias=?', 's', $aliasName);
-    }
-
     /**
     * Extract all possible IP addresses, given many possible proxy headers.
     * The first one is taken as the "most valid" one, so they should probably be ordered from best to worst.

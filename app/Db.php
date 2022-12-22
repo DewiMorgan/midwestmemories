@@ -7,7 +7,7 @@ use Exception;
 class Db {
     private $db;
 
-    function __construct() {
+    public function __construct() {
         try {
             require_once('DbAuth.php');
             $this->db = new mysqli(DbAuth::DB_HOST, DbAuth::DB_NAME, DbAuth::DB_USER, DbAuth::DB_PASS, DbAuth::DB_PORT);
@@ -20,7 +20,7 @@ class Db {
             exit("DB is empty: " . var_export($this->db, true));
         }
     }
-    function sqlExec($sql, string ...$items) {
+    public function sqlExec($sql, string ...$items) {
         if ($query = $this->db->prepare($sql)) {
             call_user_func_array(array($query, "bind_param"), self::mkRefArray($items));
             $query->execute();
@@ -28,7 +28,7 @@ class Db {
     }
 
     // Return the requested item or null.
-    function sqlGetItem($sql, $field, string ...$items) {
+    public function sqlGetItem($sql, $field, string ...$items) {
         self::adminDebug('sqlGetItem', $sql);
         if (!($query = $this->db->prepare($sql))) {
             self::adminDebug('prepare failed, dberr', $this->db->error);
@@ -62,7 +62,7 @@ class Db {
         return $row[$field];
     }
 
-    function sqlGetRow($sql, string ...$items) {
+    public function sqlGetRow($sql, string ...$items) {
         self::adminDebug('sqlGetRow', $sql);
         if (!($query = $this->db->prepare($sql))) {
             self::adminDebug('prepare failed, dberr', $this->db->error);
@@ -90,7 +90,7 @@ class Db {
         return $row;
     }
 
-    function sqlGetTable($sql, string ...$items) {
+    public function sqlGetTable($sql, string ...$items) {
         self::adminDebug('sqlGetTable', $sql);
         if ($result = $this->db->query($sql)) {
             $table = [];
@@ -103,6 +103,10 @@ class Db {
             self::adminDebug('query failed, dberr', $this->db->error);
         }
         return [];
+    }
+
+    public static function escape($str) {
+        return mysqli::real_escape_string($str);
     }
 
     // Sadly, bind_param expects references, which makes passing arrays harder.
