@@ -122,7 +122,7 @@ class DropboxManager {
         }
     }
 
-    private function processFilesFromDb(): void {
+    public function processFilesFromDb(): void {
         $endTime = time() + 20;
         $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue`");
         foreach ($list as $entry) {
