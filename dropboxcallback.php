@@ -78,6 +78,11 @@ function friendlyOutput($data)
 }
 
 /*
+userid
+cursor
+
+
+/*
     Full request info of the callback is (Important parts prefixed w '*'):
     === 2022-12-20 03:09:56:  ===
     REQUEST: array (

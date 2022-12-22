@@ -9,7 +9,6 @@ use Spatie\Dropbox\Client;
 class InitDropbox {
     private $client;
     public $cursor;
-    public $rootCursor;
     public $entries;
     public $iterations;
     private const DROPBOX_PATH = '/midwestmemories';
@@ -62,7 +61,7 @@ class InitDropbox {
     }
 
     /**
-     * Get the recursive list of all files for this website. Might be LONG.
+     * Get the list of updated files for the given cursor, up to a timeout.
      * @return string of file details.
      */
     function continueRootCursor($cursor, $entriesSoFar): array {
@@ -81,7 +80,7 @@ class InitDropbox {
                     foreach ($list['entries'] as $fileEntry) {
                         $this->entries ++;
                         if ('file' === $fileEntry['.tag'] && preg_match('#^/midwestmemories/#', $fileEntry['path_lower'])) {
-                            $result []= $fileEntry['path_display'];
+                            $result []= $fileEntry;
                         }
                     }
                 }
@@ -94,9 +93,10 @@ class InitDropbox {
 
 
     /**
-     * Get the recursive list of all files for this website. Might be LONG.
+     * Get the recursive list of all files for this website, up to a timeout.
      * @return string of file details.
      */
+/*
     function getRecursiveList(): array {
         $this->iterations = 0;
         try {
@@ -119,30 +119,7 @@ class InitDropbox {
             die(var_export($e));
         }
     }
-
-    /**
-     * Get the recursive list of all files for this website. Might be LONG.
-     * @param string $cursor The cursor that we want to get updates relative to.
-     * @return string of file details.
-     */
-    function getUpdates(string $cursor): array {
-        try {
-            $result = [];
-            $list = ['has_more' => true];
-            while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor) {
-                $list = $this->client->listFolderContinue($this->cursor);
-                $this->cursor = $list['cursor'];
-                if (array_key_exists('entries', $list)) {
-                    $result = array_merge($result, $list['entries']);
-                    $this->iterations ++;
-                }
-            }
-            return $result;
-        } catch (Exception $e) {
-            die(var_export($e));
-        }
-    }
-
+*/
     /*
      foreach ($list as $fileEntry) {
      switch ($fileEntry['.tag']) {

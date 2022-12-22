@@ -46,49 +46,44 @@ $db->sqlExec(
   <body>
     <h1>Midwest Memories - admin</h1>
     <?php
-    $cursor = $_REQUEST['cursor'] ?? null;
-    $updatesOnly = $_REQUEST['updatesonly'] ?? false;
+    $cursor = $_REQUEST['cursor'] ?? 'AAGEBZi4qpzGvbL2PyF-FGkAj4kG8Lh-c4S9yv_vOIJYTdIzzcBoJ-0kMxCtgpz3v2OxNFbjCb4rQcHRCeGTuUR8bDORsfOqmI04YMfpFjL5V4ZZ4rTbiqAxyJh040tXFj0KccZVfj3s3ONr8CCaiICo0xRGDpUdSpqUj94gHuorl5GcPZImSec6F9CS9L_dEq5jTHSv1k2Pblu9SbEjYruikIuNlkQcLQB4z9vhi2HN6dcVNBeEWCgZ4Q5T5_0Qy1IeAZvmifMMIZsdpQ1gsEfRUerfwu3SPyV--57wWyCjPEeCG0Xq8iInmFFQPFjORbmEvi6dZgCIyD5SliAL94YR89Oq3c_VT6aJQkWQX8ffvjGxOGSvWHMD-uo0IJcmIZkOQy4MoYZnhTJWnPM5cfk1c8DifGY67boVQ4uYnNRToftg7liJlp5PDHV7U0ebrbpsNfMOLRar6np16GS4OHwXZaKjnQPSu_Kn3sY1gj93aD8c265wGP8B0_XA6rZELhb1d30Elml7eb4VrrfKAI2iMWY3Q71Jj8eXLgV40uU1BdW9RYLg3nTa8HrfuGffFUsCZRNDIJbTyCqJGLADJoYseJRH5MC3xUtZ0_EoJUPqkPGP7VPjyVh9ReFkrfh3xO36hQ0dZGp90Eu6wL9wsyrn6s0jI5MnBB24aIhFlhu698gb_-BX0p2kUF-aHgaFn-4s7ze0Wj-_QkNYYNK8h_Fbto51u1WKaMoxEgH7oEdh68dq8bBDBM-pEKjA7lBL7GXJHo60wTRRMfuqViKPZmowSOReztH9VH0HVmX3wCUQPDUqdPa8sDJbAdfU4aVk8mEhP-ew-4Xwsn1zEJ8wFLfRg0OsNQTXAaytsZWKvYxzfM3lYJE5LmkYcUMKZQpWMvE';
     $initRoot = $_REQUEST['initroot'] ?? false;
     $continueRoot = $_REQUEST['continueroot'] ?? false;
     $entriessofar = $_REQUEST['entriessofar'] ?? 0;
     echo "<p>Starting. Cursor='$cursor', Request=".var_export($_REQUEST,true)."</p>";
     $fp = new InitDropbox();
-    if ($updatesOnly) {
-        echo "<h2>Updates from cursor</h2>\n";
-        $list = $fp->getUpdates($cursor);
-    } elseif($initRoot) {
-        echo "<h2>Initialize root cursor</h2>\n";
+    if($initRoot) {
+        echo "<h2>Initializing root cursor</h2>\n";
         $list = $fp->initRootCursor();
     } elseif($continueRoot) {
         echo "<h2>Continuing with the root cursor</h2>\n";
         $list = $fp->continueRootCursor($cursor, $entriessofar);
     } else {
-        echo "<h2>Full List</h2>\n";
-        $list = $fp->getRecursiveList();
+        echo "<h2>No command yet given.</h2>\n";
     }
-    $cursor = $fp->cursor ?? $cursor;
-    $entriessofar = $fp->entries ?? $entriessofar;
-    echo "<p>Finished reading. Cursor reassigned to '$cursor'. Iterations: {$fp->iterations}. Entries: {$fp->entries}.</p>";
+    $entriesChange = $fp->entries - $entriessofar;
+    echo "<p>Finished reading.<br>";
+    if ($cursor == $fp->cursor) {
+        echo "Cursor unchanged.<br>";
+    } elseif (empty($fp->cursor)) {
+        echo "Cursor was not set in client.<br>";
+    } else {
+        $cursor = $fp->cursor;
+        echo "Cursor reassigned to '$cursor'.<br>";
+    }
+    echo "Iterations: {$fp->iterations}.<br>Entries: {$fp->entries} (+$entriesChange).</p>";
     echo "<pre>" . var_export($list, true) . "</pre>";
+    $entriessofar = $fp->entries ?? $entriessofar;
     ?>
         <form method="post">
-            <input type="hidden" name="updateonly" value="1"></input>
-            <input type="text" name="cursor" value="<?=htmlspecialchars($cursor)?>"></input>
-            <button type="submit">Updates Only</button>
-        </form><br>
-        <form method="post">
-            <input type="hidden" name="fulllist" value="1"></input>
-            <button type="submit">Full List</button>
-        </form><br>
-        <form method="post">
             <input type="hidden" name="initroot" value="1"></input>
-            <button type="submit">Initialize root cursor</button>
+            <button type="submit">Initialize new root cursor</button>
         </form><br>
         <form method="post">
             <input type="text" name="entriessofar" value="<?=htmlspecialchars($entriessofar)?>"></input>
             <input type="text" name="cursor" value="<?=htmlspecialchars($cursor)?>"></input>
             <input type="hidden" name="continueroot" value="1"></input>
-            <button type="submit">Continue root cursor</button>
+            <button type="submit">Continue initializing root cursor, or get latest updates</button>
         </form>
   </body>
 </html>
