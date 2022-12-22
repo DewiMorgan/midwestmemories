@@ -65,13 +65,14 @@ class InitDropbox {
             while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
                 $list = $this->client->listFolderContinue($this->cursor);
                 $this->saveCusorFromList($list);
-                $this->handleEntries($result, $list);
+                $result = $this->handleEntries($result, $list);
                 $this->iterations ++;
             }
             return $result;
         } catch (Exception $e) {
             die(var_export($e));
         }
+        return $result;
     }
 
     /**
