@@ -143,7 +143,7 @@ class Db {
     public static function adminDebug($str, $obj = null) {
         global $connection;
         $message = "ADBG: $str" . (is_null($obj) ? "." : ": " . var_export($obj, true));
-        fwrite(STDERR, "$message\n");
+        file_put_contents('error_log', "$message\n", FILE_APPEND);
         if ($connection->isSuperAdmin) {
             echo "<pre>$message</pre>\n";
         }
