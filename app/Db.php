@@ -46,9 +46,9 @@ class Db {
      * @param string $sql Query with values replaced by '?'.
      * @param string $field Fieldname to extract and return from the result.
      * @param string ... $items a string describing the types of all following values, then the values..
-     * @return null|array
+     * @return null|string
      */
-    public static function sqlGetItem(string $sql, string $field, string ...$items): ?array {
+    public static function sqlGetItem(string $sql, string $field, string ...$items): ?string {
         self::adminDebug('sqlGetItem', $sql);
         $db = self::getInstance()->db;
         if (!($query = $db->prepare($sql))) {
