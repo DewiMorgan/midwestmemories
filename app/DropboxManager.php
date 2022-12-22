@@ -138,7 +138,7 @@ echo "<p>Not yet at timeout of $endTime, only at " . time() . "<br>\n";
             // If the dir doesn't exist, then create it.
             $dir = dirname($entry['full_path']);
 echo "<p>Extracted directory name '$dir' from full path '{$entry['full_path']}'.<br>\n";
-            if (!dir_exist($dir)) {
+            if (!is_dir($dir)) {
 echo "<p>It didn't exist: creating it.<br>\n";
                 if (mkdir($dir, 0700, true)) {
 echo "<p>Successfully created $dir in $cwd.<br>\n";
