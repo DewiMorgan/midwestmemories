@@ -4,8 +4,16 @@
 
 // If it's a validation, validate and exit.
 validate();
+// Otherwise, log the query.
+$data = logQuery();
+// ToDo:
+use app\Db;
+use app\DropboxManager;
+require_once('app/Db.php');
+Db::sqlExec("INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`, `webhook_timestamp`) VALUES (?, '', NOW()) ON DUPLICATE KEY UPDATE `webhook_timestamp` = NOW()", 'd', DropboxManager::DROPBOX_USER_ID);
+
 // If it's a human, output readable text.
-friendlyOutput();
+friendlyOutput($data);
 // Tag the user's cursor as "dirty".
 
 exit();
@@ -15,7 +23,7 @@ exit();
  * @return string The data that was logged.
  * Note: MUST NOT echo anything to headers or stdout, or validate() will break.
  */
-function logQuery() {
+function logQuery(): string {
     $filename = 'callback.out';
     $timestamp = date('Y-m-d H:i:s: ');
     $data = "=== $timestamp ===\n";
@@ -32,7 +40,7 @@ function logQuery() {
  * Required for when we set up the callback, for it to verify us.
  * May not have any headers already sent.
  */
-function validate() {
+function validate(): void {
     if (array_key_exists('challenge', $_REQUEST)) {
         header('Content-Type: text/plain');
         header('X-Content-Type-Options: nosniff');
@@ -46,8 +54,7 @@ function validate() {
  * Show a nice mesage for humans calling this page.
  * @param string $data String to display - probably the request dat that was logged.
  */
-function friendlyOutput($data)
-{
+function friendlyOutput(string $data): void {
     $requestHeaders = apache_request_headers();
     if (array_key_exists('X-Dropbox-Signature', $requestHeaders)) {
         return;
