@@ -66,7 +66,7 @@ $db->sqlExec(
         $list = $fp->getRecursiveList();
     }
     $cursor = $fp->cursor ?? $cursor;
-    $entriessofar = $fp->entries ?? 0;
+    $entriessofar = $fp->entries ?? $entriessofar;
     echo "<p>Finished reading. Cursor reassigned to '$cursor'. Iterations: {$fp->iterations}. Entries: {$fp->entries}.</p>";
     echo "<pre>" . var_export($list, true) . "</pre>";
     ?>
@@ -83,7 +83,8 @@ $db->sqlExec(
         </form><br>
         <form method="post">
             <input type="text" name="entriessofar" value="<?=htmlspecialchars($entriessofar)?>"></input>
-            <input type="text" name="continueroot" value="<?=htmlspecialchars($cursor)?>"></input>
+            <input type="text" name="cursor" value="<?=htmlspecialchars($cursor)?>"></input>
+            <input type="text" name="continueroot" value="1"></input>
             <button type="submit">Continue root cursor</button>
         </form>
   </body>
