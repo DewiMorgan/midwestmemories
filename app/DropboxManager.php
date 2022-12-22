@@ -13,6 +13,9 @@ class DropboxManager {
     public $iterations;
     private const DROPBOX_PATH = '/midwestmemories';
     private const DROPBOX_USER_ID = 16181197;
+    private const MAX_PNG_SIZE = 1024 * 1024; // Max png size before resampling to jpg.
+    private const MAX_THUMB_WIDTH = 64;
+    private const MAX_THUMB_HEIGHT = 64;
 
     public function __construct() {
         $tokenRefresher = new TokenRefresher();
@@ -118,70 +121,222 @@ class DropboxManager {
             // Could check other .tag='file' fields, like 'is_downloadable'? But that should always be true, I think.
             // Could check 'content_hash' to see if it's unchanged? But if it's in our list, it should be changed.
             // Could check .tag='deleted' later in the list to see if it gets deleted again, but not an issue til we handle deletion anyway.
-            Db::sqlExec('INSERT INTO `midmem_file_queue` (`file_name`, `full_path`) VALUES (?, ?)', 'ss', $entry['name'], $entry['path_display']);
+            Db::sqlExec('INSERT INTO `midmem_file_queue` (`file_name`, `full_path`, `sync_status`) VALUES (?, ?, ?)', 'sss', $entry['name'], $entry['path_display'], 'NEW');
         }
     }
 
     public function processFilesFromDb(): void {
         $endTime = time() + 20;
-        $cwd = getcwd();
-echo "<p>Starting to process files. Endtime set to:$endTime, running in $cwd.<br>\n";
-        $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue`");
-echo "<p>Obtained list from database:<br><pre>" . var_export($list, true) . "</pre><br>\n";
+        $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue` WHERE `sync_status` = 'NEW'");
         foreach ($list as $entry) {
             // Drop out early if we hit the time limit.
             if (time() > $endTime) {
-echo "<p>$endTime has passed, at " . time() . "<br>\n";
                 return;
             }
-echo "<p>Not yet at timeout of $endTime, only at " . time() . "<br>\n";
             // If the dir doesn't exist, then create it.
             $dir = dirname($entry['full_path']);
-echo "<p>Extracted directory name '$dir' from full path '{$entry['full_path']}'.<br>\n";
-            if (!is_dir($dir)) {
-echo "<p>It didn't exist: creating it.<br>\n";
-                if (mkdir($dir, 0700, true)) {
-echo "<p>Successfully created $dir in $cwd.<br>\n";
-                } else {
-echo "<p>Failed to create the folder $dir in $cwd.<br>\n";
-                }
-            } else {
-echo "<p>Directory $dir already exists in $cwd.<br>\n";
+            if (!is_dir($dir) && !mkdir($dir, 0700, true)) {
+                // ToDo: log this and set error state.
+                continue;
             }
             // Download the file from Dropbox. If it already exists, it might've been edited, so we get it anyway.
-echo "<p>Calling get temp url API.<br>\n";
             $url = $this->client->getTemporaryLink($entry['full_path']);
-echo "<p>Got URL: '$url'. Getting file contents.<br>\n";
-            $fileContents = file_get_contents($url);
-echo "<p>Got file contents:<br><pre>" . var_export($fileContents, true) . "</pre><br>\n";
-
-/* A maybe-better API for this, but I can't figure it out.
-            $file = $this->client->download($entry['full_path']);
-echo "<p>Saving file metadata to {$entry['full_path']}.txt.<br>\n";
-            //Save File Metadata
-            file_put_contents($entry['full_path'].".txt", $file->getMetadata());
-echo "<p>Got result '" . var_export($result, true) . "'.<br>\n";
-            //Save file contents to disk
-            $fileContents = $file->getContents();
-echo "<p>Read file contents:<br><pre>" . var_export($fileContents, true) . "</pre><br>\n";
-*/
-echo "<p>Saving file contents to {$entry['full_path']}.<br>\n";
-            $result = file_put_contents($entry['full_path'], $fileContents);
-echo "<p>Got result '" . var_export($result, true) . "'.<br>\n";
-/*
-*/
+            $result = downloadUrlToPath(file_get_contents($url), $entry['full_path']);
+            // Update the DB to DOWNLOADED or ERROR.
+            Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = ? WHERE full_path = ?", 'ss', ($result ? 'DOWNLOADED' : 'ERROR'), $entry['full_path']);
         }
     }
 
+    /*
+    * Add thumbnails, resample images, and parse txt files, then set status to PROCESSED.
+    */
+    public function downloadedfilehandler() {
+        $endTime = time() + 20;
+        $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue` WHERE `sync_status` = 'DOWNLOADED'");
+        foreach ($list as $entry) {
+            // Drop out early if we hit the time limit.
+            if (time() > $endTime) {
+                return;
+            }
+            $fullPath = $entry['full_path'];
+            if (!file_exists($fullPath)) {
+                // ToDo: log and set error state.
+                continue;
+            }
+
+            // Get the mime type.
+            $mimeType = mime_content_type($fullPath);
+            switch($mimeType) {
+                case 'text/plain':
+                    $this->processTextFile($fullPath);
+                    break;
+                case 'image/gif':
+                    $this->processGifFile($fullPath);
+                case 'image/png':
+                    $this->processPngFile($fullPath);
+                case 'image/jpeg':
+                    $this->processJpegFile($fullPath);
+                case 'directory':
+                case 'application/x-empty': // Zero length file
+                default:
+                    $this->processUnknownFile($fullPath);
+                    break;
+            }
+        }
+    }
+
+    /**
+    * Process text file, parsing fields into the db.
+    */
+    private function processTextFile($fullPath): void {
+        // ToDo
+    }
+    /** Process a png file, generating thumbnail and converting to jpg if needed.*/
+    private function processPngFile($fullPath) {
+        if ((filesize($fullPath) > self::MAX_PNG_SIZE)) {
+            // Thumbnail generation would be faster from the new jpg so we roll this into convertToJpeg.
+            $result = $this->convertToJpeg($fullPath);
+        } else {
+            $result = $this->makeThumb(imagecreatefrompng($fullPath), $fullPath);
+        }
+        Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = ? WHERE full_path = ?", 'ss', ($result ? 'PROCESSED' : 'ERROR'), $fullPath);
+    }
+    /** Process a gif file, generating thumbnail.*/
+    private function processGifFile($fullPath) {
+        $result = $this->makeThumb(imagecreatefromgif($fullPath), $fullPath);
+        Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = ? WHERE full_path = ?", 'ss', ($result ? 'PROCESSED' : 'ERROR'), $fullPath);
+    }
+    /** Process a jpeg file, generating thumbnail.*/
+    private function processJpegFile($fullPath) {
+        $result = $this->makeThumb(imagecreatefromjpeg($fullPath), $fullPath);
+        Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = ? WHERE full_path = ?", 'ss', ($result ? 'PROCESSED' : 'ERROR'), $fullPath);
+    }
+    /** Process an unknown file.*/
+    private function processUnknownFile($fullPath) {
+        // ToDo
+    }
+
     /** save the current cursor to the DB. */
-    function saveCursor(): void {
+    private function saveCursor(): void {
         Db::sqlExec("INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `cursor_id` = ?", 'dss', self::DROPBOX_USER_ID, $this->cursor, $this->cursor);
     }
 
     /** Load the current cursor from the DB. */
-    function loadCursor(): void {
+    private function loadCursor(): void {
         $this->cursor = Db::sqlGetItem("SELECT `cursor_id` FROM `midmem_dropbox_users` LIMIT 1", 'cursor_id');
     }
+
+    /**
+    * From: https://stackoverflow.com/questions/11376315/creating-a-thumbnail-from-an-uploaded-image
+    * @param resource $sourceImage Image resource loaded from whatever image format.
+    * @param string $fullPath Target full path to original file.
+    * @param int $maxWidth Thumbnail max width in pixels.
+    * @param int $maxHeight Thumbnail max height in pixels.
+    * @return bool success
+    */
+    private function makeThumb($sourceImage, string $fullPath): bool {
+        if (false === $sourceImage) {
+            // ToDo: log
+            return false;
+        }
+        // Files that begin with a dot and have no estension, eg '.example', will get thumbs called 'tn_.jpg'.
+        $basename = preg_replace('/\..+?$/', '', basename($fullPath));
+        $dest = dirname($fullPath) . '/tn_' . $basename . 'jpg';
+        // Read source image size.
+        $origWidth = imagesx($sourceImage);
+        $origHeight = imagesy($sourceImage);
+        if (false === $origWidth || false === $origHeight) {
+            // ToDo: log
+            return false;
+        }
+        $newWidth = $origWidth;
+        // Scale to max width if needed.
+        if ($origHeight > self::MAX_THUMB_HEIGHT) {
+            $newHeight = self::MAX_THUMB_HEIGHT;
+            $newWidth = floor($origWidth * ($newHeight/$origHeight));
+        }
+        // Scale to max height if still too large.
+        if ($newWidth > self::MAX_THUMB_WIDTH) {
+            $newWidth = self::MAX_THUMB_WIDTH;
+            $newHeight = floor($origWidth * ($newWidth/$origWidth));
+        }
+
+        /* Create a new, "virtual" image */
+        $virtualImage = imagecreatetruecolor($newWidth, $newHeight);
+        if (false === $virtualImage) {
+            // ToDo: log
+            return false;
+        }
+
+        /* Resize and copy source image to new image */
+        if (!imagecopyresampled($virtualImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $origWidth, $origHeight)) {
+            // ToDo: log
+            return false;
+        }
+
+        /* Create the physical thumbnail image at its destination */
+        if (!imagejpeg($virtualImage, $dest, 70)) {
+            // ToDo: log
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+    * Convert large png files to more-compressed jpgs.
+    * ToDo: How should this be reflected in the DB?
+    * @param string $fullPath Full path to original file.
+    * @return bool success
+    */
+    private function convertToJpeg(string $fullPath): bool {
+        $sourceImage = imagecreatefrompng($fullPath);
+        if (false === $sourceImage) {
+            // ToDo: log
+            return false;
+        }
+
+        $dest = dirname($fullPath) . '/' . basename($fullPath, '.png') . '.jpg';
+
+        /* Save as a renamed jpg at its destination */
+        if (!imagejpeg($sourceImage, $dest, 70)) {
+            // ToDo: log
+            return false;
+        }
+        // Try to delete the huge file. If we can't, no big loss.
+        @unlink($fullPath);
+
+        // Because it's slightly faster to create the thumbnail from here.
+        return $this->makeThumb(imagecreatefrompng($dest));
+    }
+
+
+    /**
+    From https://stackoverflow.com/questions/6409462/downloading-a-large-file-using-curl
+    */
+    public function downloadUrlToPath(string $url, string $fullpath) {
+        set_time_limit(0);
+
+        $fp = fopen ($fullpath, 'w+');
+        $ch = curl_init($url);
+
+        // These two only if https certificate isn't recognized.
+        // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+
+        // if timeout (seconds) is too low, download will be interrupted
+        curl_setopt($ch, CURLOPT_TIMEOUT, 600);
+
+        // Write curl response to file
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+        // Get curl response
+        curl_exec($ch);
+        curl_close($ch);
+        fclose($fp);
+    }
+
 
 /**
      * Get the recursive list of all files for this website, up to a timeout.

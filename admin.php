@@ -50,7 +50,9 @@ Db::sqlExec(
     $processFiles = $_REQUEST['processfiles'] ?? false;
     $initRoot = $_REQUEST['initroot'] ?? false;
     $continueRoot = $_REQUEST['continueroot'] ?? false;
+    $processDownloaded = $_REQUEST['processdownloaded'] ?? false;
     $entriessofar = intval($_REQUEST['entriessofar'] ?? 0 );
+
     echo "<p>Starting. Cursor='$cursor', Request=".var_export($_REQUEST,true)."</p>";
     $fp = new DropboxManager();
     $list = [];
@@ -63,6 +65,9 @@ Db::sqlExec(
     } elseif($processFiles) {
         echo "<h2>Processing files from the DB...</h2>\n";
         $fp->processFilesFromDb();
+    } elseif($processDownloaded) {
+        echo "<h2>Processing downloaded files...</h2>\n";
+        $fp->downloadedfilehandler();
     } else {
         echo "<h2>No command yet given.</h2>\n";
     }
@@ -81,10 +86,18 @@ Db::sqlExec(
     echo "Iterations: {$fp->iterations}.<br>Entries: {$fp->entries} (+$entriesChange).</p>";
     echo "<pre>" . var_export($list, true) . "</pre>";
     $entriessofar = $fp->entries ?? $entriessofar;
+
+    // ToDo: Finally, chain all these processes up from the web hook handler, using a single timeout time, and maybe have them retrigger each other or something.
+    // Maybe a web cron to hit the webhook? Or does cpanel allow cron jobs? Edit crontab manually?
+
     ?>
     <form method="post">
         <input type="hidden" name="processfiles" value="1"></input>
         <button type="submit">Process files from DB</button>
+    </form><br>
+    <form method="post">
+        <input type="hidden" name="processdownloaded" value="1"></input>
+        <button type="submit">Process downloaded files</button>
     </form><br>
     <form method="post">
         <input type="hidden" name="initroot" value="1"></input>

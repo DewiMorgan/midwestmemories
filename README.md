@@ -62,6 +62,7 @@ Photo archive for the family
 * [Github - spatie](https://github.com/spatie/dropbox-api) - the one we're using.
 * [Getting auth working](https://github.com/spatie/dropbox-api/issues/94) - see the very bottom post.
 * [Github - nymedia](https://github.com/nymedia/dropbox-sdk-php) - doesn't work.
+* [Github - kunalvarma05](https://github.com/kunalvarma05/dropbox-php-sdk) - might do downloads, see [SO Answer](https://stackoverflow.com/questions/47469142/how-can-i-download-file-to-local-directly-from-dropbox-api)
 * [YouTube playlist](https://www.youtube.com/playlist?list=PLfdtiltiRHWGOceoK3I3LrDL6x8mM0Ipb) (WAY outdated)
     * [Setup](https://www.youtube.com/watch?v=FsQZyNpDWv0) 
     * [Upload file](https://www.youtube.com/watch?v=xFM7_1pdiFE)
