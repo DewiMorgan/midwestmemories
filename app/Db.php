@@ -122,7 +122,8 @@ class Db {
     }
 
     public static function escape($str) {
-        return mysqli::real_escape_string($str);
+        $db = self::getInstance()->db;
+        return $db->real_escape_string($str);
     }
 
     // Sadly, bind_param expects references, which makes passing arrays harder.
