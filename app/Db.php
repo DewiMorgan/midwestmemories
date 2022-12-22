@@ -40,6 +40,7 @@ class Db {
     }
 
     // Return the requested item or null.
+    // $items
     public static function sqlGetItem($sql, $field, string ...$items) {
         self::adminDebug('sqlGetItem', $sql);
         $db = self::getInstance()->db;
@@ -47,7 +48,7 @@ class Db {
             self::adminDebug('prepare failed, dberr', $db->error);
             return null;
         }
-        if (!call_user_func_array(array($query, "bind_param"), self::mkRefArray($items))) {
+        if (!empty($items) && !call_user_func_array(array($query, "bind_param"), self::mkRefArray($items))) {
             self::adminDebug('bind_param failed, dberr', $db->error);
             self::adminDebug('bind_param failed, qerr', $query->error);
             return null;
@@ -82,7 +83,7 @@ class Db {
             self::adminDebug('prepare failed, dberr', $db->error);
             return [];
         }
-        if (!call_user_func_array(array($query, "bind_param"), self::mkRefArray($items))) {
+        if (!empty($items) && !call_user_func_array(array($query, "bind_param"), self::mkRefArray($items))) {
             self::adminDebug('bind_param failed, dberr', $db->error);
             self::adminDebug('bind_param failed, qerr', $query->error);
             return [];
@@ -104,7 +105,7 @@ class Db {
         return $row;
     }
 
-    public static function sqlGetTable($sql, string ...$items) {
+    public static function sqlGetTable($sql) {
         self::adminDebug('sqlGetTable', $sql);
         $db = self::getInstance()->db;
         if ($result = $db->query($sql)) {
