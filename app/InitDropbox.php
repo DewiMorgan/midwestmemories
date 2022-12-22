@@ -13,6 +13,7 @@ class InitDropbox {
     public $iterations;
     private const DROPBOX_PATH = '/midwestmemories';
     private const DROPBOX_USER_ID = '';
+
     public function __construct() {
         $tokenRefresher = new TokenRefresher();
         $token = $tokenRefresher->getToken();
@@ -74,10 +75,11 @@ class InitDropbox {
 
     /**
      * Do whatever is needed with an entry within the midwestmemories subfolder.
-     * @param result
-     * @param list
+     * @param array result
+     * @param array list
+     * @return array
      */
-    private function handleEntries($result, $list) {
+    private function handleEntries($result, $list): array {
         if (array_key_exists('entries', $list)) {
             foreach ($list['entries'] as $fileEntry) {
                 $this->entries++;
@@ -93,7 +95,7 @@ class InitDropbox {
      * Save the array elenent 'cursor', if any.
      * @param list an array that might have an element 'cursor'.
      */
-     private function saveCusorFromList($list) {
+     private function saveCusorFromList($list): void {
         if (!empty($list['cursor']) && $this->cursor != $list['cursor']) {
             $this->cursor = $list['cursor'];
             self::saveCursor();
@@ -101,14 +103,14 @@ class InitDropbox {
     }
 
     /** save the current cursor to the DB. */
-    function saveCursor() {
+    function saveCursor(): void {
         $m_userid = Db::escape(self::DROPBOX_USER_ID);
         $m_cursor = Db::escape($this->cursor);
         Db::sqlExec("INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`) VALUES ('$m_userid', '$m_cursor') ON DUPLICATE KEY UPDATE `cursor_id` = '$m_cursor'");
     }
 
     /** Load the current cursor from the DB. */
-    function loadCursor(): string {
+    function loadCursor(): void {
         $this->cursor = Db::sqlGetItem("SELECT `cursor_id` FROM `midmem_dropbox_users` LIMIT 1", 'cursor_id');
     }
 
