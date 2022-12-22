@@ -30,7 +30,7 @@ class Db {
         }
     }
 
-    public static function sqlExec($sql, string ...$items) {
+    public static function sqlExec(string $sql, string ...$items): void {
         self::adminDebug('sqlExec', $sql);
         $db = self::getInstance()->db;
         if ($query = $db->prepare($sql)) {
@@ -41,9 +41,14 @@ class Db {
         }
     }
 
-    // Return the requested item or null.
-    // $items
-    public static function sqlGetItem($sql, $field, string ...$items) {
+    /**
+     * Return the requested item or null.
+     * @param string $sql Query with values replaced by '?'.
+     * @param string $field Fieldname to extract and return from the result.
+     * @param string ... $items a string describing the types of all following values, then the values..
+     * @return null|array
+     */
+    public static function sqlGetItem(string $sql, string $field, string ...$items): ?array {
         self::adminDebug('sqlGetItem', $sql);
         $db = self::getInstance()->db;
         if (!($query = $db->prepare($sql))) {
@@ -78,7 +83,13 @@ class Db {
         return $row[$field];
     }
 
-    public static function sqlGetRow($sql, string ...$items) {
+    /**
+     * Return the first row from the results, or an empty array.
+     * @param string $sql Query with values replaced by '?'.
+     * @param string ... $items a string describing the types of all following values, then the values..
+     * @return array
+     */
+    public static function sqlGetRow(string $sql, string ...$items): array {
         self::adminDebug('sqlGetRow', $sql);
         $db = self::getInstance()->db;
         if (!($query = $db->prepare($sql))) {
@@ -107,7 +118,13 @@ class Db {
         return $row;
     }
 
-    public static function sqlGetTable($sql) {
+    /**
+     * Return the all the results as a 2d array, or an empty array.
+     * @param string $sql Query with values replaced by '?'.
+     * @param string ... $items a string describing the types of all following values, then the values..
+     * @return array
+     */
+    public static function sqlGetTable($sql): array {
         self::adminDebug('sqlGetTable', $sql);
         $db = self::getInstance()->db;
         if ($result = $db->query($sql)) {
@@ -123,13 +140,23 @@ class Db {
         return [];
     }
 
-    public static function escape($str) {
+    /**
+     * Escape a string using the current DB's default escaping.
+     * @param string $str
+     * @return string
+     */
+    public static function escape(string $str): string {
         $db = self::getInstance()->db;
         return $db->real_escape_string($str);
     }
 
-    // Sadly, bind_param expects references, which makes passing arrays harder.
-    private static function mkRefArray($input) {
+    /**
+     * Sadly, bind_param expects references, which makes passing arrays harder.
+     * ToDo: There's apparently a `...` operator that makes this redundant: see man page.
+     * @param array $input The array to convert.
+     * @return array The array of references.
+     */
+    private static function mkRefArray(array $input): array {
         $result = [];
         if (empty($input)) {
             return [''];
@@ -144,7 +171,12 @@ class Db {
         return $result;
     }
 
-    public static function adminDebug($str, $obj = null) {
+    /**
+     * Log a message and an optional object to the log and maybe to the screen.
+     * @param string $str
+     * @param mixed $obj
+     */
+    public static function adminDebug(string $str, $obj = null): void {
         global $connection;
         $message = "ADBG: $str" . (is_null($obj) ? "." : ": " . var_export($obj, true));
         file_put_contents('error_log', "$message\n", FILE_APPEND);
