@@ -149,18 +149,27 @@ echo "<p>Failed to create the folder $dir in $cwd.<br>\n";
 echo "<p>Directory $dir already exists in $cwd.<br>\n";
             }
             // Download the file from Dropbox. If it already exists, it might've been edited, so we get it anyway.
-echo "<p>Calling download API.<br>\n";
+echo "<p>Calling get temp url API.<br>\n";
+            $url = $this->client->getTemporaryLink($entry['full_path']);
+echo "<p>Got URL: '$url'. Getting file contents.<br>\n";
+            $fileContents = file_get_contents($url);
+echo "<p>Got file contents:<br><pre>" . var_export($fileContents, true) . "</pre><br>\n";
+
+/* A maybe-better API for this, but I can't figure it out.
             $file = $this->client->download($entry['full_path']);
-            //Save file contents to disk
-            $fileContents = $file->getContents();
-echo "<p>Read file contents:<br><pre>" . var_export($fileContents, true) . "</pre><br>\n";
-echo "<p>Saving file contents to {$entry['full_path']}.<br>\n";
-            $result = file_put_contents($entry['full_path'], $fileContents);
-echo "<p>Got result '" . var_export($result, true) . "'.<br>\n";
 echo "<p>Saving file metadata to {$entry['full_path']}.txt.<br>\n";
             //Save File Metadata
             file_put_contents($entry['full_path'].".txt", $file->getMetadata());
 echo "<p>Got result '" . var_export($result, true) . "'.<br>\n";
+            //Save file contents to disk
+            $fileContents = $file->getContents();
+echo "<p>Read file contents:<br><pre>" . var_export($fileContents, true) . "</pre><br>\n";
+*/
+echo "<p>Saving file contents to {$entry['full_path']}.<br>\n";
+            $result = file_put_contents($entry['full_path'], $fileContents);
+echo "<p>Got result '" . var_export($result, true) . "'.<br>\n";
+/*
+*/
         }
     }
 
