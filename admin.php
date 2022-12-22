@@ -24,7 +24,7 @@ require_once('app/InitDropbox.php');
 $connection = new Connection();
 
 // Log this login.
-$db->sqlExec(
+Db::sqlExec(
     'INSERT INTO midmem_visitors (`request`, `main_ip`, `all_ips_string`, `user`, `agent`) VALUES (?, ?, ?, ?, ?)',
     'sssss',
     $connection->request, $connection->ip,  $connection->ipList, $connection->user, $connection->agent
