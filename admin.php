@@ -48,7 +48,7 @@ Db::sqlExec(
     $cursor = $_REQUEST['cursor'] ?? 'AAGEBZi4qpzGvbL2PyF-FGkAj4kG8Lh-c4S9yv_vOIJYTdIzzcBoJ-0kMxCtgpz3v2OxNFbjCb4rQcHRCeGTuUR8bDORsfOqmI04YMfpFjL5V4ZZ4rTbiqAxyJh040tXFj0KccZVfj3s3ONr8CCaiICo0xRGDpUdSpqUj94gHuorl5GcPZImSec6F9CS9L_dEq5jTHSv1k2Pblu9SbEjYruikIuNlkQcLQB4z9vhi2HN6dcVNBeEWCgZ4Q5T5_0Qy1IeAZvmifMMIZsdpQ1gsEfRUerfwu3SPyV--57wWyCjPEeCG0Xq8iInmFFQPFjORbmEvi6dZgCIyD5SliAL94YR89Oq3c_VT6aJQkWQX8ffvjGxOGSvWHMD-uo0IJcmIZkOQy4MoYZnhTJWnPM5cfk1c8DifGY67boVQ4uYnNRToftg7liJlp5PDHV7U0ebrbpsNfMOLRar6np16GS4OHwXZaKjnQPSu_Kn3sY1gj93aD8c265wGP8B0_XA6rZELhb1d30Elml7eb4VrrfKAI2iMWY3Q71Jj8eXLgV40uU1BdW9RYLg3nTa8HrfuGffFUsCZRNDIJbTyCqJGLADJoYseJRH5MC3xUtZ0_EoJUPqkPGP7VPjyVh9ReFkrfh3xO36hQ0dZGp90Eu6wL9wsyrn6s0jI5MnBB24aIhFlhu698gb_-BX0p2kUF-aHgaFn-4s7ze0Wj-_QkNYYNK8h_Fbto51u1WKaMoxEgH7oEdh68dq8bBDBM-pEKjA7lBL7GXJHo60wTRRMfuqViKPZmowSOReztH9VH0HVmX3wCUQPDUqdPa8sDJbAdfU4aVk8mEhP-ew-4Xwsn1zEJ8wFLfRg0OsNQTXAaytsZWKvYxzfM3lYJE5LmkYcUMKZQpWMvE';
     $initRoot = $_REQUEST['initroot'] ?? false;
     $continueRoot = $_REQUEST['continueroot'] ?? false;
-    $entriessofar = $_REQUEST['entriessofar'] ?? 0;
+    $entriessofar = intval($_REQUEST['entriessofar'] ?? 0 );
     echo "<p>Starting. Cursor='$cursor', Request=".var_export($_REQUEST,true)."</p>";
     $fp = new InitDropbox();
     $list = [];
