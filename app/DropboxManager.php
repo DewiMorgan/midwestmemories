@@ -6,7 +6,7 @@ require_once 'TokenRefresher.php';
 use \Exception;
 use Spatie\Dropbox\Client;
 
-class InitDropbox {
+class DropboxManager {
     private $client;
     public $cursor;
     public $entries = 0;
@@ -85,9 +85,9 @@ class InitDropbox {
         if (array_key_exists('entries', $list)) {
             foreach ($list['entries'] as $fileEntry) {
                 $this->entries++;
-//                if (preg_match('#^/midwestmemories/#', $fileEntry['path_lower'])) {
+                if (preg_match('#^/midwestmemories/#', $fileEntry['path_lower'])) {
                     $result []= $fileEntry;
-//                }
+                }
             }
         }
         return $result;
@@ -104,11 +104,49 @@ class InitDropbox {
         }
     }
 
+    /**
+     * Save files to the queue, to process later.
+     * @param array $list Array of entries, each an array with elements '.tag', 'name', 'path_lower', 'path_display' and maybe more.
+     * .tag is file, folder, delete, or more.
+     */
+    private function saveListOfFilesToProcess($list): void {
+        foreach ($list as $entry) {
+            // Skip anything we don't care about.
+            if ('file' !== $entry['.tag'] || !preg_match('#^/midwestmemories/#', $entry['path_lower'])) {
+                continue;
+            }
+            // Could check other .tag='file' fields, like 'is_downloadable'? But that should always be true, I think.
+            // Could check 'content_hash' to see if it's unchanged? But if it's in our list, it should be changed.
+            // Could check .tag='deleted' later in the list to see if it gets deleted again, but not an issue til we handle deletion anyway.
+            Db::sqlExec('INSERT INTO `midmem_file_queue` (`file_name`, `full_path`) VALUES (?, ?)', 'ss', $entry['name'], $entry['path_display']);
+        }
+    }
+
+    private function processFilesFromDb(): void {
+        $endTime = time() + 20;
+        $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue`");
+        foreach ($list as $entry) {
+            // Drop out early if we hit the time limit.
+            if (time() < $endTime) {
+                return;
+            }
+            // If the dir doesn't exist, then create it.
+            $dir = dirname($entry['full_path']);
+            if (!dir_exist($dir)) {
+                mkdir($dir, 0700, true);
+            }
+            // Download the file from Dropbox. If it already exists, it might've been edited, so we get it anyway.
+            $file = $this->client->download($entry['full_path']);
+            //Save file contents to disk
+            file_put_contents($entry['full_path'], $file->getContents());
+            //Save File Metadata
+            file_put_contents($entry['full_path'].".txt", $file->getMetadata());
+        }
+    }
+
     /** save the current cursor to the DB. */
     function saveCursor(): void {
-        $m_userid = Db::escape(self::DROPBOX_USER_ID);
-        $m_cursor = Db::escape($this->cursor);
-        Db::sqlExec("INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `cursor_id` = ?", 'dss', '$m_userid', '$m_cursor', '$m_cursor');
+        Db::sqlExec("INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `cursor_id` = ?", 'dss', self::DROPBOX_USER_ID, $this->cursor, $this->cursor);
     }
 
     /** Load the current cursor from the DB. */
@@ -146,20 +184,6 @@ class InitDropbox {
 */
     /*
      foreach ($list as $fileEntry) {
-     switch ($fileEntry['.tag']) {
-     case 'folder';
-     echo "Folder: {$fileEntry['name']}\n";
-     break;
-
-     case 'file':
-     echo "File: {$fileEntry['name']}\n";
-
-     break;
-
-     default:
-     Db::adminDebug('Unknown value for $fileEntry[.tag]', $fileEntry);
-     break;
-     }
      }
      */
 }

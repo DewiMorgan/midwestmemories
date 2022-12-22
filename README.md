@@ -69,3 +69,22 @@ Photo archive for the family
     * [Browsing files/folders](https://www.youtube.com/watch?v=wfb6h9JyhBY)
     * [Text editor](https://www.youtube.com/watch?v=2puV9yXHiAA)
     * [Search filenames](https://www.youtube.com/watch?v=wlB276xVgsw)
+    
+## ToDo:
+Next:
+* Download files added to dropbox.
+* Create thumbnails for all files.
+* Create jpgs for oversized pngs.
+* Display thumbnails with a clickthrough to the images.
+* Display images in a folder with next/previous.
+Then:
+* Parse info texts.
+* Display info texts with folders and images.
+* Allow users to add more info texts.
+* Allow click people/things to name them, stores position in pic.
+* OR: allow create clickable faces in pic, maybe manually.
+* Highlight the clicked area when you mouseover a name?
+* Search for all images of a person when you click their name.
+Later:
+* Display images in a search resultset with next/previous.
+* Delete files deleted from dropbox?
