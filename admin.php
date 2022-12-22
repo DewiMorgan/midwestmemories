@@ -52,6 +52,7 @@ $db->sqlExec(
     $entriessofar = $_REQUEST['entriessofar'] ?? 0;
     echo "<p>Starting. Cursor='$cursor', Request=".var_export($_REQUEST,true)."</p>";
     $fp = new InitDropbox();
+    $list = [];
     if($initRoot) {
         echo "<h2>Initializing root cursor</h2>\n";
         $list = $fp->initRootCursor();
