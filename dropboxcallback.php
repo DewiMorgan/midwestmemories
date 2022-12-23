@@ -4,20 +4,19 @@
 
 // If it's a validation, validate and exit.
 validate();
+
 // Otherwise, log the query.
-$data = logQuery();
 use app\Db;
-use app\DropboxManager;
-require_once __DIR__ . '/vendor/autoload.php';
 require_once('app/Db.php');
-require_once('app/DropboxManager.php');
-Db::sqlExec("INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`, `webhook_timestamp`) VALUES (?, '', NOW()) ON DUPLICATE KEY UPDATE `webhook_timestamp` = NOW()", 'd', DropboxManager::DROPBOX_USER_ID);
+
+// Tag the user's cursor as "dirty".
+recordHook();
 
 // If it's a human, output readable text.
-friendlyOutput($data);
-// Tag the user's cursor as "dirty".
+friendlyOutput();
 
 exit();
+
 
 /**
  * Build a string to describe the inoming query, and log it.
@@ -51,11 +50,31 @@ function validate(): void {
     }
 }
 
+/** Record the timestamp that this hook was cxalled in the DB. */
+function recordHook(): void {
+    $body = file_get_contents('php://input');
+    if ($body) {
+        $decoded = json_decode($body, true);
+        if ($decoded && array_key_exists('delta', $decoded) && array_key_exists('users', $decoded['delta']) && count($decoded['delta']['users']) > 0) {
+            foreach ($decoded['delta']['users'] as $userId) {
+                Db::sqlExec("
+                    INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`, `webhook_timestamp`)
+                    VALUES (?, '', NOW())
+                    ON DUPLICATE KEY UPDATE `webhook_timestamp` = NOW()",
+                    'd',
+                    $userId
+                );
+            }
+        } else {
+            Db::sqlExec("UPDATE `midmem_dropbox_users` SET `webhook_timestamp` = NOW()");
+        }
+    }
+}
+
 /**
  * Show a nice mesage for humans calling this page.
- * @param string $data String to display - probably the request dat that was logged.
  */
-function friendlyOutput(string $data): void {
+function friendlyOutput(): void {
     $requestHeaders = apache_request_headers();
     if (array_key_exists('X-Dropbox-Signature', $requestHeaders)) {
         return;
