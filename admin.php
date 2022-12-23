@@ -50,7 +50,7 @@ Db::sqlExec(
     $initRoot = $_REQUEST['initroot'] ?? false;
     $continueRoot = $_REQUEST['continueroot'] ?? false;
     $checkCursor = $_REQUEST['checkcursor'] ?? false;
-    $processFiles = $_REQUEST['processfiles'] ?? false;
+    $processFiles = $_REQUEST['downloadfiles'] ?? false;
     $processDownloaded = $_REQUEST['processdownloaded'] ?? false;
     $entriessofar = intval($_REQUEST['entriessofar'] ?? 0 );
 
@@ -64,14 +64,16 @@ Db::sqlExec(
         echo "<h2>Continuing with root cursor init</h2>\n";
         $list = $fp->continueRootCursor($entriessofar);
     } elseif($checkCursor) {
-        echo "<h2>Checking cursor for updates</h2>\n";
+        echo "<h2>Checking cursor for updates...</h2>\n";
         $list = $fp->checkRootCursorForUpdates($entriessofar);
     } elseif($processFiles) {
-        echo "<h2>Processing files from the DB...</h2>\n";
-        $fp->processFilesFromDb();
+        echo "<h2>Downloading files from the DB queue...</h2>\n";
+        $numFiles = $fp->downloadFilesInDbQueue();
+        $list = ['NumberOfFilesDownloaded' => $numFiles];
     } elseif($processDownloaded) {
         echo "<h2>Processing downloaded files...</h2>\n";
-        $fp->downloadedfilehandler();
+        $numFiles = $fp->processDownloadedFiles();
+        $list = ['NumberOfFilesProcessed' => $numFiles];
     } else {
         echo "<h2>No command yet given.</h2>\n";
     }
@@ -110,8 +112,8 @@ Db::sqlExec(
         <button type="submit">Get latest updates from cursor into DB</button>
     </form>
     <form method="post">
-        <input type="hidden" name="processfiles" value="1"></input>
-        <button type="submit">Process files from DB</button>
+        <input type="hidden" name="downloadfiles" value="1"></input>
+        <button type="submit">Download files from DB queue</button>
     </form><br>
     <form method="post">
         <input type="hidden" name="processdownloaded" value="1"></input>

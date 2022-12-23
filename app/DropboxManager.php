@@ -87,7 +87,7 @@ class DropboxManager {
         self::loadCursor();
         $this->iterations = 0;
         $this->entries = $entriesSoFar;
-        $result = ['numFilesToProcess' => 0];
+        $result = ['numFilesQueued' => 0, 'numFilesProcessed' => 0];
         $endTime = time() + 20;
         try {
             $list = ['has_more' => true];
@@ -95,7 +95,8 @@ class DropboxManager {
                 $list = $this->client->listFolderContinue($this->cursor);
                 $this->saveCusorFromList($list);
                 $result = $this->getListOfEntries($result, $list);
-                $result['numFilesToProcess'] += $this->saveListOfFilesToProcess($list['entries']);
+                $result['numFilesQueued'] += $this->saveListOfFilesToDownload($list['entries']);
+                $result['numFilesProcessed'] += count($list);
                 $this->iterations ++;
             }
             return $result;
@@ -140,7 +141,7 @@ class DropboxManager {
      * .tag is file, folder, delete, or more.
      * @return number of files added to list.
      */
-    private function saveListOfFilesToProcess($list): int {
+    private function saveListOfFilesToDownload($list): int {
         $numberOfFiles = 0;
         foreach ($list as $entry) {
             // Skip anything we don't care about.
@@ -156,7 +157,11 @@ class DropboxManager {
         return $numberOfFiles;
     }
 
-    public function processFilesFromDb(): void {
+    /**
+     * Download all files from the midmem_file_queue.
+    * @return int number of files processed.
+    */
+    public function downloadFilesInDbQueue(): int {
         $endTime = time() + 20;
         $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue` WHERE `sync_status` = 'NEW'");
         foreach ($list as $entry) {
@@ -176,12 +181,14 @@ class DropboxManager {
             // Update the DB to DOWNLOADED or ERROR.
             Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = ? WHERE full_path = ?", 'ss', ($result ? 'DOWNLOADED' : 'ERROR'), $entry['full_path']);
         }
+        return count($list);
     }
 
     /*
     * Add thumbnails, resample images, and parse txt files, then set status to PROCESSED.
+    * @return int number of files processed.
     */
-    public function downloadedfilehandler() {
+    public function processDownloadedFiles(): int {
         $endTime = time() + 20;
         $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue` WHERE `sync_status` = 'DOWNLOADED'");
         foreach ($list as $entry) {
@@ -214,6 +221,7 @@ class DropboxManager {
                     break;
             }
         }
+        return count($list);
     }
 
     /**
