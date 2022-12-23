@@ -152,7 +152,7 @@ class DropboxManager {
             // Could check other .tag='file' fields, like 'is_downloadable'? But that should always be true, I think.
             // Could check 'content_hash' to see if it's unchanged? But if it's in our list, it should be changed.
             // Could check .tag='deleted' later in the list to see if it gets deleted again, but not an issue til we handle deletion anyway.
-            Db::sqlExec('INSERT INTO `midmem_file_queue` (`file_name`, `full_path`, `sync_status`) VALUES (?, ?, ?)', 'sss', $entry['name'], $entry['path_display'], 'NEW');
+            Db::sqlExec('INSERT INTO `midmem_file_queue` (`file_name`, `full_path`, `sync_status`) VALUES (?, ?, ?)', 'sss', $entry['name'], ltrim($entry['path_display'], '\\/'), 'NEW');
         }
         return $numberOfFiles;
     }
@@ -171,17 +171,18 @@ class DropboxManager {
                 return $numProcessed;
             }
             $numProcessed ++;
+            $fullPath = ltrim($entry['full_path'], '/\\');
             // If the dir doesn't exist, then create it.
-            $dir = ltrim(dirname($entry['full_path']), '/\\');
+            $dir = dirname($fullPath)
             if (!is_dir($dir) && !mkdir($dir, 0700, true)) {
-                Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_message` = ? WHERE full_path = ?", 'ss', "mkdir($dir,0700,true) failed", $entry['full_path']);
+                Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_message` = ? WHERE full_path = ?", 'ss', "mkdir($dir,0700,true) failed", $fullPath);
                 continue;
             }
             // Download the file from Dropbox. If it already exists, it might've been edited, so we get it anyway.
-            $url = $this->client->getTemporaryLink($entry['full_path']);
-            $result = $this->downloadUrlToPath($url, $entry['full_path']);
+            $url = $this->client->getTemporaryLink($entry['full_path']); // Requires NON-trimmed full path!
+            $result = $this->downloadUrlToPath($url, $fullPath);
             // Update the DB to DOWNLOADED or ERROR.
-            Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = ? WHERE full_path = ?", 'ss', ($result ? 'DOWNLOADED' : 'ERROR'), $entry['full_path']);
+            Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = ? WHERE full_path = ?", 'ss', ($result ? 'DOWNLOADED' : 'ERROR'), $fullPath);
         }
         return $numProcessed;
     }
@@ -200,7 +201,7 @@ class DropboxManager {
                 return $numProcessed;
             }
             $numProcessed ++;
-            $fullPath = $entry['full_path'];
+            $fullPath =  ltrim($entry['full_path'], '/\\');
             if (!file_exists($fullPath)) {
                 Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_message` = 'file_exists failed' WHERE full_path = ?", 's', $fullPath);
                 continue;
