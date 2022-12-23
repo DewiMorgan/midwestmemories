@@ -180,7 +180,7 @@ class Db {
         global $connection;
         $message = "ADBG: $str" . (is_null($obj) ? "." : ": " . var_export($obj, true));
         file_put_contents('error_log', "$message\n", FILE_APPEND);
-        if ($connection->isSuperAdmin) {
+        if (isset($connection) && $connection->isSuperAdmin) {
             echo "<pre>$message</pre>\n";
         }
     }

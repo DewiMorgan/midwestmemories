@@ -6,16 +6,12 @@
 validate();
 // Otherwise, log the query.
 $data = logQuery();
-// ToDo: this all seems silly. Make Connection a singleton, and hide it ALL behind a single autoloader.
 use app\Db;
-use app\Connection;
 use app\DropboxManager;
 require_once __DIR__ . '/vendor/autoload.php';
 require_once('app/Db.php');
-require_once('app/Connection.php');
 require_once('app/DropboxManager.php');
 Db::sqlExec("INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`, `webhook_timestamp`) VALUES (?, '', NOW()) ON DUPLICATE KEY UPDATE `webhook_timestamp` = NOW()", 'd', DropboxManager::DROPBOX_USER_ID);
-$connection = new Connection();
 
 // If it's a human, output readable text.
 friendlyOutput($data);
