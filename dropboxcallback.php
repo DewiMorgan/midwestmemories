@@ -53,21 +53,18 @@ function validate(): void {
 /** Record the timestamp that this hook was cxalled in the DB. */
 function recordHook(): void {
     $body = file_get_contents('php://input');
-    if ($body) {
-        $decoded = json_decode($body, true);
-        if ($decoded && array_key_exists('delta', $decoded) && array_key_exists('users', $decoded['delta']) && count($decoded['delta']['users']) > 0) {
-            foreach ($decoded['delta']['users'] as $userId) {
-                Db::sqlExec("
-                    INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`, `webhook_timestamp`)
-                    VALUES (?, '', NOW())
-                    ON DUPLICATE KEY UPDATE `webhook_timestamp` = NOW()",
-                    'd',
-                    $userId
-                );
-            }
-        } else {
-            Db::sqlExec("UPDATE `midmem_dropbox_users` SET `webhook_timestamp` = NOW()");
+    if ($body && $decoded = json_decode($body, true) && array_key_exists('delta', $decoded) && array_key_exists('users', $decoded['delta']) && count($decoded['delta']['users']) > 0) {
+        foreach ($decoded['delta']['users'] as $userId) {
+            Db::sqlExec("
+                INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`, `webhook_timestamp`)
+                VALUES (?, '', NOW())
+                ON DUPLICATE KEY UPDATE `webhook_timestamp` = NOW()",
+                'd',
+                $userId
+            );
         }
+    } else {
+        Db::sqlExec("UPDATE `midmem_dropbox_users` SET `webhook_timestamp` = NOW()");
     }
 }
 
