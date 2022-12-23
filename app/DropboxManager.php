@@ -96,7 +96,7 @@ class DropboxManager {
                 $this->saveCusorFromList($list);
                 $result = $this->getListOfEntries($result, $list);
                 $result['numFilesQueued'] += $this->saveListOfFilesToDownload($list['entries']);
-                $result['numFilesProcessed'] += count($list);
+                $result['numFilesProcessed'] += count($list['entries']);
                 $this->iterations ++;
             }
             return $result;
@@ -172,9 +172,9 @@ class DropboxManager {
             }
             $numProcessed ++;
             // If the dir doesn't exist, then create it.
-            $dir = dirname($entry['full_path']);
+            $dir = ltrim(dirname($entry['full_path']), '/\\');
             if (!is_dir($dir) && !mkdir($dir, 0700, true)) {
-                Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_mesage` = 'mkdir failed' WHERE full_path = ?", 's', $entry['full_path']);
+                Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_message` = ? WHERE full_path = ?", 'ss', "mkdir($dir,0700,true) failed", $entry['full_path']);
                 continue;
             }
             // Download the file from Dropbox. If it already exists, it might've been edited, so we get it anyway.
@@ -202,7 +202,7 @@ class DropboxManager {
             $numProcessed ++;
             $fullPath = $entry['full_path'];
             if (!file_exists($fullPath)) {
-                Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_mesage` = 'file_exists failed' WHERE full_path = ?", 's', $fullPath);
+                Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_message` = 'file_exists failed' WHERE full_path = ?", 's', $fullPath);
                 continue;
             }
 
