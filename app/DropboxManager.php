@@ -164,11 +164,13 @@ class DropboxManager {
     public function downloadFilesInDbQueue(): int {
         $endTime = time() + 20;
         $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue` WHERE `sync_status` = 'NEW'");
+        $numProcessed = 0;
         foreach ($list as $entry) {
             // Drop out early if we hit the time limit.
             if (time() > $endTime) {
-                return;
+                return $numProcessed;
             }
+            $numProcessed ++;
             // If the dir doesn't exist, then create it.
             $dir = dirname($entry['full_path']);
             if (!is_dir($dir) && !mkdir($dir, 0700, true)) {
@@ -181,7 +183,7 @@ class DropboxManager {
             // Update the DB to DOWNLOADED or ERROR.
             Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = ? WHERE full_path = ?", 'ss', ($result ? 'DOWNLOADED' : 'ERROR'), $entry['full_path']);
         }
-        return count($list);
+        return $numProcessed;
     }
 
     /*
