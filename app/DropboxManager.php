@@ -316,7 +316,7 @@ class DropboxManager {
     /**
     From https://stackoverflow.com/questions/6409462/downloading-a-large-file-using-curl
     */
-    public function elses_downloadUrlToPath(string $url, string $fullPath): bool {
+    public function downloadUrlToPath(string $url, string $fullPath): bool {
         set_time_limit(0);
         $success = false;
         $ch = false;
