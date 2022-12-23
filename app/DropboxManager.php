@@ -141,7 +141,7 @@ class DropboxManager {
             }
             // Download the file from Dropbox. If it already exists, it might've been edited, so we get it anyway.
             $url = $this->client->getTemporaryLink($entry['full_path']);
-            $result = $this->downloadUrlToPath(file_get_contents($url), $entry['full_path']);
+            $result = $this->downloadUrlToPath($url, $entry['full_path']);
             // Update the DB to DOWNLOADED or ERROR.
             Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = ? WHERE full_path = ?", 'ss', ($result ? 'DOWNLOADED' : 'ERROR'), $entry['full_path']);
         }
