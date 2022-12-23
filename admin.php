@@ -65,7 +65,7 @@ Db::sqlExec(
         $list = $fp->continueRootCursor($entriessofar);
     } elseif($checkCursor) {
         echo "<h2>Checking cursor for updates</h2>\n";
-        $list = $fp->continueRootCursor($entriessofar);
+        $list = $fp->checkRootCursorForUpdates($entriessofar);
     } elseif($processFiles) {
         echo "<h2>Processing files from the DB...</h2>\n";
         $fp->processFilesFromDb();
