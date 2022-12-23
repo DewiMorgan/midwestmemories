@@ -193,11 +193,13 @@ class DropboxManager {
     public function processDownloadedFiles(): int {
         $endTime = time() + 20;
         $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue` WHERE `sync_status` = 'DOWNLOADED'");
+        $numProcessed = 0;
         foreach ($list as $entry) {
             // Drop out early if we hit the time limit.
             if (time() > $endTime) {
-                return;
+                return $numProcessed;
             }
+            $numProcessed ++;
             $fullPath = $entry['full_path'];
             if (!file_exists($fullPath)) {
                 Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_mesage` = 'file_exists failed' WHERE full_path = ?", 's', $fullPath);
@@ -223,7 +225,7 @@ class DropboxManager {
                     break;
             }
         }
-        return count($list);
+        return $numProcessed;
     }
 
     /**
