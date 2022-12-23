@@ -9,6 +9,7 @@ $data = logQuery();
 // ToDo:
 use app\Db;
 use app\DropboxManager;
+require_once __DIR__ . '/vendor/autoload.php';
 require_once('app/Db.php');
 require_once('app/DropboxManager.php');
 Db::sqlExec("INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`, `webhook_timestamp`) VALUES (?, '', NOW()) ON DUPLICATE KEY UPDATE `webhook_timestamp` = NOW()", 'd', DropboxManager::DROPBOX_USER_ID);
