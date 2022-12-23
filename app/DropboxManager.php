@@ -136,7 +136,7 @@ class DropboxManager {
             // If the dir doesn't exist, then create it.
             $dir = dirname($entry['full_path']);
             if (!is_dir($dir) && !mkdir($dir, 0700, true)) {
-                // ToDo: log this and set error state.
+                Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_mesage` = 'mkdir failed' WHERE full_path = ?", 's', $entry['full_path']);
                 continue;
             }
             // Download the file from Dropbox. If it already exists, it might've been edited, so we get it anyway.
@@ -160,7 +160,7 @@ class DropboxManager {
             }
             $fullPath = $entry['full_path'];
             if (!file_exists($fullPath)) {
-                // ToDo: log and set error state.
+                Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_mesage` = 'file_exists failed' WHERE full_path = ?", 's', $fullPath);
                 continue;
             }
 
@@ -189,7 +189,8 @@ class DropboxManager {
     * Process text file, parsing fields into the db.
     */
     private function processTextFile($fullPath): void {
-        // ToDo
+        // ToDo: some parsing.
+        Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'PROCESSED' WHERE full_path = ?", 's', $fullPath);
     }
     /** Process a png file, generating thumbnail and converting to jpg if needed.*/
     private function processPngFile($fullPath) {
@@ -213,7 +214,8 @@ class DropboxManager {
     }
     /** Process an unknown file.*/
     private function processUnknownFile($fullPath) {
-        // ToDo
+        // Nothing to do but mark it complete.
+        Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'PROCESSED', `error_message`='Unknown type' WHERE full_path = ?", 's', $fullPath);
     }
 
     /** save the current cursor to the DB. */
@@ -236,7 +238,7 @@ class DropboxManager {
     */
     private function makeThumb($sourceImage, string $fullPath): bool {
         if (false === $sourceImage) {
-            // ToDo: log
+            Db::adminDebug('Source image false for makeThumb', $fullPath);
             return false;
         }
         // Files that begin with a dot and have no estension, eg '.example', will get thumbs called 'tn_.jpg'.
@@ -246,7 +248,7 @@ class DropboxManager {
         $origWidth = imagesx($sourceImage);
         $origHeight = imagesy($sourceImage);
         if (false === $origWidth || false === $origHeight) {
-            // ToDo: log
+            Db::adminDebug('Source image dimensions false for makeThumb', [$origWidth, $origHeight, $fullPath]);
             return false;
         }
         $newWidth = $origWidth;
@@ -264,19 +266,19 @@ class DropboxManager {
         /* Create a new, "virtual" image */
         $virtualImage = imagecreatetruecolor($newWidth, $newHeight);
         if (false === $virtualImage) {
-            // ToDo: log
+            Db::adminDebug('Virtualimage dimensions false for makeThumb', $fullPath);
             return false;
         }
 
         /* Resize and copy source image to new image */
-        if (!imagecopyresampled($virtualImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $origWidth, $origHeight)) {
-            // ToDo: log
+        if (false === imagecopyresampled($virtualImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $origWidth, $origHeight)) {
+            Db::adminDebug('imagecopyresampled failed for makeThumb', $fullPath);
             return false;
         }
 
         /* Create the physical thumbnail image at its destination */
-        if (!imagejpeg($virtualImage, $dest, 70)) {
-            // ToDo: log
+        if (false === imagejpeg($virtualImage, $dest, 70)) {
+            Db::adminDebug('imagejpeg failed for makeThumb', $fullPath);
             return false;
         }
 
@@ -292,15 +294,15 @@ class DropboxManager {
     private function convertToJpeg(string $fullPath): bool {
         $sourceImage = imagecreatefrompng($fullPath);
         if (false === $sourceImage) {
-            // ToDo: log
+            Db::adminDebug('Source image false for convertToJpeg', $fullPath);
             return false;
         }
 
         $dest = dirname($fullPath) . '/' . basename($fullPath, '.png') . '.jpg';
 
         /* Save as a renamed jpg at its destination */
-        if (!imagejpeg($sourceImage, $dest, 70)) {
-            // ToDo: log
+        if (false === imagejpeg($sourceImage, $dest, 70)) {
+            Db::adminDebug('imagejpeg failed for convertToJpeg', $fullPath);
             return false;
         }
         // Try to delete the huge file. If we can't, no big loss.
@@ -314,27 +316,48 @@ class DropboxManager {
     /**
     From https://stackoverflow.com/questions/6409462/downloading-a-large-file-using-curl
     */
-    public function downloadUrlToPath(string $url, string $fullpath) {
+    public function downloadUrlToPath(string $url, string $fullPath): bool {
         set_time_limit(0);
 
-        $fp = fopen ($fullpath, 'w+');
+        $fp = fopen($fullPath, 'w+');
+        if (false === $fp) {
+            Db::adminDebug('fopen failed for downloadUrlToPath', [$url, $fullPath]);
+            return false;
+        }
         $ch = curl_init($url);
+        if (false === $ch) {
+            Db::adminDebug('curl_init failed for downloadUrlToPath', [$url, $fullPath]);
+            return false;
+        }
 
         // These two only if https certificate isn't recognized.
         // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
         // if timeout (seconds) is too low, download will be interrupted
-        curl_setopt($ch, CURLOPT_TIMEOUT, 600);
+        $result = true;
+        $result = $result || curl_setopt($ch, CURLOPT_TIMEOUT, 600);
 
         // Write curl response to file
-        curl_setopt($ch, CURLOPT_FILE, $fp);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        $result = $result || curl_setopt($ch, CURLOPT_FILE, $fp);
+        $result = $result || curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        if (false == $result) {
+            Db::adminDebug('curl_setopt failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
+            return false;
+        }
 
         // Get curl response
-        curl_exec($ch);
+        if (false === curl_exec($ch)) {
+            Db::adminDebug('curl_exec failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
+            return false;
+        }
         curl_close($ch);
         fclose($fp);
+        if (!file_exists($fullPath)) {
+            Db::adminDebug('File cretion failed for downloadUrlToPath', [$url, $fullPath]);
+            return false;
+        }
+        return true;
     }
 
 
