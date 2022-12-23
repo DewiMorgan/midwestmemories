@@ -290,7 +290,7 @@ class DropboxManager {
         }
         // Files that begin with a dot and have no estension, eg '.example', will get thumbs called 'tn_.jpg'.
         $basename = preg_replace('/\..+?$/', '', basename($fullPath));
-        $dest = dirname($fullPath) . '/tn_' . $basename . 'jpg';
+        $dest = dirname($fullPath) . '/tn_' . $basename . '.jpg';
         // Read source image size.
         $origWidth = imagesx($sourceImage);
         $origHeight = imagesy($sourceImage);
