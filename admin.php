@@ -84,8 +84,6 @@ Db::sqlExec(
     } else {
         $cursor = $fp->cursor;
         echo "Cursor reassigned to '$cursor'.<br>";
-        $fp->saveCursor();
-        echo "Cursor saved to DB.<br>";
     }
     echo "Iterations: {$fp->iterations}.<br>Entries: {$fp->entries} (+$entriesChange).</p>";
     echo "<pre>" . var_export($list, true) . "</pre>";
