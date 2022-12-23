@@ -87,7 +87,7 @@ class DropboxManager {
         self::loadCursor();
         $this->iterations = 0;
         $this->entries = $entriesSoFar;
-        $result = [];
+        $result = ['numFilesToProcess' => 0];
         $endTime = time() + 20;
         try {
             $list = ['has_more' => true];
@@ -95,7 +95,7 @@ class DropboxManager {
                 $list = $this->client->listFolderContinue($this->cursor);
                 $this->saveCusorFromList($list);
                 $result = $this->getListOfEntries($result, $list);
-                $result = $this->saveListOfFilesToProcess($list['entries']);
+                $result['numFilesToProcess'] += $this->saveListOfFilesToProcess($list['entries']);
                 $this->iterations ++;
             }
             return $result;
