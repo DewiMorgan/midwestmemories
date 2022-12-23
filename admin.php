@@ -47,9 +47,10 @@ Db::sqlExec(
     <h1>Midwest Memories - admin</h1>
     <?php
     $cursor = $_REQUEST['cursor'] ?? 'AAGEBZi4qpzGvbL2PyF-FGkAj4kG8Lh-c4S9yv_vOIJYTdIzzcBoJ-0kMxCtgpz3v2OxNFbjCb4rQcHRCeGTuUR8bDORsfOqmI04YMfpFjL5V4ZZ4rTbiqAxyJh040tXFj0KccZVfj3s3ONr8CCaiICo0xRGDpUdSpqUj94gHuorl5GcPZImSec6F9CS9L_dEq5jTHSv1k2Pblu9SbEjYruikIuNlkQcLQB4z9vhi2HN6dcVNBeEWCgZ4Q5T5_0Qy1IeAZvmifMMIZsdpQ1gsEfRUerfwu3SPyV--57wWyCjPEeCG0Xq8iInmFFQPFjORbmEvi6dZgCIyD5SliAL94YR89Oq3c_VT6aJQkWQX8ffvjGxOGSvWHMD-uo0IJcmIZkOQy4MoYZnhTJWnPM5cfk1c8DifGY67boVQ4uYnNRToftg7liJlp5PDHV7U0ebrbpsNfMOLRar6np16GS4OHwXZaKjnQPSu_Kn3sY1gj93aD8c265wGP8B0_XA6rZELhb1d30Elml7eb4VrrfKAI2iMWY3Q71Jj8eXLgV40uU1BdW9RYLg3nTa8HrfuGffFUsCZRNDIJbTyCqJGLADJoYseJRH5MC3xUtZ0_EoJUPqkPGP7VPjyVh9ReFkrfh3xO36hQ0dZGp90Eu6wL9wsyrn6s0jI5MnBB24aIhFlhu698gb_-BX0p2kUF-aHgaFn-4s7ze0Wj-_QkNYYNK8h_Fbto51u1WKaMoxEgH7oEdh68dq8bBDBM-pEKjA7lBL7GXJHo60wTRRMfuqViKPZmowSOReztH9VH0HVmX3wCUQPDUqdPa8sDJbAdfU4aVk8mEhP-ew-4Xwsn1zEJ8wFLfRg0OsNQTXAaytsZWKvYxzfM3lYJE5LmkYcUMKZQpWMvE';
-    $processFiles = $_REQUEST['processfiles'] ?? false;
     $initRoot = $_REQUEST['initroot'] ?? false;
     $continueRoot = $_REQUEST['continueroot'] ?? false;
+    $checkCursor = $_REQUEST['checkcursor'] ?? false;
+    $processFiles = $_REQUEST['processfiles'] ?? false;
     $processDownloaded = $_REQUEST['processdownloaded'] ?? false;
     $entriessofar = intval($_REQUEST['entriessofar'] ?? 0 );
 
@@ -60,7 +61,10 @@ Db::sqlExec(
         echo "<h2>Initializing root cursor</h2>\n";
         $list = $fp->initRootCursor();
     } elseif($continueRoot) {
-        echo "<h2>Continuing with the root cursor</h2>\n";
+        echo "<h2>Continuing with root cursor init</h2>\n";
+        $list = $fp->continueRootCursor($entriessofar);
+    } elseif($checkCursor) {
+        echo "<h2>Checking cursor for updates</h2>\n";
         $list = $fp->continueRootCursor($entriessofar);
     } elseif($processFiles) {
         echo "<h2>Processing files from the DB...</h2>\n";
@@ -92,14 +96,6 @@ Db::sqlExec(
 
     ?>
     <form method="post">
-        <input type="hidden" name="processfiles" value="1"></input>
-        <button type="submit">Process files from DB</button>
-    </form><br>
-    <form method="post">
-        <input type="hidden" name="processdownloaded" value="1"></input>
-        <button type="submit">Process downloaded files</button>
-    </form><br>
-    <form method="post">
         <input type="hidden" name="initroot" value="1"></input>
         <button type="submit">Initialize new root cursor</button>
     </form><br>
@@ -107,7 +103,21 @@ Db::sqlExec(
         <input type="text" name="entriessofar" value="<?=htmlspecialchars($entriessofar)?>"></input>
         <input type="text" name="cursor" value="<?=htmlspecialchars($cursor)?>"></input>
         <input type="hidden" name="continueroot" value="1"></input>
-        <button type="submit">Continue initializing root cursor, or get latest updates</button>
+        <button type="submit">Continue initializing root cursor</button>
     </form>
+    <form method="post">
+        <input type="text" name="entriessofar" value="<?=htmlspecialchars($entriessofar)?>"></input>
+        <input type="text" name="cursor" value="<?=htmlspecialchars($cursor)?>"></input>
+        <input type="hidden" name="checkcursor" value="1"></input>
+        <button type="submit">Get latest updates from cursor into DB</button>
+    </form>
+    <form method="post">
+        <input type="hidden" name="processfiles" value="1"></input>
+        <button type="submit">Process files from DB</button>
+    </form><br>
+    <form method="post">
+        <input type="hidden" name="processdownloaded" value="1"></input>
+        <button type="submit">Process downloaded files</button>
+    </form><br>
   </body>
 </html>

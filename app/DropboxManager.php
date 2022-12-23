@@ -28,7 +28,7 @@ class DropboxManager {
      * Get the recursive list of all files for this website. Might be LONG.
      * @return string of file details.
      */
-    function initRootCursor(): array {
+    public function initRootCursor(): array {
         $this->iterations = 0;
         $this->entries = 1;
         $result = [];
@@ -38,12 +38,12 @@ class DropboxManager {
             if (array_key_exists('entries', $list)) {
                 $this->iterations = 1;
                 $this->saveCusorFromList($list);
-                $result = $this->handleEntries($result, $list);
+                $result = $this->getListOfEntries($result, $list);
             }
             while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
                 $list = $this->client->listFolderContinue($this->cursor);
                 $this->saveCusorFromList($list);
-                $result = $this->handleEntries($result, $list);
+                $result = $this->getListOfEntries($result, $list);
                 $this->iterations ++;
             }
             return $result;
@@ -57,7 +57,7 @@ class DropboxManager {
      * @param int $entriesSoFar How many antries have already been processed in this run of the script.
      * @return string of file details.
      */
-    function continueRootCursor(int $entriesSoFar): array {
+    public function continueRootCursor(int $entriesSoFar): array {
         self::loadCursor();
         $this->iterations = 0;
         $this->entries = $entriesSoFar;
@@ -68,7 +68,34 @@ class DropboxManager {
             while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
                 $list = $this->client->listFolderContinue($this->cursor);
                 $this->saveCusorFromList($list);
-                $result = $this->handleEntries($result, $list);
+                $result = $this->getListOfEntries($result, $list);
+                $this->iterations ++;
+            }
+            return $result;
+        } catch (Exception $e) {
+            die(var_export($e));
+        }
+        return $result;
+    }
+
+    /**
+     * Get the list of updated files for the given cursor, up to a timeout.
+     * @param int $entriesSoFar How many antries have already been processed in this run of the script.
+     * @return string of file details.
+     */
+    public function checkRootCursorForUpdates(int $entriesSoFar): array {
+        self::loadCursor();
+        $this->iterations = 0;
+        $this->entries = $entriesSoFar;
+        $result = [];
+        $endTime = time() + 20;
+        try {
+            $list = ['has_more' => true];
+            while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
+                $list = $this->client->listFolderContinue($this->cursor);
+                $this->saveCusorFromList($list);
+                $result = $this->getListOfEntries($result, $list);
+                $result = $this->saveListOfFilesToProcess($list['entries']);
                 $this->iterations ++;
             }
             return $result;
@@ -84,7 +111,7 @@ class DropboxManager {
      * @param array $list The data array to pull the entries from.
      * @return array
      */
-    private function handleEntries($result, $list): array {
+    private function getListOfEntries($result, $list): array {
         if (array_key_exists('entries', $list)) {
             foreach ($list['entries'] as $fileEntry) {
                 $this->entries++;
@@ -111,18 +138,22 @@ class DropboxManager {
      * Save files to the queue, to process later.
      * @param array $list Array of entries, each an array with elements '.tag', 'name', 'path_lower', 'path_display' and maybe more.
      * .tag is file, folder, delete, or more.
+     * @return number of files added to list.
      */
-    private function saveListOfFilesToProcess($list): void {
+    private function saveListOfFilesToProcess($list): int {
+        $numberOfFiles = 0;
         foreach ($list as $entry) {
             // Skip anything we don't care about.
             if ('file' !== $entry['.tag'] || !preg_match('#^/midwestmemories/#', $entry['path_lower'])) {
                 continue;
             }
+            $numberOfFiles++;
             // Could check other .tag='file' fields, like 'is_downloadable'? But that should always be true, I think.
             // Could check 'content_hash' to see if it's unchanged? But if it's in our list, it should be changed.
             // Could check .tag='deleted' later in the list to see if it gets deleted again, but not an issue til we handle deletion anyway.
             Db::sqlExec('INSERT INTO `midmem_file_queue` (`file_name`, `full_path`, `sync_status`) VALUES (?, ?, ?)', 'sss', $entry['name'], $entry['path_display'], 'NEW');
         }
+        return $numberOfFiles;
     }
 
     public function processFilesFromDb(): void {
