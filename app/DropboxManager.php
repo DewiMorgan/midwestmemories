@@ -316,48 +316,45 @@ class DropboxManager {
     /**
     From https://stackoverflow.com/questions/6409462/downloading-a-large-file-using-curl
     */
-    public function downloadUrlToPath(string $url, string $fullPath): bool {
+    public function elses_downloadUrlToPath(string $url, string $fullPath): bool {
         set_time_limit(0);
+        $success = false;
+        $ch = false;
+        $fp = false;
 
-        $fp = fopen($fullPath, 'w+');
-        if (false === $fp) {
+        // Check and log each step of downloading the file. Daisychained elseif ensures handles get closed at the end.
+        if (false === $fp = fopen($fullPath, 'w+')) {
             Db::adminDebug('fopen failed for downloadUrlToPath', [$url, $fullPath]);
-            return false;
-        }
-        $ch = curl_init($url);
-        if (false === $ch) {
+        } elseif (false === $ch = curl_init($url)) {
             Db::adminDebug('curl_init failed for downloadUrlToPath', [$url, $fullPath]);
-            return false;
-        }
-
-        // These two only if https certificate isn't recognized.
-        // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-
-        // if timeout (seconds) is too low, download will be interrupted
-        $result = true;
-        $result = $result || curl_setopt($ch, CURLOPT_TIMEOUT, 600);
-
-        // Write curl response to file
-        $result = $result || curl_setopt($ch, CURLOPT_FILE, $fp);
-        $result = $result || curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        if (false == $result) {
+        } elseif (false === (
+            // if timeout (seconds) is too low, download will be interrupted
+            curl_setopt($ch, CURLOPT_TIMEOUT, 600)
+            && curl_setopt($ch, CURLOPT_FILE, $fp) // Write curl response to file
+            && curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true)
+            // These two only if https certificate isn't recognized.
+            // && curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0)
+            // && curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0)
+        )) {
             Db::adminDebug('curl_setopt failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
-            return false;
+        } elseif (false === curl_exec($ch)) { // Get curl response
+            Db::adminDebug('curl_exec failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
+        } else if (false === file_exists($fullPath)) {
+            Db::adminDebug('File cretion failed for downloadUrlToPath', [$url, $fullPath]);
+        } else {
+            Db::adminDebug('Success: downloadUrlToPath', [$url, $fullPath]);
+            $success = true;
         }
 
-        // Get curl response
-        if (false === curl_exec($ch)) {
-            Db::adminDebug('curl_exec failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
-            return false;
+        // Close the handles.
+        if (false !== $ch) {
+            curl_close($ch);
         }
-        curl_close($ch);
-        fclose($fp);
-        if (!file_exists($fullPath)) {
-            Db::adminDebug('File cretion failed for downloadUrlToPath', [$url, $fullPath]);
-            return false;
+        if (false !== $fp) {
+            fclose($fp);
         }
-        return true;
+
+        return $success;
     }
 
 
