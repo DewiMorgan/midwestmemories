@@ -215,10 +215,13 @@ class DropboxManager {
                     break;
                 case 'image/gif':
                     $this->processGifFile($fullPath);
+                    break;
                 case 'image/png':
                     $this->processPngFile($fullPath);
+                    break;
                 case 'image/jpeg':
                     $this->processJpegFile($fullPath);
+                    break;
                 case 'directory':
                 case 'application/x-empty': // Zero length file
                 default:
