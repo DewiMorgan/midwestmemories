@@ -173,7 +173,7 @@ class DropboxManager {
             $numProcessed ++;
             $fullPath = ltrim($entry['full_path'], '/\\');
             // If the dir doesn't exist, then create it.
-            $dir = dirname($fullPath)
+            $dir = dirname($fullPath);
             if (!is_dir($dir) && !mkdir($dir, 0700, true)) {
                 Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_message` = ? WHERE full_path = ?", 'ss', "mkdir($dir,0700,true) failed", $fullPath);
                 continue;
