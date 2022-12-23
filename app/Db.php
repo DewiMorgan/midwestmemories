@@ -31,7 +31,7 @@ class Db {
     }
 
     public static function sqlExec(string $sql, string ...$items): void {
-        self::adminDebug('sqlExec', $sql);
+        self::adminDebug('sqlExec', [$sql, $items]);
         $db = self::getInstance()->db;
         if ($query = $db->prepare($sql)) {
             if (!empty($items)) {
@@ -49,7 +49,7 @@ class Db {
      * @return null|string
      */
     public static function sqlGetItem(string $sql, string $field, string ...$items): ?string {
-        self::adminDebug('sqlGetItem', $sql);
+        self::adminDebug('sqlGetItem', [$sql, $items]);
         $db = self::getInstance()->db;
         if (!($query = $db->prepare($sql))) {
             self::adminDebug('prepare failed, dberr', $db->error);
@@ -90,7 +90,7 @@ class Db {
      * @return array
      */
     public static function sqlGetRow(string $sql, string ...$items): array {
-        self::adminDebug('sqlGetRow', $sql);
+        self::adminDebug('sqlGetRow', [$sql, $items]);
         $db = self::getInstance()->db;
         if (!($query = $db->prepare($sql))) {
             self::adminDebug('prepare failed, dberr', $db->error);
