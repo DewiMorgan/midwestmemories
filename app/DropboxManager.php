@@ -250,7 +250,7 @@ class DropboxManager {
     }
 
     /** save the current cursor to the DB. */
-    private function saveCursor(): void {
+    public function saveCursor(): void {
         Db::sqlExec("INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `cursor_id` = ?", 'dss', self::DROPBOX_USER_ID, $this->cursor, $this->cursor);
     }
 
