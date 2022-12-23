@@ -296,6 +296,7 @@ class DropboxManager {
             return false;
         }
         $newWidth = $origWidth;
+        $newHeight = $origHeight;
         // Scale to max width if needed.
         if ($origHeight > self::MAX_THUMB_HEIGHT) {
             $newHeight = self::MAX_THUMB_HEIGHT;
