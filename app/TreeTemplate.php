@@ -5,31 +5,50 @@
         .container {
             display: flex;
         }
+
+        /* Drag-bar styling. */
+        .column {
+            flex-grow: 1;
+            background-color: #eee;
+        }
+        .left-column {
+            width: 25%;
+        }
+        .right-column {
+            width: 75%;
+        }
+        .drag-bar {
+            width: 10px;
+            background-color: #ccc;
+            cursor: col-resize;
+        }
+
+        /* Tree-view styling. */
         .tree-view {
-            width: 200px;
             background-color: lightgrey;
         }
-        .hello-world {
-            flex: 1;
-            background-color: lightblue;
-        }
-        /* Style the folders in the tree view. */
+        /* Folders in the tree view. */
         .folder {
             cursor: pointer;
         }
-        /* Style the expand/collapse span. */
+        /* Expand/collapse span. */
         .expand-collapse {
             font-weight: bold;
         }
-        /* Style the files in the tree view. */
+        /* Files in the tree view. */
         .file {
             cursor: default;
+        }
+
+        /* Content styling. */
+        .content {
+            background-color: lightblue;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="tree-view">
+    <div class="tree-view column left-column">
         <?php
         // Set the root directory to display in the tree view.
         $root = __DIR__ . '/../';
@@ -83,11 +102,46 @@
         ?>
     </div>
 
-    <div class="hello-world">Hello, world!</div>
+    <div class="drag-bar"></div>
+    <div class="content column right-column">Hello, world!</div>
 </div>
 
 <script>
-    // Add event listeners and handle expand/collapse behavior.
+    // DragBar behavior.
+
+    const dragBar = document.querySelector('.drag-bar');
+    const leftColumn = document.querySelector('.left-column');
+    const rightColumn = document.querySelector('.right-column');
+
+    let isDragging = false;
+    let currentX;
+    let leftColumnWidth;
+    let rightColumnWidth;
+
+    dragBar.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        currentX = e.clientX;
+        leftColumnWidth = leftColumn.offsetWidth;
+        rightColumnWidth = rightColumn.offsetWidth;
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isDragging) { return; }
+        e.preventDefault();
+        const deltaX = e.clientX - currentX;
+        const newLeftColumnWidth = Math.max(50, leftColumnWidth + deltaX);
+        const newRightColumnWidth = Math.max(50, rightColumnWidth - deltaX);
+        leftColumn.style.width = newLeftColumnWidth + 'px';
+        rightColumn.style.width = newRightColumnWidth + 'px';
+    });
+
+    document.addEventListener('mouseup', function(e) {
+        isDragging = false;
+    });
+</script>
+
+<script>
+    // Tree view event listeners and handle expand/collapse behavior.
 
     // Get all the folder elements in the tree view.
     const folders = document.querySelectorAll('.folder');
