@@ -3,6 +3,7 @@
     <title>Folder navigation</title>
     <style>
         .container, body {
+            width: 100%;
             display: flex;
             overflow: hidden;
         }
