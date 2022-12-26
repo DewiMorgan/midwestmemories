@@ -4,6 +4,7 @@
     <style>
         .container {
             display: flex;
+            overflow: hidden;
         }
 
         /* Drag-bar styling. */
@@ -13,11 +14,11 @@
         }
         .left-column {
             width: 25%;
-            overflow: scroll;
+            overflow: auto;
         }
         .right-column {
             width: 75%;
-            overflow: scroll;
+            overflow: auto;
         }
         .drag-bar {
             width: 10px;
