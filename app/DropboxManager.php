@@ -14,7 +14,7 @@ class DropboxManager {
     public int $iterations = 0;
     private const DROPBOX_PATH = '/midwestmemories';
     public const DROPBOX_USER_ID = 16181197;
-    private const MAX_PNG_SIZE = 1024 * 1024; // Max PNG size in bytes  before resampling to JPG.
+    private const MAX_PNG_SIZE = 1024 * 1024; // Max PNG size in bytes before resampling to JPG.
     private const MAX_THUMB_WIDTH = 64;
     private const MAX_THUMB_HEIGHT = 64;
 
@@ -37,12 +37,12 @@ class DropboxManager {
         $list = $this->client->listFolder('', true);
         if (array_key_exists('entries', $list)) {
             $this->iterations = 1;
-            $this->saveNewCursor($list['cursor']);
+            $this->setNewCursor($list['cursor']);
             $result = $this->getListOfEntries($result, $list);
         }
         while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
             $list = $this->client->listFolderContinue($this->cursor);
-            $this->saveNewCursor($list['cursor']);
+            $this->setNewCursor($list['cursor']);
             $result = $this->getListOfEntries($result, $list);
             $this->iterations ++;
         }
@@ -63,7 +63,7 @@ class DropboxManager {
         $list = ['has_more' => true];
         while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
             $list = $this->client->listFolderContinue($this->cursor);
-            $this->saveNewCursor($list['cursor']);
+            $this->setNewCursor($list['cursor']);
             $result = $this->getListOfEntries($result, $list);
             $this->iterations ++;
         }
@@ -84,7 +84,7 @@ class DropboxManager {
         $list = ['has_more' => true];
         while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
             $list = $this->client->listFolderContinue($this->cursor);
-            $this->saveNewCursor($list['cursor']);
+            $this->setNewCursor($list['cursor']);
             $result = $this->getListOfEntries($result, $list);
             $this->iterations ++;
             $result['numFilesQueued'] += $this->saveFileQueue($list['entries']);
@@ -109,13 +109,21 @@ class DropboxManager {
     }
 
     /**
-     * Save the array element 'cursor', if any.
-     * @param array $list An array that might have an element 'cursor'.
+     * Persistently set the cursor to a new value.
+     * @param string $cursor The cursor string.
      */
-     private function saveNewCursor(array $list): void {
-        if (!empty($list['cursor']) && $this->cursor != $list['cursor']) {
-            $this->cursor = $list['cursor'];
-            self::saveCursor();
+     private function setNewCursor(string $cursor): void {
+        if (!empty($cursor) && $this->cursor != $cursor) {
+            $this->cursor = $cursor;
+            Db::sqlExec(
+                'INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`) 
+                VALUES (?, ?) 
+                ON DUPLICATE KEY UPDATE `cursor_id` = ?',
+                'dss',
+                self::DROPBOX_USER_ID,
+                $cursor,
+                $cursor
+            );
         }
     }
 
@@ -274,19 +282,6 @@ class DropboxManager {
                 WHERE full_path = ?",
             's',
             $fullPath
-        );
-    }
-
-    /** Save the current cursor to the DB. */
-    public function saveCursor(): void {
-        Db::sqlExec(
-            'INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`) 
-                VALUES (?, ?) 
-                ON DUPLICATE KEY UPDATE `cursor_id` = ?',
-            'dss',
-            self::DROPBOX_USER_ID,
-            $this->cursor,
-            $this->cursor
         );
     }
 
