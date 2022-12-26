@@ -148,14 +148,14 @@ class Connection {
     * @return bool True if the IP is a valid public IP.
     */
     private function validatePublicIp(string $ip): bool {
-        return filter_var(
+        return (false !== filter_var(
             $ip,
             FILTER_VALIDATE_IP,
             FILTER_FLAG_IPV4 |
             FILTER_FLAG_IPV6 |
             FILTER_FLAG_NO_PRIV_RANGE |
             FILTER_FLAG_NO_RES_RANGE
-        );
+        ));
     }
 
     /** Just check an IP address truly is one.
