@@ -69,8 +69,9 @@ class Db {
     public static function readIniInParents(string $filename): array|false {
         $dir = getcwd();
         while ($dir != '/') {
+            self::adminDebug("Checking $dir / $filename.");
             if (file_exists($dir . '/' . $filename)) {
-                return parse_ini_file($filename);
+                return parse_ini_file($dir . '/' . $filename);
             }
             $dir = dirname($dir);
         }
