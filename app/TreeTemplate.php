@@ -13,9 +13,11 @@
         }
         .left-column {
             width: 25%;
+            overflow: scroll;
         }
         .right-column {
             width: 75%;
+            overflow: scroll;
         }
         .drag-bar {
             width: 10px;
