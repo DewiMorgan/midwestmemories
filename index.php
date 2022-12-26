@@ -31,12 +31,12 @@ Db::sqlExec(
     'sssss',
     $connection->request, $connection->ip,  $connection->ipList, $connection->user, $connection->agent
 );
-/*
 if (empty($path)) {
     include('app/TreeTemplate.php');
 } elseif(str_ends_with($path, '/')) {
-    include('app/ThumbsTemplate.php');
+    echo "$path: should load app/ThumbsTemplate.php";
+    // include('app/ThumbsTemplate.php');
 } else {
-    include('app/FileTemplate.php');
+    echo "$path: should load app/FileTemplate.php";
+    // include('app/FileTemplate.php');
 }
-*/
