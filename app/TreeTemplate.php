@@ -5,15 +5,18 @@
         body {
             overflow: hidden;
         }
+/*
         .container {
             width: 100%;
             display: flex;
             overflow: hidden;
         }
-
+*/
         /* Drag-bar styling. */
         .column {
+/*
             flex-grow: 1;
+*/
             background-color: #eee;
         }
         .left-column {
@@ -25,7 +28,9 @@
             overflow: auto;
         }
         .drag-bar {
-            width: 10px;
+/*
+            flex: 0 0 10px;
+ */
             background-color: #ccc;
             cursor: col-resize;
         }
@@ -54,7 +59,9 @@
     </style>
 </head>
 <body>
+<!--
 <div class="container">
+ -->
     <div class="tree-view column left-column">
         <?php
         // Set the root directory to display in the tree view.
@@ -111,8 +118,9 @@
 
     <div class="drag-bar"></div>
     <div class="content column right-column">Hello, world!</div>
+<!--
 </div>
-
+-->
 <script>
     // DragBar behavior.
 
@@ -136,13 +144,13 @@
         if (!isDragging) { return; }
         e.preventDefault();
         const deltaX = e.clientX - currentX;
-        const newLeftColumnWidth = Math.max(50, leftColumnWidth + deltaX);
-        const newRightColumnWidth = Math.max(50, rightColumnWidth - deltaX);
+        const newLeftColumnWidth = Math.max(25, leftColumnWidth + deltaX);
+        const newRightColumnWidth = Math.max(25, rightColumnWidth - deltaX);
         leftColumn.style.width = newLeftColumnWidth + 'px';
         rightColumn.style.width = newRightColumnWidth + 'px';
     });
 
-    document.addEventListener('mouseup', function(e) {
+    document.addEventListener('mouseup', function() {
         isDragging = false;
     });
 </script>
