@@ -15,14 +15,11 @@ if(array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' == $_S
 $_SESSION['login'] = 'true';
 $_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
 
+require_once('app/autoload.php');
 use app\Db;
 use app\Connection;
 //use app\DropboxManager;
 
-require_once __DIR__ . '/vendor/autoload.php';
-require_once('app/Db.php');
-require_once('app/Connection.php');
-//require_once('app/DropboxManager.php');
 $connection = new Connection();
 
 // ToDo: better user input validation of this.
@@ -34,23 +31,12 @@ Db::sqlExec(
     'sssss',
     $connection->request, $connection->ip,  $connection->ipList, $connection->user, $connection->agent
 );
-?>
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <link rel="shortcut icon" href ="/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="icon" href ="/favicon.ico">
-    <link rel="manifest" href="/site.webmanifest">
-    <title>Midwest Memories</title>
-    <meta charset="UTF-8">
-  </head>
-  <body>
-    <h1><?= $h_path ?></h1>
-    <?php
 
-    ?>
-  </body>
-</html>
+if (empty($path)) {
+    include('app/TreeTemplate.php');
+} elseif(str_ends_with($path, '/')) {
+    include('app/ThumbsTemplate.php');
+} else {
+    include('app/FileTemplate.php');
+
+}

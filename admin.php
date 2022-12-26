@@ -23,11 +23,11 @@ if(array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' == $_S
 $_SESSION['login'] = 'true';
 $_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
 
+require_once('app/autoload.php');
 use app\Db;
 use app\Connection;
 use app\DropboxManager;
 
-require_once('app/autoload.php');
 $connection = new Connection();
 
 // Log this login.
