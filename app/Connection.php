@@ -163,12 +163,11 @@ class Connection {
     * @return bool True if the IP is a valid IP.
     */
     private function validateIp(string $ip): bool {
-        return filter_var(
+        return (false !== filter_var(
             $ip,
             FILTER_VALIDATE_IP,
-            FILTER_FLAG_IPV4 |
-            FILTER_FLAG_IPV6
-        );
+            FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6
+        ));
     }
 
     /** Get a string describing the object.

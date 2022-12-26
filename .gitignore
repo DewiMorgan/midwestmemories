@@ -1,3 +1,5 @@
 MySqlAuth.ini
 DropboxAuth.ini
 error_log
+callback.out
+inst-mwm.log

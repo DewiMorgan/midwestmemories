@@ -108,7 +108,7 @@ function logCommand(): string {
         <h2>Execute a command</h2>
 
         <form method="post">
-            <input type="hidden" name="key" value="<?= htmlspecialchars($_REQUEST['key']) ?>">
+            <input type="hidden" name="key" value="<?= htmlspecialchars($_REQUEST['key'] ?? '') ?>">
             <label for="cmd"><strong>Command</strong></label>
             <div class="form-group">
                 <input type="text" name="cmd" id="cmd" value="<?= htmlspecialchars($cmd, ENT_QUOTES, 'UTF-8') ?>"
