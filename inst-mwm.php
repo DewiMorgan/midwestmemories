@@ -1,45 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-/* No longer needed as we're using .htpasswd instead.
-$hash = '68294cf2dcf09372f59e46bacf9e4fa2dc0822c0ed8d45b0b351f83789625b06';
-if (empty($_REQUEST['key']) || hash('sha256', $_REQUEST['key']) != $hash) {
-    echo '<head><title>Log in</title></head><body>
-        <form method="post">
-            <input type="text" name="key" value=""></input>
-            <button type="submit">Log in</button>
-        </form></body></html>';
-    exit();
-}
-*/
-
 $cmd = '';
 if (!empty($_POST['cmd'])) {
     $cmd = $_POST['cmd'];
-    $descriptorspec = array(
-       0 => array("pipe", "r"),  // stdin
-       1 => array("pipe", "w"),  // stdout
-       2 => array("pipe", "w"),  // stderr
-    );
+    $descriptorSpec = [
+       0 => ['pipe', 'r'],  // stdin
+       1 => ['pipe', 'w'],  // stdout
+       2 => ['pipe', 'w'],  // stderr
+    ];
 
-    // And, then, execute the test.sh command, using those descriptors, in the current directory, and saying the i/o should be from/to $pipes :
-    $pipes = null;
-    // The $process useless var NEEDS to exist, and #pipes NEEDS to be undefined, or this doesn't work.
-    $process = proc_open($cmd, $descriptorspec, $pipes, dirname(__FILE__), null);
+    // Run the command with those descriptors, in the current directory, with i/o through $pipes:
+    $pipes = [];
+    // The $process useless var NEEDS to exist, or this doesn't work.
+    $process = proc_open($cmd, $descriptorSpec, $pipes, dirname(__FILE__), null);
 
     // We can now read from the two output pipes :
     $stdout = stream_get_contents($pipes[1]);
     fclose($pipes[1]);
     $stderr = stream_get_contents($pipes[2]);
     fclose($pipes[2]);
+    logCommand();
 }
 
 /**
- * Build a string to describe the incoming query, and log it.
+ * Build a string to describe and log the incoming query.
  * @return string The data that was logged.
  * Note: MUST NOT echo anything to headers or stdout, or validate() will break.
  */
-function logCommand() {
+function logCommand(): string {
     $filename = 'inst-mwm.log';
     $timestamp = date('Y-m-d H:i:s: ');
     $data = $timestamp . $_POST['cmd'] . "\n";
@@ -119,7 +108,7 @@ function logCommand() {
         <h2>Execute a command</h2>
 
         <form method="post">
-            <input type="hidden" name="key" value="<?=htmlspecialchars($_REQUEST['key'])?>"></input>
+            <input type="hidden" name="key" value="<?= htmlspecialchars($_REQUEST['key']) ?>">
             <label for="cmd"><strong>Command</strong></label>
             <div class="form-group">
                 <input type="text" name="cmd" id="cmd" value="<?= htmlspecialchars($cmd, ENT_QUOTES, 'UTF-8') ?>"

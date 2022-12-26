@@ -1,5 +1,9 @@
 {
-    "require": {
-         "spatie/dropbox-api": "1.21.*"
-    }
+  "require": {
+    "spatie/dropbox-api": "1.21.*",
+    "ext-mysqli": "*",
+    "ext-fileinfo": "*",
+    "ext-gd": "*",
+    "ext-curl": "*"
+  }
 }

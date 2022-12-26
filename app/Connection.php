@@ -1,28 +1,41 @@
 <?php
+declare(strict_types=1);
 namespace app;
-
-// ToDo:
-// isBot to use BotSign table.
-// Do something with the ipLookup table.
-// Timestamps with timezone-aware display.
-// Make admin levels more DB-configurable.
-// Ability to register accounts (with authorization)
-// Ability to change passwords
-
+/**
+ * Manage HTTP request connection data.
+ * ToDo:
+ *  isBot to use BotSign table.
+ *  Do something with the ipLookup table.
+ *  Timestamps with timezone-aware display.
+ *  Make admin levels more DB-configurable.
+ *  Ability to register accounts (with authorization)
+ *  Ability to change passwords
+*/
 class Connection {
-    public $request = '';
-    public $date = '';
-    public $ip = '';
-    public $ipList = '';
-    public $agent = '';
-    public $user = '';
-    public $isBot = false;
-    public $isAdmin = false;
-    public $isSuperAdmin = false;
-    public $target = '';
 
-    public function __construct() {
-        // $request and $alias.
+    /**
+     * @param string $request -- URL requested, via $_SERVER['REQUEST_URI']
+     * @param string $date    -- Current date.
+     * @param string $ip      -- Requesting IP.
+     * @param string $ipList  -- List of possible originating IPs.
+     * @param string $agent   -- User-agent information.
+     * @param string $user    -- Best guess at the current user.
+     * @param bool $isBot     -- True if user looks like a known bot.
+     * @param bool $isAdmin
+     * @param bool $isSuperAdmin
+     */
+    public function __construct(
+        public string $request = '',
+        public string $date = '',
+        public string $ip = '',
+        public string $ipList = '',
+        public string $agent = '',
+        public string $user = '',
+        public bool $isBot = false,
+        public bool $isAdmin = false,
+        public bool $isSuperAdmin = false
+    ) {
+        // $request.
         if (!empty($_SERVER['REQUEST_URI'])) {
             $this->request = $_SERVER['REQUEST_URI'];
         }
@@ -31,8 +44,8 @@ class Connection {
         $this->date = gmdate('c');
 
         // $ip (set by fn) and $ipList.
-        $ips = $this->getIpData();
-        $this->ipList = implode(',', $ips);
+        $ipData = $this->getIpData();
+        $this->ipList = implode(',', $ipData);
 
         // $agent.
         if (!empty($_SERVER['HTTP_USER_AGENT'])) {
@@ -41,10 +54,10 @@ class Connection {
         if (!empty($_SERVER['HTTP_COOKIE'])) {
             $this->agent .= 'cookie:' . $_SERVER['HTTP_COOKIE'] . ', ';
         }
-        // Grab regional client/proxy vals like HTTP_ACCEPT_LANGUAGE, HTTP_CF_IPCOUNTRY, etc
-        foreach ($_SERVER as $key => $value) {
-            if (preg_match('/country|language|region/', $key)) {
-                $this->agent .= "$key:$value, ";
+        // Grab regional client/proxy values like HTTP_ACCEPT_LANGUAGE, etc
+        foreach ($_SERVER as $serverKey => $value) {
+            if (preg_match('/country|language|region/', $serverKey)) {
+                $this->agent .= "$serverKey:$value, ";
             }
         }
         $this->agent = preg_replace('/, $/', '', $this->agent); // trim trailing comma-and-space.
@@ -53,11 +66,11 @@ class Connection {
         }
 
         // $user, $isAdmin and $isBot
-        if (preg_match('/facebookexternalhit/', $this->agent)) {
+        if (str_contains($this->agent, 'facebookexternalhit')) {
             $this->user .= 'bot:facebook,';
             $this->isBot = true;
         }
-        if (preg_match('/Discordbot/', $this->agent)) {
+        if (str_contains($this->agent, 'Discordbot')) {
             $this->user .= 'bot:discord,';
             $this->isBot = true;
         }
@@ -96,10 +109,11 @@ class Connection {
     }
 
     /**
-    * Extract all possible IP addresses, given many possible proxy headers.
-    * The first one is taken as the "most valid" one, so they should probably be ordered from best to worst.
-    */
-    private function getIpData() {
+     * Extract all possible IP addresses, given many possible proxy headers.
+     * The first one is taken as the "most valid" one, so they should probably be ordered from best to worst.
+     * @return string[]
+     */
+    private function getIpData(): array {
         $ipArray = [];
         foreach ([
             'HTTP_CLIENT_IP', 'HTTP_CF_CONNECTING_IP', 'PROXY_REMOTE_ADDR', // Proxy aliases.
@@ -108,17 +122,17 @@ class Connection {
             'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED',
             'HTTP_PROXY_CONNECTION', 'HTTP_VIA',
             'HTTP_X_COMING_FROM', 'HTTP_COMING_FROM',
-            'REMOTE_ADDR', // Should be last: the only non-spoofable one.
+            'REMOTE_ADDR', // Should be last: the only one guaranteed legitimate.
         ] as $key) {
             if (!empty($_SERVER[$key])) {
                 $list = explode(',', $_SERVER[$key]);
                 foreach ($list as $ip) {
                     $ip = trim($ip);
-                    $ip = $this->normalize_ip($ip);
-                    if ($this->validate_public_ip($ip)) {
+                    $ip = $this->normalizeIp($ip);
+                    if ($this->validatePublicIp($ip)) {
                         $this->ip = $ip;
                     }
-                    if ($this->validate_ip($ip)) {
+                    if ($this->validateIp($ip)) {
                         $ipArray[$ip] = 1;
                     }
                 }
@@ -130,10 +144,10 @@ class Connection {
     /**
     * Ensures an IP address is both a valid IP address and does not fall within
     * a private network range.
-    * @param string $ip The ip unmber to check.
+    * @param string $ip The ip number to check.
     * @return bool True if the IP is a valid public IP.
     */
-    private function validate_public_ip($ip) {
+    private function validatePublicIp(string $ip): bool {
         return filter_var(
             $ip,
             FILTER_VALIDATE_IP,
@@ -144,11 +158,11 @@ class Connection {
         );
     }
 
-    /** Just check that an IP address really is one.
-    * @param string $ip The ip unmber to check.
+    /** Just check an IP address truly is one.
+    * @param string $ip The ip number to check.
     * @return bool True if the IP is a valid IP.
     */
-    private function validate_ip($ip) {
+    private function validateIp(string $ip): bool {
         return filter_var(
             $ip,
             FILTER_VALIDATE_IP,
@@ -160,7 +174,7 @@ class Connection {
     /** Get a string describing the object.
     * @return string Serialized object data,
     */
-    public function __toString() {
+    public function __toString(): string {
         return var_export([
             'request' => $this->request,
             'date' => $this->date,
@@ -174,9 +188,13 @@ class Connection {
         ], true);
     }
 
-    // Function to normalize IPv4 and IPv6 addresses with port
-    function normalize_ip($ip){
-        if (strpos($ip, ':') !== false && substr_count($ip, '.') == 3 && strpos($ip, '[') === false){
+    /**
+     * Function to normalize IPv4 and IPv6 addresses with port
+     * @param string $ip
+     * @return string The normalized IP.
+     */
+    private function normalizeIp(string $ip): string {
+        if (str_contains($ip, ':') && substr_count($ip, '.') == 3 && !str_contains($ip, '[')){
             // IPv4 with port (e.g., 123.123.123.123:80)
             $ip = explode(':', $ip);
             $ip = $ip[0];
