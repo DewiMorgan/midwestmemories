@@ -31,8 +31,8 @@ Db::sqlExec(
     'sssss',
     $connection->request, $connection->ip,  $connection->ipList, $connection->user, $connection->agent
 );
-if (empty($path)) {
-    include('app/TreeTemplate.php');
+if ('/' == $path) {
+    include('app/TreeTemplate.php'); // Temporary: this template should get merged in with the thumbs one.
 } elseif(str_ends_with($path, '/')) {
     echo "$path: should load app/ThumbsTemplate.php";
     // include('app/ThumbsTemplate.php');
