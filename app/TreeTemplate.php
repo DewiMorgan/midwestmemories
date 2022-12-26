@@ -2,7 +2,10 @@
 <head>
     <title>Folder navigation</title>
     <style>
-        .container, body {
+        body {
+            overflow: hidden;
+        }
+        .container {
             width: 100%;
             display: flex;
             overflow: hidden;
