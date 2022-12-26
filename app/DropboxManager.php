@@ -13,10 +13,10 @@ class DropboxManager {
     private Client $client;
     public string $cursor;
     public int $entries = 0;
-    public int $iterations;
+    public int $iterations = 0;
     private const DROPBOX_PATH = '/midwestmemories';
     public const DROPBOX_USER_ID = 16181197;
-    private const MAX_PNG_SIZE = 1024 * 1024; // Max PNG size before resampling to JPG.
+    private const MAX_PNG_SIZE = 1024 * 1024; // Max PNG size in bytes  before resampling to JPG.
     private const MAX_THUMB_WIDTH = 64;
     private const MAX_THUMB_HEIGHT = 64;
 
