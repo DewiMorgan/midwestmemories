@@ -2,8 +2,6 @@
 declare(strict_types=1);
 namespace app;
 
-require_once 'TokenRefresher.php';
-
 use Spatie\Dropbox\Client;
 
 /**

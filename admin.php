@@ -27,10 +27,7 @@ use app\Db;
 use app\Connection;
 use app\DropboxManager;
 
-require_once __DIR__ . '/vendor/autoload.php';
-require_once('app/Db.php');
-require_once('app/Connection.php');
-require_once('app/DropboxManager.php');
+require_once('app/autoload.php');
 $connection = new Connection();
 
 // Log this login.
