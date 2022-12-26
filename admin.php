@@ -88,10 +88,11 @@ Db::sqlExec(
     }
     $entriesChange = $fp->entries - $entriesSoFar;
     echo '<p>Finished reading.<br>';
-    if ($cursor == $fp->cursor) {
-        echo 'Cursor unchanged.<br>';
-    } elseif (empty($fp->cursor)) {
+    if (empty($fp->cursor)) {
         echo 'Cursor was not set in client.<br>';
+        $cursor = '';
+    } elseif ($cursor == $fp->cursor) {
+        echo 'Cursor unchanged.<br>';
     } else {
         $cursor = $fp->cursor;
         echo "Cursor reassigned to '$cursor'.<br>";
