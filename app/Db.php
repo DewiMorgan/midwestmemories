@@ -37,7 +37,7 @@ class Db {
                 $authArray['name'] ?? '',
                 $authArray['user'] ?? '',
                 $authArray['pass'] ?? '',
-                $authArray['port'] ?? ''
+                intval($authArray['port'] ?? '3306')
             );
         } catch (Exception $e) {
             self::adminDebug('DB connection failed: ' . $e->getMessage());
@@ -69,7 +69,6 @@ class Db {
     public static function readIniInParents(string $filename): array|false {
         $dir = getcwd();
         while ($dir != '/') {
-            self::adminDebug("Checking $dir / $filename.");
             if (file_exists($dir . '/' . $filename)) {
                 return parse_ini_file($dir . '/' . $filename);
             }
