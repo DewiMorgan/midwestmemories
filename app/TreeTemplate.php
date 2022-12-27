@@ -2,23 +2,19 @@
 <head>
     <title>Folder navigation</title>
     <style>
+        /* Page layout. */
         body {
             overflow: hidden;
+            border: 0;
+            padding: 0;
+            margin: 0;
         }
-/*
-        .container {
-            width: 100%;
+        .flex-container {
             display: flex;
-            overflow: hidden;
+            height: 100vh;
         }
-*/
-        /* Drag-bar styling. */
-        .column {
-/*
-            flex-grow: 1;
-*/
-            background-color: #eee;
-        }
+
+        /* Drag-bar layout. */
         .left-column {
             width: 25%;
             overflow: auto;
@@ -28,11 +24,12 @@
             overflow: auto;
         }
         .drag-bar {
-/*
-            flex: 0 0 10px;
- */
-            background-color: #ccc;
+            width: 10px;
+            background-color: darkgrey;
             cursor: col-resize;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         /* Tree-view styling. */
@@ -59,10 +56,8 @@
     </style>
 </head>
 <body>
-<!--
-<div class="container">
- -->
-    <div class="tree-view column left-column">
+<div class="flex-container">
+    <div class="tree-view left-column">
         <?php
         // Set the root directory to display in the tree view.
         $root = __DIR__ . '/../';
@@ -117,10 +112,9 @@
     </div>
 
     <div class="drag-bar"></div>
-    <div class="content column right-column">Hello, world!</div>
-<!--
+    <div class="content right-column">Hello, world!</div>
 </div>
--->
+
 <script>
     // DragBar behavior.
 
@@ -144,8 +138,8 @@
         if (!isDragging) { return; }
         e.preventDefault();
         const deltaX = e.clientX - currentX;
-        const newLeftColumnWidth = Math.max(25, leftColumnWidth + deltaX);
-        const newRightColumnWidth = Math.max(25, rightColumnWidth - deltaX);
+        const newLeftColumnWidth = Math.max(50, leftColumnWidth + deltaX);
+        const newRightColumnWidth = Math.max(50, rightColumnWidth - deltaX);
         leftColumn.style.width = newLeftColumnWidth + 'px';
         rightColumn.style.width = newRightColumnWidth + 'px';
     });
