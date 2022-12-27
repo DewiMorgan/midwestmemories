@@ -99,7 +99,7 @@
                     continue;
                 }
                 if (is_dir("$dir/$item")) {
-                    echo "<li class='folder'><span class='expand-collapse'>+</span> $item<ul>";
+                    echo "<li class='folder'><span class='expand-collapse'>+</span> $item<ul style='display:none;'>";
                     scanDirectory("$dir/$item");
                     echo '</ul></li>';
                 }
@@ -164,11 +164,11 @@
             // Toggle the expand/collapse state of the folder
             if ('+' === span.textContent) {
                 span.textContent = '-';
-                folder.querySelector('ul').style.display = 'none';
+                folder.querySelector('ul').style.display = 'block';
             }
             else if ('-' === span.textContent)  {
                 span.textContent = '+';
-                folder.querySelector('ul').style.display = 'block';
+                folder.querySelector('ul').style.display = 'none';
             }
         });
     });
