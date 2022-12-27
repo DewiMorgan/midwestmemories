@@ -62,30 +62,8 @@
         // Set the root directory to display in the tree view.
         $root = __DIR__ . '/../';
 
-        // Use scandir() to get a list of files and directories in the root directory.
-        $items = scandir($root);
-
-        // Loop through the items and output a list item for each one.
         echo '<ul>';
-        foreach ($items as $item) {
-            // Skip the current and parent directories
-            if ($item == '.' || $item == '..') {
-                continue;
-            }
-
-            // If the item is a directory, output a list item with a nested ul element.
-            if (is_dir("$root/$item")) {
-                echo "<li class='folder'><span class='expand-collapse'>+</span> $item<ul>";
-                // Recursively scan the subdirectory and output its contents.
-                scanDirectory("$root/$item");
-                echo '</ul></li>';
-            }
-
-            // Otherwise, output a list item for the file
-            else {
-                echo "<li class='file'>$item</li>";
-            }
-        }
+        scanDirectory($root);
         echo '</ul>';
 
         /**
@@ -94,15 +72,23 @@
          */
         function scanDirectory(string $dir): void {
             $items = scandir($dir);
+            // Loop through the items and output a list item for each one.
             foreach ($items as $item) {
+                // Skip the current and parent directories, and any hidden ones.
                 if ($item == '.' || $item == '..') {
                     continue;
                 }
+                /*
+                if (str_starts_with($item, '.')) {
+                    continue;
+                }*/
+                // If the item is a directory, output a list item with a nested ul element.
                 if (is_dir("$dir/$item")) {
-                    echo "<li class='folder'><span class='expand-collapse'>+</span> xx$item<ul style='display:none;'>";
+                    echo "<li class='folder'><span class='expand-collapse'>+</span> $item<ul style='display:none;'>";
                     scanDirectory("$dir/$item");
                     echo '</ul></li>';
                 }
+                // Otherwise, output a list item for the file
                 else {
                     echo "<li class='file'>$item</li>";
                 }
