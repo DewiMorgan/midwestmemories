@@ -140,7 +140,9 @@
 
     // Get all the folder elements in the tree view.
     const folders = document.querySelectorAll('.folder');
-alert(folders);
+    for (let i = 0; i < folders.length; i++) {
+        document.writeln((i + 1) + ": " + folders[i]);
+    }
     // Add a click event listener to each folder
     folders.forEach(folder => {
         folder.addEventListener('click', event => {
