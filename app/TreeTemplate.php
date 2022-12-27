@@ -68,7 +68,8 @@
         echo '</ul>';
 
         /**
-         * Recursively scan a directory and output its contents.
+         * Recursively scan a directory and output its contents in a format appropriate for this template.
+         * ToDo: Expand to, and select, currently passed $path.
          * @param string $dir The full path to the dir being scanned.
          */
         function scanDirectory(string $dir): void {
@@ -171,7 +172,8 @@
         link.addEventListener('click', function(e) {
             e.preventDefault();
             const request = new XMLHttpRequest();
-            request.open("GET", "content.html", true);
+            alert (this.href);
+            request.open("GET", this.href, true);
             request.send();
             request.onload = function() {
                 if (200 <= request.status && 400 > request.status) {
@@ -188,7 +190,6 @@
     });
 
 </script>
-
 
 </body>
 </html>
