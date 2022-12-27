@@ -84,7 +84,7 @@
                 }*/
                 // If the item is a directory, output a list item with a nested ul element.
                 if (is_dir("$dir/$item")) {
-                    echo "<li class='folder'><span class='expand-collapse'>+</span> $item<ul style='display:none;'>";
+                    echo "<li class='folder'><span class='expand-collapse'>+</span> $item<ul>";
                     scanDirectory("$dir/$item");
                     echo '</ul></li>';
                 }
@@ -140,7 +140,7 @@
 
     // Get all the folder elements in the tree view.
     const folders = document.querySelectorAll('.folder');
-
+alert(folders);
     // Add a click event listener to each folder
     folders.forEach(folder => {
         folder.addEventListener('click', event => {
