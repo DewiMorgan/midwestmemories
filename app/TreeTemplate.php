@@ -58,9 +58,10 @@
 <body>
 <div class="flex-container">
     <div class="tree-view left-column">
+        <p><a href="https://www.google.com" class="path-link">path-link</a></p>
         <?php
         // Set the root directory to display in the tree view.
-        $root = __DIR__ . '/../';
+        $root = __DIR__ . '/../midwestmemories/';
 
         echo '<ul>';
         scanDirectory($root);
@@ -91,10 +92,11 @@
             }
         }
         ?>
+        <p><a href="https://www.google.com" class="path-link">path-link</a></p>
     </div>
 
     <div class="drag-bar"></div>
-    <div class="content right-column">Hello, world!</div>
+    <div class="content right-column">Hello, world<a href="https://www.google.com" class="path-link">path-link</a></div>
 </div>
 
 <script>
@@ -132,7 +134,7 @@
 </script>
 
 <script>
-    // Tree view event listeners and handle expand/collapse behavior.
+    // Tree view event listeners to handle expand/collapse behavior.
 
     // Get all the folder elements in the tree view.
     const folders = document.querySelectorAll('.folder');
@@ -140,7 +142,7 @@
     // Add a click event listener to each folder
     folders.forEach(folder => {
         folder.addEventListener('click', function(e) {
-            // Get the span element that was clicked: should probably be a
+            // Get the span element that was clicked: should probably be a class rather than just span.
             const span = folder.querySelector('span');
             // Toggle the expand/collapse state of the folder
             if ('+' === span.textContent) {
@@ -155,5 +157,38 @@
         });
     });
 </script>
+
+<!--suppress InnerHTMLJS -->
+<script>
+    // Tree view event listeners to handle link-click behavior.
+    // Tree view event listeners to handle expand/collapse behavior.
+
+    // Get all the folder elements in the tree view.
+    const links = document.querySelectorAll('.path-link');
+
+    // Add a click event listener to each folder
+    links.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const request = new XMLHttpRequest();
+            request.open("GET", "content.html", true);
+            request.send();
+            request.onload = function() {
+                if (200 <= request.status && 400 > request.status) {
+                    // Success!
+                    document.getElementById("content").innerHTML = request.responseText;
+                } else {
+                    document.getElementById("content").innerHTML = 'Server returned an error.';
+                }
+            };
+            request.onerror = function() {
+                document.getElementById("content").innerHTML = 'There was a connection error of some sort.';
+            };
+        });
+    });
+
+</script>
+
+
 </body>
 </html>

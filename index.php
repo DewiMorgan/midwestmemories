@@ -22,15 +22,28 @@ use app\Connection;
 
 $connection = new Connection();
 
-// ToDo: better user input validation of this.
-$path = $_REQUEST['path'] ?? '/';
-$h_path = htmlspecialchars($path);
 // Log this login.
 Db::sqlExec(
     'INSERT INTO midmem_visitors (`request`, `main_ip`, `all_ips_string`, `user`, `agent`) VALUES (?, ?, ?, ?, ?)',
     'sssss',
     $connection->request, $connection->ip,  $connection->ipList, $connection->user, $connection->agent
 );
+
+define('BASEDIR', reapath(__DIR__ . '/midwestmemories/'));
+if (empty(BASEDIR)) {
+    Db::adminDebug("BASEDIR was empty. Not safe to continue.");
+    http_response_code(500); // Internal Server Error.
+    die();
+}
+$path = $_REQUEST['path'] ?? '/';
+$h_path = htmlspecialchars($path);
+$realPath = realpath(BASEDIR . '/' . $path);
+if (!str_starts_with($realPath, BASEDIR)) {
+    Db::adminDebug("Requested path was not valid: $path");
+    http_response_code(501); // Not implemented.
+    die();
+}
+
 if ('/' == $path) {
     include('app/TreeTemplate.php'); // Temporary: this template should get merged in with the thumbs one.
 } elseif(str_ends_with($path, '/')) {
