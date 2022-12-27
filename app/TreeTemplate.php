@@ -63,7 +63,7 @@ declare(strict_types=1);
     <div class="tree-view left-column">
         <?php
         // Set the root directory to display in the tree view.
-        $root = MM_BASEDIR . IMAGEDIR;
+        $root = MM_BASEDIR . '/' . IMAGEDIR;
 
         echo '<ul>';
         scanDirectory($root);
