@@ -82,28 +82,28 @@ declare(strict_types=1);
                 if (str_starts_with($item, '.')) {
                     continue;
                 }
-                $u_item = urlencode($item);
                 $h_item = htmlspecialchars($item);
+                $u_linkUrl = MM_BASEURL . '?path=' . urlencode($item) . '&amp;i=1';
+
                 // If the item is a directory, output a list item with a nested ul element.
                 if (is_dir("$dir/$item")) {
                     echo "<li class='folder'><span class='expand-collapse '>+</span>";
-                    echo "<a href='" . MM_BASEURL . "?path=$u_item&amp;i=1'>$h_item</a>";
+                    echo "<a href='$u_linkUrl' class='.path-link'>$h_item</a>";
                     echo "<ul style='display:none;'>";
                     scanDirectory("$dir/$item");
                     echo '</ul></li>';
                 }
                 // Otherwise, output a list item for the file
                 else {
-                    echo "<li class='file'><a href='" . MM_BASEURL . "?path=$u_item'>$h_item</a></li>";
+                    echo "<li class='file'><a href='$u_linkUrl' class='.path-link'>$h_item</a></li>";
                 }
             }
         }
         ?>
-        <p><a href="https://www.google.com" class="path-link">path-link</a></p>
     </div>
 
     <div class="drag-bar"></div>
-    <div class="content right-column">Hello, world<a href="https://www.google.com" class="path-link">path-link</a></div>
+    <div class="content right-column">Hello, world!</div>
 </div>
 
 <script>
