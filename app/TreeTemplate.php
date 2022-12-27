@@ -99,7 +99,7 @@
                     continue;
                 }
                 if (is_dir("$dir/$item")) {
-                    echo "<li class='folder'><span class='expand-collapse'>+</span> $item<ul style='display:none;'>";
+                    echo "<li class='folder'><span class='expand-collapse'>+</span> xx$item<ul style='display:none;'>";
                     scanDirectory("$dir/$item");
                     echo '</ul></li>';
                 }
