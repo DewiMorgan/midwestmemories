@@ -29,9 +29,9 @@ Db::sqlExec(
     $connection->request, $connection->ip,  $connection->ipList, $connection->user, $connection->agent
 );
 
-define('BASEDIR', reapath(__DIR__ . '/midwestmemories/'));
+define('BASEDIR', realpath(__DIR__ . '/midwestmemories/'));
 if (empty(BASEDIR)) {
-    Db::adminDebug("BASEDIR was empty. Not safe to continue.");
+    Db::adminDebug('BASEDIR was empty. Not safe to continue.');
     http_response_code(500); // Internal Server Error.
     die();
 }
