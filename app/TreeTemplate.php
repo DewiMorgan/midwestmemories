@@ -63,7 +63,7 @@ declare(strict_types=1);
     <div class="tree-view left-column">
         <?php
         // Set the root directory to display in the tree view.
-        $root = __DIR__ . '/../midwestmemories/';
+        $root = MM_BASEURL . IMAGEDIR;
 
         echo '<ul>';
         scanDirectory($root);
@@ -72,7 +72,8 @@ declare(strict_types=1);
         /**
          * Recursively scan a directory and output its contents in a format appropriate for this template.
          * ToDo: Expand to, and select, currently passed $path.
-         * @param string $dir The full path to the dir being scanned.
+         * ToDo: make it accept one or more callbacks to say how to recurse into, skip, or display entries.
+         * @param string $dir The full path to the dir being scanned. When first calling, pass the root of the tree.
          */
         function scanDirectory(string $dir): void {
             $items = scandir($dir);
@@ -83,7 +84,8 @@ declare(strict_types=1);
                     continue;
                 }
                 $h_item = htmlspecialchars($item);
-                $u_linkUrl = MM_BASEURL . '?path=' . urlencode($item) . '&amp;i=1';
+                $webDir = str_replace(MM_BASEDIR, '', "$dir/$item");
+                $u_linkUrl = MM_BASEURL . '?path=' . urlencode($webDir) . '&amp;i=1';
 
                 // If the item is a directory, output a list item with a nested ul element.
                 if (is_dir("$dir/$item")) {

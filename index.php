@@ -17,9 +17,9 @@ $_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
 
 const MM_BASEURL = 'https://midwestmemories.dewimorgan.com';
 define('IMAGEDIR', 'midwestmemories');
-define('BASEDIR', realpath(__DIR__ . '/' . IMAGEDIR . '/'));
-if (empty(BASEDIR)) {
-    Db::adminDebug('BASEDIR was empty. Not safe to continue.');
+define('MM_BASEDIR', realpath(__DIR__ . '/' . IMAGEDIR . '/'));
+if (empty(MM_BASEDIR)) {
+    Db::adminDebug('MM_BASEDIR was empty. Not safe to continue.');
     http_response_code(500); // Internal Server Error.
     die();
 }
@@ -40,9 +40,14 @@ Db::sqlExec(
 
 $path = $_REQUEST['path'] ?? '/';
 $h_path = htmlspecialchars($path);
-$realPath = realpath(BASEDIR . '/' . $path);
-if (!str_starts_with($realPath, BASEDIR)) {
-    Db::adminDebug("Requested path was not valid: $path");
+$realPath = realpath(MM_BASEDIR . '/' . $path);
+if (false === $realPath) {
+    Db::adminDebug("Requested path was not found: $path");
+    http_response_code(404); // Not found.
+    die();
+}
+if (!str_starts_with($realPath, MM_BASEDIR)) {
+    Db::adminDebug("Requested path was not within MM_BASEDIR: $path");
     http_response_code(404); // Not found.
     die();
 }
