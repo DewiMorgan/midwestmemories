@@ -166,7 +166,7 @@
                 span.textContent = '-';
                 folder.querySelector('ul').style.display = 'block';
             }
-            else {
+            else if ('-' === span.textContent)  {
                 span.textContent = '+';
                 folder.querySelector('ul').style.display = 'none';
             }
