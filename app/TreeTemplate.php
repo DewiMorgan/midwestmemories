@@ -164,11 +164,11 @@
             // Toggle the expand/collapse state of the folder
             if ('+' === span.textContent) {
                 span.textContent = '-';
-                folder.querySelector('ul').style.display = 'block';
+                folder.querySelector('ul').style.display = 'none';
             }
             else if ('-' === span.textContent)  {
                 span.textContent = '+';
-                folder.querySelector('ul').style.display = 'none';
+                folder.querySelector('ul').style.display = 'block';
             }
         });
     });
