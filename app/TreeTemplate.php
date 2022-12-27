@@ -75,16 +75,12 @@
             // Loop through the items and output a list item for each one.
             foreach ($items as $item) {
                 // Skip the current and parent directories, and any hidden ones.
-                if ($item == '.' || $item == '..') {
-                    continue;
-                }
-                /*
                 if (str_starts_with($item, '.')) {
                     continue;
-                }*/
+                }
                 // If the item is a directory, output a list item with a nested ul element.
                 if (is_dir("$dir/$item")) {
-                    echo "<li class='folder'><span class='expand-collapse'>+</span> $item<ul>";
+                    echo "<li class='folder'><span class='expand-collapse '>+</span> $item<ul>";
                     scanDirectory("$dir/$item");
                     echo '</ul></li>';
                 }
@@ -140,17 +136,12 @@
 
     // Get all the folder elements in the tree view.
     const folders = document.querySelectorAll('.folder');
-    let str='';
-    for (let i = 0; i < folders.length; i++) {
-        str += ((i + 1) + ": " + folders[i]);
-    }
-    alert(str);
+
     // Add a click event listener to each folder
     folders.forEach(folder => {
-        folder.addEventListener('click', event => {
-            // Get the span element that was clicked
-            const span = event.target;
-
+        folder.addEventListener('click', function(e) {
+            // Get the span element that was clicked: should probably be a
+            const span = folder.querySelector('span');
             // Toggle the expand/collapse state of the folder
             if ('+' === span.textContent) {
                 span.textContent = '-';
@@ -160,6 +151,7 @@
                 span.textContent = '+';
                 folder.querySelector('ul').style.display = 'none';
             }
+            e.stopPropagation();
         });
     });
 </script>
