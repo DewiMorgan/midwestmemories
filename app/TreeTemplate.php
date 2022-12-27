@@ -1,3 +1,6 @@
+<?php
+declare(strict_types=1);
+?>
 <html lang="en">
 <head>
     <title>Folder navigation</title>
@@ -58,7 +61,6 @@
 <body>
 <div class="flex-container">
     <div class="tree-view left-column">
-        <p><a href="https://www.google.com" class="path-link">path-link</a></p>
         <?php
         // Set the root directory to display in the tree view.
         $root = __DIR__ . '/../midwestmemories/';
@@ -80,15 +82,19 @@
                 if (str_starts_with($item, '.')) {
                     continue;
                 }
+                $u_item = urlencode($item);
+                $h_item = htmlspecialchars($item);
                 // If the item is a directory, output a list item with a nested ul element.
                 if (is_dir("$dir/$item")) {
-                    echo "<li class='folder'><span class='expand-collapse '>+</span> $item<ul style='display:none;'>";
+                    echo "<li class='folder'><span class='expand-collapse '>+</span>";
+                    echo "<a href='" . MM_BASEURL . "?path=$u_item&amp;i=1'>$h_item</a>";
+                    echo "<ul style='display:none;'>";
                     scanDirectory("$dir/$item");
                     echo '</ul></li>';
                 }
                 // Otherwise, output a list item for the file
                 else {
-                    echo "<li class='file'>$item</li>";
+                    echo "<li class='file'><a href='" . MM_BASEURL . "?path=$u_item'>$h_item</a></li>";
                 }
             }
         }
@@ -120,13 +126,14 @@
     });
 
     document.addEventListener('mousemove', function(e) {
-        if (!isDragging) { return; }
-        e.preventDefault();
-        const deltaX = e.clientX - currentX;
-        const newLeftColumnWidth = Math.max(50, leftColumnWidth + deltaX);
-        const newRightColumnWidth = Math.max(50, rightColumnWidth - deltaX);
-        leftColumn.style.width = newLeftColumnWidth + 'px';
-        rightColumn.style.width = newRightColumnWidth + 'px';
+        if (isDragging) {
+            e.preventDefault();
+            const deltaX = e.clientX - currentX;
+            const newLeftColumnWidth = Math.max(50, leftColumnWidth + deltaX);
+            const newRightColumnWidth = Math.max(50, rightColumnWidth - deltaX);
+            leftColumn.style.width = newLeftColumnWidth + 'px';
+            rightColumn.style.width = newRightColumnWidth + 'px';
+        }
     });
 
     document.addEventListener('mouseup', function() {
@@ -167,28 +174,33 @@
     // Get all the folder elements in the tree view.
     const links = document.querySelectorAll('.path-link');
 
+    // Method to Handle link clicking.
+    function openLinkInline(url) {
+        const request = new XMLHttpRequest();
+        request.open("GET", url, true);
+        request.send();
+        request.onload = function() {
+            if (200 <= request.status && 400 > request.status) {
+                // Success!
+                document.getElementById("content").innerHTML = request.responseText;
+            } else {
+                document.getElementById("content").innerHTML = 'Server returned an error.';
+            }
+        };
+        request.onerror = function() {
+            document.getElementById("content").innerHTML = 'There was a connection error of some sort.';
+        };
+    }
+
     // Add a click event listener to each folder
     links.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            const request = new XMLHttpRequest();
-            alert (this.href);
-            request.open("GET", this.href, true);
-            request.send();
-            request.onload = function() {
-                if (200 <= request.status && 400 > request.status) {
-                    // Success!
-                    document.getElementById("content").innerHTML = request.responseText;
-                } else {
-                    document.getElementById("content").innerHTML = 'Server returned an error.';
-                }
-            };
-            request.onerror = function() {
-                document.getElementById("content").innerHTML = 'There was a connection error of some sort.';
-            };
+            openLinkInline(this.href);
         });
     });
-
+    <?php global $h_path; ?>
+    openLinkInline('<?= $h_path; ?>');
 </script>
 
 </body>

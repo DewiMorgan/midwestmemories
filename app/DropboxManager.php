@@ -291,6 +291,16 @@ class DropboxManager {
     }
 
     /**
+     * Convert an image filename to a thumbnail filename, eg 'foo/bar.png' => 'tn_bar.jpg'.
+     * Note: Files that begin with a dot and have no extension, e.g. '.example', will get thumbs called 'tn_.jpg'.
+     * @param string $imageName Name of the source image. Path will be ignored, not returned.
+     * @return string The resulting filename.
+     */
+    public static function getThumbName(string $imageName): string {
+        return 'tn_' . preg_replace('/\..+?$/', '', $imageName) . '.jpg';
+    }
+
+    /**
     * From: https://stackoverflow.com/questions/11376315/creating-a-thumbnail-from-an-uploaded-image
     * @param resource $sourceImage Image resource loaded from whatever image format.
     * @param string $fullPath Target full path to original file.
@@ -301,9 +311,7 @@ class DropboxManager {
             Db::adminDebug('Source image false for makeThumb', $fullPath);
             return false;
         }
-        // Files that begin with a dot and have no extension, e.g. '.example', will get thumbs called 'tn_.jpg'.
-        $basename = preg_replace('/\..+?$/', '', basename($fullPath));
-        $dest = dirname($fullPath) . '/tn_' . $basename . '.jpg';
+        $dest = dirname($fullPath) . '/' . self::getThumbName($fullPath);
         // Read source image size.
         $origWidth = imagesx($sourceImage);
         $origHeight = imagesy($sourceImage);
