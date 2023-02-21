@@ -1,6 +1,19 @@
 # Project: midwestmemories
 
-Photo archive for the family
+Photo archive for the family.
+
+##
+
+Current structure:
+
+When a change is made in Dropbox, a Dropbox callback hook calls dropboxcallback.php.
+This tags the user's cursor as "dirty", but doesn't actually download any updated files.
+
+Admins can log in and manually initiate an update through admin.php.
+Maybe in the future this could be automated by dropboxcallback.php or a periodic cron.
+
+Index.php shows the nav, and the image listings.
+
 
 ## Planned Features
 
@@ -26,25 +39,7 @@ Photo archive for the family
 
 * Initially, params. Later, mod-rewrite.
 * path: path to folder. (later, search=search terms)
-* In folders: readme.md file (or HTML?) contains default values.
-  (Future: Ones marked with "ed" should be editable and overridable in the DB.)
-    * Name:
-    * Written Notes: whatever notes were saved with it.
-    * [ed] Visitor Notes:
-    * all-date: defaults for all album pictures.
-      (Future: If these are set, and someone edits one pic's property, ask whether to update for all in the folder,
-      with thumbs and checkboxes to select/unselect)
-    * all-photographer:
-    * all-location:
-    * all-subjects:
-    * all-written notes:
-    * all-visitor notes:
-    * [ed] foo-bar.jpg-date:
-    * [ed] foo-bar.jpg-photographer:
-    * [ed] foo-bar.jpg-location:
-    * [ed] foo-bar.jpg-subjects:
-    * [ed] foo-bar.jpg-written notes:
-    * [ed] foo-bar.jpg-visitor notes:
+* In folders: index.txt file (or HTML?) contains default values.
 
 * Display breadcrumb, album notes, and all images as thumbs in a fluid table. Likely need to generate thumbnails.
 * Clicking individual images shows image details and the image.
@@ -60,7 +55,7 @@ Photo archive for the family
 * For now, we only need to use dropbox in the admin page, so it should be secure.
 * Future: download zip of an album or search result. Let them choose between original images, or jpgs.
 * Future: create webhooks for Dropbox to call when the folder is updated.
-* Future: upload thumbs and jogs to dropbox?
+* Future: upload thumbs and jpgs and updated txt files to dropbox?
 
 ## Useful links
 

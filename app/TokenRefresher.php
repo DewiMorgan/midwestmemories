@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app;
@@ -17,7 +18,8 @@ class TokenRefresher implements TokenProvider
     private string $secret;
     private string $refreshToken;
 
-    public function __construct() {
+    public function __construct()
+    {
         // Parse the INI file.
         if (!$authArray = Db::readIniInParents(self::INI_FILE)) {
             Db::adminDebug('Dropbox Auth information could not be found.');
@@ -36,7 +38,8 @@ class TokenRefresher implements TokenProvider
      * Get the refresh token for the current Dropbox user.
      * @return string The refresh token.
      */
-    public function getToken(): string {
+    public function getToken(): string
+    {
         return $this->refreshToken();
         //        return Cache::remember('access_token', 14000, function () {
         //            return $this->refreshToken();
@@ -46,7 +49,8 @@ class TokenRefresher implements TokenProvider
     /**
      * @return false|string
      */
-    public function refreshToken(): string|false {
+    public function refreshToken(): string|false
+    {
         try {
             $client = new HttpClient();
             $res = $client->request(

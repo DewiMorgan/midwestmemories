@@ -1,5 +1,9 @@
 <?php
+
+/** This is the template to display the tree navigation. */
 declare(strict_types=1);
+
+namespace MidwestMemories;
 ?>
 <html lang="en">
 <head>
@@ -12,6 +16,7 @@ declare(strict_types=1);
             padding: 0;
             margin: 0;
         }
+
         .flex-container {
             display: flex;
             height: 100vh;
@@ -22,10 +27,12 @@ declare(strict_types=1);
             width: 25%;
             overflow: auto;
         }
+
         .right-column {
             width: 75%;
             overflow: auto;
         }
+
         .drag-bar {
             width: 10px;
             background-color: darkgrey;
@@ -39,14 +46,17 @@ declare(strict_types=1);
         .tree-view {
             background-color: lightgrey;
         }
+
         /* Folders in the tree view. */
         .folder {
             cursor: pointer;
         }
+
         /* Expand/collapse span. */
         .expand-collapse {
             font-weight: bold;
         }
+
         /* Files in the tree view. */
         .file {
             cursor: default;
@@ -63,7 +73,7 @@ declare(strict_types=1);
     <div class="tree-view left-column">
         <?php
         // Set the root directory to display in the tree view.
-        $root = MM_BASEDIR;
+        $root = Index::$baseDir;
 
         echo '<ul>';
         scanDirectory($root);
@@ -75,7 +85,8 @@ declare(strict_types=1);
          * ToDo: make it accept one or more callbacks to say how to recurse into, skip, or display entries.
          * @param string $dir The full path to the dir being scanned. When first calling, pass the root of the tree.
          */
-        function scanDirectory(string $dir): void {
+        function scanDirectory(string $dir): void
+        {
             $items = scandir($dir);
             // Loop through the items and output a list item for each one.
             foreach ($items as $item) {
@@ -84,8 +95,8 @@ declare(strict_types=1);
                     continue;
                 }
                 $h_item = htmlspecialchars($item);
-                $webDir = str_replace(MM_BASEDIR, '', "$dir/$item");
-                $u_linkUrl = MM_BASEURL . '?path=' . urlencode($webDir) . '&amp;i=1';
+                $webDir = str_replace(Index::$baseDir, '', "$dir/$item");
+                $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($webDir) . '&amp;i=1';
 
                 // If the item is a directory, output a list item with a nested ul element.
                 if (is_dir("$dir/$item")) {
@@ -94,13 +105,13 @@ declare(strict_types=1);
                     echo "<ul style='display:none;'>";
                     scanDirectory("$dir/$item");
                     echo '</ul></li>';
-                }
-                // Otherwise, output a list item for the file
-                else {
+                } else {
+                    // Otherwise, output a list item for the file
                     echo "<li class='file'><a href='$u_linkUrl' class='.path-link'>$h_item</a></li>";
                 }
             }
         }
+
         ?>
     </div>
 
@@ -158,8 +169,7 @@ declare(strict_types=1);
             if ('+' === span.textContent) {
                 span.textContent = '-';
                 folder.querySelector('ul').style.display = 'block';
-            }
-            else if ('-' === span.textContent)  {
+            } else if ('-' === span.textContent) {
                 span.textContent = '+';
                 folder.querySelector('ul').style.display = 'none';
             }
@@ -201,8 +211,8 @@ declare(strict_types=1);
             openLinkInline(this.href);
         });
     });
-    <?php global $h_path; ?>
-    openLinkInline('<?= $h_path; ?>');
+    <?php global $h_requestedPath; ?>
+    openLinkInline('<?= $h_requestedPath; ?>');
 </script>
 
 </body>

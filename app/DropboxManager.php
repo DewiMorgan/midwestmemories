@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace app;
 
 use Spatie\Dropbox\Client;
@@ -18,7 +20,8 @@ class DropboxManager {
     private const MAX_THUMB_WIDTH = 64;
     private const MAX_THUMB_HEIGHT = 64;
 
-    public function __construct() {
+    public function __construct()
+    {
         $tokenRefresher = new TokenRefresher();
         $token = $tokenRefresher->getToken();
 
@@ -29,7 +32,8 @@ class DropboxManager {
      * Get the recursive list of all files for this website. Might be LONG.
      * @return array List of file details.
      */
-    public function initRootCursor(): array {
+    public function initRootCursor(): array
+    {
         $this->iterations = 0;
         $this->entries = 1;
         $result = [];
@@ -44,7 +48,7 @@ class DropboxManager {
             $list = $this->client->listFolderContinue($this->cursor);
             $this->setNewCursor($list['cursor']);
             $result = $this->getListOfEntries($result, $list);
-            $this->iterations ++;
+            $this->iterations++;
         }
         return $result;
     }
@@ -54,7 +58,8 @@ class DropboxManager {
      * @param int $entriesSoFar How many entries have already been processed in this run of the script.
      * @return array List of file details.
      */
-    public function resumeRootCursor(int $entriesSoFar): array {
+    public function resumeRootCursor(int $entriesSoFar): array
+    {
         self::loadCursor();
         $this->iterations = 0;
         $this->entries = $entriesSoFar;
@@ -65,7 +70,7 @@ class DropboxManager {
             $list = $this->client->listFolderContinue($this->cursor);
             $this->setNewCursor($list['cursor']);
             $result = $this->getListOfEntries($result, $list);
-            $this->iterations ++;
+            $this->iterations++;
         }
         return $result;
     }
@@ -75,7 +80,8 @@ class DropboxManager {
      * @param int $entriesSoFar How many entries have already been processed in this run of the script.
      * @return array List of file details.
      */
-    public function readCursorUpdate(int $entriesSoFar): array {
+    public function readCursorUpdate(int $entriesSoFar): array
+    {
         self::loadCursor();
         $this->iterations = 0;
         $this->entries = $entriesSoFar;
@@ -86,7 +92,7 @@ class DropboxManager {
             $list = $this->client->listFolderContinue($this->cursor);
             $this->setNewCursor($list['cursor']);
             $result = $this->getListOfEntries($result, $list);
-            $this->iterations ++;
+            $this->iterations++;
             $result['numFilesQueued'] += $this->saveFileQueue($list['entries']);
             $result['numFilesProcessed'] += count($list['entries']);
         }
@@ -99,7 +105,8 @@ class DropboxManager {
      * @param array $list The list of entries to pull the entries from and filter.
      * @return array The filtered list of entries.
      */
-    private function getListOfEntries(array $result, array $list): array {
+    private function getListOfEntries(array $result, array $list): array
+    {
         $filteredEntries = array_filter($list['entries'], function ($fileEntry) {
             return preg_match('/^\/midwestmemories\//', $fileEntry['path_lower']);
         });
@@ -112,7 +119,8 @@ class DropboxManager {
      * Persistently set the cursor to a new value.
      * @param string $cursor The cursor string.
      */
-     private function setNewCursor(string $cursor): void {
+    private function setNewCursor(string $cursor): void
+    {
         if (!empty($cursor) && $this->cursor != $cursor) {
             $this->cursor = $cursor;
             Db::sqlExec(
@@ -133,7 +141,8 @@ class DropboxManager {
      * .tag is file, folder, delete, or more.
      * @return int How many files were added to the list.
      */
-    private function saveFileQueue(array $list): int {
+    private function saveFileQueue(array $list): int
+    {
         $numberOfFiles = 0;
         foreach ($list as $entry) {
             // Skip anything we don't care about.
@@ -158,9 +167,10 @@ class DropboxManager {
 
     /**
      * Download all files from the file queue table.
-    * @return int How many files were processed.
-    */
-    public function downloadFiles(): int {
+     * @return int How many files were processed.
+     */
+    public function downloadFiles(): int
+    {
         $endTime = time() + 20;
         $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue` WHERE `sync_status` = 'NEW'");
         $numProcessed = 0;
@@ -169,7 +179,7 @@ class DropboxManager {
             if (time() > $endTime) {
                 return $numProcessed;
             }
-            $numProcessed ++;
+            $numProcessed++;
             $fullPath = ltrim($entry['full_path'], '/\\');
             // If the dir doesn't exist, then create it.
             $dir = dirname($fullPath);
@@ -197,10 +207,11 @@ class DropboxManager {
     }
 
     /**
-    * Add thumbnails, resample images, and parse txt files, then set status to PROCESSED.
-    * @return int How many files were processed.
+     * Add thumbnails, resample images, and parse txt files, then set status to PROCESSED.
+     * @return int How many files were processed.
      */
-    public function processDownloads(): int {
+    public function processDownloads(): int
+    {
         $endTime = time() + 20;
         $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue` WHERE `sync_status` = 'DOWNLOADED'");
         $numProcessed = 0;
@@ -209,8 +220,8 @@ class DropboxManager {
             if (time() > $endTime) {
                 return $numProcessed;
             }
-            $numProcessed ++;
-            $fullPath =  ltrim($entry['full_path'], '/\\');
+            $numProcessed++;
+            $fullPath = ltrim($entry['full_path'], '/\\');
             if (!file_exists($fullPath)) {
                 Db::sqlExec(
                     "UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_message` = 'file_exists failed' 
@@ -223,7 +234,7 @@ class DropboxManager {
 
             // Get the mime type.
             $mimeType = mime_content_type($fullPath);
-            switch($mimeType) {
+            switch ($mimeType) {
                 case 'text/plain':
                     $this->processTextFile($fullPath);
                     break;
@@ -247,14 +258,17 @@ class DropboxManager {
     }
 
     /**
-    * Process text file, parsing fields into the db.
-    */
-    private function processTextFile($fullPath): void {
+     * Process text file, parsing fields into the db.
+     */
+    private function processTextFile($fullPath): void
+    {
         // ToDo: some parsing.
         Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'PROCESSED' WHERE full_path = ?", 's', $fullPath);
     }
+
     /** Process a PNG file, generating thumbnail and converting to JPG if needed.*/
-    private function processPngFile(string $fullPath): void {
+    private function processPngFile(string $fullPath): void
+    {
         if ((filesize($fullPath) > self::MAX_PNG_SIZE)) {
             // Thumbnail generation would be faster from the new JPG, so we roll this into convertToJpeg.
             $result = $this->convertToJpeg($fullPath);
@@ -263,18 +277,24 @@ class DropboxManager {
         }
         $this->setSyncStatus($fullPath, ($result ? 'PROCESSED' : 'ERROR'), 'Processed as PNG.');
     }
+
     /** Process a GIF file, generating thumbnail.*/
-    private function processGifFile(string $fullPath): void {
+    private function processGifFile(string $fullPath): void
+    {
         $result = $this->makeThumb(imagecreatefromgif($fullPath), $fullPath);
         $this->setSyncStatus($fullPath, ($result ? 'PROCESSED' : 'ERROR'), 'Processed as GIF.');
     }
+
     /** Process a JPG file, generating thumbnail.*/
-    private function processJpegFile(string $fullPath): void {
+    private function processJpegFile(string $fullPath): void
+    {
         $result = $this->makeThumb(imagecreatefromjpeg($fullPath), $fullPath);
         $this->setSyncStatus($fullPath, ($result ? 'PROCESSED' : 'ERROR'), 'Processed as JPG.');
     }
+
     /** Process an unknown file.*/
-    private function processOtherFile(string $fullPath): void {
+    private function processOtherFile(string $fullPath): void
+    {
         // Nothing to do but mark it complete.
         Db::sqlExec(
             "UPDATE `midmem_file_queue` 
@@ -286,7 +306,8 @@ class DropboxManager {
     }
 
     /** Load the current cursor from the DB. */
-    private function loadCursor(): void {
+    private function loadCursor(): void
+    {
         $this->cursor = Db::sqlGetItem('SELECT `cursor_id` FROM `midmem_dropbox_users` LIMIT 1', 'cursor_id');
     }
 
@@ -296,17 +317,19 @@ class DropboxManager {
      * @param string $imageName Name of the source image. Path will be ignored, not returned.
      * @return string The resulting filename.
      */
-    public static function getThumbName(string $imageName): string {
+    public static function getThumbName(string $imageName): string
+    {
         return 'tn_' . preg_replace('/\..+?$/', '', $imageName) . '.jpg';
     }
 
     /**
-    * From: https://stackoverflow.com/questions/11376315/creating-a-thumbnail-from-an-uploaded-image
-    * @param resource $sourceImage Image resource loaded from whatever image format.
-    * @param string $fullPath Target full path to original file.
-    * @return bool success
-    */
-    private function makeThumb($sourceImage, string $fullPath): bool {
+     * From: https://stackoverflow.com/questions/11376315/creating-a-thumbnail-from-an-uploaded-image
+     * @param resource $sourceImage Image resource loaded from whatever image format.
+     * @param string $fullPath Target full path to original file.
+     * @return bool success
+     */
+    private function makeThumb($sourceImage, string $fullPath): bool
+    {
         if (false === $sourceImage) {
             Db::adminDebug('Source image false for makeThumb', $fullPath);
             return false;
@@ -324,12 +347,12 @@ class DropboxManager {
         // Scale to max width if needed.
         if ($origHeight > self::MAX_THUMB_HEIGHT) {
             $newHeight = self::MAX_THUMB_HEIGHT;
-            $newWidth = floor($origWidth * ($newHeight/$origHeight));
+            $newWidth = floor($origWidth * ($newHeight / $origHeight));
         }
         // Scale to max height if still too large.
         if ($newWidth > self::MAX_THUMB_WIDTH) {
             $newWidth = self::MAX_THUMB_WIDTH;
-            $newHeight = floor($origWidth * ($newWidth/$origWidth));
+            $newHeight = floor($origWidth * ($newWidth / $origWidth));
         }
 
         /* Create a new, "virtual" image */
@@ -341,17 +364,17 @@ class DropboxManager {
 
         /* Resize and copy source image to new image */
         if (false === imagecopyresampled(
-            $virtualImage,
-            $sourceImage,
-            0,
-            0,
-            0,
-            0,
-            $newWidth,
-            $newHeight,
-            $origWidth,
-            $origHeight
-        )) {
+                $virtualImage,
+                $sourceImage,
+                0,
+                0,
+                0,
+                0,
+                $newWidth,
+                $newHeight,
+                $origWidth,
+                $origHeight
+            )) {
             Db::adminDebug('imagecopyresampled failed for makeThumb', $fullPath);
             return false;
         }
@@ -366,12 +389,13 @@ class DropboxManager {
     }
 
     /**
-    * Convert large png files to more-compressed jpgs.
-    * ToDo: How should this be reflected in the DB?
-    * @param string $fullPath Full path to original file.
-    * @return bool success
-    */
-    private function convertToJpeg(string $fullPath): bool {
+     * Convert large png files to more-compressed jpgs.
+     * ToDo: How should this be reflected in the DB?
+     * @param string $fullPath Full path to original file.
+     * @return bool success
+     */
+    private function convertToJpeg(string $fullPath): bool
+    {
         $sourceImage = imagecreatefrompng($fullPath);
         if (false === $sourceImage) {
             Db::adminDebug('Source image false for convertToJpeg', $fullPath);
@@ -399,7 +423,8 @@ class DropboxManager {
      * @param string $fullPath The path to download to.
      * @return bool Success.
      */
-    public function downloadFromUrl(string $url, string $fullPath): bool {
+    public function downloadFromUrl(string $url, string $fullPath): bool
+    {
         set_time_limit(0);
         $success = false;
         $ch = false;
@@ -410,14 +435,14 @@ class DropboxManager {
         } elseif (false === $ch = curl_init($url)) {
             Db::adminDebug('curl_init failed for downloadUrlToPath', [$url, $fullPath]);
         } elseif (false === (
-            // if timeout (seconds) is too low, download will be interrupted
-            curl_setopt($ch, CURLOPT_TIMEOUT, 600)
-            && curl_setopt($ch, CURLOPT_FILE, $fp) // Write curl response to file
-            && curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true)
-            // These two only if https certificate isn't recognized.
-            // && curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0)
-            // && curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0)
-        )) {
+                // if timeout (seconds) is too low, download will be interrupted
+                curl_setopt($ch, CURLOPT_TIMEOUT, 600)
+                && curl_setopt($ch, CURLOPT_FILE, $fp) // Write curl response to file
+                && curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true)
+                // These two only if https certificate isn't recognized.
+                // && curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0)
+                // && curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0)
+            )) {
             Db::adminDebug('curl_setopt failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
         } elseif (false === curl_exec($ch)) { // Get curl response
             Db::adminDebug('curl_exec failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
@@ -445,7 +470,8 @@ class DropboxManager {
      * @param string $status The new status to give this record.
      * @param string $errorMessage Optional error message to log.
      */
-    public function setSyncStatus(string $fullPath, string $status, string $errorMessage = ''): void {
+    public function setSyncStatus(string $fullPath, string $status, string $errorMessage = ''): void
+    {
         Db::sqlExec(
             'UPDATE `midmem_file_queue` SET `sync_status` = ?, error_message = ? WHERE full_path = ?',
             'sss',
@@ -459,30 +485,30 @@ class DropboxManager {
      * Get the recursive list of all files for this website, up to a timeout.
      * @return array List of file details.
      */
-/*
-    function getRecursiveList(): array {
-        $this->iterations = 0;
-        try {
-            $list = $this->client->listFolder(self::DROPBOX_PATH, true);
-            if (array_key_exists('entries', $list)) {
-                $result = $list['entries'];
-                $this->iterations = 1;
-                $this->cursor = $list['cursor'];
-            }
-            while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor) {
-                $list = $this->client->listFolderContinue($this->cursor);
-                $this->cursor = $list['cursor'];
+    /*
+        function getRecursiveList(): array {
+            $this->iterations = 0;
+            try {
+                $list = $this->client->listFolder(self::DROPBOX_PATH, true);
                 if (array_key_exists('entries', $list)) {
-                    $result = array_merge($result, $list['entries']);
-                    $this->iterations ++;
+                    $result = $list['entries'];
+                    $this->iterations = 1;
+                    $this->cursor = $list['cursor'];
                 }
+                while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor) {
+                    $list = $this->client->listFolderContinue($this->cursor);
+                    $this->cursor = $list['cursor'];
+                    if (array_key_exists('entries', $list)) {
+                        $result = array_merge($result, $list['entries']);
+                        $this->iterations ++;
+                    }
+                }
+                return $result;
+            } catch (Exception $e) {
+                die(var_export($e));
             }
-            return $result;
-        } catch (Exception $e) {
-            die(var_export($e));
         }
-    }
-*/
+    */
     /*
      foreach ($list as $fileEntry) {
      }
