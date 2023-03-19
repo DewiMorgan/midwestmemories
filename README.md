@@ -14,9 +14,10 @@ Maybe in the future this could be automated by dropboxcallback.php or a periodic
 
 Index.php shows the nav, and the image listings.
 
-
 ## Planned Features
 
+* Get namespaces and autoloading working per PSR.
+* Get testing working (again check PSR).
 * Hierarchical nav with breadcrumbs.
 * Copy from file structure.
 * Mirror to/from dropbox.
@@ -98,3 +99,43 @@ Later:
 
 * Display images in a search result-set with next/previous.
 * Delete files deleted from dropbox?
+
+## Test workflow
+
+I've been avoiding working on this as it became a bigger and bigger
+molehill-mountain in my head, partly because I don't really remember
+what my dev workflow was. So here're the steps:
+
+1) Open the project in PHPStorm EAP.
+2) Browser tab: cpanel from https://porkbun.com/account/webhosting/dewimorgan.com
+3) Browser tab: https://dewimorgan.com/midwestmemories/inst-mwm.php to run the git pull.
+4) Browser tab: https://midwestmemories.dewimorgan.com/admin.php to admin it.
+5) Browser tab: https://midwestmemories.dewimorgan.com/ to view the actual content.
+
+What do the commands in the admin page MEAN?
+
+**Initialize root cursor**:
+Logs the system into Dropbox, pulling down (and ignoring!) the listing of ALL files.
+Not normally needed, as it maintains the cursor periodically.
+If this page hangs/times out, after showing just the heading, that's OK. Give it a few mins, then go to the next.
+
+**Continue initializing the root cursor**: Continues downloading and ignoring that list of files,
+If it timed out the first time. You can tell it to start at a certain offset, ignoring the first N files,
+but that isn't necessary, and the default is fine.
+Again, this is just initialization stuff, should never be needed.
+
+**Get latest cursor updates into DB**: This is where it gets the list of new files and puts them in the DB.
+This is the list of files that have changed since the most last file listed by any of the above three commands.
+This should happen automatically from the Dropbox callback. I'm not sure whether it does.
+
+**Download files from DB queue**: This downloads those new files from the previous command.
+
+**Process downloaded files**: Makes thumbnails, publicly publishes the files, etc.
+
+To push a change: 
+1) Git push in PHPStorm.
+2) Git pull in inst-mwm.
+
+## Current Issues
+
+OpenLinkInline doesn't seem to do so.
