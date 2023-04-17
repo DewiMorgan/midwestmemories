@@ -106,7 +106,7 @@ I've been avoiding working on this as it became a bigger and bigger
 molehill-mountain in my head, partly because I don't really remember
 what my dev workflow was. So here're the steps:
 
-1) Open the project in PHPStorm EAP.
+1) Open the project in PHPStorm EAP (OK, I went and bought the license).
 2) Browser tab: cpanel from https://porkbun.com/account/webhosting/dewimorgan.com
 3) Browser tab: https://dewimorgan.com/midwestmemories/inst-mwm.php to run the git pull.
 4) Browser tab: https://midwestmemories.dewimorgan.com/admin.php to admin it.
@@ -138,4 +138,5 @@ To push a change:
 
 ## Current Issues
 
-OpenLinkInline doesn't seem to do so.
+* OpenLinkInline doesn't seem to do so.
+* [Download files from DB queue] and [Process downloaded files] are both giving me Cursor='',"Cursor was not set in client." but I am not sure that's an errror

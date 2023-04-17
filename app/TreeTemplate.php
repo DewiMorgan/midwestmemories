@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Folder navigation</title>
@@ -188,27 +189,39 @@ namespace MidwestMemories;
 
     // Method to Handle link clicking.
     function openLinkInline(url) {
-        const request = new XMLHttpRequest();
-        request.open("GET", url, true);
-        request.send();
-        request.onload = function() {
-            if (200 <= request.status && 400 > request.status) {
-                // Success!
-                document.getElementById("content").innerHTML = request.responseText;
-            } else {
-                document.getElementById("content").innerHTML = 'Server returned an error.';
-            }
-        };
-        request.onerror = function() {
-            document.getElementById("content").innerHTML = 'There was a connection error of some sort.';
-        };
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                // set the content of the div to the fetched data
+                console.log("Got to writing.");
+                document.getElementById("content").innerHTML = data;
+            })
+            .catch(error => {
+                document.getElementById("content").innerHTML = error;
+                console.error(error);
+            });
+        // const request = new XMLHttpRequest();
+        // request.open("GET", url, true);
+        // request.send();
+        // request.onload = function() {
+        //     if (200 <= request.status && 400 > request.status) {
+        //         // Success!
+        //         document.getElementById("content").innerHTML = request.responseText;
+        //     } else {
+        //         document.getElementById("content").innerHTML = 'Server returned an error.';
+        //     }
+        // };
+        // request.onerror = function() {
+        //     document.getElementById("content").innerHTML = 'There was a connection error of some sort.';
+        // };
     }
 
     // Add a click event listener to each folder
     links.forEach(link => {
         link.addEventListener('click', function(e) {
+            console.log("Onclick.");
             e.preventDefault();
-            openLinkInline(this.href);
+            openLinkInline(this.getAttribute("href"));
         });
     });
     <?php global $h_requestedPath; ?>
