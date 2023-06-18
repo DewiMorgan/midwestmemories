@@ -1,16 +1,19 @@
 <?php
-
 declare(strict_types=1);
 /**
  * Callback for changes in DropBox. Only have 10 seconds to respond, so make it fast!
  * ToDo: refactor to a class, and move the class into the app/ folder.
  */
 
+namespace MidwestMemories;
+date_default_timezone_set('US/Central');
+require_once('app/autoload.php');
+
 // If it's a validation, validate and exit.
 validate();
 
 // Otherwise, log the query.
-use app\Db;
+use MidwestMemories\Db;
 
 require_once('app/Db.php');
 

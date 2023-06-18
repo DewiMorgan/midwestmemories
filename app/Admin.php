@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
-use app\Connection;
-use app\Db;
-use app\DropboxManager;
-
 /**
  * The class for the main index.php file.
  */
