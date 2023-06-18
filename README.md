@@ -103,28 +103,28 @@ Later:
 ## Test workflow
 
 I've been avoiding working on this as it became a bigger and bigger
-molehill-mountain in my head, partly because I don't really remember
-what my dev workflow was. So here're the steps:
+molehill-mountain in my head, partly because I forget the dev workflow. So here are the steps:
 
-1) Open the project in PHPStorm EAP (OK, I went and bought the license).
-2) Browser tab: cpanel from https://porkbun.com/account/webhosting/dewimorgan.com
-3) Browser tab: https://dewimorgan.com/midwestmemories/inst-mwm.php to run the git pull.
-4) Browser tab: https://midwestmemories.dewimorgan.com/admin.php to admin it.
-5) Browser tab: https://midwestmemories.dewimorgan.com/ to view the actual content.
+1) Open the project in PHPStorm EAP (OK, in PHPStorm regular: I went and bought the license).
+2) In Bash, do "service mysql start". See MySqAuth.ini for auth info.
+3) Browser tab: cpanel from https://porkbun.com/account/webhosting/dewimorgan.com -> file manager.
+4) Browser tab: https://dewimorgan.com/midwestmemories/inst-mwm.php to run the git pull.
+5) Browser tab: https://midwestmemories.dewimorgan.com/admin.php to admin it.
+6) Browser tab: https://midwestmemories.dewimorgan.com/ to view the actual content.
 
 What do the commands in the admin page MEAN?
 
 **Initialize root cursor**:
 Logs the system into Dropbox, pulling down (and ignoring!) the listing of ALL files.
 Not normally needed, as it maintains the cursor periodically.
-If this page hangs/times out, after showing just the heading, that's OK. Give it a few mins, then go to the next.
+If this page hangs/times out, after showing just the heading, that's OK. Give it a few minutes, then go to the next.
 
 **Continue initializing the root cursor**: Continues downloading and ignoring that list of files,
 If it timed out the first time. You can tell it to start at a certain offset, ignoring the first N files,
 but that isn't necessary, and the default is fine.
 Again, this is just initialization stuff, should never be needed.
 
-**Get latest cursor updates into DB**: This is where it gets the list of new files and puts them in the DB.
+**Get latest cursor updates into the DB**: This is where it gets the list of new files and puts them in the DB.
 This is the list of files that have changed since the most last file listed by any of the above three commands.
 This should happen automatically from the Dropbox callback. I'm not sure whether it does.
 
@@ -132,11 +132,28 @@ This should happen automatically from the Dropbox callback. I'm not sure whether
 
 **Process downloaded files**: Makes thumbnails, publicly publishes the files, etc.
 
-To push a change: 
+To push a change:
+
 1) Git push in PHPStorm.
 2) Git pull in inst-mwm.
 
 ## Current Issues
 
-* OpenLinkInline doesn't seem to do so.
-* [Download files from DB queue] and [Process downloaded files] are both giving me Cursor='',"Cursor was not set in client." but I am not sure that's an errror
+* OpenLinkInline doesn't seem to do so. Steps to reproduce:
+    * https://midwestmemories.dewimorgan.com/
+    * F12 to see console.
+    * I see a basically empty page, apart from stuff from my plugins (GA opt-out extension, and dark mode.)
+      TreeTemplate.html should have <!DOCTYPE html>.
+    * Checking the logs, I see:
+      `Class "MidwestMemories\Index" not found in /data0/ulixamvtuwwyaykg/public_html/midwestmemories/index.php:13`
+    * Looks like I don't have autoincludes working properly.
+    * app\autoload.php exists.
+    * Let's make it log when it does something.
+* OpenLinkInline doesn't seem to do so. Steps to reproduce:
+    * None yet.
+* [Download files from DB queue] and [Process downloaded files]are both giving me:
+    * Cursor='',"Cursor was not set in client.", but I am not sure if that is even a true error.
+    * No repro steps yet.
+* Create a simple static logger class. Log::error($str), etc.
+* Create a simple static config class. Conf::get(Conf::LOG_LEVEL), etc. Read auth info through this.
+* FIXED: DropboxManager has some very poor naming. `dbm.iterations` and `dbm.extracted` need renaming.

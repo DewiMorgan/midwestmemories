@@ -9,16 +9,36 @@ use Spatie\Dropbox\Client;
 /**
  * Manage a dropbox connection, and the operations on dropbox files.
  */
-class DropboxManager {
+class DropboxManager
+{
+    /** @var Client $client Dropbod Client object. */
     private Client $client;
+
+    /** @var string $cursor The current position in a read of the file status. Longlived, persistent, gets updates. */
     public string $cursor;
+
+    /** @var int $entries How many valid files were found. Used only for reportig. */
     public int $entries = 0;
+
+    /** @var int $iterations How many times we got the file list from the cursor because it responded "has more".
+     * Only used for reporting display.
+     */
     public int $iterations = 0;
-    private const DROPBOX_PATH = '/midwestmemories';
+
+    /** @const int DROPBOX_USER_ID - The id of the dropbox user. ToDo: move this into DropboxAuth.ini? */
     public const DROPBOX_USER_ID = 16181197;
-    private const MAX_PNG_SIZE = 1024 * 1024; // Max PNG size in bytes before resampling to JPG.
+
+    /** @const int MAX_PNG_BYTES - Max PNG size in bytes before we resample to JPG. */
+    private const MAX_PNG_BYTES = 1024 * 1024;
+
+    /** @const int MAX_THUMB_WIDTH - Max image width in pixels before scaling down for thumbnail. */
     private const MAX_THUMB_WIDTH = 64;
+
+    /** @const int MAX_THUMB_HEIGHT - Max image height in pixels before scaling down for thumbnail. */
     private const MAX_THUMB_HEIGHT = 64;
+
+    /** @const string VALID_FILE_PATH_REGEX - The sub-folder within the dropbox repo that we're interested in. */
+    private const VALID_FILE_PATH_REGEX = '#^/midwestmemories/#';
 
     public function __construct()
     {
@@ -42,15 +62,9 @@ class DropboxManager {
         if (array_key_exists('entries', $list)) {
             $this->iterations = 1;
             $this->setNewCursor($list['cursor']);
-            $result = $this->getListOfEntries($result, $list);
+            $result = $this->addValidEntries($result, $list['entries']);
         }
-        while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
-            $list = $this->client->listFolderContinue($this->cursor);
-            $this->setNewCursor($list['cursor']);
-            $result = $this->getListOfEntries($result, $list);
-            $this->iterations++;
-        }
-        return $result;
+        return $this->readCursorToEnd($list, $endTime, $result);
     }
 
     /**
@@ -66,13 +80,7 @@ class DropboxManager {
         $result = [];
         $endTime = time() + 20;
         $list = ['has_more' => true];
-        while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
-            $list = $this->client->listFolderContinue($this->cursor);
-            $this->setNewCursor($list['cursor']);
-            $result = $this->getListOfEntries($result, $list);
-            $this->iterations++;
-        }
-        return $result;
+        return $this->readCursorToEnd($list, $endTime, $result);
     }
 
     /**
@@ -91,7 +99,7 @@ class DropboxManager {
         while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
             $list = $this->client->listFolderContinue($this->cursor);
             $this->setNewCursor($list['cursor']);
-            $result = $this->getListOfEntries($result, $list);
+            $result = $this->addValidEntries($result, $list['entries']);
             $this->iterations++;
             $result['numFilesQueued'] += $this->saveFileQueue($list['entries']);
             $result['numFilesProcessed'] += count($list['entries']);
@@ -100,19 +108,19 @@ class DropboxManager {
     }
 
     /**
-     * Filters a list of Dropbox file entries to return only those that match a given path.
-     * @param array $result The current list of matching entries, which will be appended to.
-     * @param array $list The list of entries to pull the entries from and filter.
+     * Filters a list of Dropbox file entries, appending those that match our valid file path with the known good ones.
+     * @param array $knownGoodFiles The current list of matching entries, which will be merged with.
+     * @param array $suspectFiles A list of file details to validate.
      * @return array The filtered list of entries.
      */
-    private function getListOfEntries(array $result, array $list): array
+    private function addValidEntries(array $knownGoodFiles, array $suspectFiles): array
     {
-        $filteredEntries = array_filter($list['entries'], function ($fileEntry) {
-            return preg_match('/^\/midwestmemories\//', $fileEntry['path_lower']);
+        $filteredEntries = array_filter($suspectFiles, function ($fileEntry) {
+            return preg_match(self::VALID_FILE_PATH_REGEX, $fileEntry['path_lower']);
         });
 
         $this->entries += count($filteredEntries);
-        return array_merge($result, $filteredEntries);
+        return array_merge($knownGoodFiles, $filteredEntries);
     }
 
     /**
@@ -269,7 +277,7 @@ class DropboxManager {
     /** Process a PNG file, generating thumbnail and converting to JPG if needed.*/
     private function processPngFile(string $fullPath): void
     {
-        if ((filesize($fullPath) > self::MAX_PNG_SIZE)) {
+        if ((filesize($fullPath) > self::MAX_PNG_BYTES)) {
             // Thumbnail generation would be faster from the new JPG, so we roll this into convertToJpeg.
             $result = $this->convertToJpeg($fullPath);
         } else {
@@ -344,12 +352,12 @@ class DropboxManager {
         }
         $newWidth = $origWidth;
         $newHeight = $origHeight;
-        // Scale to max width if needed.
+        // Scale to max height if needed.
         if ($origHeight > self::MAX_THUMB_HEIGHT) {
             $newHeight = self::MAX_THUMB_HEIGHT;
             $newWidth = floor($origWidth * ($newHeight / $origHeight));
         }
-        // Scale to max height if still too large.
+        // Scale further to max width if still too large.
         if ($newWidth > self::MAX_THUMB_WIDTH) {
             $newWidth = self::MAX_THUMB_WIDTH;
             $newHeight = floor($origWidth * ($newWidth / $origWidth));
@@ -389,7 +397,7 @@ class DropboxManager {
     }
 
     /**
-     * Convert large png files to more-compressed jpgs.
+     * Convert large PNG files to more-compressed jpgs.
      * ToDo: How should this be reflected in the DB?
      * @param string $fullPath Full path to original file.
      * @return bool success
@@ -479,6 +487,25 @@ class DropboxManager {
             $errorMessage,
             $fullPath
         );
+    }
+
+    /**
+     * Read from the cursor until it no longer response "has_more", filtering out files we're uninterested in.
+     * @param array $list The list of files or other responses from the cursor's listFolder call.
+     * @param int $endTime Maximum time() we can loop before we time out.
+     * @param array $knownGoodFiles The current list of matching entries, which will be merged with.
+     * @return array The filtered list of entries.
+     * @return array The list of files from the folder we're interested in.
+     */
+    public function readCursorToEnd(array $list, int $endTime, array $knownGoodFiles): mixed
+    {
+        while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
+            $list = $this->client->listFolderContinue($this->cursor);
+            $this->setNewCursor($list['cursor']);
+            $knownGoodFiles = $this->addValidEntries($knownGoodFiles, $list['entries']);
+            $this->iterations++;
+        }
+        return $knownGoodFiles;
     }
 
     /**
