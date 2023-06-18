@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app;
+namespace MidwestMemories;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;

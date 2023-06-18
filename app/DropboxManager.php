@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app;
+namespace MidwestMemories;
 
 use Spatie\Dropbox\Client;
 

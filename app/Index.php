@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace app\MidwestMemories;
+namespace MidwestMemories;
 
-use app\Connection;
-use app\Db;
+use MidwestMemories\Connection;
+use MidwestMemories\Db;
 
 /**
  * The class for the main index.php file.
