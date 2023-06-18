@@ -74,6 +74,8 @@ namespace MidwestMemories;
     <div class="tree-view left-column">
         <?php
         // Set the root directory to display in the tree view.
+        use app\MidwestMemories\Index;
+
         $root = Index::$baseDir;
 
         echo '<ul>';

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use app\DropboxManager;
-use MidwestMemories\Index;
+use app\MidwestMemories\Index;
 
 /** Template to display thumbnails in a table, with titles, and a description at the top.
  * Requirements:

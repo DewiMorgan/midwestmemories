@@ -5,6 +5,8 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use app\MidwestMemories\Index;
+
 date_default_timezone_set('US/Central');
 session_start();
 

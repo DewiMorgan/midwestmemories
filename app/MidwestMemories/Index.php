@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MidwestMemories;
+namespace app\MidwestMemories;
 
 use app\Connection;
 use app\Db;
