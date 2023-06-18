@@ -83,7 +83,7 @@ class Index
      */
     private static function validateBaseDir(): void
     {
-        $baseDir = realpath(__DIR__ . '/' . Index::IMAGE_DIR . '/');
+        $baseDir = realpath(__DIR__ . '/../' . Index::IMAGE_DIR . '/');
         if (empty(static::$baseDir)) {
             Db::adminDebug('MM_BASE_DIR was empty. Not safe to continue.');
             http_response_code(500); // Internal Server Error.
