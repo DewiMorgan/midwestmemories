@@ -1,6 +1,6 @@
 <?php
-/** The main site page.  */
 
+/** The main site page.  */
 declare(strict_types=1);
 
 namespace MidwestMemories;

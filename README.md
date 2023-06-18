@@ -139,22 +139,16 @@ To push a change:
 
 ## Current Issues
 
-* Main page doesn't load.
-    * https://midwestmemories.dewimorgan.com/
-    * F12 to see console.
-    * I see a basically empty page, apart from stuff from my plugins (GA opt-out extension, and dark mode.)
-      TreeTemplate.html should have <!DOCTYPE html>.
-    * Checking the logs, I see:
-      `Class "MidwestMemories\Index" not found in /data0/ulixamvtuwwyaykg/public_html/midwestmemories/index.php:13`
-    * Looks like I don't have autoincludes working properly.
-    * app\autoload.php exists.
-    * Let's make it log when it does something.
+* It logs the connection twice for each page load, but needn't.
 * OpenLinkInline doesn't seem to do so. Steps to reproduce:
     * None yet.
 * [Download files from DB queue] and [Process downloaded files]are both giving me:
     * Cursor='',"Cursor was not set in client.", but I am not sure if that is even a true error.
     * No repro steps yet.
 * Refactor dropboxcallback to a class, and move the class into the app/ folder.
-* Create a simple static logger class. Log::error($str), etc.
-* Create a simple static config class. Conf::get(Conf::LOG_LEVEL), etc. Read auth info through this.
+* Read auth info through the config class, and create a config file for non-secret info.
+* FIXED: Create a simple static logger class. Log::error($str), etc.
+* FIXED: Create a simple static config class. Conf::get(Conf::LOG_LEVEL), etc.
 * FIXED: DropboxManager has some very poor naming. `dbm.iterations` and `dbm.extracted` need renaming.
+* FIXED: Main page doesn't load.
+* FIXED: Remove logging from autoloader.
