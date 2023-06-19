@@ -139,14 +139,57 @@ To push a change:
 
 ## Current Issues
 
-* It logs the connection twice for each page load, but needn't.
+Urgent:
+
 * OpenLinkInline doesn't seem to do so. Steps to reproduce:
     * None yet.
 * [Download files from DB queue] and [Process downloaded files]are both giving me:
     * Cursor='',"Cursor was not set in client.", but I am not sure if that is even a true error.
-    * No repro steps yet.
-* Refactor dropboxcallback to a class, and move the class into the app/ folder.
-* Read auth info through the config class, and create a config file for non-secret info.
+    * No reproduction steps yet.
+* Index: Inline file view
+* Index: Inline search view
+
+From ToDos:
+
+* Admin: Chain all admin processes up from the web hook handler, using a single timeout time.
+* Admin: Maybe have admin processes re-trigger each other or something.
+* Admin: Maybe a web cron to hit the webhook? Or does cpanel allow cron jobs? Edit crontab manually?
+* `gitpull`: Delete `gitpull.php`
+* `inst-mwm`: Delete `inst-mwm.php`
+* `phpinfoz`: Delete `phpinfoz.php`
+* Admin: Make Admin.php ShowPage() a template.
+* Admin: Wrap InitSession() logging in a connectionLogger.
+* Index: Wrap InitSession() logging in a connectionLogger.
+* Connection: isBot to use BotSign table.
+* Connection: Do something with the ipLookup table.
+* Connection: Timestamps with timezone-aware display.
+* Connection: Make admin levels more DB-configurable.
+* Connection: Ability to register accounts (with authorization)
+* Connection: Ability to change passwords
+* Db::mkRefArray(): There's apparently a `...` operator that makes this redundant: see man page.
+* DropboxManager::processTextFile(): Some processing.
+* DropboxManager::convertToJpeg(): How should this be reflected in the DB?
+* ThumbsTemplate: Folders first.
+* ThumbsTemplate: Alt text when displaying images.
+* ThumbsTemplate: Check width and height when displaying images.
+* TreeTemplate: Expand to, and select, currently passed $path.
+* TreeTemplate: Make it accept one or more callbacks to say how to recurse into, skip, or display entries.
+
+Low priority:
+
+* Allow log level to be specified as a string
+* Split a FileProcessor class out from DropboxManager?
+* Log rolling.
+* It logs the connection twice for each page load, but needn't.
+* Make all Log methods also echo, like Log::adminDebug(), depending on a config var something like LOG_ADMIN_ECHO_LEVEL.
+* Get rid of Log::adminDebug() method. Replace w Log::debug() throughout.
+
+Fixed:
+
+* FIXED: Create a config file for non-secret info.
+* FIXED: Read auth info through the config class.
+* FIXED: Unify pre-existing logging (as in Db class) to use Log class.
+* FIXED: Refactor dropboxcallback to a class, and move the class into the app/ folder.
 * FIXED: Create a simple static logger class. Log::error($str), etc.
 * FIXED: Create a simple static config class. Conf::get(Conf::LOG_LEVEL), etc.
 * FIXED: DropboxManager has some very poor naming. `dbm.iterations` and `dbm.extracted` need renaming.

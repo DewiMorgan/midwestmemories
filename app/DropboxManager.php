@@ -11,22 +11,19 @@ use Spatie\Dropbox\Client;
  */
 class DropboxManager
 {
-    /** @var Client $client Dropbod Client object. */
+    /** @var Client $client Dropbox Client object. */
     private Client $client;
 
-    /** @var string $cursor The current position in a read of the file status. Longlived, persistent, gets updates. */
+    /** @var string $cursor The current position in a read of the file status. Long-lived, persistent, gets updates. */
     public string $cursor;
 
-    /** @var int $entries How many valid files were found. Used only for reportig. */
+    /** @var int $entries How many valid files were found. Used only for reporting. */
     public int $entries = 0;
 
     /** @var int $iterations How many times we got the file list from the cursor because it responded "has more".
      * Only used for reporting display.
      */
     public int $iterations = 0;
-
-    /** @const int DROPBOX_USER_ID - The id of the dropbox user. ToDo: move this into DropboxAuth.ini? */
-    public const DROPBOX_USER_ID = 16181197;
 
     /** @const int MAX_PNG_BYTES - Max PNG size in bytes before we resample to JPG. */
     private const MAX_PNG_BYTES = 1024 * 1024;
@@ -136,7 +133,7 @@ class DropboxManager
                 VALUES (?, ?) 
                 ON DUPLICATE KEY UPDATE `cursor_id` = ?',
                 'dss',
-                self::DROPBOX_USER_ID,
+                Conf::get(Key::DROPBOX_USER_ID),
                 $cursor,
                 $cursor
             );
@@ -339,7 +336,7 @@ class DropboxManager
     private function makeThumb($sourceImage, string $fullPath): bool
     {
         if (false === $sourceImage) {
-            Db::adminDebug('Source image false for makeThumb', $fullPath);
+            Log::adminDebug('Source image false for makeThumb', $fullPath);
             return false;
         }
         $dest = dirname($fullPath) . '/' . self::getThumbName($fullPath);
@@ -347,7 +344,7 @@ class DropboxManager
         $origWidth = imagesx($sourceImage);
         $origHeight = imagesy($sourceImage);
         if (false === $origWidth || false === $origHeight) {
-            Db::adminDebug('Source image dimensions false for makeThumb', [$origWidth, $origHeight, $fullPath]);
+            Log::adminDebug('Source image dimensions false for makeThumb', [$origWidth, $origHeight, $fullPath]);
             return false;
         }
         $newWidth = $origWidth;
@@ -366,7 +363,7 @@ class DropboxManager
         /* Create a new, "virtual" image */
         $virtualImage = imagecreatetruecolor($newWidth, $newHeight);
         if (false === $virtualImage) {
-            Db::adminDebug('Virtual image dimensions false for makeThumb', $fullPath);
+            Log::adminDebug('Virtual image dimensions false for makeThumb', $fullPath);
             return false;
         }
 
@@ -383,13 +380,13 @@ class DropboxManager
                 $origWidth,
                 $origHeight
             )) {
-            Db::adminDebug('imagecopyresampled failed for makeThumb', $fullPath);
+            Log::adminDebug('imagecopyresampled failed for makeThumb', $fullPath);
             return false;
         }
 
         /* Create the physical thumbnail image at its destination */
         if (false === imagejpeg($virtualImage, $dest, 70)) {
-            Db::adminDebug('imagejpeg failed for makeThumb', $fullPath);
+            Log::adminDebug('imagejpeg failed for makeThumb', $fullPath);
             return false;
         }
 
@@ -406,7 +403,7 @@ class DropboxManager
     {
         $sourceImage = imagecreatefrompng($fullPath);
         if (false === $sourceImage) {
-            Db::adminDebug('Source image false for convertToJpeg', $fullPath);
+            Log::adminDebug('Source image false for convertToJpeg', $fullPath);
             return false;
         }
 
@@ -414,7 +411,7 @@ class DropboxManager
 
         /* Save as a renamed JPG at its destination */
         if (false === imagejpeg($sourceImage, $newFullPath, 70)) {
-            Db::adminDebug('imagejpeg failed for convertToJpeg', $fullPath);
+            Log::adminDebug('imagejpeg failed for convertToJpeg', $fullPath);
             return false;
         }
         // Try to delete the huge file. If we can't, no big loss.
@@ -439,9 +436,9 @@ class DropboxManager
 
         // Check and log each step of downloading the file. Daisy-chained elseif ensures handles get closed at the end.
         if (false === $fp = fopen($fullPath, 'w+')) {
-            Db::adminDebug('fopen failed for downloadUrlToPath', [$url, $fullPath]);
+            Log::adminDebug('fopen failed for downloadUrlToPath', [$url, $fullPath]);
         } elseif (false === $ch = curl_init($url)) {
-            Db::adminDebug('curl_init failed for downloadUrlToPath', [$url, $fullPath]);
+            Log::adminDebug('curl_init failed for downloadUrlToPath', [$url, $fullPath]);
         } elseif (false === (
                 // if timeout (seconds) is too low, download will be interrupted
                 curl_setopt($ch, CURLOPT_TIMEOUT, 600)
@@ -451,13 +448,13 @@ class DropboxManager
                 // && curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0)
                 // && curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0)
             )) {
-            Db::adminDebug('curl_setopt failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
+            Log::adminDebug('curl_setopt failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
         } elseif (false === curl_exec($ch)) { // Get curl response
-            Db::adminDebug('curl_exec failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
+            Log::adminDebug('curl_exec failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
         } elseif (false === file_exists($fullPath)) {
-            Db::adminDebug('File creation failed for downloadUrlToPath', [$url, $fullPath]);
+            Log::adminDebug('File creation failed for downloadUrlToPath', [$url, $fullPath]);
         } else {
-            Db::adminDebug('Success: downloadUrlToPath', [$url, $fullPath]);
+            Log::adminDebug('Success: downloadUrlToPath', [$url, $fullPath]);
             $success = true;
         }
 
@@ -494,10 +491,9 @@ class DropboxManager
      * @param array $list The list of files or other responses from the cursor's listFolder call.
      * @param int $endTime Maximum time() we can loop before we time out.
      * @param array $knownGoodFiles The current list of matching entries, which will be merged with.
-     * @return array The filtered list of entries.
      * @return array The list of files from the folder we're interested in.
      */
-    public function readCursorToEnd(array $list, int $endTime, array $knownGoodFiles): mixed
+    public function readCursorToEnd(array $list, int $endTime, array $knownGoodFiles): array
     {
         while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
             $list = $this->client->listFolderContinue($this->cursor);

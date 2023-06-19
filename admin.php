@@ -6,7 +6,6 @@
  *  Chain all these processes up from the web hook handler, using a single timeout time.
  *  Maybe have them re-trigger each other or something.
  *  Maybe a web cron to hit the webhook? Or does cpanel allow cron jobs? Edit crontab manually?
- *  Refactor to a class, and move the class into the app/ folder, like Index.html.
  */
 
 declare(strict_types=1);
