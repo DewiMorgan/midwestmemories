@@ -191,7 +191,6 @@ namespace MidwestMemories;
 <!--suppress InnerHTMLJS -->
 <script>
     // Tree view event listeners to handle link-click behavior.
-    // Tree view event listeners to handle expand/collapse behavior.
 
     // Get all the folder elements in the tree view.
     const links = document.querySelectorAll('.path-link');
@@ -230,13 +229,14 @@ namespace MidwestMemories;
 
     function addLinkClickHandler(link) {
         link.addEventListener('click', function (e) {
+            alert("hot to onclick");
             console.log("Onclick.");
             e.preventDefault();
             openLinkInline(this.getAttribute("href"));
         });
     }
     <?php global $h_requestedPath; ?>
-    openLinkInline('<?= $h_requestedPath; ?>');
+//    openLinkInline('<?= $h_requestedPath; ?>');
 </script>
 
 </body>

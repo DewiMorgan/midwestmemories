@@ -30,8 +30,8 @@ class Index
         static::initSession();
 
         $requestedPath = $_REQUEST['path'] ?? '/';
-        static::$h_requestedPath = htmlspecialchars($requestedPath);
         static::validatePath($requestedPath);
+        static::$h_requestedPath = htmlspecialchars($requestedPath);
 
         static::showPage();
     }
@@ -85,8 +85,8 @@ class Index
     {
         $baseDir = realpath(__DIR__ . '/../' . Index::IMAGE_DIR . '/');
         if (empty($baseDir)) {
-            Db::adminDebug('MM_BASE_DIR empty from "' . __DIR__ . ' + /../ + ' . Index::IMAGE_DIR . ' + /".');
-            Db::adminDebug('Not safe to continue');
+            Log::adminDebug('MM_BASE_DIR empty from "' . __DIR__ . ' + /../ + ' . Index::IMAGE_DIR . ' + /".');
+            Log::adminDebug('Not safe to continue');
             http_response_code(500); // Internal Server Error.
             die();
         }
@@ -100,12 +100,12 @@ class Index
     {
         $realPath = realpath(static::$baseDir . '/' . $requestedPath);
         if (false === $realPath) {
-            Db::adminDebug("Requested path was not found: $requestedPath");
+            Log::adminDebug("Requested path was not found: $requestedPath");
             http_response_code(404); // Not found.
             die();
         }
         if (!str_starts_with($realPath, static::$baseDir)) {
-            Db::adminDebug("Requested path was not within MM_BASE_DIR: $requestedPath");
+            Log::adminDebug("Requested path was not within MM_BASE_DIR: $requestedPath");
             http_response_code(404); // Not found.
             die();
         }

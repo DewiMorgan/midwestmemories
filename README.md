@@ -141,7 +141,7 @@ To push a change:
 
 Urgent:
 * FIXED: Argument #5 ($port) must be of type ?int, string given in /data0/ulixamvtuwwyaykg/public_html/midwestmemories/app/Db.php:41
-
+* index.php double-loads the tree template.
 * Content div has it as a class but not an id:
     * Uncaught (in promise) TypeError: document.getElementById(...) is null
     * openLinkInline https://midwestmemories.dewimorgan.com/:151
