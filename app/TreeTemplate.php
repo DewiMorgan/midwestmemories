@@ -119,7 +119,7 @@ namespace MidwestMemories;
     </div>
 
     <div class="drag-bar"></div>
-    <div class="content right-column">Hello, world!</div>
+    <div class="content right-column" id="content">Hello, world!</div>
 </div>
 
 <script>
