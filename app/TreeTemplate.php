@@ -73,6 +73,7 @@ namespace MidwestMemories;
 <div class="flex-container">
     <div class="tree-view left-column">
         <?php
+
         // Set the root directory to display in the tree view.
         use MidwestMemories\Index;
 
@@ -134,14 +135,18 @@ namespace MidwestMemories;
     let leftColumnWidth;
     let rightColumnWidth;
 
-    dragBar.addEventListener('mousedown', function(e) {
+    dragBar.addEventListener('mousedown', handleDragBarMouseDown);
+    document.addEventListener('mousemove', handleDragBarMouseMove);
+    document.addEventListener('mouseup', handleDragBarMouseUp);
+
+    function handleDragBarMouseDown(e) {
         isDragging = true;
         currentX = e.clientX;
         leftColumnWidth = leftColumn.offsetWidth;
         rightColumnWidth = rightColumn.offsetWidth;
-    });
+    }
 
-    document.addEventListener('mousemove', function(e) {
+    function handleDragBarMouseMove(e) {
         if (isDragging) {
             e.preventDefault();
             const deltaX = e.clientX - currentX;
@@ -150,11 +155,11 @@ namespace MidwestMemories;
             leftColumn.style.width = newLeftColumnWidth + 'px';
             rightColumn.style.width = newRightColumnWidth + 'px';
         }
-    });
+    }
 
-    document.addEventListener('mouseup', function() {
+    function handleDragBarMouseUp() {
         isDragging = false;
-    });
+    }
 </script>
 
 <script>
@@ -164,8 +169,10 @@ namespace MidwestMemories;
     const folders = document.querySelectorAll('.folder');
 
     // Add a click event listener to each folder
-    folders.forEach(folder => {
-        folder.addEventListener('click', function(e) {
+    folders.forEach(addFoldClickHandler);
+
+    function addFoldClickHandler(folder) {
+        folder.addEventListener('click', function (e) {
             // Get the span element that was clicked: should probably be a class rather than just span.
             const span = folder.querySelector('span');
             // Toggle the expand/collapse state of the folder
@@ -178,7 +185,7 @@ namespace MidwestMemories;
             }
             e.stopPropagation();
         });
-    });
+    }
 </script>
 
 <!--suppress InnerHTMLJS -->
@@ -219,13 +226,15 @@ namespace MidwestMemories;
     }
 
     // Add a click event listener to each folder
-    links.forEach(link => {
-        link.addEventListener('click', function(e) {
+    links.forEach(addLinkClickHandler);
+
+    function addLinkClickHandler(link) {
+        link.addEventListener('click', function (e) {
             console.log("Onclick.");
             e.preventDefault();
             openLinkInline(this.getAttribute("href"));
         });
-    });
+    }
     <?php global $h_requestedPath; ?>
     openLinkInline('<?= $h_requestedPath; ?>');
 </script>
