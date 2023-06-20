@@ -233,8 +233,7 @@ namespace MidwestMemories;
     function addLinkClickHandler(link) {
         console.log("Adding onClick to link: " + link.getAttribute("href"));
         link.addEventListener('click', function (e) {
-            alert("got to onclick");
-            console.log("Onclick.");
+            console.log("Onclick link.");
             e.preventDefault();
             openLinkInline(this.getAttribute("href"));
         });

@@ -140,17 +140,6 @@ To push a change:
 ## Current Issues
 
 Urgent:
-* FIXED: Argument #5 ($port) must be of type ?int, string given in /data0/ulixamvtuwwyaykg/public_html/midwestmemories/app/Db.php:41
-* index.php double-loads the tree template.
-* Content div has it as a class but not an id:
-    * Uncaught (in promise) TypeError: document.getElementById(...) is null
-    * openLinkInline https://midwestmemories.dewimorgan.com/:151
-    * promise callback*openLinkInline https://midwestmemories.dewimorgan.com/:150
-    * `<anonymous>` https://midwestmemories.dewimorgan.com/:178
-    * midwestmemories.dewimorgan.com:151:26
-
-* OpenLinkInline doesn't seem to do so. Steps to reproduce:
-    * None yet.
 * [Download files from DB queue] and [Process downloaded files]are both giving me:
     * Cursor='',"Cursor was not set in client.", but I am not sure if that is even a true error.
     * No reproduction steps yet.
@@ -194,6 +183,10 @@ Low priority:
 
 Fixed:
 
+* FIXED: Argument #5 ($port) must be of type ?int, string given in /data0/ulixamvtuwwyaykg/public_html/midwestmemories/app/Db.php:41
+* FIXED: index.php double-loads the tree template.
+* FIXED: Content div has it as a class but not an id
+* FIXED: OpenLinkInline doesn't seem to do so. I had the wrong classnames.
 * FIXED: Create a config file for non-secret info.
 * FIXED: Read auth info through the config class.
 * FIXED: Unify pre-existing logging (as in Db class) to use Log class.
