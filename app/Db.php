@@ -38,7 +38,7 @@ class Db
                 Conf::get(Key::MYSQL_USER),
                 Conf::get(Key::MYSQL_PASS),
                 Conf::get(Key::MYSQL_NAME),
-                Conf::get(Key::MYSQL_PORT)
+                intval(Conf::get(Key::MYSQL_PORT))
             );
         } catch (Exception $e) {
             Log::adminDebug('DB connection failed: ' . $e->getMessage());
