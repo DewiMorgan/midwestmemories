@@ -172,6 +172,7 @@ namespace MidwestMemories;
     folders.forEach(addFoldClickHandler);
 
     function addFoldClickHandler(folder) {
+        console.log("Adding onClick to fold: " + folder.textContent);
         folder.addEventListener('click', function (e) {
             // Get the span element that was clicked: should probably be a class rather than just span.
             const span = folder.querySelector('span');
@@ -200,6 +201,7 @@ namespace MidwestMemories;
 
     // Method to Handle link clicking.
     function openLinkInline(url) {
+        console.log("Opening link inline: " + url);
         fetch(url)
             .then(response => response.text())
             .then(data => {
@@ -229,7 +231,7 @@ namespace MidwestMemories;
 
 
     function addLinkClickHandler(link) {
-        console.log("Adding onClick to ." + link.getAttribute("href"));
+        console.log("Adding onClick to link: " + link.getAttribute("href"));
         link.addEventListener('click', function (e) {
             alert("got to onclick");
             console.log("Onclick.");
