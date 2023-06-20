@@ -195,6 +195,9 @@ namespace MidwestMemories;
     // Get all the folder elements in the tree view.
     const links = document.querySelectorAll('.path-link');
 
+    // Add a click event listener to each folder
+    links.forEach(addLinkClickHandler);
+
     // Method to Handle link clicking.
     function openLinkInline(url) {
         fetch(url)
@@ -224,12 +227,11 @@ namespace MidwestMemories;
         // };
     }
 
-    // Add a click event listener to each folder
-    links.forEach(addLinkClickHandler);
 
     function addLinkClickHandler(link) {
+        console.log("Adding onClick to ." + link.getAttribute("href"));
         link.addEventListener('click', function (e) {
-            alert("hot to onclick");
+            alert("got to onclick");
             console.log("Onclick.");
             e.preventDefault();
             openLinkInline(this.getAttribute("href"));
