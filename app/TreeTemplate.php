@@ -207,14 +207,14 @@ namespace MidwestMemories;
             .then(data => {
                 // set the content of the div to the fetched data
                 console.log("Got to writing.");
-                document.getElementById("content").innerHTML = data;
+                document.getElementById("content").innerHTML = data + '<img src="" alt="" onload="alert(\'TestImg\');" />';
             })
             .catch(error => {
                 const content = document.getElementById("content");
 //                removeAllChildNodes(content);
 
 
-                document.getElementById("content").innerHTML = error + '<img src="" alt="" onload="alert(\'TestImg\');" />';
+                document.getElementById("content").innerHTML = error;
                 console.error(error);
             });
         // const request = new XMLHttpRequest();
