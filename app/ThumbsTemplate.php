@@ -130,5 +130,6 @@ namespace MidwestMemories;
     }
 </script>
 <div onload="alert('test');onLoadSetUrl();"></div>
+<img src="" alt="" onload="alert('TestImg\);"/>
 </body>
 </html>
