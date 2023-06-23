@@ -207,30 +207,17 @@ namespace MidwestMemories;
             .then(data => {
                 // set the content of the div to the fetched data
                 console.log("Got to writing.");
-                document.getElementById("content").innerHTML = data + '<img src="https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftn_test3.jpg&i=2" alt="" onload="alert(\'TestImg\');" />';
+                removeAllChildNodes(content); // Ensure event listeners are removed.
+                document.getElementById("content").innerHTML = data;
+                console.log("Updating URL to '" + url + "'.");
+                window.history.pushState(null, '', '<?=Index::$realPath ?>');
             })
             .catch(error => {
                 const content = document.getElementById("content");
-//                removeAllChildNodes(content);
-
-
+                removeAllChildNodes(content); // Ensure event listeners are removed.
                 document.getElementById("content").innerHTML = error;
                 console.error(error);
             });
-        // const request = new XMLHttpRequest();
-        // request.open("GET", url, true);
-        // request.send();
-        // request.onload = function() {
-        //     if (200 <= request.status && 400 > request.status) {
-        //         // Success!
-        //         document.getElementById("content").innerHTML = request.responseText;
-        //     } else {
-        //         document.getElementById("content").innerHTML = 'Server returned an error.';
-        //     }
-        // };
-        // request.onerror = function() {
-        //     document.getElementById("content").innerHTML = 'There was a connection error of some sort.';
-        // };
     }
 
 
@@ -248,8 +235,6 @@ namespace MidwestMemories;
             parent.removeChild(parent.firstChild);
         }
     }
-    <?php global $h_requestedPath; ?>
-//    openLinkInline('<?= $h_requestedPath; ?>');
 </script>
 
 </body>
