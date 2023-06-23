@@ -57,7 +57,8 @@ class Db
         $db = self::getInstance()->db;
         if ($query = $db->prepare($sql)) {
             if (!empty($items)) {
-                call_user_func_array([$query, 'bind_param'], $items);
+                $args = $items;
+                call_user_func_array([$query, 'bind_param'], $args);
 //                call_user_func_array([$query, 'bind_param'], self::mkRefArray($items));
             }
             $query->execute();
