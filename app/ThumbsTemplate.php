@@ -105,11 +105,12 @@ use MidwestMemories\Index;
             echo "  <li>Hidden dot file: $item</li>\n";
         } elseif (!preg_match('/\.(gif|png|jpg|jpeg)$/', $item)) {
             echo "  <li>Not an image file: $item</li>\n";
-        }
-        // Skip files without a matching thumbnail file: they have not been fully processed.
-        $thumbName = DropboxManager::getThumbName($item);
-        if (!is_file($thumbName)) {
-            echo "  <li>No thumb found: $thumbName from $item</li>\n";
+        } else {
+            // Skip files without a matching thumbnail file: they have not been fully processed.
+            $thumbName = DropboxManager::getThumbName($item);
+            if (!is_file($thumbName)) {
+                echo "  <li>No thumb found: $thumbName from $item</li>\n";
+            }
         }
         echo "</ul>\n";
 // /DELETEME DEBUG
