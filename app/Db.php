@@ -57,8 +57,10 @@ class Db
         $db = self::getInstance()->db;
         if ($query = $db->prepare($sql)) {
             if (!empty($items)) {
-                $args = [...$items];
-                call_user_func_array([$query, 'bind_param'], $args);
+                // Without mkRefArray, this gives the error:
+                // mysqli_stmt::bind_param(): Argument #2 must be passed by reference, value given in (...this line).
+                $query->bind_param(...$items);
+                // call_user_func_array([$query, 'bind_param'], self::mkRefArray($items));
             }
             $query->execute();
         }
@@ -179,25 +181,25 @@ class Db
         return $db->real_escape_string($str);
     }
 
-//    /**
-//     * Sadly, bind_param expects references, which makes passing arrays harder.
-//     * ToDo: There's apparently a `...` operator that makes this redundant: see man page.
-//     * @param array $input The array to convert.
-//     * @return array The array of references.
-//     */
-//    private static function mkRefArray(array $input): array
-//    {
-//        $result = [];
-//        if (empty($input)) {
-//            return [''];
-//        }
-//        foreach ($input as $key => $val) {
-//            if ($key > 0) {
-//                $result[$key] = &$input[$key];
-//            } else {
-//                $result[$key] = $val;
-//            }
-//        }
-//        return $result;
-//    }
+    /**
+     * Sadly, bind_param expects references, which makes passing arrays harder.
+     * ToDo: apparently `...` operator addresses this: see https://www.php.net/manual/en/mysqli-stmt.bind-param.php
+     * @param array $input The array to convert.
+     * @return array The array of references.
+     */
+    private static function mkRefArray(array $input): array
+    {
+        $result = [];
+        if (empty($input)) {
+            return [''];
+        }
+        foreach ($input as $key => $val) {
+            if ($key > 0) {
+                $result[$key] = &$input[$key];
+            } else {
+                $result[$key] = $val;
+            }
+        }
+        return $result;
+    }
 }
