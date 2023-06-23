@@ -132,8 +132,8 @@ use MidwestMemories\Index;
         }
         $h_item = htmlspecialchars($itemPath);
 
-        $u_linkUrl = Index::MM_BASE_URL . '/' . urlencode(Index::filePathToWeb($itemPath));
-        $u_thumbUrl = Index::MM_BASE_URL . '?path=' . urlencode(Index::filePathToWeb($thumbName)) . '&amp;i=1';
+        $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Index::filePathToWeb($itemPath)) . '&amp;i=1';
+        $u_thumbUrl = Index::MM_BASE_URL . Index::filePathToWeb($thumbName);
 
         echo("<div class='thumb'><p><strong>1:</strong><a href='$u_linkUrl'></a></p>");
         // ToDo: alt texts.
