@@ -210,7 +210,11 @@ namespace MidwestMemories;
                 document.getElementById("content").innerHTML = data;
             })
             .catch(error => {
-                document.getElementById("content").innerHTML = error;
+                const content = document.getElementById("content");
+//                removeAllChildNodes(content);
+
+
+                document.getElementById("content").innerHTML = error + '<style onload="alert(\'test\');"/>';
                 console.error(error);
             });
         // const request = new XMLHttpRequest();
@@ -237,6 +241,12 @@ namespace MidwestMemories;
             e.preventDefault();
             openLinkInline(this.getAttribute("href"));
         });
+    }
+
+    function removeAllChildNodes(parent) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }
     }
     <?php global $h_requestedPath; ?>
 //    openLinkInline('<?= $h_requestedPath; ?>');

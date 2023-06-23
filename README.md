@@ -141,7 +141,13 @@ To push a change:
 See also todo list at the top of this file.
 
 Urgent:
-* The ThumbTemplate doesn't fill out - maybe no suitable files with thumbs?
+* replace innerHTML use (mem leaks as doesn't remove handlers for old content; and doesn't run script tags.)
+* ThumbsTemplate: Folders first.
+* ThumbsTemplate: Alt text when displaying images.
+* ThumbsTemplate: Display title.
+* ThumbsTemplate: Display breadcrumbs?
+* ThumbsTemplate: Check width and height when displaying images.
+
 * Files within the mm folder aren't navigable to.
 * The admin page may be broken.
 * [Download files from DB queue] and [Process downloaded files]are both giving me:
@@ -171,11 +177,6 @@ From Code ToDos:
 * Db::mkRefArray(): There's apparently a `...` operator that makes this redundant: see man page.
 * DropboxManager::processTextFile(): Some processing.
 * DropboxManager::convertToJpeg(): How should this be reflected in the DB?
-* ThumbsTemplate: Folders first.
-* ThumbsTemplate: Alt text when displaying images.
-* ThumbsTemplate: Display title.
-* ThumbsTemplate: Display breadcrumbs?
-* ThumbsTemplate: Check width and height when displaying images.
 * TreeTemplate: Expand to, and select, currently passed $path.
 * TreeTemplate: Make it accept one or more callbacks to say how to recurse into, skip, or display entries.
 

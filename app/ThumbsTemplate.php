@@ -124,8 +124,11 @@ namespace MidwestMemories;
 </div><!-- thumb-content -->
 
 <script>
-    console.log("Updating URL to '<?=Index::$realPath ?>'.");
-    window.history.pushState(null, '', '<?=Index::$realPath ?>');
+    function onLoadSetUrl() {
+        console.log("Updating URL to '<?=Index::$realPath ?>'.");
+        window.history.pushState(null, '', '<?=Index::$realPath ?>');
+    }
 </script>
+<div onload="alert('test');onLoadSetUrl();"></div>
 </body>
 </html>
