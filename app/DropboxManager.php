@@ -317,14 +317,14 @@ class DropboxManager
     }
 
     /**
-     * Convert an image filename to a thumbnail filename, eg 'foo/bar.png' => 'tn_bar.jpg'.
+     * Convert an image filename to a thumbnail filename, eg 'foo/bar.png' => 'foo/tn_bar.jpg'.
      * Note: Files that begin with a dot and have no extension, e.g. '.example', will get thumbs called 'tn_.jpg'.
-     * @param string $imageName Name of the source image. Path will be ignored, not returned.
+     * @param string $imagePath Path and filename of the source image.
      * @return string The resulting filename.
      */
-    public static function getThumbName(string $imageName): string
+    public static function getThumbName(string $imagePath): string
     {
-        return 'tn_' . preg_replace('/\..+?$/', '', $imageName) . '.jpg';
+        return preg_replace('#([^/]*)\.[^/.]+?$#', 'tn_$1.jpg', $imagePath);
     }
 
     /**
@@ -339,7 +339,7 @@ class DropboxManager
             Log::adminDebug('Source image false for makeThumb', $fullPath);
             return false;
         }
-        $dest = dirname($fullPath) . '/' . self::getThumbName($fullPath);
+        $dest = self::getThumbName($fullPath);
         // Read source image size.
         $origWidth = imagesx($sourceImage);
         $origHeight = imagesy($sourceImage);
