@@ -214,7 +214,7 @@ namespace MidwestMemories;
 //                removeAllChildNodes(content);
 
 
-                document.getElementById("content").innerHTML = error + '<style onload="alert(\'test\');"/>';
+                document.getElementById("content").innerHTML = error + '<img src="" alt="" onload="alert(\'TestImg\');" />';
                 console.error(error);
             });
         // const request = new XMLHttpRequest();
