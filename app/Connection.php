@@ -1,6 +1,9 @@
 <?php
+
 declare(strict_types=1);
+
 namespace MidwestMemories;
+
 /**
  * Manage HTTP request connection data.
  * ToDo:
@@ -10,17 +13,18 @@ namespace MidwestMemories;
  *  Make admin levels more DB-configurable.
  *  Ability to register accounts (with authorization)
  *  Ability to change passwords
-*/
-class Connection {
+ */
+class Connection
+{
 
     /**
      * @param string $request -- URL requested, via $_SERVER['REQUEST_URI']
-     * @param string $date    -- Current date.
-     * @param string $ip      -- Requesting IP.
-     * @param string $ipList  -- List of possible originating IPs.
-     * @param string $agent   -- User-agent information.
-     * @param string $user    -- Best guess at the current user.
-     * @param bool $isBot     -- True if user looks like a known bot.
+     * @param string $date -- Current date.
+     * @param string $ip -- Requesting IP.
+     * @param string $ipList -- List of possible originating IPs.
+     * @param string $agent -- User-agent information.
+     * @param string $user -- Best guess at the current user.
+     * @param bool $isBot -- True if user looks like a known bot.
      * @param bool $isAdmin
      * @param bool $isSuperAdmin
      */
@@ -113,17 +117,27 @@ class Connection {
      * The first one is taken as the "most valid" one, so they should probably be ordered from best to worst.
      * @return string[]
      */
-    private function getIpData(): array {
+    private function getIpData(): array
+    {
         $ipArray = [];
-        foreach ([
-            'HTTP_CLIENT_IP', 'HTTP_CF_CONNECTING_IP', 'PROXY_REMOTE_ADDR', // Proxy aliases.
-            'HTTP_X_REAL_IP', 'HTTP_X_CLUSTER_CLIENT_IP', // _X_s.
-            'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED',
-            'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED',
-            'HTTP_PROXY_CONNECTION', 'HTTP_VIA',
-            'HTTP_X_COMING_FROM', 'HTTP_COMING_FROM',
-            'REMOTE_ADDR', // Should be last: the only one guaranteed legitimate.
-        ] as $key) {
+        foreach (
+            [
+                'HTTP_CLIENT_IP',
+                'HTTP_CF_CONNECTING_IP',
+                'PROXY_REMOTE_ADDR', // Proxy aliases.
+                'HTTP_X_REAL_IP',
+                'HTTP_X_CLUSTER_CLIENT_IP', // _X_s.
+                'HTTP_FORWARDED_FOR',
+                'HTTP_FORWARDED',
+                'HTTP_X_FORWARDED_FOR',
+                'HTTP_X_FORWARDED',
+                'HTTP_PROXY_CONNECTION',
+                'HTTP_VIA',
+                'HTTP_X_COMING_FROM',
+                'HTTP_COMING_FROM',
+                'REMOTE_ADDR', // Should be last: the only one guaranteed legitimate.
+            ] as $key
+        ) {
             if (!empty($_SERVER[$key])) {
                 $list = explode(',', $_SERVER[$key]);
                 foreach ($list as $ip) {
@@ -142,38 +156,43 @@ class Connection {
     }
 
     /**
-    * Ensures an IP address is both a valid IP address and does not fall within
-    * a private network range.
-    * @param string $ip The ip number to check.
-    * @return bool True if the IP is a valid public IP.
-    */
-    private function validatePublicIp(string $ip): bool {
+     * Ensures an IP address is both a valid IP address and does not fall within
+     * a private network range.
+     * @param string $ip The ip number to check.
+     * @return bool True if the IP is a valid public IP.
+     */
+    private function validatePublicIp(string $ip): bool
+    {
         return (false !== filter_var(
-            $ip,
-            FILTER_VALIDATE_IP,
-            FILTER_FLAG_IPV4 |
-            FILTER_FLAG_IPV6 |
-            FILTER_FLAG_NO_PRIV_RANGE |
-            FILTER_FLAG_NO_RES_RANGE
-        ));
+                $ip,
+                FILTER_VALIDATE_IP,
+                FILTER_FLAG_IPV4 |
+                FILTER_FLAG_IPV6 |
+                FILTER_FLAG_NO_PRIV_RANGE |
+                FILTER_FLAG_NO_RES_RANGE
+            )
+        );
     }
 
     /** Just check an IP address truly is one.
-    * @param string $ip The ip number to check.
-    * @return bool True if the IP is a valid IP.
-    */
-    private function validateIp(string $ip): bool {
+     * @param string $ip The ip number to check.
+     * @return bool True if the IP is a valid IP.
+     */
+    private function validateIp(string $ip): bool
+    {
         return (false !== filter_var(
-            $ip,
-            FILTER_VALIDATE_IP,
-            FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6
-        ));
+                $ip,
+                FILTER_VALIDATE_IP,
+                FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6
+            )
+        );
     }
 
     /** Get a string describing the object.
-    * @return string Serialized object data,
-    */
-    public function __toString(): string {
+     * @return string Serialized object data,
+     */
+    public function __toString(): string
+    {
         return var_export([
             'request' => $this->request,
             'date' => $this->date,
@@ -192,8 +211,9 @@ class Connection {
      * @param string $ip
      * @return string The normalized IP.
      */
-    private function normalizeIp(string $ip): string {
-        if (str_contains($ip, ':') && substr_count($ip, '.') == 3 && !str_contains($ip, '[')){
+    private function normalizeIp(string $ip): string
+    {
+        if (str_contains($ip, ':') && substr_count($ip, '.') == 3 && !str_contains($ip, '[')) {
             // IPv4 with port (e.g., 123.123.123.123:80)
             $ip = explode(':', $ip);
             $ip = $ip[0];

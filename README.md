@@ -138,17 +138,19 @@ To push a change:
 2) Git pull in inst-mwm.
 
 ## Current Issues
+See also todo list at the top of this file.
 
 Urgent:
-* The admin page may be broken.
 * The ThumbTemplate doesn't fill out - maybe no suitable files with thumbs?
+* Files within the mm folder aren't navigable to.
+* The admin page may be broken.
 * [Download files from DB queue] and [Process downloaded files]are both giving me:
     * Cursor='',"Cursor was not set in client.", but I am not sure if that is even a true error.
     * No reproduction steps yet.
 * Index: Inline file view
 * Index: Inline search view
 
-From ToDos:
+From Code ToDos:
 
 * Admin: Chain all admin processes up from the web hook handler, using a single timeout time.
 * Admin: Maybe have admin processes re-trigger each other or something.
@@ -176,12 +178,14 @@ From ToDos:
 
 Low priority:
 
+* site.webmanifest file could do with populating properly.
 * Allow log level to be specified as a string
 * Split a FileProcessor class out from DropboxManager?
 * Log rolling.
 * It logs the connection twice for each page load, but needn't.
 * Make all Log methods also echo, like Log::adminDebug(), depending on a config var something like LOG_ADMIN_ECHO_LEVEL.
 * Get rid of Log::adminDebug() method. Replace w Log::debug() throughout.
+* Create an always-present error-div, that's shown if it has any content. Sorta like an in-page console.
 
 Fixed:
 

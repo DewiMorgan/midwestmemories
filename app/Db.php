@@ -57,7 +57,8 @@ class Db
         $db = self::getInstance()->db;
         if ($query = $db->prepare($sql)) {
             if (!empty($items)) {
-                call_user_func_array([$query, 'bind_param'], self::mkRefArray($items));
+                call_user_func_array([$query, 'bind_param'], $items);
+//                call_user_func_array([$query, 'bind_param'], self::mkRefArray($items));
             }
             $query->execute();
         }
@@ -78,7 +79,8 @@ class Db
             Log::adminDebug('prepare failed, db error', $db->error);
             return null;
         }
-        if (!empty($items) && !call_user_func_array([$query, 'bind_param'], self::mkRefArray($items))) {
+//        if (!empty($items) && !call_user_func_array([$query, 'bind_param'], self::mkRefArray($items))) {
+        if (!empty($items) && !call_user_func_array([$query, 'bind_param'], $items)) {
             Log::adminDebug('bind_param failed, db error', $db->error);
             Log::adminDebug('bind_param failed, sql error', $query->error);
             return null;
@@ -110,6 +112,7 @@ class Db
      * @param string $sql Query with values replaced by '?'.
      * @param int|string ...$items A string describing the types of all following values, then the values..
      * @return array
+     * @noinspection PhpUnused
      */
     public static function sqlGetRow(string $sql, int|string ...$items): array
     {
@@ -119,7 +122,8 @@ class Db
             Log::adminDebug('prepare failed, db error', $db->error);
             return [];
         }
-        if (!empty($items) && !call_user_func_array([$query, 'bind_param'], self::mkRefArray($items))) {
+//        if (!empty($items) && !call_user_func_array([$query, 'bind_param'], self::mkRefArray($items))) {
+        if (!empty($items) && !call_user_func_array([$query, 'bind_param'], $items)) {
             Log::adminDebug('bind_param failed, db error', $db->error);
             Log::adminDebug('bind_param failed, sql error', $query->error);
             return [];
@@ -153,7 +157,7 @@ class Db
         if ($result = $db->query($sql)) {
             $table = [];
             while ($row = $result->fetch_assoc()) {
-                $table []= $row;
+                $table [] = $row;
             }
             $result->free();
             return $table;
@@ -167,6 +171,7 @@ class Db
      * Escape a string using the current DB's default escaping.
      * @param string $str
      * @return string
+     * @noinspection PhpUnused
      */
     public static function escape(string $str): string
     {
@@ -174,25 +179,25 @@ class Db
         return $db->real_escape_string($str);
     }
 
-    /**
-     * Sadly, bind_param expects references, which makes passing arrays harder.
-     * ToDo: There's apparently a `...` operator that makes this redundant: see man page.
-     * @param array $input The array to convert.
-     * @return array The array of references.
-     */
-    private static function mkRefArray(array $input): array
-    {
-        $result = [];
-        if (empty($input)) {
-            return [''];
-        }
-        foreach ($input as $key => $val) {
-            if ($key > 0) {
-                $result[$key] = &$input[$key];
-            } else {
-                $result[$key] = $val;
-            }
-        }
-        return $result;
-    }
+//    /**
+//     * Sadly, bind_param expects references, which makes passing arrays harder.
+//     * ToDo: There's apparently a `...` operator that makes this redundant: see man page.
+//     * @param array $input The array to convert.
+//     * @return array The array of references.
+//     */
+//    private static function mkRefArray(array $input): array
+//    {
+//        $result = [];
+//        if (empty($input)) {
+//            return [''];
+//        }
+//        foreach ($input as $key => $val) {
+//            if ($key > 0) {
+//                $result[$key] = &$input[$key];
+//            } else {
+//                $result[$key] = $val;
+//            }
+//        }
+//        return $result;
+//    }
 }

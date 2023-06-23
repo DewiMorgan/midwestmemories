@@ -130,6 +130,9 @@ class Index
         } elseif (is_dir(static::$realPath)) {
             // We're showing an inline folder view; a list of thumbnails.
             include('app/ThumbsTemplate.php');
+        } elseif (is_file(static::$realPath) && 2 == $_REQUEST['i']) {
+            // ToDo: We're showing a raw image file, eg for an img link.
+            include('app/RawTemplate.php');
         } elseif (is_file(static::$realPath)) {
             // ToDo: We're showing an inline file view.
             // include('app/FileTemplate.php');

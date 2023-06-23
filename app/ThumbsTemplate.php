@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-use MidwestMemories\DropboxManager;
-use MidwestMemories\Index;
+namespace MidwestMemories;
 
 /** Template to display thumbnails in a table, with titles, and a description at the top.
  * Requirements:
- *   $dirPath as string -> unique key identifies dir (or later, search result!)
+ *   Index::$realPath as string -> unique key identifies dir (or later, search result!)
  * This can be used to generate:
  *   $h_pageTitle as h_string
  *   $h_pageTopContent as h_string
@@ -21,7 +20,6 @@ use MidwestMemories\Index;
  *     'numPerPage'=>Int
  *   ]
  *   $listOfThumbs as [description=>h_string, 'thumbUrl'=>Url, 'imageUrl'=>Url]
- * 1 +- 2 +/- 3 * 4 = ?
  */
 ?>
 <!DOCTYPE html>
@@ -99,17 +97,22 @@ use MidwestMemories\Index;
 // DELETEME DEBUG
         echo "<ul>\n";
         if (!is_file($itemPath)) {
+            Log::adminDebug("Not a file: $itemPath");
             echo "  <li>Not a file: $itemPath</li>\n";
         } elseif (str_starts_with($itemPath, 'tn_')) {
-            echo "  <li>starts with tn_: $itemPath</li>\n";
+            Log::adminDebug("Starts with tn_: $itemPath");
+            echo "  <li>Starts with tn_: $itemPath</li>\n";
         } elseif (str_starts_with($itemPath, '.')) {
+            Log::adminDebug("Hidden dot file: $itemPath");
             echo "  <li>Hidden dot file: $itemPath</li>\n";
         } elseif (!preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath)) {
+            Log::adminDebug("Not an image file: $itemPath");
             echo "  <li>Not an image file: $itemPath</li>\n";
         } else {
             // Skip files without a matching thumbnail file: they have not been fully processed.
             $thumbName = DropboxManager::getThumbName($itemPath);
             if (!is_file($thumbName)) {
+                Log::adminDebug("No thumb found: $thumbName from $itemPath");
                 echo "  <li>No thumb found: $thumbName from $itemPath</li>\n";
             }
         }
@@ -128,6 +131,7 @@ use MidwestMemories\Index;
         // Skip files without a matching thumbnail file: they have not been fully processed.
         $thumbName = DropboxManager::getThumbName($itemPath);
         if (!is_file($thumbName)) {
+            Log::adminDebug("No thumb found for image: $thumbName from $itemPath");
             continue;
         }
         $h_item = htmlspecialchars($itemPath);
