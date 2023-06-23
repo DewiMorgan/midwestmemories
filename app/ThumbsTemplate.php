@@ -122,5 +122,9 @@ namespace MidwestMemories;
     ?>
     <div class="spacer">&nbsp;</div>
 </div><!-- thumb-content -->
+
+<script>
+    window.history.pushState(null, '', '<?=Index::$realPath ?>');
+</script>
 </body>
 </html>

@@ -149,6 +149,7 @@ Urgent:
     * No reproduction steps yet.
 * Index: Inline file view
 * Index: Inline search view
+* Update the URL as the page changes.
 
 From Code ToDos:
 
@@ -172,6 +173,8 @@ From Code ToDos:
 * DropboxManager::convertToJpeg(): How should this be reflected in the DB?
 * ThumbsTemplate: Folders first.
 * ThumbsTemplate: Alt text when displaying images.
+* ThumbsTemplate: Display title.
+* ThumbsTemplate: Display breadcrumbs?
 * ThumbsTemplate: Check width and height when displaying images.
 * TreeTemplate: Expand to, and select, currently passed $path.
 * TreeTemplate: Make it accept one or more callbacks to say how to recurse into, skip, or display entries.
@@ -186,9 +189,11 @@ Low priority:
 * Make all Log methods also echo, like Log::adminDebug(), depending on a config var something like LOG_ADMIN_ECHO_LEVEL.
 * Get rid of Log::adminDebug() method. Replace w Log::debug() throughout.
 * Create an always-present error-div, that's shown if it has any content. Sorta like an in-page console.
-
+* Handle empty folders.
+* 
 Fixed:
 
+* FIXED: The ThumbTemplate doesn't fill out - maybe no suitable files with thumbs?
 * FIXED: Argument #5 ($port) must be of type ?int, string given in .../public_html/midwestmemories/app/Db.php:41
 * FIXED: index.php double-loads the tree template.
 * FIXED: Content div has it as a class but not an id
