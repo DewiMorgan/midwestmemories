@@ -99,14 +99,11 @@ use MidwestMemories\Index;
         echo "<ul>\n";
         if (!is_file($item)) {
             echo "  <li>Not a file: $item</li>\n";
-        }
-        if (str_starts_with($item, 'tn_')) {
+        } elseif (str_starts_with($item, 'tn_')) {
             echo "  <li>starts with tn_: $item</li>\n";
-        }
-        if (str_starts_with($item, '.')) {
+        } elseif (str_starts_with($item, '.')) {
             echo "  <li>Hidden dot file: $item</li>\n";
-        }
-        if (!preg_match('/\.(gif|png|jpg|jpeg)$/', $item)) {
+        } elseif (!preg_match('/\.(gif|png|jpg|jpeg)$/', $item)) {
             echo "  <li>Not an image file: $item</li>\n";
         }
         // Skip files without a matching thumbnail file: they have not been fully processed.
