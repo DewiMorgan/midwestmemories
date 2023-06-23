@@ -185,7 +185,7 @@ Low priority:
 
 Fixed:
 
-* FIXED: Argument #5 ($port) must be of type ?int, string given in /data0/ulixamvtuwwyaykg/public_html/midwestmemories/app/Db.php:41
+* FIXED: Argument #5 ($port) must be of type ?int, string given in .../public_html/midwestmemories/app/Db.php:41
 * FIXED: index.php double-loads the tree template.
 * FIXED: Content div has it as a class but not an id
 * FIXED: OpenLinkInline doesn't seem to do so. I had the wrong classnames.

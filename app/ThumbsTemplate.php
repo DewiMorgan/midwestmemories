@@ -91,8 +91,7 @@ use MidwestMemories\Index;
 <div class="thumb-pad" id="rounded">
     <div class="spacer">&nbsp;</div>
     <?php
-    global $realPath;
-    $items = scandir($realPath);
+    $items = scandir(Index::$realPath);
     foreach ($items as $item) {
         // Todo: folders first.
 
