@@ -94,31 +94,6 @@ namespace MidwestMemories;
         // Todo: folders first.
         $itemPath = Index::$realPath . '/' . $item;
 
-// DELETEME DEBUG
-        echo "<ul>\n";
-        if (!is_file($itemPath)) {
-            Log::adminDebug("Not a file: $itemPath");
-            echo "  <li>Not a file: $itemPath</li>\n";
-        } elseif (str_starts_with($itemPath, 'tn_')) {
-            Log::adminDebug("Starts with tn_: $itemPath");
-            echo "  <li>Starts with tn_: $itemPath</li>\n";
-        } elseif (str_starts_with($itemPath, '.')) {
-            Log::adminDebug("Hidden dot file: $itemPath");
-            echo "  <li>Hidden dot file: $itemPath</li>\n";
-        } elseif (!preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath)) {
-            Log::adminDebug("Not an image file: $itemPath");
-            echo "  <li>Not an image file: $itemPath</li>\n";
-        } else {
-            // Skip files without a matching thumbnail file: they have not been fully processed.
-            $thumbName = DropboxManager::getThumbName($itemPath);
-            if (!is_file($thumbName)) {
-                Log::adminDebug("No thumb found: $thumbName from $itemPath");
-                echo "  <li>No thumb found: $thumbName from $itemPath</li>\n";
-            }
-        }
-        echo "</ul>\n";
-// /DELETEME DEBUG
-
         // Skip files we're uninterested in.
         if (
             !is_file($itemPath)
