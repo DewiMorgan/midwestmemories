@@ -207,7 +207,7 @@ namespace MidwestMemories;
             .then(data => {
                 // set the content of the div to the fetched data
                 console.log("Got to writing.");
-                document.getElementById("content").innerHTML = data + '<img src="" alt="" onload="alert(\'TestImg\');" />';
+                document.getElementById("content").innerHTML = data + '<img src="https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftn_test3.jpg&i=2" alt="" onload="alert(\'TestImg\');" />';
             })
             .catch(error => {
                 const content = document.getElementById("content");
