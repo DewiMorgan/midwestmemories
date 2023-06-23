@@ -14,13 +14,16 @@ class Index
 {
     // Constants.
     public const MM_BASE_URL = 'https://midwestmemories.dewimorgan.com';
+
     public const IMAGE_DIR = 'midwestmemories';
 
     // We don't allow accessing files outside this folder.
     public static string $baseDir;
+
     // The path that the user requested, HTML-escaped.
     public static string $h_requestedPath;
-    // The actual path to the thing the user requested. If set, the thing exists.
+
+    // The actual path to the thing the user requested. If set, the thing exists. No trailing slash on folders.
     public static string $realPath;
 
     public function __construct()

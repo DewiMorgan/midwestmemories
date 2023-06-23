@@ -94,22 +94,23 @@ use MidwestMemories\Index;
     $items = scandir(Index::$realPath);
     foreach ($items as $item) {
         // Todo: folders first.
+        $itemPath = Index::$realPath . '/' . $item;
 
 // DELETEME DEBUG
         echo "<ul>\n";
-        if (!is_file($item)) {
-            echo "  <li>Not a file: $item</li>\n";
-        } elseif (str_starts_with($item, 'tn_')) {
-            echo "  <li>starts with tn_: $item</li>\n";
-        } elseif (str_starts_with($item, '.')) {
-            echo "  <li>Hidden dot file: $item</li>\n";
-        } elseif (!preg_match('/\.(gif|png|jpg|jpeg)$/', $item)) {
-            echo "  <li>Not an image file: $item</li>\n";
+        if (!is_file($itemPath)) {
+            echo "  <li>Not a file: $itemPath</li>\n";
+        } elseif (str_starts_with($itemPath, 'tn_')) {
+            echo "  <li>starts with tn_: $itemPath</li>\n";
+        } elseif (str_starts_with($itemPath, '.')) {
+            echo "  <li>Hidden dot file: $itemPath</li>\n";
+        } elseif (!preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath)) {
+            echo "  <li>Not an image file: $itemPath</li>\n";
         } else {
             // Skip files without a matching thumbnail file: they have not been fully processed.
-            $thumbName = DropboxManager::getThumbName($item);
+            $thumbName = DropboxManager::getThumbName($itemPath);
             if (!is_file($thumbName)) {
-                echo "  <li>No thumb found: $thumbName from $item</li>\n";
+                echo "  <li>No thumb found: $thumbName from $itemPath</li>\n";
             }
         }
         echo "</ul>\n";
@@ -118,20 +119,20 @@ use MidwestMemories\Index;
 
         // Skip files we're uninterested in.
         if (
-            !is_file($item)
-            || str_starts_with($item, 'tn_')
-            || str_starts_with($item, '.')
-            || !preg_match('/\.(gif|png|jpg|jpeg)$/', $item)
+            !is_file($itemPath)
+            || str_starts_with($itemPath, 'tn_')
+            || str_starts_with($itemPath, '.')
+            || !preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath)
         ) {
             continue;
         }
         // Skip files without a matching thumbnail file: they have not been fully processed.
-        $thumbName = DropboxManager::getThumbName($item);
+        $thumbName = DropboxManager::getThumbName($itemPath);
         if (!is_file($thumbName)) {
             continue;
         }
-        $h_item = htmlspecialchars($item);
-        $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($item) . '&amp;i=1';
+        $h_item = htmlspecialchars($itemPath);
+        $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($itemPath) . '&amp;i=1';
         $u_thumbUrl = Index::MM_BASE_URL . '?path=' . urlencode($thumbName) . '&amp;i=1';
 
         echo("<div class='thumb'><p><strong>1:</strong><a href='$u_linkUrl'></a></p>");
