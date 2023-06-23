@@ -144,7 +144,7 @@ namespace MidwestMemories;
         // ToDo: alt texts.
         // ToDo: check width and height.
         echo("<a href='$u_linkUrl'><img src='$u_thumbUrl' title='ToDo' alt='ToDo' width='150' height='50'></a></div>");
-        echo("<a href='$u_linkUrl'><img src='$u_thumbUrl2' title='ToDo' alt='ToDo' width='150' height='50'></a></div>");// DELETEME DEBUG
+        echo("<a href='$u_linkUrl'><img src='$u_thumbUrl2' title='ToDo2' alt='ToDo2' width='150' height='50'></a></div>");// DELETEME DEBUG
     }
     ?>
     <div class="spacer">&nbsp;</div>
