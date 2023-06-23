@@ -96,6 +96,29 @@ use MidwestMemories\Index;
     foreach ($items as $item) {
         // Todo: folders first.
 
+// DELETEME DEBUG
+        echo "<ul>\n";
+        if (!is_file($item)) {
+            echo "  <li>Not a file: $item</li>\n";
+        }
+        if (str_starts_with($item, 'tn_')) {
+            echo "  <li>starts with tn_: $item</li>\n";
+        }
+        if (str_starts_with($item, '.')) {
+            echo "  <li>Hidden dot file: $item</li>\n";
+        }
+        if (!preg_match('/\.(gif|png|jpg|jpeg)$/', $item)) {
+            echo "  <li>Not an image file: $item</li>\n";
+        }
+        // Skip files without a matching thumbnail file: they have not been fully processed.
+        $thumbName = DropboxManager::getThumbName($item);
+        if (!is_file($thumbName)) {
+            echo "  <li>No thumb found: $thumbName from $item</li>\n";
+        }
+        echo "</ul>\n";
+// /DELETEME DEBUG
+
+
         // Skip files we're uninterested in.
         if (
             !is_file($item)

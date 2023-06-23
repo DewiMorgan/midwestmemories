@@ -140,6 +140,8 @@ To push a change:
 ## Current Issues
 
 Urgent:
+* The admin page may be broken.
+* The ThumbTemplate doesn't fill out - maybe no suitable files with thumbs?
 * [Download files from DB queue] and [Process downloaded files]are both giving me:
     * Cursor='',"Cursor was not set in client.", but I am not sure if that is even a true error.
     * No reproduction steps yet.
