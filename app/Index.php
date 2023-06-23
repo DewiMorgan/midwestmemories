@@ -103,12 +103,12 @@ class Index
     {
         $realPath = realpath(static::$baseDir . '/' . $requestedPath);
         if (false === $realPath) {
-            Log::adminDebug("Requested path was not found: $requestedPath");
+            Log::adminDebug("Validated path was not found: $requestedPath");
             http_response_code(404); // Not found.
             die();
         }
         if (!str_starts_with($realPath, static::$baseDir)) {
-            Log::adminDebug("Requested path was not within MM_BASE_DIR: $requestedPath");
+            Log::adminDebug("Validated path was not within MM_BASE_DIR: $requestedPath");
             http_response_code(404); // Not found.
             die();
         }
@@ -141,5 +141,29 @@ class Index
             echo 'Search view not yet implemented';
             http_response_code(501); // Not implemented.
         }
+    }
+
+    /**
+     * Take a filesystem path of an object on the filesystem, and return an absolute web path, from the document root.
+     * @param string $filePath
+     * @return string Return the found path, or a string like 'PATH_ERROR_...' on failure, to avoid exploits.
+     */
+    public static function filePathToWeb(string $filePath): string
+    {
+        $realPath = realpath($filePath);
+        if (!$realPath) {
+            Log::adminDebug("Converted path was not found: $filePath");
+            return 'PATH_ERROR_404';
+        }
+        $result = preg_replace('#^' . preg_quote(self::$baseDir) . '#', '', $realPath);
+        if (!$result) {
+            Log::adminDebug("Requested path gave an empty string or error: $filePath");
+            return 'PATH_ERROR_BAD';
+        }
+        if (!str_starts_with($realPath, static::$baseDir)) {
+            Log::adminDebug("Converted path was not within MM_BASE_DIR: $realPath from $filePath");
+            return 'PATH_ERROR_401';
+        }
+        return $result;
     }
 }

@@ -116,7 +116,6 @@ use MidwestMemories\Index;
         echo "</ul>\n";
 // /DELETEME DEBUG
 
-
         // Skip files we're uninterested in.
         if (
             !is_file($itemPath)
@@ -132,8 +131,9 @@ use MidwestMemories\Index;
             continue;
         }
         $h_item = htmlspecialchars($itemPath);
-        $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($itemPath) . '&amp;i=1';
-        $u_thumbUrl = Index::MM_BASE_URL . '?path=' . urlencode($thumbName) . '&amp;i=1';
+
+        $u_linkUrl = Index::MM_BASE_URL . '/' . urlencode(Index::filePathToWeb($itemPath));
+        $u_thumbUrl = Index::MM_BASE_URL . '?path=' . urlencode(Index::filePathToWeb($thumbName)) . '&amp;i=1';
 
         echo("<div class='thumb'><p><strong>1:</strong><a href='$u_linkUrl'></a></p>");
         // ToDo: alt texts.
