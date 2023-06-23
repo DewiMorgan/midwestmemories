@@ -138,11 +138,13 @@ namespace MidwestMemories;
 
         $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Index::filePathToWeb($itemPath)) . '&amp;i=1';
         $u_thumbUrl = Index::MM_BASE_URL . Index::filePathToWeb($thumbName);
+        $u_thumbUrl2 = Index::MM_BASE_URL . '?path=' . urlencode(Index::filePathToWeb($thumbName)) . '&amp;i=2';
 
         echo("<div class='thumb'><p><strong>1:</strong><a href='$u_linkUrl'></a></p>");
         // ToDo: alt texts.
         // ToDo: check width and height.
         echo("<a href='$u_linkUrl'><img src='$u_thumbUrl' title='ToDo' alt='ToDo' width='150' height='50'></a></div>");
+        echo("<a href='$u_linkUrl'><img src='$u_thumbUrl2' title='ToDo' alt='ToDo' width='150' height='50'></a></div>");// DELETEME DEBUG
     }
     ?>
     <div class="spacer">&nbsp;</div>
