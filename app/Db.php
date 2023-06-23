@@ -57,10 +57,7 @@ class Db
         $db = self::getInstance()->db;
         if ($query = $db->prepare($sql)) {
             if (!empty($items)) {
-                // Without mkRefArray, this gives the error:
-                // mysqli_stmt::bind_param(): Argument #2 must be passed by reference, value given in (...this line).
                 $query->bind_param(...$items);
-                // call_user_func_array([$query, 'bind_param'], self::mkRefArray($items));
             }
             $query->execute();
         }
@@ -81,8 +78,7 @@ class Db
             Log::adminDebug('prepare failed, db error', $db->error);
             return null;
         }
-//        if (!empty($items) && !call_user_func_array([$query, 'bind_param'], self::mkRefArray($items))) {
-        if (!empty($items) && !call_user_func_array([$query, 'bind_param'], $items)) {
+        if (!empty($items) && !$query->bind_param(...$items)) {
             Log::adminDebug('bind_param failed, db error', $db->error);
             Log::adminDebug('bind_param failed, sql error', $query->error);
             return null;
@@ -124,8 +120,7 @@ class Db
             Log::adminDebug('prepare failed, db error', $db->error);
             return [];
         }
-//        if (!empty($items) && !call_user_func_array([$query, 'bind_param'], self::mkRefArray($items))) {
-        if (!empty($items) && !call_user_func_array([$query, 'bind_param'], $items)) {
+        if (!empty($items) && !$query->bind_param(...$items)) {
             Log::adminDebug('bind_param failed, db error', $db->error);
             Log::adminDebug('bind_param failed, sql error', $query->error);
             return [];
@@ -179,27 +174,5 @@ class Db
     {
         $db = self::getInstance()->db;
         return $db->real_escape_string($str);
-    }
-
-    /**
-     * Sadly, bind_param expects references, which makes passing arrays harder.
-     * ToDo: apparently `...` operator addresses this: see https://www.php.net/manual/en/mysqli-stmt.bind-param.php
-     * @param array $input The array to convert.
-     * @return array The array of references.
-     */
-    private static function mkRefArray(array $input): array
-    {
-        $result = [];
-        if (empty($input)) {
-            return [''];
-        }
-        foreach ($input as $key => $val) {
-            if ($key > 0) {
-                $result[$key] = &$input[$key];
-            } else {
-                $result[$key] = $val;
-            }
-        }
-        return $result;
     }
 }
