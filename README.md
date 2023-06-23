@@ -141,6 +141,7 @@ To push a change:
 See also todo list at the top of this file.
 
 Urgent:
+
 * replace innerHTML use (mem leaks as doesn't remove handlers for old content; and doesn't run script tags.)
 * ThumbsTemplate: Folders first.
 * ThumbsTemplate: Alt text when displaying images.
@@ -174,7 +175,6 @@ From Code ToDos:
 * Connection: Make admin levels more DB-configurable.
 * Connection: Ability to register accounts (with authorization)
 * Connection: Ability to change passwords
-* Db::mkRefArray(): There's apparently a `...` operator that makes this redundant: see man page.
 * DropboxManager::processTextFile(): Some processing.
 * DropboxManager::convertToJpeg(): How should this be reflected in the DB?
 * TreeTemplate: Expand to, and select, currently passed $path.
@@ -194,6 +194,7 @@ Low priority:
 * 
 Fixed:
 
+* FIXED: Db::mkRefArray(): There's apparently a `...` operator that makes this kludge redundant: see man page.
 * FIXED: The ThumbTemplate doesn't fill out - maybe no suitable files with thumbs?
 * FIXED: Argument #5 ($port) must be of type ?int, string given in .../public_html/midwestmemories/app/Db.php:41
 * FIXED: index.php double-loads the tree template.

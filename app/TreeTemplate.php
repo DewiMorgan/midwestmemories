@@ -199,6 +199,15 @@ namespace MidwestMemories;
     // Add a click event listener to each folder
     links.forEach(addLinkClickHandler);
 
+    window.onpopstate = handleNavigation;
+
+    function handleNavigation(e) {
+        if (e.state) {
+            document.getElementById("content").innerHTML = e.state.html;
+            document.title = e.state.pageTitle;
+        }
+    }
+
     // Method to Handle link clicking.
     function openLinkInline(url) {
         console.log("Opening link inline: " + url);
@@ -210,7 +219,8 @@ namespace MidwestMemories;
                 removeAllChildNodes(content); // Ensure event listeners are removed.
                 document.getElementById("content").innerHTML = data;
                 console.log("Updating URL to '" + url + "'.");
-                window.history.pushState(null, '', '<?=Index::$realPath ?>');
+                window.history.pushState({"html": url, "pageTitle": "Todo: Title"}, '', url); // ToDo: page title.
+                document.title
             })
             .catch(error => {
                 const content = document.getElementById("content");
