@@ -80,7 +80,7 @@ namespace MidwestMemories;
         $root = Index::$baseDir;
 
         echo '<ul>';
-        echo "<li class='folder'><a href='/' class='path-link'>Home</a></li>";
+        echo "<li class='folder'><a href='/?i=1' class='path-link'>Home</a></li>";
         scanDirectory($root);
         echo '</ul>';
 
