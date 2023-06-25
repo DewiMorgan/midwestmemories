@@ -80,7 +80,7 @@ namespace MidwestMemories;
         $root = Index::$baseDir;
 
         echo '<ul>';
-        echo "<li class='folder'><a href='/?i=1' class='path-link'>Home</a></li>";
+        echo "<li class='folder'><a href='?path=%2F&amp;i=1' class='path-link'>Home</a></li>";
         scanDirectory($root);
         echo '</ul>';
 
@@ -93,7 +93,9 @@ namespace MidwestMemories;
         function scanDirectory(string $dir): void
         {
             $items = scandir($dir);
+
             // Loop through the items and output a list item for each one.
+            $files = '';
             foreach ($items as $item) {
                 // Skip the current and parent directories, and any hidden ones.
                 if (str_starts_with($item, '.')) {
@@ -102,19 +104,19 @@ namespace MidwestMemories;
                 $h_item = htmlspecialchars($item);
                 $webDir = str_replace(Index::$baseDir, '', "$dir/$item");
                 $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($webDir) . '&amp;i=1';
-
                 // If the item is a directory, output a list item with a nested ul element.
                 if (is_dir("$dir/$item")) {
                     echo "<li class='folder'><span class='expand-collapse '>+</span>";
                     echo "<a href='$u_linkUrl' class='path-link'>$h_item</a>";
-                    echo "<ul style='display:none;'>";
+                    echo "<ul style='display:none;'>\n";
                     scanDirectory("$dir/$item");
-                    echo '</ul></li>';
+                    echo '</ul></li>\n';
                 } else {
-                    // Otherwise, output a list item for the file
-                    echo "<li class='file'><a href='$u_linkUrl' class='path-link'>$h_item</a></li>";
+                    // Otherwise, append to the list of files.
+                    $files .= "<li class='file'><a href='$u_linkUrl' class='path-link'>$h_item</a></li>\n";
                 }
             }
+            echo $files;
         }
 
         ?>

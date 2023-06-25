@@ -142,7 +142,7 @@ See also todo list at the top of this file.
 
 Urgent:
 
-* Need a link to home at the top of treeview template.
+* FIXED: Need a link to home at the top of treeview template.
 * back button doesn't populate page correctly.
 * Reloading page doesn't repopulate correctly.
 * replace innerHTML use (mem leaks as doesn't remove handlers for old content; and doesn't run script tags.)
