@@ -142,6 +142,9 @@ See also todo list at the top of this file.
 
 Urgent:
 
+* Need a link to home at the top of treeview template.
+* back button doesn't populate page correctly.
+* Reloading page doesn't repopulate correctly.
 * replace innerHTML use (mem leaks as doesn't remove handlers for old content; and doesn't run script tags.)
 * ThumbsTemplate: Folders first.
 * ThumbsTemplate: Alt text when displaying images.
@@ -191,9 +194,10 @@ Low priority:
 * Get rid of Log::adminDebug() method. Replace w Log::debug() throughout.
 * Create an always-present error-div, that's shown if it has any content. Sorta like an in-page console.
 * Handle empty folders.
-* 
+
 Fixed:
 
+* FIXED: Update browser history when navigating.
 * FIXED: Db::mkRefArray(): There's apparently a `...` operator that makes this kludge redundant: see man page.
 * FIXED: The ThumbTemplate doesn't fill out - maybe no suitable files with thumbs?
 * FIXED: Argument #5 ($port) must be of type ?int, string given in .../public_html/midwestmemories/app/Db.php:41
