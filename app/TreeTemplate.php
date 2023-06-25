@@ -221,9 +221,10 @@ namespace MidwestMemories;
                 console.log("Got to writing.");
                 removeAllChildNodes(content); // Ensure event listeners are removed.
                 document.getElementById("content").innerHTML = data;
-                historyUrl = url.replace(/&(amp;)?i=\d+/, ''); // Strip out "inline" instruction.
-                console.log("Updating URL to '" + url + "'.");
-                window.history.pushState({"html": url, "pageTitle": "Todo: Title"}, '', url); // ToDo: page title.
+                const historyUrl = url.replace(/&(?:amp;)?i=\d+/, ''); // Strip out "inline" instruction.
+                console.log("Updating URL to '" + historyUrl + "'.");
+                // ToDo: page title.
+                window.history.pushState({"html": historyUrl, "pageTitle": "Todo: Title"}, '', historyUrl);
                 document.title
             })
             .catch(error => {
