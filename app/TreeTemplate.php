@@ -110,7 +110,7 @@ namespace MidwestMemories;
                     echo "<a href='$u_linkUrl' class='path-link'>$h_item</a>";
                     echo "<ul style='display:none;'>\n";
                     scanDirectory("$dir/$item");
-                    echo '</ul></li>\n';
+                    echo "</ul></li>\n";
                 } else {
                     // Otherwise, append to the list of files.
                     $files .= "<li class='file'><a href='$u_linkUrl' class='path-link'>$h_item</a></li>\n";
