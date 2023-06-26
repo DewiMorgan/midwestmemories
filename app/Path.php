@@ -58,6 +58,8 @@ class Path
      */
     public static function isChildInPath(string $childPath, string $parentPath): bool
     {
+        Log::debug(__METHOD__ . "($childPath, $parentPath)"); // DELETEME DEBUG
+
         // Check they both exist.
         $realChildPath = realpath($childPath);
         if (false === $realChildPath) {
@@ -81,8 +83,12 @@ class Path
 
         // Prevent /pa/ from matching /path/to/file.
         if (strlen($realParentPath) < strlen($realChildPath)) {
+            Log::debug("Expanding short parent."); // DELETEME DEBUG
             $realParentPath .= '/';
         }
+
+        Log::debug('Result: ' . (str_starts_with($realChildPath, $realParentPath) ? 'y' : 'n')); // DELETEME DEBUG
+
 
         // Return whether the parent contains the child.
         return str_starts_with($realChildPath, $realParentPath);

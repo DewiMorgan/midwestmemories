@@ -163,6 +163,7 @@ Urgent:
 
 From Code comments:
 
+* FIXED: Log class is not logging.
 * Admin: Chain all admin processes up from the web hook handler, using a single timeout time.
 * Admin: Maybe have admin processes re-trigger each other or something.
 * Admin: Maybe a web cron to hit the webhook? Or does cpanel allow cron jobs? Edit crontab manually?
