@@ -7,6 +7,7 @@ namespace MidwestMemories;
 /**
  * Possible key names for the Conf class.
  * @noinspection PhpClassNamingConventionInspection
+ * @noinspection PhpUnused
  */
 enum Key: string
 {

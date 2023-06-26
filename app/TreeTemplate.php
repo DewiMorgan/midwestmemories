@@ -255,12 +255,16 @@ namespace MidwestMemories;
      * @param {Element} link
      */
     function addLinkClickHandler(link) {
-        console.log("Adding onClick to link: " + link.getAttribute("href"));
-        link.addEventListener('click', function (e) {
-            console.log("Onclick link.");
-            e.preventDefault();
-            openLinkInline(this.getAttribute("href"));
-        });
+        const attr = link.getAttribute("href");
+        console.log("Adding onClick to link: " + attr);
+        link.addEventListener('click', clickLink);
+    }
+
+    function clickLink(e) {
+        console.log("Onclick link.");
+        e.preventDefault();
+        const attr = this.getAttribute("href");
+        openLinkInline(attr);
     }
 
     /**

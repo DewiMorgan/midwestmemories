@@ -144,7 +144,6 @@ See also list at the top of this file.
 Urgent:
 
 * CSS-based folding is not working.
-* Get rid of (ideally, FIX) all code warnings. They just slow me down.
 * back button doesn't populate page correctly (doesn't parse path=...). Need to change expand/collapse to be a
   style/class thing, so we can set the style when building the list.
 * Reloading page doesn't repopulate correctly.
@@ -199,6 +198,7 @@ Low priority:
 
 Fixed:
 
+* FIXED: Get rid of (ideally, FIX) all code warnings. They just slow me down.
 * FIXED: TreeTemplate: Expand to, and select, currently passed $path.
 * FIXED: isOnTargetPath() - write this, though I've likely already got a similar class.
 * FIXED: Migrate the path manipulation methods from Index to their own class.
