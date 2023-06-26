@@ -186,19 +186,21 @@ namespace MidwestMemories;
 
     function addFoldClickHandler(folder) {
         console.log("Adding onClick to fold: " + folder.textContent);
-        folder.addEventListener('click', function (e) {
-            // Get the span element that was clicked: should probably be a class rather than just span.
-            const span = folder.querySelector('span');
-            // Toggle the expand/collapse state of the folder
-            folder.classList.toggle("expanded");
-            folder.classList.toggle("collapsed");
-            if ('+' === span.textContent) {
-                span.textContent = '-';
-            } else if ('-' === span.textContent) {
-                span.textContent = '+';
-            }
-            e.stopPropagation();
-        });
+        folder.addEventListener('click', foldElement);
+    }
+
+    function foldElement(e) {
+        // Get the span element that was clicked: should probably be a class rather than just span.
+        const span = this.querySelector('span');
+        // Toggle the expand/collapse state of the folder
+        this.classList.toggle("expanded");
+        this.classList.toggle("collapsed");
+        if ('+' === span.textContent) {
+            span.textContent = '-';
+        } else if ('-' === span.textContent) {
+            span.textContent = '+';
+        }
+        e.stopPropagation();
     }
 </script>
 
