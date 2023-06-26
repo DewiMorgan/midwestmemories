@@ -191,14 +191,16 @@ namespace MidwestMemories;
 
     function foldElement(e) {
         // Get the span element that was clicked: should probably be a class rather than just span.
-        const span = this.querySelector('span');
         // Toggle the expand/collapse state of the folder
         this.classList.toggle("expanded");
         this.classList.toggle("collapsed");
-        if ('+' === span.textContent) {
-            span.textContent = '-';
-        } else if ('-' === span.textContent) {
-            span.textContent = '+';
+        const span = this.querySelector('span');
+        if (span) {
+            if ('+' === span.textContent) {
+                span.textContent = '-';
+            } else if ('-' === span.textContent) { // The explicit elseif allows OTHER spans to go untouched.
+                span.textContent = '+';
+            }
         }
         e.stopPropagation();
     }
@@ -236,7 +238,7 @@ namespace MidwestMemories;
         try {
             const response = await fetch(url);
             content.innerHTML = await response.text();
-            //ToDo: set document title.
+            // ToDo: set document title.
             console.log("Got to writing.");
         } catch (error) {
             document.title = 'Error loading page';
