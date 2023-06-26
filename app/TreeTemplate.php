@@ -58,11 +58,11 @@ namespace MidwestMemories;
             font-weight: bold;
         }
 
-        li.collapsed ul {
+        li.collapsed > ul {
             display: none;
         }
 
-        li.expanded ul {
+        li.expanded > ul {
             display: block;
         }
 
