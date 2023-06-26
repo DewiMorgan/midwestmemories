@@ -184,6 +184,7 @@ From Code comments:
 
 Low priority:
 
+* Migrate TreeTemplate's JS out to TreeTemplate.js.
 * site.webmanifest file could do with populating properly.
 * Allow log level to be specified as a string
 * Split a FileProcessor class out from DropboxManager?

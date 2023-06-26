@@ -14,8 +14,8 @@ class Index
 
     public const IMAGE_DIR = 'midwestmemories';
 
-    // We don't allow accessing files outside this folder.
-    public static string $baseDir;
+    // The full filesystem path to the image folder. We don't allow access to files outside this folder.
+    public static string $imageBasePath;
 
     // The path that the user requested, HTML-escaped.
     public static string $h_requestedPath;

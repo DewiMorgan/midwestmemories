@@ -22,7 +22,7 @@ class Path
             http_response_code(500); // Internal Server Error.
             die();
         }
-        Index::$baseDir = $baseDir;
+        Index::$imageBasePath = $baseDir;
     }
 
     /**
@@ -37,12 +37,12 @@ class Path
             Log::adminDebug("Converted path was not found: $filePath");
             return 'PATH_ERROR_404';
         }
-        $result = preg_replace('#^' . preg_quote(Index::$baseDir) . '#', '', $realPath);
+        $result = preg_replace('#^' . preg_quote(Index::$imageBasePath) . '#', '', $realPath);
         if (!$result) {
             Log::adminDebug("Converted path gave an empty string or error: $filePath");
             return 'PATH_ERROR_BAD';
         }
-        if (!str_starts_with($realPath, Index::$baseDir)) {
+        if (!str_starts_with($realPath, Index::$imageBasePath)) {
             Log::adminDebug("Converted path was not within MM_BASE_DIR: $realPath from $filePath");
             return 'PATH_ERROR_401';
         }
@@ -73,7 +73,7 @@ class Path
         }
 
         // Only need to check that parent is in basedir.
-        if (!str_starts_with($realParentPath, Index::$baseDir)) {
+        if (!str_starts_with($realParentPath, Index::$imageBasePath)) {
             Log::adminDebug("Parent path was not within MM_BASE_DIR: $parentPath");
             http_response_code(404); // Not found.
             die();
@@ -94,17 +94,18 @@ class Path
      */
     public static function validatePath(string $webPath): void
     {
-        $realPath = realpath(Index::$baseDir . '/' . $webPath);
+        $realPath = realpath(Index::$imageBasePath . '/' . $webPath);
         if (false === $realPath) {
             Log::adminDebug("Validated path was not found: $webPath");
             http_response_code(404); // Not found.
             die();
         }
-        if (!str_starts_with($realPath, Index::$baseDir)) {
+        if (!str_starts_with($realPath, Index::$imageBasePath)) {
             Log::adminDebug("Validated path was not within MM_BASE_DIR: $webPath");
             http_response_code(404); // Not found.
             die();
         }
         Index::$realPath = $realPath;
+        Log::adminDebug("Validated path: $webPath as $realPath");
     }
 }

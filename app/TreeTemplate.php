@@ -83,7 +83,7 @@ namespace MidwestMemories;
         <?php
 
         // Set the root directory to display in the tree view.
-        $root = Index::$baseDir;
+        $root = Index::$imageBasePath;
 
         echo '<ul>';
         echo "<li class='folder'><a href='?path=%2F&amp;i=1' class='path-link'>Home</a></li>";
@@ -104,18 +104,20 @@ namespace MidwestMemories;
             // Loop through the items and output a list item for each one.
             $files = '';
             foreach ($items as $item) {
+                Log::info("Checking: $item"); // DELETEME DEBUG
+                Log::debug("Debugging: $item"); // DELETEME DEBUG
                 // Skip the current and parent directories, and any hidden ones.
                 if (str_starts_with($item, '.')) {
                     continue;
                 }
                 $h_item = htmlspecialchars($item);
-                $webDir = str_replace(Index::$baseDir, '', "$dir/$item");
+                $webDir = str_replace(Index::$imageBasePath, '', "$dir/$item");
                 $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($webDir) . '&amp;i=1';
                 // If the item is a directory, output a list item with a nested ul element.
                 if (is_dir("$dir/$item")) {
                     // Collapse, unless our target path is within this branch.
                     $expandClass = Path::isChildInPath($targetPath, "$dir/$item") ? 'expanded' : 'collapsed';
-                    Log::debug("$expandClass : $dir/$item"); // DELETEME DEBUG
+                    Log::debug("Writing: $expandClass : $dir/$item"); // DELETEME DEBUG
                     echo "<li class='folder $expandClass'><span class='expand-collapse '>+</span>";
                     echo "<a href='$u_linkUrl' class='path-link'>$h_item</a>";
                     echo "<ul>\n";
