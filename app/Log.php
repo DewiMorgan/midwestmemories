@@ -85,9 +85,9 @@ class Log
     private static function log(string $str, mixed $obj = null): void
     {
         if (is_null($obj)) {
-            file_put_contents(Conf::get(Key::LOG_FILE), $str . '.');
+            file_put_contents(Conf::get(Key::LOG_FILE), $str . '.', FILE_APPEND);
         } else {
-            file_put_contents(Conf::get(Key::LOG_FILE), $str . ': ' . var_export($obj, true));
+            file_put_contents(Conf::get(Key::LOG_FILE), $str . ': ' . var_export($obj, true), FILE_APPEND);
         }
     }
 
