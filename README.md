@@ -143,9 +143,6 @@ See also list at the top of this file.
 
 Urgent:
 
-* back button doesn't populate page correctly (doesn't parse path=...). Need to change expand/collapse to be a
-  style/class thing, so we can set the style when building the list.
-* Reloading page doesn't repopulate correctly.
 * replace innerHTML use (mem leaks as doesn't remove handlers for old content; and doesn't run script tags.)
 * ThumbsTemplate: Alt text when displaying images.
 * ThumbsTemplate: Display title.
@@ -163,7 +160,6 @@ Urgent:
 
 From Code comments:
 
-* FIXED: Log class is not logging.
 * Admin: Chain all admin processes up from the web hook handler, using a single timeout time.
 * Admin: Maybe have admin processes re-trigger each other or something.
 * Admin: Maybe a web cron to hit the webhook? Or does cpanel allow cron jobs? Edit crontab manually?
@@ -200,6 +196,10 @@ Low priority:
 
 Fixed:
 
+* FIXED: Log class is not logging.
+* FIXED: back button doesn't populate page correctly (doesn't parse path=...).
+* FIXED: Need to change expand/collapse to be a style/class thing, so we can set the style when building the list.
+* FIXED: Reloading page doesn't repopulate correctly.
 * FIXED: "Span is null" error when clicking "Home". Probably any empty/root folder.
 * FIXED: CSS-based folding is not working.
 * FIXED: Get rid of (ideally, FIX) all code warnings. They just slow me down.

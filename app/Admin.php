@@ -11,7 +11,7 @@ class Admin
 {
 
     private static string $cursor;
-    private static string $entriesSoFar;
+    private static int $entriesSoFar = 0;
 
     public function __construct()
     {
