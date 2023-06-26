@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
-use MidwestMemories\Connection;
-use MidwestMemories\Db;
-
 /**
  * The class for the main index.php file.
  */
@@ -97,7 +94,7 @@ class Index
             // We're showing an inline folder view; a list of thumbnails.
             include('app/ThumbsTemplate.php');
         } elseif (is_file(static::$realPath) && 2 == $_REQUEST['i']) {
-            // ToDo: We're showing a raw image file, eg for an img link.
+            // ToDo: We're showing a raw image file, such as for an img link.
             include('app/RawTemplate.php');
         } elseif (is_file(static::$realPath)) {
             // ToDo: We're showing an inline file view.

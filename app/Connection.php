@@ -11,8 +11,8 @@ namespace MidwestMemories;
  *  Do something with the ipLookup table.
  *  Timestamps with timezone-aware display.
  *  Make admin levels more DB-configurable.
- *  Ability to register accounts (with authorization)
- *  Ability to change passwords
+ *  Ability to register accounts (with authorization).
+ *  Ability to change passwords.
  */
 class Connection
 {
@@ -188,8 +188,9 @@ class Connection
         );
     }
 
-    /** Get a string describing the object.
-     * @return string Serialized object data,
+    /** Get a string describing the object. Mostly for debugging, not used by real code.
+     * @return string Serialized object data.
+     * @noinspection PhpUnused
      */
     public function __toString(): string
     {

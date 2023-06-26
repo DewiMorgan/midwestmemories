@@ -115,7 +115,7 @@ namespace MidwestMemories;
                 if (is_dir("$dir/$item")) {
                     // Collapse, unless our target path is within this branch.
                     $expandClass = Path::isChildInPath($targetPath, "$dir/$item") ? 'expanded' : 'collapsed';
-Log::debug("<li class='folder $expandClass'><span class='expand-collapse '>+</span>");
+                    Log::debug("$expandClass : $dir/$item"); // DELETEME DEBUG
                     echo "<li class='folder $expandClass'><span class='expand-collapse '>+</span>";
                     echo "<a href='$u_linkUrl' class='path-link'>$h_item</a>";
                     echo "<ul style='display:none;'>\n";
@@ -221,31 +221,37 @@ Log::debug("<li class='folder $expandClass'><span class='expand-collapse '>+</sp
         }
     }
 
-    // Method to Handle link clicking.
-    function openLinkInline(url) {
+    /**
+     * Handle link clicking, to load content into the content div
+     * @param {string} url The link to load.
+     * @returns {Promise<void>}
+     */
+    async function openLinkInline(url) {
         console.log("Opening link inline: " + url);
-        fetch(url)
-            .then(response => response.text())
-            .then(data => {
-                // set the content of the div to the fetched data
-                console.log("Got to writing.");
-                removeAllChildNodes(content); // Ensure event listeners are removed.
-                document.getElementById("content").innerHTML = data;
-                const historyUrl = url.replace(/&(?:amp;)?i=\d+/, ''); // Strip out "inline" instruction.
-                console.log("Updating URL to '" + historyUrl + "'.");
-                // ToDo: page title.
-                window.history.pushState({"html": historyUrl, "pageTitle": "Todo: Title"}, '', historyUrl);
-                document.title
-            })
-            .catch(error => {
-                const content = document.getElementById("content");
-                removeAllChildNodes(content); // Ensure event listeners are removed.
-                document.getElementById("content").innerHTML = error;
-                console.error(error);
-            });
+
+        const content = document.getElementById("content");
+        removeAllChildNodes(content); // Ensure event listeners are removed.
+        try {
+            const response = await fetch(url);
+            content.innerHTML = await response.text();
+            //ToDo: set document title.
+            console.log("Got to writing.");
+        } catch (error) {
+            document.title = 'Error loading page';
+            content.innerHTML = error;
+            console.error(error);
+        }
+
+        // set the content of the div to the fetched data
+        const historyUrl = url.replace(/&(?:amp;)?i=\d+/, ''); // Strip out "inline" instruction.
+        console.log("Updating URL to '" + historyUrl + "'.");
+        window.history.pushState({"html": historyUrl, "pageTitle": "Todo: Title"}, '', historyUrl);
     }
 
-
+    /**
+     * Add an onclick handler to a link.
+     * @param {Element} link
+     */
     function addLinkClickHandler(link) {
         console.log("Adding onClick to link: " + link.getAttribute("href"));
         link.addEventListener('click', function (e) {
@@ -255,17 +261,15 @@ Log::debug("<li class='folder $expandClass'><span class='expand-collapse '>+</sp
         });
     }
 
+    /**
+     * Clear all child nodes from a parent.
+     * @param {HTMLElement} parent
+     */
     function removeAllChildNodes(parent) {
         while (parent.firstChild) {
             parent.removeChild(parent.firstChild);
         }
     }
-
-    /*
-            // Get the "path" variable.
-        const urlParams = new URLSearchParams(window.location.search);
-        const targetPath = urlParams.get('path');
-    * */
 </script>
 
 </body>

@@ -438,7 +438,7 @@
       "authors": [
         {
           "name": "PHP-FIG",
-          "homepage": "http://www.php-fig.org/"
+          "homepage": "https://www.php-fig.org/"
         }
       ],
       "description": "Common interface for HTTP clients",
@@ -490,7 +490,7 @@
       "authors": [
         {
           "name": "PHP-FIG",
-          "homepage": "http://www.php-fig.org/"
+          "homepage": "https://www.php-fig.org/"
         }
       ],
       "description": "Common interfaces for PSR-7 HTTP message factories",
@@ -544,7 +544,7 @@
       "authors": [
         {
           "name": "PHP-FIG",
-          "homepage": "http://www.php-fig.org/"
+          "homepage": "https://www.php-fig.org/"
         }
       ],
       "description": "Common interface for HTTP messages",

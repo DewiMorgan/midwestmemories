@@ -6,7 +6,7 @@ namespace MidwestMemories;
 
 RawTemplate::showFile();
 
-/** Template to display the literal binary content of a file, eg an image for an img tag.
+/** Template to display the literal binary content of a file, such as an image for an img tag.
  * Requirements:
  *   Index::$realPath as string -> unique key identifies dir, file, or later, search result!
  */

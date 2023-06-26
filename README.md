@@ -143,7 +143,9 @@ See also list at the top of this file.
 
 Urgent:
 
-* back button doesn't populate page correctly (doesn't parse path=...). Need to change expand/collapse to be a style class thing, so we can set the style when building the list.
+* Get rid of (ideally, FIX) all code warnings. They just slow me down.
+* back button doesn't populate page correctly (doesn't parse path=...). Need to change expand/collapse to be a
+  style/class thing, so we can set the style when building the list.
 * Reloading page doesn't repopulate correctly.
 * replace innerHTML use (mem leaks as doesn't remove handlers for old content; and doesn't run script tags.)
 * ThumbsTemplate: Alt text when displaying images.
@@ -153,7 +155,7 @@ Urgent:
 
 * Files within the mm folder aren't navigable to.
 * The admin page may be broken.
-* [Download files from DB queue] and [Process downloaded files] are both giving me:
+* "Download files from DB queue" and "Process downloaded files" are both giving me:
     * Cursor='',"Cursor was not set in client.", but I am not sure if that is even a true error.
     * No reproduction steps yet.
 * Index: Inline file view
@@ -200,7 +202,7 @@ Fixed:
 * FIXED: isOnTargetPath() - write this, though I've likely already got a similar class.
 * FIXED: Migrate the path manipulation methods from Index to their own class.
 
-* FIXED: Need a link to home at the top of treeview template.
+* FIXED: Need a link to home at the top of tree-view template.
 * FIXED: ThumbsTemplate: Folders first.
 * FIXED: ThumbsTemplate: break HTML lines for file list.
 * FIXED: back button doesn't populate page correctly (unnecessary i=1).
@@ -209,7 +211,7 @@ Fixed:
 * FIXED: The ThumbTemplate doesn't fill out - maybe no suitable files with thumbs?
 * FIXED: Argument #5 ($port) must be of type ?int, string given in .../public_html/midwestmemories/app/Db.php:41
 * FIXED: index.php double-loads the tree template.
-* FIXED: Content div has it as a class but not an id
+* FIXED: Content div has it as a class but not an ID.
 * FIXED: OpenLinkInline doesn't seem to do so. I had the wrong classnames.
 * FIXED: Create a config file for non-secret info.
 * FIXED: Read auth info through the config class.

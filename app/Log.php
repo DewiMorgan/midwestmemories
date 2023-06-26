@@ -28,6 +28,7 @@ class Log
      * Helper: Log as an info line.
      * @param string $str The string to log.
      * @param mixed|null $obj The object to serialize and log, if any.
+     * @noinspection PhpUnused
      */
     public static function info(string $str, mixed $obj = null): void
     {
@@ -40,6 +41,7 @@ class Log
      * Helper: Log as a warning line.
      * @param string $str The string to log.
      * @param mixed|null $obj The object to serialize and log, if any.
+     * @noinspection PhpUnused
      */
     public static function warn(string $str, mixed $obj = null): void
     {
@@ -52,6 +54,7 @@ class Log
      * Helper: Log as a warning line. Alias of warn().
      * @param string $str The string to log.
      * @param mixed|null $obj The object to serialize and log, if any.
+     * @noinspection PhpUnused
      */
     public static function warning(string $str, mixed $obj = null): void
     {
@@ -64,6 +67,7 @@ class Log
      * Helper: Log as an error line.
      * @param string $str The string to log.
      * @param mixed|null $obj The object to serialize and log, if any.
+     * @noinspection PhpUnused
      */
     public static function error(string $str, mixed $obj = null): void
     {
