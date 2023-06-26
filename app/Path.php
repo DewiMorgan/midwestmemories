@@ -111,7 +111,7 @@ class Path
             http_response_code(404); // Not found.
             die();
         }
-        Index::$realPath = $realPath;
+        Index::$requestedPath = $realPath;
         Log::adminDebug("Validated path: $webPath as $realPath");
     }
 }

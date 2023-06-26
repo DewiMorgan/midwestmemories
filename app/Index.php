@@ -21,7 +21,7 @@ class Index
     public static string $h_requestedPath;
 
     // The actual path to the thing the user requested. If set, the thing exists. No trailing slash on folders.
-    public static string $realPath;
+    public static string $requestedPath;
 
     public function __construct()
     {
@@ -90,13 +90,13 @@ class Index
             // This is a request by a user, perhaps to a bookmark.
             // Load the tree view, which will then call us back for the inline version of the pointed-at $path resource.
             include('app/TreeTemplate.php');
-        } elseif (is_dir(static::$realPath)) {
+        } elseif (is_dir(static::$requestedPath)) {
             // We're showing an inline folder view; a list of thumbnails.
             include('app/ThumbsTemplate.php');
-        } elseif (is_file(static::$realPath) && 2 == $_REQUEST['i']) {
+        } elseif (is_file(static::$requestedPath) && 2 == $_REQUEST['i']) {
             // ToDo: We're showing a raw image file, such as for an img link.
             include('app/RawTemplate.php');
-        } elseif (is_file(static::$realPath)) {
+        } elseif (is_file(static::$requestedPath)) {
             // ToDo: We're showing an inline file view.
             // include('app/FileTemplate.php');
             echo 'File view not yet implemented';

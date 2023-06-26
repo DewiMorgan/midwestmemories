@@ -87,7 +87,7 @@ namespace MidwestMemories;
 
         echo '<ul>';
         echo "<li class='folder'><a href='?path=%2F&amp;i=1' class='path-link'>Home</a></li>";
-        scanDirectory($root);
+        scanDirectory($root, Index::$requestedPath);
         echo '</ul>';
 
         /**
@@ -121,7 +121,7 @@ namespace MidwestMemories;
                     echo "<li class='folder $expandClass'><span class='expand-collapse '>+</span>";
                     echo "<a href='$u_linkUrl' class='path-link'>$h_item</a>";
                     echo "<ul>\n";
-                    scanDirectory("$dir/$item");
+                    scanDirectory("$dir/$item", $targetPath);
                     echo "</ul></li>\n";
                 } else {
                     // Otherwise, append to the list of files.
