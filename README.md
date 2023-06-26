@@ -195,6 +195,7 @@ Low priority:
 * Create an always-present error-div, that's shown if it has any content. Sorta like an in-page console.
 * Handle empty folders.
 * ThumbsTemplate: indent HTML lines for file list.
+* Dark mode
 
 Fixed:
 

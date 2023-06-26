@@ -62,7 +62,7 @@ namespace MidwestMemories;
             display = 'none';
         }
 
-        .expanded {
+        .expanded ul {
             display = 'block';
         }
 
