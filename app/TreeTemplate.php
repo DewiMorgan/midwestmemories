@@ -58,11 +58,11 @@ namespace MidwestMemories;
             font-weight: bold;
         }
 
-        .collapsed ul {
+        li.collapsed ul {
             display = 'none';
         }
 
-        .expanded ul {
+        li.expanded ul {
             display = 'block';
         }
 
@@ -118,7 +118,7 @@ namespace MidwestMemories;
                     Log::debug("$expandClass : $dir/$item"); // DELETEME DEBUG
                     echo "<li class='folder $expandClass'><span class='expand-collapse '>+</span>";
                     echo "<a href='$u_linkUrl' class='path-link'>$h_item</a>";
-                    echo "<ul style='display:none;'>\n";
+                    echo "<ul>\n";
                     scanDirectory("$dir/$item");
                     echo "</ul></li>\n";
                 } else {
