@@ -111,8 +111,8 @@ namespace MidwestMemories;
         }
         $h_item = htmlspecialchars($itemPath);
 
-        $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Index::filePathToWeb($itemPath)) . '&amp;i=1';
-        $u_thumbUrl = Index::MM_BASE_URL . '?path=' . urlencode(Index::filePathToWeb($thumbName)) . '&amp;i=2';
+        $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($itemPath)) . '&amp;i=1';
+        $u_thumbUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($thumbName)) . '&amp;i=2';
 
         echo("<div class='thumb'><p><strong>1:</strong><a href='$u_linkUrl'></a></p>");
         // ToDo: alt texts.

@@ -29,11 +29,11 @@ class Index
     public function __construct()
     {
         static::handleLogouts();
-        static::validateBaseDir();
+        Path::validateBaseDir();
         static::initSession();
 
         $requestedPath = $_REQUEST['path'] ?? '/';
-        static::validatePath($requestedPath);
+        Path::validatePath($requestedPath);
         static::$h_requestedPath = htmlspecialchars($requestedPath);
 
         static::showPage();
@@ -82,40 +82,6 @@ class Index
     }
 
     /**
-     * Handle base dir: being empty could allow arbitrary file access, so check it very early on.
-     */
-    private static function validateBaseDir(): void
-    {
-        $baseDir = realpath(__DIR__ . '/../' . Index::IMAGE_DIR . '/');
-        if (empty($baseDir)) {
-            Log::adminDebug('MM_BASE_DIR empty from "' . __DIR__ . ' + /../ + ' . Index::IMAGE_DIR . ' + /".');
-            Log::adminDebug('Not safe to continue');
-            http_response_code(500); // Internal Server Error.
-            die();
-        }
-        static::$baseDir = $baseDir;
-    }
-
-    /**
-     * Check the file request we were given.
-     */
-    private static function validatePath($requestedPath): void
-    {
-        $realPath = realpath(static::$baseDir . '/' . $requestedPath);
-        if (false === $realPath) {
-            Log::adminDebug("Validated path was not found: $requestedPath");
-            http_response_code(404); // Not found.
-            die();
-        }
-        if (!str_starts_with($realPath, static::$baseDir)) {
-            Log::adminDebug("Validated path was not within MM_BASE_DIR: $requestedPath");
-            http_response_code(404); // Not found.
-            die();
-        }
-        static::$realPath = $realPath;
-    }
-
-    /**
      * Handle displaying the requested page.
      */
     private static function showPage(): void
@@ -144,29 +110,5 @@ class Index
             echo 'Search view not yet implemented';
             http_response_code(501); // Not implemented.
         }
-    }
-
-    /**
-     * Take a filesystem path of an object on the filesystem, and return an absolute web path, from the document root.
-     * @param string $filePath
-     * @return string Return the found path, or a string like 'PATH_ERROR_...' on failure, to avoid exploits.
-     */
-    public static function filePathToWeb(string $filePath): string
-    {
-        $realPath = realpath($filePath);
-        if (!$realPath) {
-            Log::adminDebug("Converted path was not found: $filePath");
-            return 'PATH_ERROR_404';
-        }
-        $result = preg_replace('#^' . preg_quote(self::$baseDir) . '#', '', $realPath);
-        if (!$result) {
-            Log::adminDebug("Requested path gave an empty string or error: $filePath");
-            return 'PATH_ERROR_BAD';
-        }
-        if (!str_starts_with($realPath, static::$baseDir)) {
-            Log::adminDebug("Converted path was not within MM_BASE_DIR: $realPath from $filePath");
-            return 'PATH_ERROR_401';
-        }
-        return $result;
     }
 }

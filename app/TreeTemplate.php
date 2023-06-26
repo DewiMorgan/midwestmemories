@@ -58,6 +58,14 @@ namespace MidwestMemories;
             font-weight: bold;
         }
 
+        .collapsed ul {
+            display = 'none';
+        }
+
+        .expanded {
+            display = 'block';
+        }
+
         /* Files in the tree view. */
         .file {
             cursor: default;
@@ -75,8 +83,6 @@ namespace MidwestMemories;
         <?php
 
         // Set the root directory to display in the tree view.
-        use MidwestMemories\Index;
-
         $root = Index::$baseDir;
 
         echo '<ul>';
@@ -89,8 +95,9 @@ namespace MidwestMemories;
          * ToDo: Expand to, and select, currently passed $path.
          * ToDo: make it accept one or more callbacks to say how to recurse into, skip, or display entries.
          * @param string $dir The full path to the dir being scanned. When first calling, pass the root of the tree.
+         * @param string $targetPath The current item selected/expanded/viewed by the user.
          */
-        function scanDirectory(string $dir): void
+        function scanDirectory(string $dir, string $targetPath = ''): void
         {
             $items = scandir($dir);
 
@@ -106,7 +113,9 @@ namespace MidwestMemories;
                 $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($webDir) . '&amp;i=1';
                 // If the item is a directory, output a list item with a nested ul element.
                 if (is_dir("$dir/$item")) {
-                    echo "<li class='folder'><span class='expand-collapse '>+</span>";
+                    // Collapse, unless our target path is within this branch.
+                    $expandClass = Path::isChildInPath($targetPath, "$dir/$item") ? 'expanded' : 'collapsed';
+                    echo "<li class='folder $expandClass'><span class='expand-collapse '>+</span>";
                     echo "<a href='$u_linkUrl' class='path-link'>$h_item</a>";
                     echo "<ul style='display:none;'>\n";
                     scanDirectory("$dir/$item");
@@ -180,12 +189,12 @@ namespace MidwestMemories;
             // Get the span element that was clicked: should probably be a class rather than just span.
             const span = folder.querySelector('span');
             // Toggle the expand/collapse state of the folder
+            folder.classList.toggle("expanded");
+            folder.classList.toggle("collapsed");
             if ('+' === span.textContent) {
                 span.textContent = '-';
-                folder.querySelector('ul').style.display = 'block';
             } else if ('-' === span.textContent) {
                 span.textContent = '+';
-                folder.querySelector('ul').style.display = 'none';
             }
             e.stopPropagation();
         });
@@ -250,6 +259,12 @@ namespace MidwestMemories;
             parent.removeChild(parent.firstChild);
         }
     }
+
+    /*
+            // Get the "path" variable.
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetPath = urlParams.get('path');
+    * */
 </script>
 
 </body>
