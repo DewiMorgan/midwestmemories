@@ -59,11 +59,11 @@ namespace MidwestMemories;
         }
 
         li.collapsed ul {
-            display = 'none';
+            display: none;
         }
 
         li.expanded ul {
-            display = 'block';
+            display: block;
         }
 
         /* Files in the tree view. */
