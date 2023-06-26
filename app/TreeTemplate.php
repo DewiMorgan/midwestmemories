@@ -115,6 +115,7 @@ namespace MidwestMemories;
                 if (is_dir("$dir/$item")) {
                     // Collapse, unless our target path is within this branch.
                     $expandClass = Path::isChildInPath($targetPath, "$dir/$item") ? 'expanded' : 'collapsed';
+Log::debug("<li class='folder $expandClass'><span class='expand-collapse '>+</span>");
                     echo "<li class='folder $expandClass'><span class='expand-collapse '>+</span>";
                     echo "<a href='$u_linkUrl' class='path-link'>$h_item</a>";
                     echo "<ul style='display:none;'>\n";
