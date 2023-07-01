@@ -104,8 +104,6 @@ namespace MidwestMemories;
             // Loop through the items and output a list item for each one.
             $files = '';
             foreach ($items as $item) {
-                Log::info("Checking: $item"); // DELETEME DEBUG
-                Log::debug("Debugging: $item"); // DELETEME DEBUG
                 // Skip the current and parent directories, and any hidden ones.
                 if (str_starts_with($item, '.')) {
                     continue;

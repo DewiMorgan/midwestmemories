@@ -167,13 +167,15 @@ class Metadata
         $names = [];
         foreach ($data['/'] as $key => $item) {
             $strippedKey = strtolower(preg_replace('[^a-z0-9.]', '', $key));
+
+            Log::debug("Cleaning dir key '$key' as '$strippedKey':"); // DELETEME DEBUG
+
             if (!in_array($strippedKey, $this->dirKeyNames)) {
                 // Todo: handle the versioned comment history keys.
-                Log::warn('Unrecognized dir-level property', $key);
+                Log::warn("Unrecognized dir-level property $key as $strippedKey");
                 continue;
             }
 
-            Log::debug("Cleaning dir key '$key' as '$strippedKey':"); // DELETEME DEBUG
             switch ($strippedKey) {
                 case 'displayname':
                 case 'source':
