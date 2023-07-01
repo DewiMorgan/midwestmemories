@@ -166,7 +166,7 @@ class Metadata
 
         $names = [];
         foreach ($data['/'] as $key => $item) {
-            $strippedKey = strtolower(preg_replace('[^a-z0-9.]', '', $key));
+            $strippedKey = strtolower(preg_replace('/[^a-z0-9.]/', '', $key));
 
             Log::debug("Cleaning dir key '$key' as '$strippedKey':"); // DELETEME DEBUG
 
