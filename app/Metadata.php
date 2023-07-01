@@ -54,7 +54,7 @@ class Metadata
      */
     public function loadFromIni(): void
     {
-        $iniFileData = parse_ini_file($this->path, true);
+        $iniFileData = parse_ini_file($this->path . '/index.txt', true);
 
         if (false === $iniFileData) {
             Log::error('loadFromIni failed to parse ini file', $this->path);

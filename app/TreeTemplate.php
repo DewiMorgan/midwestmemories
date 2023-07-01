@@ -130,8 +130,11 @@ namespace MidwestMemories;
             }
             echo $files;
 
+            // DELETEME DEBUG
             $metadata = new Metadata($dir);
+            $metadata->loadFromIni();
             echo "<pre>$dir:\n" . var_export($metadata->getData(), true) . '</pre>';
+            // END DELETEME DEBUG
         }
 
         ?>
