@@ -22,9 +22,12 @@ namespace MidwestMemories;
 // ToDo: Style this.
 // ToDo: Add edit button.
 // ToDo: Add for input fields.
-$metadata = new Metadata(dirname(Index::$requestedPath));
-$fileDetails = $metadata->getFileDetails(basename(Index::$requestedPath));
-var_export($fileDetails);
+$dir = dirname(Index::$requestedPath);
+$file = basename(Index::$requestedPath);
+$metadata = new Metadata($dir);
+$fileDetails = $metadata->getFileDetails($file);
+echo "<pre>$dir(/)$file:\n" . var_export($fileDetails, true) . "</pre>\n";
+
 $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb(Index::$requestedPath)) . '&amp;i=2';
 echo "<img src=\"$u_linkUrl\" alt=\"TODO: alt text\">\n";
 ?>

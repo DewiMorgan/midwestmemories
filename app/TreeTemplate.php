@@ -131,7 +131,7 @@ namespace MidwestMemories;
             echo $files;
 
             $metadata = new Metadata($dir);
-            echo '<pre>' . var_export($metadata->getData(), true) . '</pre>';
+            echo "<pre>$dir:\n" . var_export($metadata->getData(), true) . '</pre>';
         }
 
         ?>
