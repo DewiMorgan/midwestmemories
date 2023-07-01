@@ -54,7 +54,15 @@ class Metadata
      */
     public function loadFromIni(): void
     {
-        $iniFileData = parse_ini_file($this->path . '/index.txt', true);
+        $iniFilePath = $this->path . '/index.txt';
+
+        if (!file_exists($iniFilePath)) {
+            Log::warn('loadFromIni found no ini file', $this->path);
+            Index::showError('No ini file for this folder.');
+            return;
+        }
+
+        $iniFileData = parse_ini_file($iniFilePath, true);
 
         if (false === $iniFileData) {
             Log::error('loadFromIni failed to parse ini file', $this->path);
@@ -165,6 +173,7 @@ class Metadata
                 continue;
             }
 
+            Log::debug("Cleaning dir key '$key' as '$strippedKey':"); // DELETEME DEBUG
             switch ($strippedKey) {
                 case 'displayname':
                 case 'source':
@@ -190,6 +199,7 @@ class Metadata
                     $newDirData[$strippedKey] = $this->cleanKeywords($keywords);
                     break;
                 default:
+                    Log::warn('dir-level property default:', $key);
             }
         }
 
@@ -235,6 +245,9 @@ class Metadata
         $names = [];
         foreach ($data as $key => $item) {
             $strippedKey = strtolower(preg_replace('[^a-z0-9.]', '', $key));
+
+            Log::debug("Cleaning file key '$key' as '$strippedKey':"); // DELETEME DEBUG
+
             if (!in_array($strippedKey, $this->fileKeyNames)) {
                 // Todo: handle the versioned comment history keys.
                 Log::warn('Unrecognized file-level property', $key);
@@ -263,6 +276,7 @@ class Metadata
                     $newFileData[$strippedKey] = $this->cleanKeywords($keywords);
                     break;
                 default:
+                    Log::warn('file-level property default:', $key);
             }
         }
         $this->cleanNamesInData($newFileData, $names);
@@ -278,6 +292,7 @@ class Metadata
      */
     private function cleanString(mixed $item, int $maxLength = null, bool $parseSlashes = false): string
     {
+        Log::debug(__METHOD__ . ", Parsing item $item"); // DELETEME DEBUG
         if (!is_string($item)) {
             Log::warn('String property was not string', $item);
             return '';
@@ -288,6 +303,7 @@ class Metadata
             $trimmed = substr($trimmed, 0, $maxLength);
         }
         if ($parseSlashes) {
+            Log::debug("Parsing slashes"); // DELETEME DEBUG
             // This is a hack, since stripcslashes() will remove a slash that precedes a non-special character.
             // Instead, this only escapes the special characters \f, \n, \r, \t, \v, and octal and hex escapes.
             $trimmed = preg_replace_callback(
@@ -296,6 +312,7 @@ class Metadata
                 $trimmed
             );
         }
+        Log::debug(__METHOD__ . ", returning $trimmed"); // DELETEME DEBUG
         return $trimmed;
     }
 
@@ -306,10 +323,12 @@ class Metadata
      */
     private function cleanDate(mixed $item): ?int
     {
+        Log::debug(__METHOD__ . ", Parsing item $item"); // DELETEME DEBUG
         $result = strtotime($item);
         if (false === $result) {
             return null;
         }
+        Log::debug(__METHOD__ . ", returning $result"); // DELETEME DEBUG
         return $result;
     }
 
@@ -323,6 +342,7 @@ class Metadata
      */
     private function cleanCsvLine(mixed $item, int $maxLength = null, bool $parseSlashes = true): array
     {
+        Log::debug(__METHOD__ . ", Parsing item $item"); // DELETEME DEBUG
         if (!is_string($item)) {
             Log::warn('CSV property was not string', $item);
             return [];
@@ -335,6 +355,7 @@ class Metadata
         foreach ($parsed as &$item) {
             $item = $this->cleanString($item, $maxLength, $parseSlashes);
         }
+        Log::debug(__METHOD__ . ", returning " . implode('#,#', $parsed)); // DELETEME DEBUG
         return $parsed;
     }
 
@@ -348,6 +369,7 @@ class Metadata
      */
     private function cleanKeywords(array $keywords): array
     {
+        Log::debug(__METHOD__ . ", returning " . implode('#,#', $keywords)); // DELETEME DEBUG
         return $keywords;
     }
 

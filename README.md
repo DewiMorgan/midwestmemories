@@ -144,8 +144,13 @@ See also list at the top of this file.
 Urgent:
 
 * Index: Inline file view
-* PHP: Parse ini file TO database.
-* PHP: Parse ini file FROM database.
+* PHP: Parse Metadata FROM ini file.
+* Bug: ini params with spaces are not read in correctly.
+* PHP: Parse Metadata TO ini file.
+* PHP: Parse Metadata TO database.
+* PHP: Parse Metadata FROM database.
+* PHP: Parse Metadata TO web form.
+* PHP: Parse Metadata FROM web form.
 * PHP: Display ini file contents in inline file view, tagged by type.
     * Single-line string (strip WS, strip HTML, replace \n), fixed length (display chars remaining once close/over).
     * Multi-line string (strip WS, strip HTML), unlimited or fixed length (display chars remaining once close/over).
@@ -158,6 +163,7 @@ Urgent:
 * PHP: Parse form input to database, with validation, errors, etc.
 * JS: Parse and display form errors.
 * CSS: Make the inline file view look like not ass.
+* Stop the thumbnails from listing in TreeTemplate.
 
 * Index: Inline search view.
 * FileTemplate: display the file, the various fields, and an edit button to view them.
