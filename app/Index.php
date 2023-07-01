@@ -90,22 +90,31 @@ class Index
             // This is a request by a user, perhaps to a bookmark.
             // Load the tree view, which will then call us back for the inline version of the pointed-at $path resource.
             include('app/TreeTemplate.php');
+        } elseif (2 == $_REQUEST['i']) {
+            // We're showing raw file view, such as for an img link.
+            include('app/RawTemplate.php');
+        } elseif (3 == $_REQUEST['i']) {
+            // We're showing an inline search view, by choice.
+            include('app/RawTemplate.php');
         } elseif (is_dir(static::$requestedPath)) {
             // We're showing an inline folder view; a list of thumbnails.
             include('app/ThumbsTemplate.php');
-        } elseif (is_file(static::$requestedPath) && 2 == $_REQUEST['i']) {
-            // ToDo: We're showing a raw image file, such as for an img link.
-            include('app/RawTemplate.php');
         } elseif (is_file(static::$requestedPath)) {
-            // ToDo: We're showing an inline file view.
-            // include('app/FileTemplate.php');
-            echo 'File view not yet implemented';
-            http_response_code(501); // Not implemented.
+            // We're showing an inline file view.
+            include('app/FileTemplate.php');
         } else {
-            // ToDo: We're showing an inline search view.
-            // include('app/SearchTemplate.php');
-            echo 'Search view not yet implemented';
-            http_response_code(501); // Not implemented.
+            // We're showing an inline search view, because we've nothing else to show.
+            include('app/SearchTemplate.php');
         }
+    }
+
+    /**
+     * Display an error in the error box on the page.
+     * @param string $string
+     * @ToDo: use some kinda push tech to do this with Javascript.
+     */
+    public static function showError(string $string): void
+    {
+        echo $string;
     }
 }

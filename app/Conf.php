@@ -47,7 +47,7 @@ class Conf
             self::$data[$key->value] = $default;
         } else {
             Log::adminDebug('Config entry could not be found and there was no default:' . $key->value);
-            die();
+            die(1);
         }
     }
 
@@ -62,7 +62,7 @@ class Conf
         // Parse the MySQL INI file.
         if (!$mysqlConfig = self::readIniInParents(self::MYSQL_INI_FILE)) {
             Log::adminDebug('MySQL Auth information could not be read.');
-            die();
+            die(1);
         }
         self::parseIniFileKey(Key::MYSQL_HOST, $mysqlConfig);
         self::parseIniFileKey(Key::MYSQL_PORT, $mysqlConfig, 3306);
@@ -73,7 +73,7 @@ class Conf
         // Parse the Dropbox INI file.
         if (!$dropboxConfig = self::readIniInParents(self::DROPBOX_INI_FILE)) {
             Log::adminDebug('Dropbox Auth information could not be read.');
-            die();
+            die(1);
         }
         self::parseIniFileKey(Key::DROPBOX_KEY, $dropboxConfig);
         self::parseIniFileKey(Key::DROPBOX_SECRET, $dropboxConfig);

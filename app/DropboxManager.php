@@ -528,7 +528,8 @@ class DropboxManager
                 }
                 return $result;
             } catch (Exception $e) {
-                die(var_export($e));
+                Log::Error("", $e);
+                die(1);
             }
         }
     */

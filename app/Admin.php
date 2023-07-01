@@ -34,7 +34,7 @@ class Admin
             echo "<!DOCTYPE html>\n";
             echo '<html lang="en"><head><title>Logout</title></head><body><h1>Logged out</h1><p><a href="'
                 . $_SERVER['PHP_SELF'] . '">Click here to log back in.</a></p></body></html>' . "\n";
-            exit;
+            exit(0);
         }
     }
 

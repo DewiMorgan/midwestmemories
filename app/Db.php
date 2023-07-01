@@ -42,7 +42,7 @@ class Db
             );
         } catch (Exception $e) {
             Log::adminDebug('DB connection failed: ' . $e->getMessage());
-            exit('DB connection failed.');
+            die(1);
         }
     }
 

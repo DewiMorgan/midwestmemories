@@ -20,7 +20,7 @@ class Path
             Log::adminDebug('MM_BASE_DIR empty from "' . __DIR__ . ' + /../ + ' . Index::IMAGE_DIR . ' + /".');
             Log::adminDebug('Not safe to continue');
             http_response_code(500); // Internal Server Error.
-            die();
+            die(1);
         }
         Index::$imageBasePath = $baseDir;
     }
@@ -65,20 +65,20 @@ class Path
         if (false === $realChildPath) {
             Log::adminDebug("Child path was not found: $childPath");
             http_response_code(404); // Not found.
-            die();
+            die(1);
         }
         $realParentPath = realpath($parentPath);
         if (false === $realParentPath) {
             Log::adminDebug("Parent path was not found: $parentPath");
             http_response_code(404); // Not found.
-            die();
+            die(1);
         }
 
         // Only need to check that parent is in basedir.
         if (!str_starts_with($realParentPath, Index::$imageBasePath)) {
             Log::adminDebug("Parent path was not within MM_BASE_DIR: $parentPath");
             http_response_code(404); // Not found.
-            die();
+            die(1);
         }
 
         // Prevent /pa/ from matching /path/to/file.
@@ -104,12 +104,12 @@ class Path
         if (false === $realPath) {
             Log::adminDebug("Validated path was not found: $webPath");
             http_response_code(404); // Not found.
-            die();
+            die(1);
         }
         if (!str_starts_with($realPath, Index::$imageBasePath)) {
             Log::adminDebug("Validated path was not within MM_BASE_DIR: $webPath");
             http_response_code(404); // Not found.
-            die();
+            die(1);
         }
         Index::$requestedPath = $realPath;
         Log::adminDebug("Validated path: $webPath as $realPath");

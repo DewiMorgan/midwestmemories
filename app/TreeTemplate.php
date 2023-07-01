@@ -129,6 +129,9 @@ namespace MidwestMemories;
                 }
             }
             echo $files;
+
+            $metadata = new Metadata($dir);
+            echo '<pre>' . var_export($metadata->getData(), true) . '</pre>';
         }
 
         ?>

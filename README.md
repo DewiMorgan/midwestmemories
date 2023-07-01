@@ -143,19 +143,34 @@ See also list at the top of this file.
 
 Urgent:
 
+* Index: Inline file view
+* PHP: Parse ini file TO database.
+* PHP: Parse ini file FROM database.
+* PHP: Display ini file contents in inline file view, tagged by type.
+    * Single-line string (strip WS, strip HTML, replace \n), fixed length (display chars remaining once close/over).
+    * Multi-line string (strip WS, strip HTML), unlimited or fixed length (display chars remaining once close/over).
+    * Date
+    * User selector (like single line string, but with drop-down hint picker)
+    * Location picker (ditto)
+    * Keyword picker (ditto)
+    * Each with who-can-edit level (nobody, owner, admin, regular, guest)
+* JS: Convert view mode to edit mode when edit button clicked? Or have all fields default to editable?
+* PHP: Parse form input to database, with validation, errors, etc.
+* JS: Parse and display form errors.
+* CSS: Make the inline file view look like not ass.
+
+* Index: Inline search view.
+* FileTemplate: display the file, the various fields, and an edit button to view them.
 * replace innerHTML use (mem leaks as doesn't remove handlers for old content; and doesn't run script tags.)
 * ThumbsTemplate: Alt text when displaying images.
 * ThumbsTemplate: Display title.
 * ThumbsTemplate: Display breadcrumbs?
 * ThumbsTemplate: Check width and height when displaying images.
+* Some kinda push tech to display error messages through Javascript in Index::ShowError().
 
-* Files within the mm folder aren't navigable to.
-* The admin page may be broken.
 * "Download files from DB queue" and "Process downloaded files" are both giving me:
     * Cursor='',"Cursor was not set in client.", but I am not sure if that is even a true error.
     * No reproduction steps yet.
-* Index: Inline file view
-* Index: Inline search view
 * Update the URL as the page changes.
 
 From Code comments:
@@ -181,6 +196,8 @@ From Code comments:
 
 Low priority:
 
+* Migrate templates into a sub-folder.
+* Files within the mm folder aren't navigable to.
 * Migrate TreeTemplate's JS out to TreeTemplate.js.
 * site.webmanifest file could do with populating properly.
 * Allow log level to be specified as a string
@@ -196,6 +213,11 @@ Low priority:
 
 Fixed:
 
+* FIXED: Convert existing DBs to InnoDB, locally and remotely.
+* FIXED: DB: Add index to midmem_file_queue.full_path.
+* FIXED: DB: Create rest of schema.
+
+* FIXED: The admin page may be broken.
 * FIXED: Log class is not logging.
 * FIXED: back button doesn't populate page correctly (doesn't parse path=...).
 * FIXED: Need to change expand/collapse to be a style/class thing, so we can set the style when building the list.
@@ -206,7 +228,6 @@ Fixed:
 * FIXED: TreeTemplate: Expand to, and select, currently passed $path.
 * FIXED: isOnTargetPath() - write this, though I've likely already got a similar class.
 * FIXED: Migrate the path manipulation methods from Index to their own class.
-
 * FIXED: Need a link to home at the top of tree-view template.
 * FIXED: ThumbsTemplate: Folders first.
 * FIXED: ThumbsTemplate: break HTML lines for file list.
