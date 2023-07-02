@@ -81,6 +81,8 @@ class Metadata
     {
         if ($overwrite || !file_exists($iniPath)) {
             $iniString = $this->getIniString('/', $this->data);
+echo "<pre>$iniString</pre>"; // DELETEME DEBUG
+return; // DELETEME DEBUG
             file_put_contents($iniPath, $iniString);
         } else {
             // If we're not overwriting, then read in the existing data from the file, if any.

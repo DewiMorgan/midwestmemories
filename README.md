@@ -142,10 +142,10 @@ To push a change:
 See also list at the top of this file.
 
 Urgent:
+* FIXED: Bug: ini params with spaces are not read in correctly.
+* FIXED: PHP: Parse Metadata FROM ini file.
 
 * Index: Inline file view
-* PHP: Parse Metadata FROM ini file.
-* Bug: ini params with spaces are not read in correctly.
 * PHP: Parse Metadata TO ini file.
 * PHP: Parse Metadata TO database.
 * PHP: Parse Metadata FROM database.
