@@ -142,9 +142,8 @@ To push a change:
 See also list at the top of this file.
 
 Urgent:
-* FIXED: Bug: ini params with spaces are not read in correctly.
-* FIXED: PHP: Parse Metadata FROM ini file.
 
+* Index: Clicking links seems broken, they don't open inline.
 * Index: Inline file view
 * PHP: Parse Metadata TO ini file.
 * PHP: Parse Metadata TO database.
@@ -218,6 +217,9 @@ Low priority:
 * Dark mode
 
 Fixed:
+
+* FIXED: Bug: ini params with spaces are not read in correctly.
+* FIXED: PHP: Parse Metadata FROM ini file.
 
 * FIXED: Convert existing DBs to InnoDB, locally and remotely.
 * FIXED: DB: Add index to midmem_file_queue.full_path.

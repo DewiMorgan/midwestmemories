@@ -81,8 +81,8 @@ class Metadata
     {
         if ($overwrite || !file_exists($iniPath)) {
             $iniString = $this->getIniString('/', $this->data);
-echo "<pre>$iniString</pre>"; // DELETEME DEBUG
-return; // DELETEME DEBUG
+//echo "<pre>$iniString</pre>"; // DELETEME DEBUG
+//return; // DELETEME DEBUG
             file_put_contents($iniPath, $iniString);
         } else {
             // If we're not overwriting, then read in the existing data from the file, if any.
@@ -100,7 +100,7 @@ return; // DELETEME DEBUG
      * @param int $depth How deeply we have recursed. Used to prevent infinite recursion.
      * @return string The contents of the ini fie, or the section that we've recursed into.
      */
-    private function getIniString(string $key, mixed $data, int $depth = 0): string
+    public function getIniString(string $key, mixed $data, int $depth = 0): string
     {
         // Prevent infinite recursion.
         if ($depth > 2) {

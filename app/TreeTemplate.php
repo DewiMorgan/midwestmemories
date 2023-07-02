@@ -132,7 +132,8 @@ namespace MidwestMemories;
             $metadata = new Metadata($dir);
             $metadata->loadFromIni();
 //            echo "<pre>$dir:\n" . var_export($metadata->getData(), true) . '</pre>';
-            $metadata->saveToIni('x', true);
+//            $metadata->saveToIni('x', true);
+            echo '<pre>' . $metadata->getIniString('/', $metadata->getData()) . '</pre>';
             // END DELETEME DEBUG
         }
 
