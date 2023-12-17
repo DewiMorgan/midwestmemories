@@ -2,9 +2,7 @@
 
 Photo archive for the family.
 
-##
-
-Current structure:
+## Current structure
 
 When a change is made in Dropbox, a Dropbox callback hook calls dropboxcallback.php.
 This tags the user's cursor as "dirty", but doesn't actually download any updated files.
@@ -102,8 +100,8 @@ Later:
 
 ## Test workflow
 
-I've been avoiding working on this as it became a bigger and bigger
-molehill-mountain in my head, partly because I forget the dev workflow. So here are the steps:
+I've been avoiding working on this as it became a bigger and bigger molehill-mountain in my head,
+partly because I forget the dev workflow. So here are the steps:
 
 1) Open the project in PHPStorm EAP (OK, in PHPStorm regular: I went and bought the license).
 2) In Bash, do "service mysql start". See MySqAuth.ini for auth info.
@@ -144,6 +142,11 @@ See also list at the top of this file.
 Urgent:
 
 * Index: Clicking links seems broken, they don't open inline.
+    * Repro steps:
+      * Go to the index (https://midwestmemories.dewimorgan.com/).
+      * Click "Dewi". It should open in the pane to the right, but opens in full page.
+      * This is handled serverside by index.php:showPage(), and clientside by TreeTemplate.php:openLinkInline(url)
+      * 
 * Index: Inline file view
 * PHP: Parse Metadata TO ini file.
 * PHP: Parse Metadata TO database.
@@ -220,11 +223,9 @@ Fixed:
 
 * FIXED: Bug: ini params with spaces are not read in correctly.
 * FIXED: PHP: Parse Metadata FROM ini file.
-
 * FIXED: Convert existing DBs to InnoDB, locally and remotely.
 * FIXED: DB: Add index to midmem_file_queue.full_path.
 * FIXED: DB: Create rest of schema.
-
 * FIXED: The admin page may be broken.
 * FIXED: Log class is not logging.
 * FIXED: back button doesn't populate page correctly (doesn't parse path=...).

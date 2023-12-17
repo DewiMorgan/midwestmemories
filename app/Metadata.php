@@ -116,7 +116,7 @@ class Metadata
         if (is_array($data)) {
             $res = "[$key]\n";
             foreach ($data as $subKey => $value) {
-                $res .= $this->getIniString($subKey, $value, $depth + 1);
+                $res .= $this->getIniString($subKey . "", $value, $depth + 1);
             }
             return $res . "\n";
         }
