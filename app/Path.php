@@ -87,7 +87,7 @@ class Path
 
         // Prevent /pa/ from matching /path/to/file.
         if (strlen($realParentPath) < strlen($realChildPath)) {
-            Log::debug("Expanding short parent."); // DELETEME DEBUG
+            Log::debug('Expanding short parent.'); // DELETEME DEBUG
             $realParentPath .= '/';
         }
 
