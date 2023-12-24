@@ -12,16 +12,11 @@ class Index
     // Constants.
     public const MM_BASE_URL = 'https://midwestmemories.dewimorgan.com';
 
-    public const IMAGE_DIR = 'midwestmemories';
-
-    // The full filesystem path to the image folder. We don't allow access to files outside this folder.
-    public static string $imageBasePath;
-
-    // The path that the user requested, HTML-escaped.
-    public static string $h_requestedPath;
-
-    // The actual path to the thing the user requested. If set, the thing exists. No trailing slash on folders.
+    // User's requested path. If set, exists and is relative to in Path::$imageBasePath. No trailing slash on folders.
     public static string $requestedPath;
+
+    // HTML-escaped path that the user requested.
+    public static string $h_requestedPath;
 
     public function __construct()
     {
@@ -30,7 +25,7 @@ class Index
         static::initSession();
 
         $requestedPath = $_REQUEST['path'] ?? '/';
-        Path::validatePath($requestedPath);
+        Path::validatePath($requestedPath); // Dies if not correct.
         static::$h_requestedPath = htmlspecialchars($requestedPath);
 
         static::showPage();

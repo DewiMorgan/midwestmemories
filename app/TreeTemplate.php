@@ -77,13 +77,15 @@ namespace MidwestMemories;
         }
     </style>
 </head>
-<body>
+<?php
+$u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Index::$requestedPath) . '&amp;i=1';
+?>
+<body onload="openLinkInline('<?= $u_linkUrl ?>')">
 <div class="flex-container">
     <div class="tree-view left-column">
         <?php
-
         // Set the root directory to display in the tree view.
-        $root = Index::$imageBasePath;
+        $root = Path::$imageBasePath;
 
         echo '<ul>';
         echo "<li class='folder'><a href='?path=%2F&amp;i=1' class='path-link'>Home</a></li>";
@@ -109,7 +111,7 @@ namespace MidwestMemories;
                     continue;
                 }
                 $h_item = htmlspecialchars($item);
-                $webDir = str_replace(Index::$imageBasePath, '', "$dir/$item");
+                $webDir = str_replace(Path::$imageBasePath, '', "$dir/$item");
                 $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($webDir) . '&amp;i=1';
                 // If the item is a directory, output a list item with a nested ul element.
                 if (is_dir("$dir/$item")) {
@@ -199,7 +201,7 @@ namespace MidwestMemories;
 
     function foldElement(e) {
         // Get the span element that was clicked: should probably be a class rather than just span.
-        // Toggle the expand/collapse state of the folder
+        // Toggle the expand/collapse state of the folder.
         this.classList.toggle("expanded");
         this.classList.toggle("collapsed");
         const span = this.querySelector('span');

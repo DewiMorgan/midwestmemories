@@ -9,20 +9,24 @@ namespace MidwestMemories;
  */
 class Path
 {
+    public const IMAGE_DIR = 'midwestmemories';
+
+    // The full filesystem path to the image folder. We don't allow access to files outside this folder.
+    public static string $imageBasePath;
 
     /**
      * Handle base dir: being empty could allow arbitrary file access, so check it very early on.
      */
     public static function validateBaseDir(): void
     {
-        $baseDir = realpath(__DIR__ . '/../' . Index::IMAGE_DIR . '/');
+        $baseDir = realpath(__DIR__ . '/../' . Path::IMAGE_DIR . '/');
         if (empty($baseDir)) {
-            Log::adminDebug('MM_BASE_DIR empty from "' . __DIR__ . ' + /../ + ' . Index::IMAGE_DIR . ' + /".');
+            Log::adminDebug('MM_BASE_DIR empty from "' . __DIR__ . ' + /../ + ' . Path::IMAGE_DIR . ' + /".');
             Log::adminDebug('Not safe to continue');
             http_response_code(500); // Internal Server Error.
             die(1);
         }
-        Index::$imageBasePath = $baseDir;
+        Path::$imageBasePath = $baseDir;
     }
 
     /**
@@ -37,12 +41,12 @@ class Path
             Log::adminDebug("Converted path was not found: $filePath");
             return 'PATH_ERROR_404';
         }
-        $result = preg_replace('#^' . preg_quote(Index::$imageBasePath) . '#', '', $realPath);
+        $result = preg_replace('#^' . preg_quote(Path::$imageBasePath) . '#', '', $realPath);
         if (!$result) {
             Log::adminDebug("Converted path gave an empty string or error: $filePath");
             return 'PATH_ERROR_BAD';
         }
-        if (!str_starts_with($realPath, Index::$imageBasePath)) {
+        if (!str_starts_with($realPath, Path::$imageBasePath)) {
             Log::adminDebug("Converted path was not within MM_BASE_DIR: $realPath from $filePath");
             return 'PATH_ERROR_401';
         }
@@ -75,7 +79,7 @@ class Path
         }
 
         // Only need to check that parent is in basedir.
-        if (!str_starts_with($realParentPath, Index::$imageBasePath)) {
+        if (!str_starts_with($realParentPath, Path::$imageBasePath)) {
             Log::adminDebug("Parent path was not within MM_BASE_DIR: $parentPath");
             http_response_code(404); // Not found.
             die(1);
@@ -100,13 +104,13 @@ class Path
      */
     public static function validatePath(string $webPath): void
     {
-        $realPath = realpath(Index::$imageBasePath . '/' . $webPath);
+        $realPath = realpath(Path::$imageBasePath . '/' . $webPath);
         if (false === $realPath) {
             Log::adminDebug("Validated path was not found: $webPath");
             http_response_code(404); // Not found.
             die(1);
         }
-        if (!str_starts_with($realPath, Index::$imageBasePath)) {
+        if (!str_starts_with($realPath, Path::$imageBasePath)) {
             Log::adminDebug("Validated path was not within MM_BASE_DIR: $webPath");
             http_response_code(404); // Not found.
             die(1);

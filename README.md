@@ -140,13 +140,19 @@ To push a change:
 See also list at the top of this file.
 
 Urgent:
-
-* Index: Clicking links seems broken, they don't open inline.
-    * Repro steps:
-      * Go to the index (https://midwestmemories.dewimorgan.com/).
-      * Click "Dewi". It should open in the pane to the right, but opens in full page.
-      * This is handled serverside by index.php:showPage(), and clientside by TreeTemplate.php:openLinkInline(url)
-      * 
+* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill out the right hand side ("hello world").
+  * This will likely be handled by TreeTemplate? Or Index.php?
+  * Best approach probably to create Path::pathToUrl, then in TreeTemplate have:
+  *     <body onload="openLinkInline('<?= Path::pathToUrl(Index::$requestedPath)) ?>')"
+  * or maybe cleaner, wrap it as:
+  *     <body onload="openLinkInline('<?= Path::getRequestedUrl() ?>')" 
+  * Wait, I already have that!
+  *     <body onload="<?php echo "openLinkInline('')"?>">
+  * So I just need to pass in the correct URL, instead of a blank.
+* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't populate image names and title from the ini file.
+* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2 (mod_rewrite)
+* https://midwestmemories.dewimorgan.com/?path=%2FDewi doesn't show the subfolder "2".
+* Ini files don't handle subfolder details? Probably those details should come from ini files in the subfolders, I guess?
 * Index: Inline file view
 * PHP: Parse Metadata TO ini file.
 * PHP: Parse Metadata TO database.
@@ -221,6 +227,12 @@ Low priority:
 
 Fixed:
 
+* FIXED: Index: Clicking links seems broken, they don't open inline.
+  * Repro steps:
+    * Go to the index (https://midwestmemories.dewimorgan.com/).
+    * Click "Dewi". It should open in the pane to the right, but opens in full page.
+    * This is handled serverside by index.php:showPage(), and clientside by TreeTemplate.php:openLinkInline(url)
+    * This typically breaks when there's a 500 error somewhere.
 * FIXED: Bug: ini params with spaces are not read in correctly.
 * FIXED: PHP: Parse Metadata FROM ini file.
 * FIXED: Convert existing DBs to InnoDB, locally and remotely.
