@@ -78,7 +78,7 @@ namespace MidwestMemories;
     </style>
 </head>
 <?php
-$u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Index::$requestedPath) . '&amp;i=1';
+$u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/') . '&amp;i=1';
 ?>
 <body onload="openLinkInline('<?= $u_linkUrl ?>')">
 <div class="flex-container">

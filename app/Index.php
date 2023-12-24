@@ -12,7 +12,7 @@ class Index
     // Constants.
     public const MM_BASE_URL = 'https://midwestmemories.dewimorgan.com';
 
-    // User's requested path. If set, exists and is relative to in Path::$imageBasePath. No trailing slash on folders.
+    // Full user-requested path relative to hdd /. If set, exists in Path::$imageBasePath. No trailing slash on folders.
     public static string $requestedPath;
 
     // HTML-escaped path that the user requested.
@@ -25,7 +25,7 @@ class Index
         static::initSession();
 
         $requestedPath = $_REQUEST['path'] ?? '/';
-        Path::validatePath($requestedPath); // Dies if not correct.
+        Index::$requestedPath = Path::webToUnixPath($requestedPath); // Dies if not correct.
         static::$h_requestedPath = htmlspecialchars($requestedPath);
 
         static::showPage();

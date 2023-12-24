@@ -99,10 +99,11 @@ class Path
     }
 
     /**
-     * Check the file request we were given exists in MM_BASE_DIR.
-     * @param string $webPath The web path to validate, relative to MM_BASE_DIR.
+     * Safely convert a web path to a unix filesystem path, or die if it's not within MM_BASE_DIR.
+     * @param string $webPath The web path to validate and correct, relative to MM_BASE_DIR.
+     * @return string The converted path, relative to filesystem root.
      */
-    public static function validatePath(string $webPath): void
+    public static function webToUnixPath(string $webPath): string
     {
         $realPath = realpath(Path::$imageBasePath . '/' . $webPath);
         if (false === $realPath) {
@@ -115,7 +116,7 @@ class Path
             http_response_code(404); // Not found.
             die(1);
         }
-        Index::$requestedPath = $realPath;
         Log::adminDebug("Validated path: $webPath as $realPath");
+        return $realPath;
     }
 }
