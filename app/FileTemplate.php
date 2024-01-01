@@ -14,8 +14,8 @@ namespace MidwestMemories;
     <title>File</title>
 </head>
 <body>
-<h1 class="center">Folder title goes here</h1>
-<p>This is a description of the folder/album and its contents.</p>
+<h1 class="center">File title goes here</h1>
+<p>This is a description of the file.</p>
 
 
 <?php

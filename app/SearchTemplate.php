@@ -14,8 +14,8 @@ namespace MidwestMemories;
 </head>
 <body>
 <div class="thumb-content">
-    <h1 class="center">Folder title goes here</h1>
-    <p>This is a description of the folder/album and its contents.</p>
+    <h1 class="center">Search</h1>
+    <p>This is a description of the search process.</p>
 </div>
 
 <div class="thumb-pad" id="rounded">

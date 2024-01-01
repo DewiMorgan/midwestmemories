@@ -140,17 +140,14 @@ To push a change:
 See also list at the top of this file.
 
 Urgent:
+* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif (superseded below) doesn't populate details well.
+  * Metadata class might want to be a singleton factory?
+  * 
 
-* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill out the right hand side ("hello world").
-    * This will likely be handled by TreeTemplate? Or Index.php?
-    * Best approach probably to create Path::pathToUrl, then in TreeTemplate have:
-    *     <body onload="openLinkInline('<?= Path::pathToUrl(Index::$requestedPath)) ?>')"
-    * or maybe cleaner, wrap it as:
-    *     <body onload="openLinkInline('<?= Path::getRequestedUrl() ?>')" 
-    * Wait, I already have that!
-    *     <body onload="<?php echo "openLinkInline('')"?>">
-    * So I just need to pass in the correct URL, instead of a blank.
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't populate image names and title from the ini file.
+  * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.
+  * But the instructions are vague. Where is the data stored/read in?
+  * In Metadata. We're using that in FileTemplate first: get that working before worrying about TreeTemplate.
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2
   (mod_rewrite)
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi doesn't show the subfolder "2".
@@ -229,6 +226,8 @@ Low priority:
 
 Fixed:
 
+* FIXED - https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill out the right hand side ("hello world").
+    * Just had to populate the ONLOAD call.
 * FIXED: Index: Clicking links seems broken, they don't open inline.
     * Reproduction steps:
         * Go to the index (https://midwestmemories.dewimorgan.com/).
