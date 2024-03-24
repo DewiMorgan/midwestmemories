@@ -6,90 +6,98 @@ namespace MidwestMemories;
 
 /**
  * Class to handle moving metadata between ini files, DB, web display, and web form.
+ * Metadata can be inherited from parent folders, etc. So we need to store the entire tree, lazy-loaded.
+ * At the same time, we don't want to be passing in the path we're talking about all the time.
+ * So we should have a static tree object, and each instance has its own path object.
+ * Then to save it out, we need to mark the stuff that changed, and write out only the dirty folders.
  */
 class Metadata
 {
-    private array $dirKeyNames = [
-        'displayname',
-        'source',
-        'writtennotes',
-        'visitornotes',
-        'location',
-        'startdate',
-        'enddate',
-        'photographer',
-        'people',
-        'keywords',
-    ];
-    private array $fileKeyNames = [
-        'displayname',
-        'date',
-        'writtennotes',
-        'visitornotes',
-        'location',
-        'photographer',
-        'people',
-        'keywords',
-    ];
 
     /**
-     * @var array Dict of string properties, and for folders, sub-arrays for the files.
+     * @var array Tree of folders in web path, each containing a 'data' element from the ini file for that folder.
+     * That's a dict of string properties for the folder, and sub-arrays for properties for each file in the folder.
+     * If a folder has an 'isDirty' element that's true, then it has been modified.
      */
-    private array $data;
+    private static array $folderTree;
 
     /**
-     * @param string $path Promoted property.
+     * @param string $webPath Web path. Promoted property. This is assumed validated and sanitized.
      */
-    public function __construct(public string $path)
+    public function __construct(public string $webPath)
     {
-        // Initialize the keys in our directory data.
-        $this->data = ['/' => []];
-        foreach ($this->dirKeyNames as $key) {
-            $this->data['/'][$key] = null;
+    }
+
+    /**
+     * Load in our data from an Ini file, and all parents.
+     * @param string $webPath The web path to load build and load the folder tree down to, from the root.
+     */
+    public function loadFromInis(string $webPath): void
+    {
+        $pathSoFar = '';
+        $currentNode = &self::$folderTree;
+        // "/var/www/path/to/file' => '/path/to/file' => ['', 'path', 'to', 'file']
+        foreach (explode('/', $webPath) AS $pathElement) {
+            // Build the folder tree to the branch we're interested in.
+            if ($pathElement != '') {
+                if (!array_key_exists($pathElement, $currentNode)) {
+                    $currentNode[$pathElement] = [];
+                }
+                $currentNode = &$currentNode[$pathElement];
+            }
+
+            // Create the data only if it doesn't already exist.
+            if (!array_key_exists('data', $currentNode)) {
+                $currentNode['data'] = [];
+            }
+            $pathSoFar .= '/' . $pathElement;
+            $pathSoFar = preg_replace('#//#', '/', $pathSoFar);
+            if (empty($currentNode['data'])) {
+                $currentNode['data'] = $this->loadFolderIni($pathSoFar);
+            }
         }
     }
 
     /**
-     * Load in our data from an Ini file.
+     * Load data block for a single folder.
+     * @param string $webPath Web path to parse.
+     * @return array|array[] The array structure read for that folder.
      */
-    public function loadFromIni(): void
+    private function loadFolderIni(string $webPath): array
     {
-        $iniFilePath = $this->path . '/index.txt';
+        $iniUnixPath = Path::webToUnixPath($webPath . '/index.txt');
 
-        if (!file_exists($iniFilePath)) {
-            Log::warn('loadFromIni found no ini file', $this->path);
+        if (!file_exists($iniUnixPath)) {
+            Log::warn('loadFromIni found no ini file', $webPath);
             Index::showError('No ini file for this folder.');
-            return;
+            return [];
         }
 
-        $iniFileData = parse_ini_file($iniFilePath, true);
+        $iniFileData = parse_ini_file($iniUnixPath, true);
 
         if (false === $iniFileData) {
-            Log::error('loadFromIni failed to parse ini file', $this->path);
+            Log::error('loadFromIni failed to parse ini file', $webPath);
             Index::showError('Failed to parse ini file for this folder.');
             die(1);
         }
 
-        $this->data = $this->cleanDirData($iniFileData);
+        return MetadataCleaner::cleanDirData($iniFileData);
     }
 
     /**
      * Write out to an Ini file
-     * @param string $iniPath The file to write to. Should have already been sanity-checked.
+     * @param string $webPath The folder to add/update the ini file for. Should have already been sanity-checked.
      */
-    public function saveToIni(string $iniPath, bool $overwrite = false): void
+    public function saveToInis(string $webPath): void
     {
-        if ($overwrite || !file_exists($iniPath)) {
-            $iniString = $this->getIniString('/', $this->data);
-//echo "<pre>$iniString</pre>"; // DELETEME DEBUG
-//return; // DELETEME DEBUG
-            file_put_contents($iniPath, $iniString);
-        } else {
-            // If we're not overwriting, then read in the existing data from the file, if any.
-            $oldData = new Metadata($iniPath);
-            $oldData->loadFromIni();
-            $oldData->updateFromObject($this);
-            $oldData->saveToIni($iniPath, true);
+        $pathSoFar = '';
+        foreach (explode('/', $webPath) AS $pathElement) {
+            $pathSoFar = preg_replace('#//#', '/', "$pathSoFar/$pathElement");
+            if (array_key_exists('dirty', self::$folderTree[$webPath]) && !empty(self::$folderTree[$webPath]['data'])) {
+                $iniUnixPath = Path::webToUnixPath($pathSoFar . '/index.txt');
+                $iniString = $this->getIniString('/', self::$folderTree[$webPath]['data']);
+                file_put_contents($iniUnixPath, $iniString);
+            }
         }
     }
 
@@ -116,7 +124,7 @@ class Metadata
         if (is_array($data)) {
             $res = "[$key]\n";
             foreach ($data as $subKey => $value) {
-                $res .= $this->getIniString($subKey . "", $value, $depth + 1);
+                $res .= $this->getIniString("$subKey", $value, $depth + 1);
             }
             return $res . "\n";
         }
@@ -141,6 +149,7 @@ class Metadata
 
     /**
      * Load in from the Database.
+     * ToDo: This.
      */
     public function loadFromMysql(): void
     {
@@ -148,249 +157,10 @@ class Metadata
 
     /**
      * Write out to the Database.
+     * ToDo: This.
      */
     public function saveToMysql(): void
     {
-    }
-
-    /**
-     * Clean up a directory array, removing anything "dirty"/unexpected, parsing non-string types, etc.
-     * @param array $data The data to clean.
-     * @return array The cleaned data.
-     */
-    private function cleanDirData(array $data): array
-    {
-        // Initialize the keys in our data.
-        $newDirData = [];
-        foreach ($this->dirKeyNames as $key) {
-            $newDirData[$key] = null;
-        }
-
-        $names = [];
-        foreach ($data['/'] as $key => $item) {
-            $strippedKey = strtolower(preg_replace('/[^a-z0-9.]/', '', $key));
-
-            Log::debug("Cleaning dir key '$key' as '$strippedKey':"); // DELETEME DEBUG
-
-            if (!in_array($strippedKey, $this->dirKeyNames)) {
-                // Todo: handle the versioned comment history keys.
-                Log::warn("Unrecognized dir-level property $key as $strippedKey");
-                continue;
-            }
-
-            switch ($strippedKey) {
-                case 'displayname':
-                case 'source':
-                    $newDirData[$strippedKey] = $this->cleanString($item, 255);
-                    break;
-                case 'writtennotes':
-                case 'visitornotes':
-                case 'location':
-                    $newDirData[$strippedKey] = $this->cleanString($item);
-                    break;
-                case 'startdate':
-                case 'enddate':
-                    $newDirData[$strippedKey] = $this->cleanDate($item);
-                    break;
-                case 'photographer':
-                    $names[$strippedKey] = $this->cleanString($item, 255);
-                    break;
-                case 'people':
-                    $names[$strippedKey] = $this->cleanCsvLine($item);
-                    break;
-                case 'keywords':
-                    $keywords = $this->cleanCsvLine($item);
-                    $newDirData[$strippedKey] = $this->cleanKeywords($keywords);
-                    break;
-                default:
-                    Log::warn('dir-level property default:', $key);
-            }
-        }
-
-        // Swap the dates if they're in the wrong order.
-        if ($newDirData['startdate'] > $newDirData['enddate']) {
-            Log::warn('Start date later than end date: swapping');
-            $tmp = $newDirData['startdate'];
-            $newDirData['startdate'] = $newDirData['enddate'];
-            $newDirData['enddate'] = $tmp;
-        }
-        $this->cleanNamesInData($newDirData, $names);
-
-        // Clean file sub-arrays, and remove non-array keys.
-        $newData = ['/' => $newDirData];
-        foreach ($data as $key => $value) {
-            if ('/' !== $key && is_array($value)) {
-                // Filenames may contain only space, hyphen and dot, plus underscore and alphanumerics.
-                $strippedKey = preg_replace('/[^- .\w]/', '', $key);
-
-                // For safety, this file may not be listed.
-                if ('index.txt' !== $strippedKey) {
-                    $newData[$strippedKey] = $this->cleanFileData($value);
-                }
-            }
-        }
-
-        return $newData;
-    }
-
-    /**
-     * Clean up a file array, removing anything "dirty"/unexpected, parsing non-string types, etc.
-     * @param array $data The data to clean. Modified in place.
-     * @return array The cleaned data.
-     */
-    private function cleanFileData(array $data): array
-    {
-        // Initialize the keys in our data.
-        $newFileData = [];
-        foreach ($this->fileKeyNames as $key) {
-            $newFileData[$key] = null;
-        }
-
-        $names = [];
-        foreach ($data as $key => $item) {
-            $strippedKey = strtolower(preg_replace('/[^a-z0-9.]/', '', $key));
-
-            Log::debug("Cleaning file key '$key' as '$strippedKey':"); // DELETEME DEBUG
-
-            if (!in_array($strippedKey, $this->fileKeyNames)) {
-                // Todo: handle the versioned comment history keys.
-                Log::warn('Unrecognized file-level property', $key);
-                continue;
-            }
-            switch ($strippedKey) {
-                case 'displayname':
-                    $newFileData[$strippedKey] = $this->cleanString($item, 255);
-                    break;
-                case 'writtennotes':
-                case 'visitornotes':
-                case 'location':
-                    $newFileData[$strippedKey] = $this->cleanString($item);
-                    break;
-                case 'date':
-                    $newFileData[$strippedKey] = $this->cleanDate($item);
-                    break;
-                case 'photographer':
-                    $names[$strippedKey] = $this->cleanString($item, 255);
-                    break;
-                case 'people':
-                    $names[$strippedKey] = $this->cleanCsvLine($item);
-                    break;
-                case 'keywords':
-                    $keywords = $this->cleanCsvLine($item);
-                    $newFileData[$strippedKey] = $this->cleanKeywords($keywords);
-                    break;
-                default:
-                    Log::warn('file-level property default:', $key);
-            }
-        }
-        $this->cleanNamesInData($newFileData, $names);
-        return $newFileData;
-    }
-
-    /**
-     * Given a string, make sure it's trimmed, and truncate it to the max length, if any.
-     * @param mixed $item The item to clean as a string.
-     * @param ?int $maxLength optional max length to truncate to.
-     * @param bool $parseSlashes Whether to parse C slashes (\f, \n, \r, \t, \v, numeric escapes) in the string.
-     * @return string The cleaned string, which may be empty.
-     */
-    private function cleanString(mixed $item, int $maxLength = null, bool $parseSlashes = false): string
-    {
-        Log::debug(__METHOD__ . ", Parsing item $item"); // DELETEME DEBUG
-        if (!is_string($item)) {
-            Log::warn('String property was not string', $item);
-            return '';
-        }
-        $trimmed = trim($item);
-        if (!is_null($maxLength) && strlen($trimmed) > $maxLength) {
-            Log::warn('String property was too long', $trimmed);
-            $trimmed = substr($trimmed, 0, $maxLength);
-        }
-        if ($parseSlashes) {
-            Log::debug("Parsing slashes"); // DELETEME DEBUG
-            // This is a hack, since stripcslashes() will remove a slash that precedes a non-special character.
-            // Instead, this only escapes the special characters \f, \n, \r, \t, \v, and octal and hex escapes.
-            $trimmed = preg_replace_callback(
-                '/\\\\([fnrtv\\\\$"]|[0-7]{1,3}|\x[0-9A-Fa-f]{1,2})/',
-                fn($matches) => stripcslashes($matches[0]),
-                $trimmed
-            );
-        }
-        Log::debug(__METHOD__ . ", returning $trimmed"); // DELETEME DEBUG
-        return $trimmed;
-    }
-
-    /**
-     * Given a date string, return a valid timestamp, or null.
-     * @param mixed $item The item to try parsing for a date.
-     * @return int|null The valid timestamp, or null if it could not be parsed.
-     */
-    private function cleanDate(mixed $item): ?int
-    {
-        Log::debug(__METHOD__ . ", Parsing item $item"); // DELETEME DEBUG
-        $result = strtotime($item);
-        if (false === $result) {
-            return null;
-        }
-        Log::debug(__METHOD__ . ", returning $result"); // DELETEME DEBUG
-        return $result;
-    }
-
-    /**
-     * Given a single line of CSV, return an array of items, each truncated to a max length, if any.
-     * @param mixed $item The item to parse into CSV items, if possible.
-     * @param ?int $maxLength optional max length to truncate to.
-     * @param bool $parseSlashes Whether to parse C slashes (\n, \r, \t, \v, \f, numeric escapes) in the string.
-     * @return array
-     * @noinspection PhpSameParameterValueInspection
-     */
-    private function cleanCsvLine(mixed $item, int $maxLength = null, bool $parseSlashes = true): array
-    {
-        Log::debug(__METHOD__ . ", Parsing item $item"); // DELETEME DEBUG
-        if (!is_string($item)) {
-            Log::warn('CSV property was not string', $item);
-            return [];
-        }
-        if (0 === strlen($item)) {
-            Log::warn('CSV property was empty', $item);
-            return [];
-        }
-        $parsed = str_getcsv($item);
-        foreach ($parsed as &$item) {
-            $item = $this->cleanString($item, $maxLength, $parseSlashes);
-        }
-        Log::debug(__METHOD__ . ", returning " . implode('#,#', $parsed)); // DELETEME DEBUG
-        return $parsed;
-    }
-
-    /**
-     * Clean a list of keywords.
-     * @param array $keywords The keywords to clean.
-     * @return array
-     * @ToDo: Currently a no-op. Maybe:
-     *   - optional param $checkExists to accept only pre-existing keywords?
-     *   - restrict the characters that can be in a keyword?
-     */
-    private function cleanKeywords(array $keywords): array
-    {
-        Log::debug(__METHOD__ . ", returning " . implode('#,#', $keywords)); // DELETEME DEBUG
-        return $keywords;
-    }
-
-    /**
-     * Take lists of name-lists, and ensure that they are valid, in some sense.
-     * @param array $newDirData A data array that should have the name lists inserted/updated into.
-     * @param array $nameLists A list of name-lists, keyed by their key within the data array.
-     * @ToDo: Currently does no cleaning.
-     *   - Optional param $checkExists to accept only pre-existing names?
-     *     This is why they're all bundled together, so it can be done in one query.
-     *   - Restrict the characters that can be in a name? Remove <script>, etc.
-     */
-    private function cleanNamesInData(array &$newDirData, array $nameLists): void
-    {
-        foreach ($nameLists as $key => $nameList) {
-            $newDirData[$key] = $nameList;
-        }
     }
 
     /** Populate and overwrite our values with the values from another object.
@@ -403,7 +173,7 @@ class Metadata
             if (is_array($entry)) {
                 foreach ($entry as $subKey => $subEntry) {
                     if (!is_null($subEntry)) {
-                        $this->data[$key][$subKey] = $subEntry;
+                        self::$folderTree[$key][$subKey] = $subEntry;
                     }
                 }
             }
@@ -416,27 +186,46 @@ class Metadata
      */
     public function getData(): array
     {
-        return $this->data;
+        return self::$folderTree;
     }
 
     /**
      * Get the directory's metadata entry for the given file.
+     * @param string $webFilePath The file to get the information for.
+     * @return array
+     */
+    public function getFileDetails(string $webFilePath): array
+    {
+        $webDirPath = dirname($webFilePath);
+        if (!array_key_exists($webDirPath, self::$folderTree)) {
+            $this->loadFolderIni($webDirPath);
+        }
+
+        if (array_key_exists($webDirPath, self::$folderTree)) {
+            $basename = basename($webFilePath);
+            if (!array_key_exists($basename, self::$folderTree[$webDirPath]['data'])) {
+                Log::warn('File details requested for unknown file', $basename);
+                return [];
+            }
+            return self::$folderTree[$webDirPath]['data'];
+        } else {
+            Log::warn('File details requested for unknown folder', $webDirPath);
+            return [];
+        }
+    }
+
+    /**
+     * Get the directory's metadata entry for the given file, plus all inherited data for everything above.
      * @param string $filename The file to get the information for.
      * @return array
      */
-    public function getFileDetails(string $filename): array
+    public function getFileDetailsWithInherits(string $filename): array
     {
-        $basename = basename($filename);
-        if (array_key_exists($basename, $this->data)) {
-            if (is_array($this->data[$basename])) {
-                return $this->data[$basename];
-            } else {
-                Log::warn('Non-array file details found for file', $basename);
-                return [];
-            }
-        } else {
-            Log::warn('File details requested for unknown file', $basename);
-            return [];
-        }
+        // ToDo: this does not yet handle inherited data.
+        //       Data from all parent folders isn't loaded at all.
+        //       Saving inherited data: do we save it only if it was modified? Seems sensible.
+        //       How can the caller distinguish inherited data in the returned data structure? Do they need to?
+        //       Should I instead have a getInheritedValue($filename, $key), for templates to call for missing values?
+        return ($this->getFileDetails($filename));
     }
 }

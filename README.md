@@ -140,14 +140,29 @@ To push a change:
 See also list at the top of this file.
 
 Urgent:
-* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif (superseded below) doesn't populate details well.
-  * Metadata class might want to be a singleton factory?
-  * 
+* Metadata class 
+    * should be singleton factory, or cache somehow, if we're loading from ini files multiple times.
+    * data from all parent folders isn't loaded at all.
+    * Saving inherited data: do we save it only if it was modified? Seems sensible.
+    * How do we distinguish inherited data in the returned data structure?
+    * Should I instead have a getInheritedValue($filename, $key), for templates to call for missing values?
+    * Versioned comments: how to represent, store, etc?
+* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif (supersedes issues below) doesn't populate well.
+    * This is FileTemplate: get that working before worrying about TreeTemplate.
+    * How do we visually distinguish inherited data from local data?
+        * I think inherited data should be greyed out. Editing it saves locally. Button to go to page of parent/origin.
+    * Get it to populate fully, first.
+    * Style this template.
+    * Add edit button.
+    * Convert view mode to edit mode when edit button clicked? Or have all fields default to edit-on-click?
+    * Display the file, the various fields, and an edit button to view them.
+    * Change page title from "Folder Navigation".
+    * Add for input fields.
 
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't populate image names and title from the ini file.
-  * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.
-  * But the instructions are vague. Where is the data stored/read in?
-  * In Metadata. We're using that in FileTemplate first: get that working before worrying about TreeTemplate.
+    * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.
+    * But the instructions are vague. Where is the data stored/read in?
+    * In Metadata. We're using that in FileTemplate first: get that working before worrying about TreeTemplate.
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2
   (mod_rewrite)
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi doesn't show the subfolder "2".
@@ -166,14 +181,12 @@ Urgent:
     * Location picker (ditto)
     * Keyword picker (ditto)
     * Each with who-can-edit level (nobody, owner, admin, regular, guest)
-* JS: Convert view mode to edit mode when edit button clicked? Or have all fields default to editable?
 * PHP: Parse form input to database, with validation, errors, etc.
 * JS: Parse and display form errors.
 * CSS: Make the inline file view look like not ass.
 * Stop the thumbnails from listing in TreeTemplate.
 
 * Index: Inline search view.
-* FileTemplate: display the file, the various fields, and an edit button to view them.
 * replace innerHTML use (mem leaks as doesn't remove handlers for old content; and doesn't run script tags.)
 * ThumbsTemplate: Alt text when displaying images.
 * ThumbsTemplate: Display title.

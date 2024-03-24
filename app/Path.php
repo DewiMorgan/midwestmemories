@@ -41,7 +41,7 @@ class Path
             Log::adminDebug("Converted path was not found: $filePath");
             return 'PATH_ERROR_404';
         }
-        $result = preg_replace('#^' . preg_quote(Path::$imageBasePath) . '#', '', $realPath);
+        $result = preg_replace('#^' . preg_quote(Path::$imageBasePath) . '#', '/', $realPath);
         if (!$result) {
             Log::adminDebug("Converted path gave an empty string or error: $filePath");
             return 'PATH_ERROR_BAD';
@@ -56,8 +56,8 @@ class Path
     /**
      * Verify a requested path contains a child element, and both exist. Used for example when generating the tree view,
      * to find paths that contain the current item, so should be expanded.
-     * @param string $parentPath The path that should contain the child.
-     * @param string $childPath The path that should be within the parent.
+     * @param string $parentPath The filesystem path that should contain the child.
+     * @param string $childPath The filesystem path that should be within the parent.
      * @return bool True if the child is within the parent.
      */
     public static function isChildInPath(string $childPath, string $parentPath): bool
