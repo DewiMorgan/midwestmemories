@@ -19,7 +19,7 @@ class Metadata
      * That's a dict of string properties for the folder, and sub-arrays for properties for each file in the folder.
      * If a folder has an 'isDirty' element that's true, then it has been modified.
      */
-    private static array $folderTree;
+    private static array $folderTree = [];
 
     /**
      * @param string $webPath Web path. Promoted property. This is assumed validated and sanitized.
