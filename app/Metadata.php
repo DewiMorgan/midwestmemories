@@ -65,7 +65,7 @@ class Metadata
      */
     private function loadFolderIni(string $webPath): array
     {
-        $iniUnixPath = Path::webToUnixPath($webPath . '/index.txt');
+        $iniUnixPath = Path::webToUnixPath(preg_replace('#//#', '/', "$webPath/index.txt"));
 
         if (!file_exists($iniUnixPath)) {
             Log::warn('loadFolderIni found no ini file', $webPath);
