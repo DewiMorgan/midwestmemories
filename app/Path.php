@@ -107,7 +107,7 @@ class Path
     public static function webToUnixPath(string $webPath, bool $mustExist = true): string
     {
         $realPath = realpath(Path::$imageBasePath . '/' . $webPath);
-        if (false === $realPath) {
+        if (true === $mustExist && false === $realPath) {
             Log::adminDebug("Validated path was not found: $webPath");
             http_response_code(404); // Not found.
             die(1);
