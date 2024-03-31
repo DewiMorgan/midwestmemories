@@ -140,13 +140,14 @@ To push a change:
 See also list at the top of this file.
 
 Urgent:
-* Metadata class 
+
+* Metadata class
     * should be singleton factory, or cache somehow, if we're loading from ini files multiple times.
     * data from all parent folders isn't loaded at all.
     * Saving inherited data: do we save it only if it was modified? Seems sensible.
     * How do we distinguish inherited data in the returned data structure?
     * Should I instead have a getInheritedValue($filename, $key), for templates to call for missing values?
-    * Versioned comments: how to represent, store, etc?
+    * Versioned comments: how to represent, store, and so on?
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif (supersedes issues below) doesn't populate well.
     * This is FileTemplate: get that working before worrying about TreeTemplate.
     * How do we visually distinguish inherited data from local data?
