@@ -68,7 +68,7 @@ class Metadata
         $iniUnixPath = Path::webToUnixPath($webPath . '/index.txt');
 
         if (!file_exists($iniUnixPath)) {
-            Log::warn('loadFromIni found no ini file', $webPath);
+            Log::warn('loadFolderIni found no ini file', $webPath);
             Index::showError('No ini file for this folder.');
             return [];
         }
@@ -76,7 +76,7 @@ class Metadata
         $iniFileData = parse_ini_file($iniUnixPath, true);
 
         if (false === $iniFileData) {
-            Log::error('loadFromIni failed to parse ini file', $webPath);
+            Log::error('loadFolderIni failed to parse ini file', $webPath);
             Index::showError('Failed to parse ini file for this folder.');
             die(1);
         }
