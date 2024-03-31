@@ -101,9 +101,10 @@ class Path
     /**
      * Safely convert a web path to a unix filesystem path, or die if it's not within MM_BASE_DIR.
      * @param string $webPath The web path to validate and correct, relative to MM_BASE_DIR.
+     * @param bool $mustExist True (default) if the target must exist on the filesystem.
      * @return string The converted path, relative to filesystem root.
      */
-    public static function webToUnixPath(string $webPath): string
+    public static function webToUnixPath(string $webPath, bool $mustExist = true): string
     {
         $realPath = realpath(Path::$imageBasePath . '/' . $webPath);
         if (false === $realPath) {

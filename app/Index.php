@@ -25,7 +25,7 @@ class Index
         static::initSession();
 
         $requestedPath = $_REQUEST['path'] ?? '/';
-        Index::$requestedPath = Path::webToUnixPath($requestedPath); // Dies if not correct.
+        Index::$requestedPath = Path::webToUnixPath($requestedPath, true); // Dies if not correct.
         static::$h_requestedPath = htmlspecialchars($requestedPath);
 
         static::showPage();
