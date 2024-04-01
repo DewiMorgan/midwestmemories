@@ -136,7 +136,8 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             $metadata->loadFromInis();
 //            echo "<pre>$dir:\n" . var_export($metadata->getData(), true) . '</pre>';
 //            $metadata->saveToIni('x', true);
-            echo 'Dump:<br><pre>' . $metadata->getIniString('/', $metadata->getData()) . '</pre>';
+            echo 'IniFile:<br><pre>' . $metadata->getIniString('/', $metadata->getData()) . '</pre>';
+            echo 'ArrayDump:<br><pre>' . var_export($metadata->getData(), true) . '</pre>';
             // END DELETEME DEBUG
         }
 
