@@ -113,9 +113,10 @@ class Path
                 http_response_code(404); // Not found.
                 die(1);
             } else {
-                $folder = Path::$imageBasePath . '/' . dirname($webPath);
+                $folder = Path::$imageBasePath . '/?' . dirname($webPath);
                 $file = basename($webPath);
                 $realPath = realpath($folder);
+                Log::adminDebug("Validating nonexistent file as $folder / $file, folder was not found: $webPath");
                 if (false === $realPath) {
                     Log::adminDebug("Validated folder was not found: $webPath");
                     http_response_code(404); // Not found.
