@@ -25,8 +25,9 @@ namespace MidwestMemories;
 // DELETEME DEBUG
 $dir = dirname(Index::$requestedPath);
 $file = basename(Index::$requestedPath);
-$metadata = new Metadata($dir);
-$metadata->loadFromInis($dir);
+$webDir = str_replace(Path::$imageBasePath, '', "$dir");
+$metadata = new Metadata($webDir);
+$metadata->loadFromInis();
 $fileDetails = $metadata->getFileDetails($file);
 echo "<pre>$dir(/)$file:\n" . var_export($fileDetails, true) . "</pre>\n";
 // END DELETEME DEBUG
