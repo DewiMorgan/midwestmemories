@@ -101,16 +101,28 @@ class Path
     /**
      * Safely convert a web path to a unix filesystem path, or die if it's not within MM_BASE_DIR.
      * @param string $webPath The web path to validate and correct, relative to MM_BASE_DIR.
-     * @param bool $mustExist True (default) if the target must exist on the filesystem.
+     * @param bool $mustExist True (default) if the file must exist on the folder (folder must always exist!
      * @return string The converted path, relative to filesystem root.
      */
     public static function webToUnixPath(string $webPath, bool $mustExist = true): string
     {
         $realPath = realpath(Path::$imageBasePath . '/' . $webPath);
-        if (true === $mustExist && false === $realPath) {
-            Log::adminDebug("Validated path was not found: $webPath");
-            http_response_code(404); // Not found.
-            die(1);
+        if (false === $realPath) {
+            if (true === $mustExist) {
+                Log::adminDebug("Validated path was not found: $webPath");
+                http_response_code(404); // Not found.
+                die(1);
+            } else {
+                $folder = Path::$imageBasePath . '/' . dirname($webPath);
+                $file = basename($webPath);
+                $realPath = realpath($folder);
+                if (false === $realPath) {
+                    Log::adminDebug("Validated folder was not found: $webPath");
+                    http_response_code(404); // Not found.
+                    die(1);
+                }
+                $realPath = "$realPath/$file";
+            }
         }
         if (!str_starts_with($realPath, Path::$imageBasePath)) {
             Log::adminDebug("Validated path was not within MM_BASE_DIR: $webPath");
