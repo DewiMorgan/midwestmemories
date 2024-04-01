@@ -30,11 +30,14 @@ class Metadata
 
     /**
      * Load in our data from an Ini file, and all parents.
-     * @param string $webPath The web path to load build and load the folder tree down to, from the root.
+     * @param string|null $webPath The web path to load build and load the folder tree down to, from the root.
      */
-    public function loadFromInis(string $webPath): void
+    public function loadFromInis(string $webPath = null): void
     {
-        $pathSoFar = '';
+        $webPathSoFar = '';
+        if (is_null($webPath)) {
+            $webPath = $this->webPath;
+        }
         $currentNode = &self::$folderTree;
         // "/var/www/path/to/file' => '/path/to/file' => ['', 'path', 'to', 'file']
         foreach (explode('/', $webPath) AS $pathElement) {
@@ -50,10 +53,10 @@ class Metadata
             if (!array_key_exists('data', $currentNode)) {
                 $currentNode['data'] = [];
             }
-            $pathSoFar .= '/' . $pathElement;
-            $pathSoFar = preg_replace('#//#', '/', $pathSoFar);
+            $webPathSoFar .= '/' . $pathElement;
+            $webPathSoFar = preg_replace('#//#', '/', $webPathSoFar);
             if (empty($currentNode['data'])) {
-                $currentNode['data'] = $this->loadFolderIni($pathSoFar);
+                $currentNode['data'] = $this->loadFolderIni($webPathSoFar);
             }
         }
     }

@@ -131,8 +131,9 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             echo $files;
 
             // DELETEME DEBUG
-            $metadata = new Metadata($dir);
-            $metadata->loadFromInis($dir);
+            $webDir = str_replace(Path::$imageBasePath, '', "$dir");
+            $metadata = new Metadata($webDir);
+            $metadata->loadFromInis();
 //            echo "<pre>$dir:\n" . var_export($metadata->getData(), true) . '</pre>';
 //            $metadata->saveToIni('x', true);
             echo '<pre>' . $metadata->getIniString('/', $metadata->getData()) . '</pre>';
