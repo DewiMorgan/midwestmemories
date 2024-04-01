@@ -117,8 +117,9 @@ class Path
                 $fullFolder = Path::$imageBasePath . $folder;
                 $file = basename($webPath);
                 $realPath = realpath($fullFolder);
-                Log::adminDebug("Validating nonexistent file as $fullFolder via $folder & $file, folder was not found: $webPath");
                 if (false === $realPath) {
+                    Log::adminDebug("Validating nonexistent file as $fullFolder via $folder & $file, folder was not found: $webPath");
+                    Log::adminDebug("Backtrace", debug_backtrace());
                     Log::adminDebug("Validated folder was not found: $webPath");
                     http_response_code(404); // Not found.
                     die(1);
