@@ -97,9 +97,10 @@ namespace MidwestMemories;
         // Skip files we're uninterested in.
         if (
             !is_file($itemPath)
-            || preg_match('/\/(\.|tn_)[^\/]+$/', $itemPath)
+            || preg_match('/\/(?:\.|tn_)[^\/]+$/', $itemPath)
             || !preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath)
         ) {
+            Log::adminDebug("Ignoring file: $itemPath");
             continue;
         }
         // Skip files without a matching thumbnail file: they have not been fully processed.
