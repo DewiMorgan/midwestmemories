@@ -158,6 +158,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
     let isDragging = false;
     let currentX;
     let leftColumnWidth;
+    function handleDragBarMouseMove(e) {
     let rightColumnWidth;
 
     dragBar.addEventListener('mousedown', handleDragBarMouseDown);
@@ -171,7 +172,6 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         rightColumnWidth = rightColumn.offsetWidth;
     }
 
-    function handleDragBarMouseMove(e) {
         if (isDragging) {
             e.preventDefault();
             const deltaX = e.clientX - currentX;

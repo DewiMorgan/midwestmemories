@@ -24,9 +24,7 @@ class Metadata
     /**
      * @param string $webPath Web path. Promoted property. This is assumed validated and sanitized.
      */
-    public function __construct(public string $webPath)
-    {
-    }
+    public function __construct(public string $webPath) {}
 
     /**
      * Load in our data from an Ini file, and all parents.
@@ -42,13 +40,12 @@ class Metadata
         // "/var/www/path/to/file' => '/path/to/file' => ['', 'path', 'to', 'file']
         foreach (explode('/', $webPath) AS $pathElement) {
             // Build the folder tree to the branch we're interested in.
-            if ($pathElement != '') {
+            if ($pathElement !== '') {
                 if (!array_key_exists($pathElement, $currentNode)) {
                     $currentNode[$pathElement] = [];
                 }
                 $currentNode = &$currentNode[$pathElement];
             }
-
             // Create the data only if it doesn't already exist.
             if (!array_key_exists('data', $currentNode)) {
                 $currentNode['data'] = [];
@@ -112,58 +109,48 @@ class Metadata
      */
     public function getIniString(string $key, mixed $data, int $depth = 0): string
     {
-        // Prevent infinite recursion.
+        $result = '';
         if ($depth > 2) {
-            return '';
-        }
-
-        // Don't save empty data.
-        if (is_null($data)) {
-            return '';
-        }
-
-        // Recurse into sub-arrays.
-        if (is_array($data)) {
+            // Prevent infinite recursion: don't save if recursed too far.
+        } elseif (is_null($data)) {
+            // Don't save empty data.
+        } elseif (is_array($data)) {
+            // Recurse into sub-arrays.
             $res = "[$key]\n";
             foreach ($data as $subKey => $value) {
-                $res .= $this->getIniString("$subKey", $value, $depth + 1);
+                $res .= $this->getIniString((string)$subKey, $value, $depth + 1);
             }
-            return $res . "\n";
-        }
-
-        // Handle all other data types.
-        if (is_numeric($data)) {
-            return "$key = $data\n";
+            $result = $res . "\n";
+        } elseif (is_numeric($data)) {
+            // Handle all other data types.
+            $result = "$key = $data\n";
         } elseif (is_bool($data)) {
-            return "$key = " . ($data ? 'yes' : 'no') . "\n";
+            $result = "$key = " . ($data ? 'yes' : 'no') . "\n";
         } elseif (is_string($data)) {
             $escaped = addcslashes($data, "\0..\37\177..\377\\");
-            return "$key = \"$escaped\"\n";
+            $result = "$key = \"$escaped\"\n";
         } elseif (is_object($data) && method_exists($data, '__toString')) {
             // This will have problems if __toString() doesn't return a string.
             $escaped = addcslashes($data->__toString(), "\0..\37\177..\377\\");
-            return "$key = \"$escaped\"\n";
+            $result = "$key = \"$escaped\"\n";
         } else {
+            // Don't save Unknown datatypes.
             Log::error("Unknown datatype for '$key'", $data);
-            return '';
         }
+        return $result;
     }
 
     /**
      * Load in from the Database.
      * ToDo: This.
      */
-    public function loadFromMysql(): void
-    {
-    }
+    public function loadFromMysql(): void {}
 
     /**
      * Write out to the Database.
      * ToDo: This.
      */
-    public function saveToMysql(): void
-    {
-    }
+    public function saveToMysql(): void {}
 
     /** Populate and overwrite our values with the values from another object.
      * @param Metadata $sourceObject The Metadata object to copy from.
@@ -210,10 +197,9 @@ class Metadata
                 return [];
             }
             return self::$folderTree[$webDirPath]['data'];
-        } else {
-            Log::warn('File details requested for unknown folder', $webDirPath);
-            return [];
         }
+        Log::warn('File details requested for unknown folder', $webDirPath);
+        return [];
     }
 
     /**

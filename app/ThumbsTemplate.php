@@ -106,9 +106,9 @@ namespace MidwestMemories;
         // Skip files without a matching thumbnail file: they have not been fully processed.
         $thumbName = DropboxManager::getThumbName($itemPath);
         if (!is_file($thumbName)) {
-            if (!str_starts_with($thumbName, 'tn_')) { // Avoid log spam from thumbs.
+//            if (!str_starts_with($thumbName, 'tn_')) { // Avoid log spam from thumbs.
                 Log::adminDebug("No thumb found for image: $thumbName from $itemPath");
-            }
+//            }
             continue;
         }
 

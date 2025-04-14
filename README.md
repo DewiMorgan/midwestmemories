@@ -58,12 +58,12 @@ Index.php shows the nav, and the image listings.
 
 ## Useful links
 
-* [API docs](https://www.dropbox.com/developers/documentation/http/documentation#files-list_folder)
-* [GitHub - spatie](https://github.com/spatie/dropbox-api) - the one we're using.
-* [Getting auth working](https://github.com/spatie/dropbox-api/issues/94) - see the very bottom post.
+* [Dropbox API docs](https://www.dropbox.com/developers/documentation/http/documentation#files-list_folder)
+* [GitHub - spatie](https://github.com/spatie/dropbox-api) - the dropbox lib we're using.
+* [Getting dropbox auth working](https://github.com/spatie/dropbox-api/issues/94) - see very bottom post.
 * [GitHub - NyMedia](https://github.com/nymedia/dropbox-sdk-php) - doesn't work.
-* [Github - KuNalVarMa05](https://github.com/kunalvarma05/dropbox-php-sdk) - might do downloads, see
-  [SO Answer](https://stackoverflow.com/questions/47469142/how-can-i-download-file-to-local-directly-from-dropbox-api)
+* [Github - KuNalVarMa05](https://github.com/kunalvarma05/dropbox-php-sdk) - might do downloads?
+* [SO Answer](https://stackoverflow.com/questions/47469142) - download file from Dropbox to local.
 * [YouTube playlist](https://www.youtube.com/playlist?list=PLfdtiltiRHWGOceoK3I3LrDL6x8mM0Ipb) (WAY outdated)
     * [Setup](https://www.youtube.com/watch?v=FsQZyNpDWv0)
     * [Upload file](https://www.youtube.com/watch?v=xFM7_1pdiFE)
@@ -160,13 +160,13 @@ Urgent:
     * Change page title from "Folder Navigation".
     * Add for input fields.
 
-* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't populate image names and title from the ini file.
+* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from ini file in ThumbsTemplate.
     * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.
     * But the instructions are vague. Where is the data stored/read in?
     * In Metadata. We're using that in FileTemplate first: get that working before worrying about TreeTemplate.
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2
   (mod_rewrite)
-* https://midwestmemories.dewimorgan.com/?path=%2FDewi doesn't show the subfolder "2".
+* https://midwestmemories.dewimorgan.com/?path=%2FDewi doesn't show the subfolder "2". (edit: fixed? Works for me!)
 * Ini files don't handle subfolder details? Probably those details should come from ini files in the subfolders I guess?
 * Index: Inline file view
 * PHP: Parse Metadata TO ini file.
