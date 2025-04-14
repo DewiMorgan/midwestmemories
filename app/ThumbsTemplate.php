@@ -98,8 +98,6 @@ namespace MidwestMemories;
         if (
             !is_file($itemPath)
             || preg_match('/\/(\.|tn_)[^\/]+$/', $itemPath)
-//            || str_starts_with($itemPath, 'tn_')
-//            || str_starts_with($itemPath, '.')
             || !preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath)
         ) {
             continue;
