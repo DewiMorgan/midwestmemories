@@ -97,8 +97,9 @@ namespace MidwestMemories;
         // Skip files we're uninterested in.
         if (
             !is_file($itemPath)
-            || str_starts_with($itemPath, 'tn_')
-            || str_starts_with($itemPath, '.')
+            || preg_match('/\/(\.|tn_)[^\/]+$/', $itemPath)
+//            || str_starts_with($itemPath, 'tn_')
+//            || str_starts_with($itemPath, '.')
             || !preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath)
         ) {
             continue;
@@ -106,11 +107,10 @@ namespace MidwestMemories;
         // Skip files without a matching thumbnail file: they have not been fully processed.
         $thumbName = DropboxManager::getThumbName($itemPath);
         if (!is_file($thumbName)) {
-//            if (!str_starts_with($thumbName, 'tn_')) { // Avoid log spam from thumbs.
-                Log::adminDebug("No thumb found for image: $thumbName from $itemPath");
-//            }
+            Log::adminDebug("No thumb found for image: $thumbName from $itemPath");
             continue;
         }
+        Log::adminDebug("Creating thumb-link for image: $thumbName from $itemPath");
 
         $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($itemPath)) . '&amp;i=1';
         $u_thumbUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($thumbName)) . '&amp;i=2';
