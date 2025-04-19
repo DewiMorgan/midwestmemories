@@ -197,12 +197,13 @@ class Metadata
         if (array_key_exists($webDirPath, self::$folderTree)) {
             $basename = basename($webFilePath);
             if (!array_key_exists($basename, self::$folderTree[$webDirPath]['data'])) {
-                Log::warn('File details requested for unknown file', $basename);
+                Log::warn(__METHOD__ . ': File details requested for unknown file', $basename);
                 return [];
             }
+            Log::debug(__METHOD__ . ': File details found!', $webDirPath);
             return self::$folderTree[$webDirPath]['data'];
         }
-        Log::warn('File details requested for unknown folder', $webDirPath);
+        Log::warn(__METHOD__ . ': File details requested for unknown folder', $webDirPath);
         return [];
     }
 
