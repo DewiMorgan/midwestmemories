@@ -36,6 +36,7 @@ echo '<pre>$webDir = str_replace(Path::$imageBasePath, "", "$dir"); -> ' . var_e
 
 $metadata = new Metadata($webDir);
 $metadata->loadFromInis();
+echo "<p>metadata before printed</p>\n";
 echo '<pre>$metadata = new Metadata($webDir); -> ' . var_export($metadata, true) . "</pre>\n";
 echo "<p>metadata printed</p>\n";
 
