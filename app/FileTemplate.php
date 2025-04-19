@@ -23,11 +23,21 @@ namespace MidwestMemories;
 // ToDo: Add edit button.
 // ToDo: Add for input fields.
 // DELETEME DEBUG
+echo '<p>requestedPath:\n</p><pre>Index::$requestedPath -> ' . var_export(Index::$requestedPath, true) . "</pre>\n";
+
 $dir = dirname(Index::$requestedPath);
+echo '<p>dir:\n</p><pre>$dir = dirname(Index::$requestedPath); -> ' . var_export($dir, true) . "</pre>\n";
+
 $file = basename(Index::$requestedPath);
+echo '<p>file:\n</p><pre>$file = basename(Index::$requestedPath); -> ' . var_export($file, true) . "</pre>\n";
+
 $webDir = str_replace(Path::$imageBasePath, '', "$dir");
+echo '<p>webDir:\n</p><pre>$webDir = str_replace(Path::$imageBasePath, "", "$dir"); -> ' . var_export($webDir, true) . "</pre>\n";
+
 $metadata = new Metadata($webDir);
 $metadata->loadFromInis();
+echo '<p>metadata:\n</p><pre>$metadata = new Metadata($webDir); -> ' . var_export($metadata, true) . "</pre>\n";
+
 $fileDetails = $metadata->getFileDetails($file);
 echo "<pre>$dir(/)$file:\n" . var_export($fileDetails, true) . "</pre>\n";
 // END DELETEME DEBUG

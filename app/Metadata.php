@@ -67,10 +67,13 @@ class Metadata
     {
         $iniUnixPath = Path::webToUnixPath(preg_replace('#//#', '/', "$webPath/index.txt"), false);
         if (!file_exists($iniUnixPath)) {
-            Log::warn('loadFolderIni found no ini file as webpath', $webPath);
+            Log::warn('loadFolderIni found no ini file as webPath', $webPath);
             Log::warn('Tried to load as unix path', $iniUnixPath);
             Index::showError('No ini file for this folder.');
             return [];
+        } else {
+            Log::debug('loadFolderIni found ini file as webPath', $webPath);
+            Log::warn('Found at unix path', $iniUnixPath);
         }
 
         $iniFileData = parse_ini_file($iniUnixPath, true);
