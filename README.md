@@ -12,6 +12,15 @@ Maybe in the future this could be automated by dropboxcallback.php or a periodic
 
 Index.php shows the nav, and the image listings.
 
+## What we actually want:
+
+* File structure nav panel of folders.
+* Each folder shows all thumbnails and folders within it.
+* Each thumbnail can be expanded to full details on that file.
+* Full details can be edited.
+* Edited details can be saved.
+* Images and details are in Dropbox.
+
 ## Planned Features
 
 * Get namespaces and autoloading working per PSR.
@@ -139,7 +148,31 @@ To push a change:
 
 See also list at the top of this file.
 
+Current task:
+
+* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif
+* This is FileTemplate: get that working before worrying about TreeTemplate or ThumbsTemplate.
+    * FIRST THING: Get it to populate fully with readonly text from Metadata.
+        * Check: Does it have access to the Metadata?
+        * Check: Is the Metadata populated correctly? (dump it below a \<hr>!)
+        * Convert the dump to real output.
+    * Display the file, the various fields, and an edit button to view them.
+    * Style this template.
+    * Add edit button.
+    * Ad next/prev buttons (disappear when editing?)
+    * Convert view mode to edit mode when edit button clicked? Or have all fields default to edit-on-click?
+    * How do we visually distinguish inherited data from local data?
+        * We don't care about this for now.
+        * I think inherited data should be greyed out. Editing it saves locally. Button to go to page of parent/origin.
+
 Urgent:
+
+* ThumbsTemplate
+    * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
+    * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.
+    * But the instructions are vague. Where is the data stored/read in?
+    * In Metadata. We're using that in FileTemplate first: get that working before worrying about TreeTemplate.
+    * Show subfolders as thumbs, too.
 
 * Metadata class
     * should be singleton factory, or cache somehow, if we're loading from ini files multiple times.
@@ -148,22 +181,7 @@ Urgent:
     * How do we distinguish inherited data in the returned data structure?
     * Should I instead have a getInheritedValue($filename, $key), for templates to call for missing values?
     * Versioned comments: how to represent, store, and so on?
-* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif (supersedes issues below) doesn't populate well.
-    * This is FileTemplate: get that working before worrying about TreeTemplate.
-    * How do we visually distinguish inherited data from local data?
-        * I think inherited data should be greyed out. Editing it saves locally. Button to go to page of parent/origin.
-    * Get it to populate fully, first.
-    * Style this template.
-    * Add edit button.
-    * Convert view mode to edit mode when edit button clicked? Or have all fields default to edit-on-click?
-    * Display the file, the various fields, and an edit button to view them.
-    * Change page title from "Folder Navigation".
-    * Add for input fields.
 
-* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from ini file in ThumbsTemplate.
-    * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.
-    * But the instructions are vague. Where is the data stored/read in?
-    * In Metadata. We're using that in FileTemplate first: get that working before worrying about TreeTemplate.
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2
   (mod_rewrite)
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi doesn't show the subfolder "2". (edit: fixed? Works for me!)
@@ -240,6 +258,8 @@ Low priority:
 
 Fixed:
 
+* FIXED: Change FileTemplate page title from "Folder Navigation".
+* FIXED: ThumbsTemplate wasn't ignoring the right files.
 * FIXED - https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill out the right hand side ("hello world").
     * Just had to populate the ONLOAD call.
 * FIXED: Index: Clicking links seems broken, they don't open inline.
