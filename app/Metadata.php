@@ -73,7 +73,7 @@ class Metadata
             return [];
         } else {
             Log::debug('loadFolderIni found ini file as webPath', $webPath);
-            Log::warn('Found at unix path', $iniUnixPath);
+            Log::debug('Found at unix path', $iniUnixPath);
         }
 
         $iniFileData = parse_ini_file($iniUnixPath, true);
