@@ -21,35 +21,19 @@ namespace MidwestMemories;
 <?php
 // ToDo: Style this.
 // ToDo: Add edit button.
-// ToDo: Add for input fields.
+// ToDo: Add form input fields.
+// ToDo: Add next/prev buttons.
+
 // DELETEME DEBUG
-echo '<pre>Index::$requestedPath -> ' . var_export(Index::$requestedPath, true) . "</pre>\n";
-
-$dir = dirname(Index::$requestedPath);
-echo '<pre>$dir = dirname(Index::$requestedPath); -> ' . var_export($dir, true) . "</pre>\n";
-
+$webDir = str_replace(Path::$imageBasePath, '', dirname(Index::$requestedPath));
 $file = basename(Index::$requestedPath);
-echo '<pre>$file = basename(Index::$requestedPath); -> ' . var_export($file, true) . "</pre>\n";
-
-$webDir = str_replace(Path::$imageBasePath, '', $dir);
-echo '<pre>$webDir = str_replace(Path::$imageBasePath, "", "$dir"); -> ' . var_export($webDir, true) . "</pre>\n";
-
 $webPath = $webDir . '/' . $file;
-echo '<pre>$webPath = $webDir . "/" . $file; -> ' . var_export($webPath, true) . "</pre>\n";
-
-$metadata = new Metadata($webDir);
-$metadata->loadFromInis();
-echo '<pre>$metadata = new Metadata($webDir); -> ' . var_export($metadata, true) . "</pre>\n";
-
-$fileDetails = $metadata->getFileDetails($webPath);
-echo "<p>getFileDetails completed</p>\n";
-echo "<pre>$dir(/)$file file details:\n" . var_export($fileDetails, true) . "</pre>\n";
+$fileDetails = Metadata::getFileDetails($webPath);
+echo "<pre>$file file details:\n" . var_export($fileDetails, true) . "</pre>\n";
 // END DELETEME DEBUG
 
 $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb(Index::$requestedPath)) . '&amp;i=2';
 echo "<img src=\"$u_linkUrl\" alt=\"TODO: alt text\">\n";
-
-echo '<pre>$metadata data -> ' . var_export($metadata->getData(), true) . "</pre>\n";
 
 ?>
 

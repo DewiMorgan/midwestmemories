@@ -131,13 +131,12 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             echo $files;
 
             // DELETEME DEBUG
-            $webDir = str_replace(Path::$imageBasePath, '', "$dir");
-            $metadata = new Metadata($webDir);
-            $metadata->loadFromInis();
-//            echo "<pre>$dir:\n" . var_export($metadata->getData(), true) . '</pre>';
-//            $metadata->saveToIni('x', true);
-            echo 'IniFile:<br><pre>' . $metadata->getIniString('/', $metadata->getData()) . '</pre>';
-            echo 'ArrayDump:<br><pre>' . var_export($metadata->getData(), true) . '</pre>';
+            $webDir = str_replace(Path::$imageBasePath, '', $dir);
+            Metadata::loadFromInis($webDir);
+//            echo "<pre>$dir:\n" . var_export(Metadata::getData(), true) . '</pre>';
+//            Metadata::saveToIni('x', true);
+            echo 'IniFile:<br><pre>' . Metadata::getIniString('/', Metadata::getData()) . '</pre>';
+            echo 'ArrayDump:<br><pre>' . var_export(Metadata::getData(), true) . '</pre>';
             // END DELETEME DEBUG
         }
 
@@ -150,7 +149,6 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
 
 <script>
     // DragBar behavior.
-
     const dragBar = document.querySelector('.drag-bar');
     const leftColumn = document.querySelector('.left-column');
     const rightColumn = document.querySelector('.right-column');
@@ -158,19 +156,12 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
     let isDragging = false;
     let currentX;
     let leftColumnWidth;
-    function handleDragBarMouseMove(e) {
     let rightColumnWidth;
 
-    dragBar.addEventListener('mousedown', handleDragBarMouseDown);
-    document.addEventListener('mousemove', handleDragBarMouseMove);
-    document.addEventListener('mouseup', handleDragBarMouseUp);
-
-    function handleDragBarMouseDown(e) {
-        isDragging = true;
-        currentX = e.clientX;
-        leftColumnWidth = leftColumn.offsetWidth;
-        rightColumnWidth = rightColumn.offsetWidth;
-    }
+    function handleDragBarMouseMove(e) {
+        dragBar.addEventListener('mousedown', handleDragBarMouseDown);
+        document.addEventListener('mousemove', handleDragBarMouseMove);
+        document.addEventListener('mouseup', handleDragBarMouseUp);
 
         if (isDragging) {
             e.preventDefault();
@@ -180,6 +171,13 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             leftColumn.style.width = newLeftColumnWidth + 'px';
             rightColumn.style.width = newRightColumnWidth + 'px';
         }
+    }
+
+    function handleDragBarMouseDown(e) {
+        isDragging = true;
+        currentX = e.clientX;
+        leftColumnWidth = leftColumn.offsetWidth;
+        rightColumnWidth = rightColumn.offsetWidth;
     }
 
     function handleDragBarMouseUp() {

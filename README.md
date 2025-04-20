@@ -152,20 +152,25 @@ Current task:
 
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif
 * This is FileTemplate: get that working before worrying about TreeTemplate or ThumbsTemplate.
-    * FIRST THING: Get it to populate fully with readonly text from Metadata.
-        * Check: Does it have access to the Metadata? YES
-        * Check: Is the Metadata populated correctly? YES
-        * Bug: Metadata->getFileDetails() uses webPath as a key, rather than iterating its parts.
-        * Bug: Metadata->getFileDetails() needs to handle path/to/file as path/to/data/file.
+    * Get Metadata to be a singleton. This feels like a fairly light lift.
+    * Get FileTemplate to populate fully with readonly text from Metadata.
+        * Check the spreadsheet and see what info we actually want to display.
+        * Delete a bunch of the debugging text.
         * Convert the dump to real output.
-    * Display the file, the various fields, and an edit button to view them.
+    * Add image alt text (the name? Description?)
+    * Add edit button to change fields to editable.
+        * Switch view mode to edit mode on edit button click? Or have all fields edit-on-click? Or pen by each?
+    * Add next/prev buttons (disappear when editing?)
     * Style this template.
-    * Add edit button.
-    * Ad next/prev buttons (disappear when editing?)
-    * Convert view mode to edit mode when edit button clicked? Or have all fields default to edit-on-click?
+        * Display the file, centered, scaled to the window.
+        * The various fields, both for display and for edit.
     * How do we visually distinguish inherited data from local data?
+        * Is there even a programmatic difference?
         * We don't care about this for now.
-        * I think inherited data should be greyed out. Editing it saves locally. Button to go to page of parent/origin.
+        * I think inherited data should be greyed out. Editing it saves locally. Button to go to page of parent/origin?
+* Bug: it doesn't show the selected files, nor the other files in its folder, on the left. The folder is collapsed.
+    * That's in TreeTemplate.
+    * Should probably bold the selected item, too.
 
 Urgent:
 
