@@ -222,7 +222,7 @@ class Metadata
             } else {
                 if ($loadIfNotFound) {
                     Log::debug(__METHOD__ . ": Path segment '$segment' of '$webFilePath' not loaded: reloading.");
-                    self::loadOneFolderIni(dirname($webFilePath));
+                    self::loadFromInis(dirname($webFilePath));
                     return self::getFileDetails($webFilePath, false);
                 }
                 Log::debug(
