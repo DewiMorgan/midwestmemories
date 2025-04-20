@@ -23,8 +23,12 @@ class MetadataCleaner
     ];
     private const FILE_KEY_NAMES = [
         'displayname',
+        'slideorigin', // Where the slide was kept.
+        'slidenumber', // Where the slide was kept.
+        'slidesubsection', // Where the slide was kept.
+        'unfiltered', // Boolean, false if ICE.
         'date',
-        'writtennotes',
+        'writtennotes', // Slide text.
         'visitornotes',
         'location',
         'photographer',
@@ -138,6 +142,7 @@ class MetadataCleaner
             }
             switch ($strippedKey) {
                 case 'displayname':
+                case 'slideorigin':
                     $newFileData[$strippedKey] = self::cleanString($item, 255);
                     break;
                 case 'writtennotes':
@@ -158,12 +163,64 @@ class MetadataCleaner
                     $keywords = self::cleanCsvLine($item);
                     $newFileData[$strippedKey] = self::cleanKeywords($keywords);
                     break;
+                case 'slidenumber':
+                case 'slidesubsection':
+                    $newFileData[$strippedKey] = self::cleanInt($item);
+                    break;
+                case 'unfiltered':
+                    $newFileData[$strippedKey] = self::cleanBool($item);
+                    break;
                 default:
                     Log::warn('file-level property default:', $key);
             }
         }
         self::cleanNamesInData($newFileData, $names);
         return $newFileData;
+    }
+
+    /**
+     * Given input that represents a boolean, return a valid boolean, or null.
+     *   Null if it can't be converted to a string.
+     *   Null if it converts to empty string.
+     *   False if string representation contains "0", "n" or "f" (eg, "no", "n/a", "false").
+     *   True otherwise.
+     * @param mixed $item The item to try parsing as a boolean.
+     * @return bool|null The valid boolean, or null if it could not be parsed.
+     */
+    private static function cleanBool(mixed $item): ?bool
+    {
+        Log::debug(__METHOD__ . ", Parsing item $item"); // DELETEME DEBUG
+        if (
+            is_array($item) ||
+            (is_object($item) && !method_exists($item, '__toString')) ||
+            (!is_object($item) && !settype($item, 'string')) ||
+            '' === (string)$item
+        ) {
+            $result = null;
+        } elseif (preg_match('/[0nf]/', $item)) {
+            $result = false;
+        } else {
+            $result = true;
+        }
+        Log::debug(__METHOD__ . ", returning $result"); // DELETEME DEBUG
+        return $result;
+    }
+
+    /**
+     * Given input that represents a number, return a valid integer, or null.
+     * @param mixed $item The item to try parsing for a number.
+     * @return int|null The valid number, or null if it could not be parsed.
+     */
+    private static function cleanInt(mixed $item): ?int
+    {
+        Log::debug(__METHOD__ . ", Parsing item $item"); // DELETEME DEBUG
+        if (is_numeric($item)) {
+            $result = (int)$item; // Casting to int always parses as decimal.
+        } else {
+            $result = null;
+        }
+        Log::debug(__METHOD__ . ", returning $result"); // DELETEME DEBUG
+        return $result;
     }
 
     /**
@@ -180,13 +237,13 @@ class MetadataCleaner
             Log::warn('CSV property was not string', $item);
             return [];
         }
-        if (0 === strlen($item)) {
+        if ('' === $item) {
             Log::warn('CSV property was empty', $item);
             return [];
         }
         $parsed = str_getcsv($item);
-        foreach ($parsed as &$item) {
-            $item = self::cleanString($item, $maxLength, $parseSlashes);
+        foreach ($parsed as $key => $csvSegment) {
+            $parsed[$key] = self::cleanString($csvSegment, $maxLength, $parseSlashes);
         }
         Log::debug(__METHOD__ . ', returning ' . implode('#,#', $parsed)); // DELETEME DEBUG
         return $parsed;
@@ -214,7 +271,7 @@ class MetadataCleaner
      * @return array
      * @ToDo: Currently a no-op. Maybe:
      *   - optional param $checkExists to accept only pre-existing keywords?
-     *   - restrict the characters that can be in a keyword?? Remove <script>, etc.
+     *   - restrict the characters that can be in a keyword? Remove <script>, etc.
      */
     private static function cleanKeywords(array $keywords): array
     {
@@ -228,7 +285,7 @@ class MetadataCleaner
      * @param array $nameLists A list of name-lists, keyed by their key within the data array.
      * @ToDo: Currently a no-op. Maybe:
      *   - Optional param $checkExists to accept only pre-existing names?
-     *     This is why they're all bundled together, so it can be done in one query.
+     *   - This is why they're all bundled together, so it can be done in one query.
      *   - Restrict the characters that can be in a name? Remove <script>, etc.
      */
     private static function cleanNamesInData(array &$newDirData, array $nameLists): void
@@ -263,7 +320,7 @@ class MetadataCleaner
             // Instead, this only escapes the special characters \f, \n, \r, \t, \v, and octal and hex escapes.
             $trimmed = preg_replace_callback(
                 '/\\\\([fnrtv\\\\$"]|[0-7]{1,3}|\x[0-9A-Fa-f]{1,2})/',
-                fn($matches) => stripcslashes($matches[0]),
+                static fn($matches) => stripcslashes($matches[0]),
                 $trimmed
             );
         }

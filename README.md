@@ -152,10 +152,8 @@ Current task:
 
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif
 * This is FileTemplate: get that working before worrying about TreeTemplate or ThumbsTemplate.
-    * Get Metadata to be a singleton. This feels like a fairly light lift.
     * Get FileTemplate to populate fully with readonly text from Metadata.
         * Check the spreadsheet and see what info we actually want to display.
-        * Delete a bunch of the debugging text.
         * Convert the dump to real output.
     * Add image alt text (the name? Description?)
     * Add edit button to change fields to editable.
