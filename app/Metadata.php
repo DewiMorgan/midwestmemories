@@ -180,15 +180,25 @@ class Metadata
     }
 
     /**
-     * Get the directory's metadata entry for the given file.
+     * Get the directory's metadata entry for the given file, or folder.
+     * Since filenames are inserted in the "data" element, "path/to/file.txt" matches:
+     *   ['path'=>['to'=>['data'=>['file.txt'=>[the array that gets returned]]]]]
+     * However, folders are inserted in the '/' element, so "path/to/folder/" matches:
+     *   ['path'=>['to'=>['folder'=>['/'=>[the array that gets returned]]]]]
      * @param string $webFilePath The absolute web file to get the information for. NOT relative!
      * @param bool $loadIfNotFound True (default) if we can try loading file if the folder is not yet loaded.
      * @return array
      */
     public function getFileDetails(string $webFilePath, bool $loadIfNotFound = true): array
     {
-        // Split into path segments, ignoring leading/trailing slashes.
         $segments = explode('/', trim($webFilePath, '/'));
+        if ($webFilePath[-1] === '/') {
+            // This is a folder, as last character is slash, so append a slash element.
+            $segments[] = '/';
+        } else {
+            // This is a file, so insert the 'data' element.
+            $segments = array_splice($segments, -1, 0, ['data']);
+        }
 
         // Reference to traverse the array.
         $currentLevel = self::$folderTree;
@@ -208,7 +218,11 @@ class Metadata
         }
 
         Log::debug(__METHOD__ . ': All path segments found', $webFilePath);
-        return $currentLevel;
+        if (is_array($currentLevel)) {
+            return $currentLevel;
+        }
+        Log::warning(__METHOD__ . ": File entry at '$webFilePath' was not an array: returning empty.", $currentLevel);
+        return [];
     }
 
     /**

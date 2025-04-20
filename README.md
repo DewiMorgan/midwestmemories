@@ -155,7 +155,8 @@ Current task:
     * FIRST THING: Get it to populate fully with readonly text from Metadata.
         * Check: Does it have access to the Metadata? YES
         * Check: Is the Metadata populated correctly? YES
-        * Bug:  Metadata->getFileDetails() uses webPath as a key, rather than iterating its parts.
+        * Bug: Metadata->getFileDetails() uses webPath as a key, rather than iterating its parts.
+        * Bug: Metadata->getFileDetails() needs to handle path/to/file as path/to/data/file.
         * Convert the dump to real output.
     * Display the file, the various fields, and an edit button to view them.
     * Style this template.
