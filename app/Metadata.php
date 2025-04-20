@@ -184,7 +184,7 @@ class Metadata
 
     /**
      * Get the directory's metadata entry for the given file.
-     * @param string $webFilePath The file to get the information for.
+     * @param string $webFilePath The absolute web file to get the information for. NOT relative!
      * @return array
      */
     public function getFileDetails(string $webFilePath): array

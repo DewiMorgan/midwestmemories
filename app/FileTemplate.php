@@ -34,13 +34,16 @@ echo '<pre>$file = basename(Index::$requestedPath); -> ' . var_export($file, tru
 $webDir = str_replace(Path::$imageBasePath, '', $dir);
 echo '<pre>$webDir = str_replace(Path::$imageBasePath, "", "$dir"); -> ' . var_export($webDir, true) . "</pre>\n";
 
+$webPath = $webDir . '/' . $file;
+echo '<pre>$webPath = $webDir . "/" . $file; -> ' . var_export($webPath, true) . "</pre>\n";
+
 $metadata = new Metadata($webDir);
 $metadata->loadFromInis();
 echo "<p>metadata before printed</p>\n";
 echo '<pre>$metadata = new Metadata($webDir); -> ' . var_export($metadata, true) . "</pre>\n";
 echo "<p>metadata printed</p>\n";
 
-$fileDetails = $metadata->getFileDetails($file);
+$fileDetails = $metadata->getFileDetails($webPath);
 echo "<p>getFileDetails completed</p>\n";
 echo "<pre>$dir(/)$file:\n" . var_export($fileDetails, true) . "</pre>\n";
 // END DELETEME DEBUG
