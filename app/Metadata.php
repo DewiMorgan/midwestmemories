@@ -225,7 +225,9 @@ class Metadata
                     self::loadOneFolderIni(dirname($webFilePath));
                     return self::getFileDetails($webFilePath, false);
                 }
-                Log::debug(__METHOD__ . ": Path segment '$segment' of '$webFilePath' not loaded: returning empty.");
+                Log::debug(
+                    __METHOD__ . ": Path segment '$segment' of '$webFilePath' not loaded: returning empty.",
+                    self::$folderTree);
                 return [];
             }
         }
