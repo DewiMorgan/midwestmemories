@@ -39,17 +39,18 @@ echo '<pre>$webPath = $webDir . "/" . $file; -> ' . var_export($webPath, true) .
 
 $metadata = new Metadata($webDir);
 $metadata->loadFromInis();
-echo "<p>metadata before printed</p>\n";
 echo '<pre>$metadata = new Metadata($webDir); -> ' . var_export($metadata, true) . "</pre>\n";
-echo "<p>metadata printed</p>\n";
 
 $fileDetails = $metadata->getFileDetails($webPath);
 echo "<p>getFileDetails completed</p>\n";
-echo "<pre>$dir(/)$file:\n" . var_export($fileDetails, true) . "</pre>\n";
+echo "<pre>$dir(/)$file file details:\n" . var_export($fileDetails, true) . "</pre>\n";
 // END DELETEME DEBUG
 
 $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb(Index::$requestedPath)) . '&amp;i=2';
 echo "<img src=\"$u_linkUrl\" alt=\"TODO: alt text\">\n";
+
+echo '<pre>$metadata data -> ' . var_export($metadata->getData(), true) . "</pre>\n";
+
 ?>
 
 </body>
