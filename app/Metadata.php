@@ -192,12 +192,16 @@ class Metadata
     public function getFileDetails(string $webFilePath, bool $loadIfNotFound = true): array
     {
         $segments = explode('/', trim($webFilePath, '/'));
+        Log::debug(__METHOD__ . ': Segments 1: ', $segments);
+
         if ($webFilePath[-1] === '/') {
             // This is a folder, as last character is slash, so append a slash element.
             $segments[] = '/';
+            Log::debug(__METHOD__ . ': Segments 2: ', $segments);
         } else {
             // This is a file, so insert the 'data' element.
             $segments = array_splice($segments, -1, 0, ['data']);
+            Log::debug(__METHOD__ . ': Segments 3: ', $segments);
         }
 
         // Reference to traverse the array.
@@ -219,7 +223,7 @@ class Metadata
         }
 
         if ($currentLevel === self::$folderTree) {
-            Log::debug(__METHOD__ . ': Never iterated over segments: ', $segments);
+            Log::warning(__METHOD__ . ': Never iterated over segments: ', $segments);
         }
 
         Log::debug(__METHOD__ . ': All path segments found', $webFilePath);
