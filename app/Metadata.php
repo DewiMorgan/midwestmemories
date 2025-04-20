@@ -200,7 +200,7 @@ class Metadata
             Log::debug(__METHOD__ . ': Segments 2: ', $segments);
         } else {
             // This is a file, so insert the 'data' element.
-            $segments = array_splice($segments, -1, 0, ['data']);
+            array_splice($segments, -1, 0, ['data']);
             Log::debug(__METHOD__ . ': Segments 3: ', $segments);
         }
 
