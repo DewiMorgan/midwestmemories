@@ -206,6 +206,7 @@ class Metadata
         foreach ($segments as $segment) {
             if (is_array($currentLevel) && array_key_exists($segment, $currentLevel)) {
                 $currentLevel = $currentLevel[$segment]; // Go one level deeper
+                Log::debug(__METHOD__ . ": Found path segment '$segment' of '$webFilePath' not loaded: continuing.");
             } else {
                 if ($loadIfNotFound) {
                     Log::debug(__METHOD__ . ": Path segment '$segment' of '$webFilePath' not loaded: reloading.");
@@ -215,6 +216,10 @@ class Metadata
                 Log::debug(__METHOD__ . ": Path segment '$segment' of '$webFilePath' not loaded: returning empty.");
                 return [];
             }
+        }
+
+        if ($currentLevel === self::$folderTree) {
+            Log::debug(__METHOD__ . ': Never iterated over segments: ', $segments);
         }
 
         Log::debug(__METHOD__ . ': All path segments found', $webFilePath);
