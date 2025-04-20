@@ -37,7 +37,7 @@ class Metadata
             $webPath = $this->webPath;
         }
         $currentNode = &self::$folderTree;
-        // "/var/www/path/to/file' => '/path/to/file' => ['', 'path', 'to', 'file']
+        // "/var/www/path/to/file" => '/path/to/file' => ['', 'path', 'to', 'file']
         foreach (explode('/', $webPath) AS $pathElement) {
             // Build the folder tree to the branch we're interested in.
             if ($pathElement !== '') {
@@ -67,14 +67,11 @@ class Metadata
     {
         $iniUnixPath = Path::webToUnixPath(preg_replace('#//#', '/', "$webPath/index.txt"), false);
         if (!file_exists($iniUnixPath)) {
-            Log::warn('loadFolderIni found no ini file as webPath', $webPath);
-            Log::warn('Tried to load as unix path', $iniUnixPath);
+            Log::debug("loadFolderIni found no ini from webPath $webPath at unix path", $iniUnixPath);
             Index::showError('No ini file for this folder.');
             return [];
-        } else {
-            Log::debug('loadFolderIni found ini file as webPath', $webPath);
-            Log::debug('Found at unix path', $iniUnixPath);
         }
+        Log::debug("loadFolderIni found ini from webPath $webPath at unix path", $iniUnixPath);
 
         $iniFileData = parse_ini_file($iniUnixPath, true);
 
@@ -185,26 +182,33 @@ class Metadata
     /**
      * Get the directory's metadata entry for the given file.
      * @param string $webFilePath The absolute web file to get the information for. NOT relative!
+     * @param bool $loadIfNotFound True (default) if we can try loading file if the folder is not yet loaded.
      * @return array
      */
-    public function getFileDetails(string $webFilePath): array
+    public function getFileDetails(string $webFilePath, bool $loadIfNotFound = true): array
     {
-        $webDirPath = dirname($webFilePath);
-        if (!array_key_exists($webDirPath, self::$folderTree)) {
-            $this->loadFolderIni($webDirPath);
-        }
+        // Split into path segments, ignoring leading/trailing slashes.
+        $segments = explode('/', trim($webFilePath, '/'));
 
-        if (array_key_exists($webDirPath, self::$folderTree)) {
-            $basename = basename($webFilePath);
-            if (!array_key_exists($basename, self::$folderTree[$webDirPath]['data'])) {
-                Log::warn(__METHOD__ . ': File details requested for unknown file', $basename);
+        // Reference to traverse the array.
+        $currentLevel = self::$folderTree;
+
+        foreach ($segments as $segment) {
+            if (is_array($currentLevel) && array_key_exists($segment, $currentLevel)) {
+                $currentLevel = $currentLevel[$segment]; // Go one level deeper
+            } else {
+                if ($loadIfNotFound) {
+                    Log::debug(__METHOD__ . ": Path segment '$segment' of '$webFilePath' not loaded: reloading.");
+                    $this->loadFolderIni(dirname($webFilePath));
+                    return $this->getFileDetails($webFilePath, false);
+                }
+                Log::debug(__METHOD__ . ": Path segment '$segment' of '$webFilePath' not loaded: returning empty.");
                 return [];
             }
-            Log::debug(__METHOD__ . ': File details found!', $webDirPath);
-            return self::$folderTree[$webDirPath]['data'];
         }
-        Log::warn(__METHOD__ . ': File details requested for unknown folder', $webDirPath);
-        return [];
+
+        Log::debug(__METHOD__ . ': All path segments found', $webFilePath);
+        return $currentLevel;
     }
 
     /**
