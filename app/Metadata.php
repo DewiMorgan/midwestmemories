@@ -188,7 +188,7 @@ class Metadata
     }
 
     /**
-     * Get the directory's metadata entry for the given file, or folder.
+     * Get the directory's metadata entry for the given absolute file, or folder.
      * Since filenames are inserted in the "data" element, "path/to/file.txt" matches:
      *   ['path'=>['to'=>['data'=>['file.txt'=>[the array that gets returned]]]]]
      * However, folders are inserted in the '/' element, so "path/to/folder/" matches:
@@ -199,6 +199,8 @@ class Metadata
      */
     public static function getFileDetails(string $webFilePath, bool $loadIfNotFound = true): array
     {
+        //$webFilePath = str_replace(Path::$imageBasePath, '', Index::$requestedPath);
+
         $segments = explode('/', trim($webFilePath, '/'));
         Log::debug(__METHOD__ . ': Segments 1: ', $segments);
 

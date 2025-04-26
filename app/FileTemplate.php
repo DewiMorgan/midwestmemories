@@ -30,16 +30,21 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb(Index
 echo "<img src=\"$u_linkUrl\" alt=\"TODO: alt text\">\n";
 
 // DELETEME DEBUG
-echo '<hr><h3>Debugging stuff below this line</h3>';
-$webDir = str_replace(Path::$imageBasePath, '', dirname(Index::$requestedPath));
-$file = basename(Index::$requestedPath);
-$webFilePath = $webDir . '/' . $file;
-$fileDetails = Metadata::getFileDetails($webFilePath);
-echo "<pre>$file file details:\n" . var_export($fileDetails, true) . "</pre>\n";
+//echo '<hr><h3>Debugging stuff below this line</h3>';
+//$webDir = str_replace(Path::$imageBasePath, '', dirname(Index::$requestedPath));
+//$file = basename(Index::$requestedPath);
+//$webFilePath = $webDir . '/' . $file;
+//$fileDetails = Metadata::getFileDetails($webFilePath);
+//echo "<pre>$file file details:\n" . var_export($fileDetails, true) . "</pre>\n";
 
-$webFilePath2 = str_replace(Path::$imageBasePath, '', Index::$requestedPath);
-$fileDetails2 = Metadata::getFileDetails($webFilePath2);
-echo "<pre>$file file details:\n" . var_export($fileDetails2, true) . "</pre>\n";
+//$fileDetails2 = Metadata::getFileDetails(str_replace(Path::$imageBasePath, '', Index::$requestedPath));
+//echo "<pre>$file file details:\n" . var_export($fileDetails2, true) . "</pre>\n";
+
+echo("Why strip '" . Path::$imageBasePath . "' off '" . Index::$requestedPath . "'?");
+$file = '';
+
+$fileDetails3 = Metadata::getFileDetails(Index::$requestedPath);
+echo "<pre>$file file details:\n" . var_export($fileDetails3, true) . "</pre>\n";
 
 // END DELETEME DEBUG
 ?>
