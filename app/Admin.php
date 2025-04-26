@@ -28,7 +28,7 @@ class Admin
     private static function handleLogouts(): void
     {
         // Handle logouts.
-        if (array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' == $_SESSION['login']) {
+        if (array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' === $_SESSION['login']) {
             header('HTTP/1.1 401 Unauthorized');
             $_SESSION['login'] = 'false';
             echo "<!DOCTYPE html>\n";
@@ -78,12 +78,12 @@ class Admin
     {
         // Parse all the params we can look for in the request.
         $cursor = $_REQUEST['cursor'] ?? '';
-        $initRoot = $_REQUEST['init_root'] ?? false;
-        $continueRoot = $_REQUEST['continue_root'] ?? false;
-        $checkCursor = $_REQUEST['check_cursor'] ?? false;
-        $processFiles = $_REQUEST['download_files'] ?? false;
-        $processDownloads = $_REQUEST['process_downloaded'] ?? false;
-        $entriesSoFar = intval($_REQUEST['entries_so_far'] ?? 0);
+        $initRoot = $_REQUEST['init_root'] ?? null;
+        $continueRoot = $_REQUEST['continue_root'] ?? null;
+        $checkCursor = $_REQUEST['check_cursor'] ?? null;
+        $processFiles = $_REQUEST['download_files'] ?? null;
+        $processDownloads = $_REQUEST['process_downloaded'] ?? null;
+        $entriesSoFar = (int)($_REQUEST['entries_so_far'] ?? 0);
 
         static::debug("<p>Starting. Cursor='$cursor', Request=" . var_export($_REQUEST, true) . '</p>');
 
@@ -114,7 +114,7 @@ class Admin
         if (empty($fp->cursor)) {
             echo 'Cursor was not set in client.<br>';
             static::$cursor = '';
-        } elseif (static::$cursor == $fp->cursor) {
+        } elseif (static::$cursor === $fp->cursor) {
             echo 'Cursor unchanged.<br>';
         } else {
             $cursor = $fp->cursor;

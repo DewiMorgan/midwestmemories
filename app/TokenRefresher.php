@@ -32,7 +32,7 @@ class TokenRefresher implements TokenProvider
         $token = Conf::get(Key::DROPBOX_REFRESH_TOKEN);
         try {
             $client = new HttpClient();
-            $res = $client->request(
+            $request = $client->request(
                 'POST',
                 "https://$key:$secret@api.dropbox.com/oauth2/token",
                 [
@@ -47,11 +47,22 @@ class TokenRefresher implements TokenProvider
             return false;
         }
 
-        if ($res->getStatusCode() != 200) {
+        if ($request->getStatusCode() !== 200) {
             return false;
         }
 
-        $response = json_decode($res->getBody()->getContents(), true);
-        return trim(json_encode($response['access_token']), '"');
+        try {
+            $decodedRequest = json_decode($request->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            Log::adminDebug("Failed to decode json: '{$e->getCode()}: {$e->getMessage()}'.");
+            return false;
+        }
+        try {
+            $encodedResponse = trim(json_encode($decodedRequest['access_token'], JSON_THROW_ON_ERROR), '"');
+        } catch (\JsonException $e) {
+            Log::adminDebug("Failed to encode json: '{$e->getCode()}: {$e->getMessage()}'.");
+            return false;
+        }
+        return $encodedResponse;
     }
 }

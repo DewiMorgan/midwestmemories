@@ -38,7 +38,7 @@ class Db
                 Conf::get(Key::MYSQL_USER),
                 Conf::get(Key::MYSQL_PASS),
                 Conf::get(Key::MYSQL_NAME),
-                intval(Conf::get(Key::MYSQL_PORT))
+                (int)Conf::get(Key::MYSQL_PORT)
             );
         } catch (Exception $e) {
             Log::adminDebug('DB connection failed: ' . $e->getMessage());
@@ -67,7 +67,7 @@ class Db
      * Return the requested item or null.
      * @param string $sql Query with values replaced by '?'.
      * @param string $field Field name to extract and return from the result.
-     * @param int|string ...$items A string describing the types of all following values, then the values..
+     * @param int|string ...$items A string describing the types of all following values, then the values.
      * @return null|string
      */
     public static function sqlGetItem(string $sql, string $field, int|string ...$items): ?string
@@ -108,7 +108,7 @@ class Db
     /**
      * Return the first row from the results, or an empty array.
      * @param string $sql Query with values replaced by '?'.
-     * @param int|string ...$items A string describing the types of all following values, then the values..
+     * @param int|string ...$items A string describing the types of all following values, then the values.
      * @return array
      * @noinspection PhpUnused
      */
@@ -158,9 +158,8 @@ class Db
             }
             $result->free();
             return $table;
-        } else {
-            Log::adminDebug('query failed, db error', $db->error);
         }
+        Log::adminDebug('query failed, db error', $db->error);
         return [];
     }
 
@@ -172,7 +171,6 @@ class Db
      */
     public static function escape(string $str): string
     {
-        $db = self::getInstance()->db;
-        return $db->real_escape_string($str);
+        return self::getInstance()->db->real_escape_string($str);
     }
 }

@@ -17,7 +17,7 @@ class RawTemplate
      */
     public static function showFile(): void
     {
-        $itemPath = Index::$requestedPath;
+        $itemPath = Index::$requestUnixPath;
 
         // DELETEME DEBUG
         if (!is_file($itemPath)) {

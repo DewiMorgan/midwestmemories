@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MidwestMemories;
 
 use JetBrains\PhpStorm\NoReturn;
+use JsonException;
 
 /**
  * Callback for changes in DropBox. Only have 10 seconds to respond, so make it fast!
@@ -59,11 +60,19 @@ class DropboxCallback
         }
     }
 
-    /** Record the timestamp that this hook was called in the DB. */
+    /** Record the timestamp that this hook was called in the DB.
+     */
     private static function recordHook(): void
     {
         $body = file_get_contents('php://input');
-        if ($body && $decoded = json_decode($body, true)) {
+        try {
+            $decoded = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            echo $e->getMessage();
+            die("Fatal error. Couldn't json_decode the body.");
+        }
+
+        if ($body && $decoded) {
             if (array_key_exists('delta', $decoded)
                 && array_key_exists('users', $decoded['delta'])
                 && count($decoded['delta']['users']) > 0
@@ -80,6 +89,7 @@ class DropboxCallback
                 }
             }
         } else {
+            // On failure, we set the webhook timestamp to now(). I don't know why.
             Db::sqlExec('UPDATE `midmem_dropbox_users` SET `webhook_timestamp` = NOW() WHERE 1');
         }
     }

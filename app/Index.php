@@ -13,10 +13,7 @@ class Index
     public const MM_BASE_URL = 'https://midwestmemories.dewimorgan.com';
 
     // Full user-requested path relative to hdd /. If set, exists in Path::$imageBasePath. No trailing slash on folders.
-    public static string $requestedPath;
-
-    // HTML-escaped path that the user requested.
-    public static string $h_requestedPath;
+    public static string $requestUnixPath;
 
     public function __construct()
     {
@@ -24,9 +21,8 @@ class Index
         Path::validateBaseDir();
         static::initSession();
 
-        $requestedPath = $_REQUEST['path'] ?? '/';
-        Index::$requestedPath = Path::webToUnixPath($requestedPath, true); // Dies if not correct.
-        static::$h_requestedPath = htmlspecialchars($requestedPath);
+        $requestedWebPath = $_REQUEST['path'] ?? '/';
+        self::$requestUnixPath = Path::webToUnixPath($requestedWebPath); // Dies if not correct.
 
         static::showPage();
     }
@@ -37,7 +33,7 @@ class Index
     private static function handleLogouts(): void
     {
         // Handle logouts.
-        if (array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' == $_SESSION['login']) {
+        if (array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' === $_SESSION['login']) {
             header('HTTP/1.1 401 Unauthorized');
             $_SESSION['login'] = 'false';
             echo "<!DOCTYPE html>\n";
@@ -85,16 +81,16 @@ class Index
             // This is a request by a user, perhaps to a bookmark.
             // Load the tree view, which will then call us back for the inline version of the pointed-at $path resource.
             include('app/TreeTemplate.php');
-        } elseif (2 == $_REQUEST['i']) {
+        } elseif (2 === (int)$_REQUEST['i']) {
             // We're showing raw file view, such as for an img link.
             include('app/RawTemplate.php');
-        } elseif (3 == $_REQUEST['i']) {
+        } elseif (3 === (int)$_REQUEST['i']) {
             // We're showing an inline search view, by choice.
             include('app/RawTemplate.php');
-        } elseif (is_dir(static::$requestedPath)) {
+        } elseif (is_dir(static::$requestUnixPath)) {
             // We're showing an inline folder view; a list of thumbnails.
             include('app/ThumbsTemplate.php');
-        } elseif (is_file(static::$requestedPath)) {
+        } elseif (is_file(static::$requestUnixPath)) {
             // We're showing an inline file view.
             include('app/FileTemplate.php');
         } else {

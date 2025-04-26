@@ -89,7 +89,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
 
         echo '<ul>';
         echo "<li class='folder'><a href='?path=%2F&amp;i=1' class='path-link'>Home</a></li>";
-        scanDirectory($root, Index::$requestedPath);
+        scanDirectory($root, Index::$requestUnixPath);
         echo '</ul>';
 
         /**

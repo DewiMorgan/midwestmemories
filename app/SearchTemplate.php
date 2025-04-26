@@ -21,10 +21,10 @@ namespace MidwestMemories;
 <div class="thumb-pad" id="rounded">
     <div class="spacer">&nbsp;</div>
     <?php
-    $items = scandir(Index::$requestedPath);
+    $items = scandir(Index::$requestUnixPath);
     foreach ($items as $item) {
         // Todo: folders first.
-        $itemPath = Index::$requestedPath . '/' . $item;
+        $itemPath = Index::$requestUnixPath . '/' . $item;
 
         // Skip files we're uninterested in.
         if (

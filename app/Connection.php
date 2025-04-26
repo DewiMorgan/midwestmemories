@@ -214,14 +214,14 @@ class Connection
      */
     private function normalizeIp(string $ip): string
     {
-        if (str_contains($ip, ':') && substr_count($ip, '.') == 3 && !str_contains($ip, '[')) {
+        if (str_contains($ip, ':') && substr_count($ip, '.') === 3 && !str_contains($ip, '[')) {
             // IPv4 with port (e.g., 123.123.123.123:80)
-            $ip = explode(':', $ip);
-            $ip = $ip[0];
+            $ips = explode(':', $ip);
+            $ip = $ips[0];
         } else {
             // IPv6 with port (e.g., [::1]:80)
-            $ip = explode(']', $ip);
-            $ip = ltrim($ip[0], '[');
+            $ips = explode(']', $ip);
+            $ip = ltrim($ips[0], '[');
         }
         return $ip;
     }

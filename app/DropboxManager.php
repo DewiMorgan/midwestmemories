@@ -71,7 +71,7 @@ class DropboxManager
      */
     public function resumeRootCursor(int $entriesSoFar): array
     {
-        self::loadCursor();
+        $this->loadCursor();
         $this->iterations = 0;
         $this->entries = $entriesSoFar;
         $result = [];
@@ -87,7 +87,7 @@ class DropboxManager
      */
     public function readCursorUpdate(int $entriesSoFar): array
     {
-        self::loadCursor();
+        $this->loadCursor();
         $this->iterations = 0;
         $this->entries = $entriesSoFar;
         $result = ['numFilesQueued' => 0, 'numFilesProcessed' => 0];
@@ -112,7 +112,7 @@ class DropboxManager
      */
     private function addValidEntries(array $knownGoodFiles, array $suspectFiles): array
     {
-        $filteredEntries = array_filter($suspectFiles, function ($fileEntry) {
+        $filteredEntries = array_filter($suspectFiles, static function ($fileEntry) {
             return preg_match(self::VALID_FILE_PATH_REGEX, $fileEntry['path_lower']);
         });
 
@@ -126,7 +126,7 @@ class DropboxManager
      */
     private function setNewCursor(string $cursor): void
     {
-        if (!empty($cursor) && $this->cursor != $cursor) {
+        if (!empty($cursor) && $this->cursor !== $cursor) {
             $this->cursor = $cursor;
             Db::sqlExec(
                 'INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`) 
@@ -188,7 +188,8 @@ class DropboxManager
             $fullPath = ltrim($entry['full_path'], '/\\');
             // If the dir doesn't exist, then create it.
             $dir = dirname($fullPath);
-            if (!is_dir($dir) && !mkdir($dir, 0700, true)) {
+            // Repeat is_dir() check twice to ensure it either exists, or got created.
+            if (!is_dir($dir) && !mkdir($dir, 0700, true) && !is_dir($dir)) {
                 Db::sqlExec(
                     "UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_message` = ? WHERE full_path = ?",
                     'ss',
@@ -435,7 +436,7 @@ class DropboxManager
         $ch = false;
 
         // Check and log each step of downloading the file. Daisy-chained elseif ensures handles get closed at the end.
-        if (false === $fp = fopen($fullPath, 'w+')) {
+        if (false === $fp = fopen($fullPath, 'wb+')) {
             Log::adminDebug('fopen failed for downloadUrlToPath', [$url, $fullPath]);
         } elseif (false === $ch = curl_init($url)) {
             Log::adminDebug('curl_init failed for downloadUrlToPath', [$url, $fullPath]);

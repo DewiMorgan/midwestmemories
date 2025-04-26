@@ -15,6 +15,7 @@ echo "<p>function_exists('mysqli_stmt_get_result')? -> "
 echo "<p>All declared classes:</p>\n";
 echo '<pre>' . var_export(get_declared_classes(), true) . "</pre>\n";
 echo "<h1>PHP Info:</h1>\n";
+/** @noinspection ForgottenDebugOutputInspection */
 phpinfo();
 ?>
 </body>

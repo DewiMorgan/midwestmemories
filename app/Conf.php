@@ -26,11 +26,7 @@ class Conf
         if (is_null(self::$data)) {
             self::initialize();
         }
-        if (array_key_exists($key->value, self::$data)) {
-            return self::$data[$key->value];
-        } else {
-            return null;
-        }
+        return self::$data[$key->value] ?? null;
     }
 
     /**
@@ -90,7 +86,7 @@ class Conf
     private static function readIniInParents(string $filename): array|false
     {
         $dir = getcwd();
-        while ($dir != '/') {
+        while ($dir !== '/') {
             if (file_exists($dir . '/' . $filename)) {
                 return parse_ini_file($dir . '/' . $filename);
             }

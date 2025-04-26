@@ -115,6 +115,7 @@ class Metadata
      * @param mixed $data The data structure to recurse through to print.
      * @param int $depth How deeply we have recursed. Used to prevent infinite recursion.
      * @return string The contents of the ini fie, or the section that we've recursed into.
+     * @noinspection MissingOrEmptyGroupStatementInspection - Empty if clauses are the cleanest way, here.
      */
     public static function getIniString(string $key, mixed $data, int $depth = 0): string
     {
@@ -229,7 +230,8 @@ class Metadata
                 }
                 Log::debug(
                     __METHOD__ . ": Path segment '$segment' of '$webFilePath' not loaded: returning empty.",
-                    self::$folderTree);
+                    self::$folderTree
+                );
                 return [];
             }
         }
