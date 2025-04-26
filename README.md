@@ -153,9 +153,8 @@ Current task:
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif
 * This is FileTemplate: get that working before worrying about TreeTemplate or ThumbsTemplate.
     * Get FileTemplate to populate fully with readonly text from Metadata.
-        * Check the spreadsheet and see what info we actually want to display.
-        * Convert the dump to real output.
-    * Add image alt text (the name? Description?)
+        * Convert the dump to real output fields.
+    * Add image alt text (the name? Description?).
     * Add edit button to change fields to editable.
         * Switch view mode to edit mode on edit button click? Or have all fields edit-on-click? Or pen by each?
     * Add next/prev buttons (disappear when editing?)
@@ -180,12 +179,11 @@ Urgent:
     * Show subfolders as thumbs, too.
 
 * Metadata class
-    * should be singleton factory, or cache somehow, if we're loading from ini files multiple times.
     * data from all parent folders isn't loaded at all.
     * Saving inherited data: do we save it only if it was modified? Seems sensible.
     * How do we distinguish inherited data in the returned data structure?
     * Should I instead have a getInheritedValue($filename, $key), for templates to call for missing values?
-    * Versioned comments: how to represent, store, and so on?
+    * Versioned comments: how to represent, store, and so on? Just backup copies of the ini file? In a backup subfolder?
 
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2
   (mod_rewrite)
