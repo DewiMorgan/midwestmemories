@@ -136,4 +136,17 @@ class Path
         Log::adminDebug("Validated path: $webPath as $realPath");
         return $realPath;
     }
+
+    /**
+     * Convert a unix path to a web path, or return empty string if it's not within the web folder.
+     * @param string $unixPath The path to convert to a web path.
+     * @return string The converted path.
+     */
+    public static function unixToWebPath(string $unixPath): string
+    {
+        if (str_contains(self::$imageBasePath, $unixPath)) {
+            return str_replace(self::$imageBasePath, '', $unixPath);
+        }
+        return '';
+    }
 }

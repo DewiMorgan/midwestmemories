@@ -38,11 +38,8 @@ echo "<img src=\"$u_linkUrl\" alt=\"TODO: alt text\">\n";
 //$fileDetails2 = Metadata::getFileDetails(str_replace(Path::$imageBasePath, '', Index::$requestedPath));
 //echo "<pre>$file file details:\n" . var_export($fileDetails2, true) . "</pre>\n";
 
-echo("Why strip '" . Path::$imageBasePath . "' off '" . Index::$requestUnixPath . "'?");
-$file = '';
-
-$fileDetails3 = Metadata::getFileDetails(Index::$requestUnixPath);
-echo "<pre>$file file details:\n" . var_export($fileDetails3, true) . "</pre>\n";
+$fileDetails = Metadata::getFileDataByUnixPath(Index::$requestUnixPath);
+echo '<pre>' . basename(Index::$requestUnixPath) . " file details:\n" . var_export($fileDetails, true) . "</pre>\n";
 
 // END DELETEME DEBUG
 ?>

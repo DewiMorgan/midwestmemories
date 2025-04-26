@@ -5,36 +5,21 @@ declare(strict_types=1);
 namespace MidwestMemories;
 
 /**
- * Class to handle moving metadata between ini files, DB, web display, and web form.
+ * Purely static class to handle moving metadata between ini files, DB, web display, and web form.
  * Metadata can be inherited from parent folders, etc. So we need to store the entire tree, lazy-loaded.
  * At the same time, we don't want to be passing in the path we're talking about all the time.
  * So we should have a static tree object, and each instance has its own path object.
  * Then to save it out, we need to mark the stuff that changed, and write out only the dirty folders.
+ * ToDo: loadFromMysql(), saveToMysql().
  */
 class Metadata
 {
-    // Singleton instance.
-    private static ?Metadata $instance = null;
-
     /**
      * Tree of folders in web path, starting from root, each with a 'data' element from the ini file for that folder.
      * That's a dict of string properties for the folder, and sub-arrays for properties for each file in the folder.
      * If a folder has a 'dirty' element that's true, then it has been modified.
      */
     private static array $folderTree = [];
-
-    /**
-     * Singleton: private constructor to prevent direct instantiation
-     */
-    private function __construct() {}
-
-    /**
-     * @return Metadata Our unique singleton instance.
-     */
-    public static function getInstance(): Metadata
-    {
-        return self::$instance ??= new self();
-    }
 
     /**
      * Load in our data from an Ini file, and all parents, into the singleton's $folderTree datastore.
@@ -96,7 +81,7 @@ class Metadata
      * @param string $webPath The folder to add/update the ini file for. Should have already been sanity-checked.
      * ToDo: singleton.
      */
-    public function saveToInis(string $webPath): void
+    public static function saveToInis(string $webPath): void
     {
         $pathSoFar = '';
         foreach (explode('/', $webPath) AS $pathElement) {
@@ -150,18 +135,6 @@ class Metadata
         return $result;
     }
 
-    /**
-     * Load in from the Database.
-     * ToDo: This.
-     */
-    private static function loadFromMysql(): void {}
-
-    /**
-     * Write out to the Database.
-     * ToDo: This.
-     */
-    private static function saveToMysql(): void {}
-
     /** Populate and overwrite our values with the values from another object.
      * @param array $sourceArray The Metadata object to copy from, in the same format as self::$folderTree.
      */
@@ -190,18 +163,32 @@ class Metadata
 
     /**
      * Get the directory's metadata entry for the given absolute file, or folder.
+     * @see getFileDataByWebPath for more info.
+     * @param string $unixFilePath The absolute unix file to get the information for.
+     * @return array Subarray from the metadata in self::$folderTree.
+     */
+    public static function getFileDataByUnixPath(string $unixFilePath): array
+    {
+        return self::getFileDataByWebPath(Path::unixToWebPath($unixFilePath));
+    }
+
+    /**
+     * Get the directory's metadata entry for the given absolute file, or folder.
      * Since filenames are inserted in the "data" element, "path/to/file.txt" matches:
      *   ['path'=>['to'=>['data'=>['file.txt'=>[the array that gets returned]]]]]
      * However, folders are inserted in the '/' element, so "path/to/folder/" matches:
      *   ['path'=>['to'=>['folder'=>['/'=>[the array that gets returned]]]]]
      * @param string $webFilePath The absolute web file to get the information for. NOT relative!
      * @param bool $loadIfNotFound True (default) if we can try loading file if the folder is not yet loaded.
-     * @return array
+     * @return array Subarray from the metadata in self::$folderTree.
+     * ToDo: this does not yet handle inherited data.
+     *       Data from all parent folders isn't loaded at all.
+     *       Saving inherited data: do we save it only if it was modified? Seems sensible.
+     *       How can the caller distinguish inherited data in the returned data structure? Do they need to?
+     *       Should I instead have a getInheritedValue($filename, $key), for templates to call for missing values?
      */
-    public static function getFileDetails(string $webFilePath, bool $loadIfNotFound = true): array
+    public static function getFileDataByWebPath(string $webFilePath, bool $loadIfNotFound = true): array
     {
-        //$webFilePath = str_replace(Path::$imageBasePath, '', Index::$requestedPath);
-
         $segments = explode('/', trim($webFilePath, '/'));
         Log::debug(__METHOD__ . ': Segments 1: ', $segments);
 
@@ -226,7 +213,7 @@ class Metadata
                 if ($loadIfNotFound) {
                     Log::debug(__METHOD__ . ": Path segment '$segment' of '$webFilePath' not loaded: reloading.");
                     self::loadFromInis(dirname($webFilePath));
-                    return self::getFileDetails($webFilePath, false);
+                    return self::getFileDataByWebPath($webFilePath, false);
                 }
                 Log::debug(
                     __METHOD__ . ": Path segment '$segment' of '$webFilePath' not loaded: returning empty.",
@@ -246,20 +233,5 @@ class Metadata
         }
         Log::warning(__METHOD__ . ": File entry at '$webFilePath' was not an array: returning empty.", $currentLevel);
         return [];
-    }
-
-    /**
-     * Get the directory's metadata entry for the given file, plus all inherited data for everything above.
-     * @param string $filename The file to get the information for.
-     * @return array
-     */
-    public static function getInheritedData(string $filename): array
-    {
-        // ToDo: this does not yet handle inherited data.
-        //       Data from all parent folders isn't loaded at all.
-        //       Saving inherited data: do we save it only if it was modified? Seems sensible.
-        //       How can the caller distinguish inherited data in the returned data structure? Do they need to?
-        //       Should I instead have a getInheritedValue($filename, $key), for templates to call for missing values?
-        return (self::getFileDetails($filename));
     }
 }
