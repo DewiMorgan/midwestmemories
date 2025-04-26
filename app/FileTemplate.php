@@ -28,7 +28,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb(Index
 echo "<img src=\"$u_linkUrl\" alt=\"TODO: alt text\">\n";
 
 // DELETEME DEBUG
-//echo '<hr><h3>Debugging stuff below this line</h3>';
+echo '<hr><h3>Debugging stuff below this line</h3>';
 //$webDir = str_replace(Path::$imageBasePath, '', dirname(Index::$requestedPath));
 //$file = basename(Index::$requestedPath);
 //$webFilePath = $webDir . '/' . $file;

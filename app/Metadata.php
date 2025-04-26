@@ -169,6 +169,7 @@ class Metadata
      */
     public static function getFileDataByUnixPath(string $unixFilePath): array
     {
+        echo __METHOD__ . '(' . $unixFilePath . ")<br>\n"; // DELETEME DEBUG
         return self::getFileDataByWebPath(Path::unixToWebPath($unixFilePath));
     }
 
@@ -189,6 +190,8 @@ class Metadata
      */
     public static function getFileDataByWebPath(string $webFilePath, bool $loadIfNotFound = true): array
     {
+        echo __METHOD__ . '(' . $webFilePath . ',' . ($loadIfNotFound ? 'y' : 'n') . ")<br>\n"; // DELETEME DEBUG
+
         $segments = explode('/', trim($webFilePath, '/'));
         Log::debug(__METHOD__ . ': Segments 1: ', $segments);
 
