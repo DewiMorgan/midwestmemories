@@ -70,6 +70,10 @@ namespace MidwestMemories;
             font-weight: bold;
         }
 
+        li.selected > a {
+            font-weight: bold;
+        }
+
         /* Files in the tree view. */
         .file {
             cursor: default;
