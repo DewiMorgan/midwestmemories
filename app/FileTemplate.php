@@ -106,11 +106,10 @@ function cleanFileDetails(array $fileDetails): array {
                 $h_fd[$key] = htmlspecialchars($fileDetail['dateString']);
                 echo 'Using dateString ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
             } else {
-                $fileDetail = implode(', ', $fileDetail);
+                $fileDetail = htmlspecialchars(implode(', ', $fileDetail));
                 echo 'Converting array ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
             }
-        }
-        if (is_numeric($fileDetail)) {
+        } elseif (is_numeric($fileDetail)) {
             $h_fd[$key] = $fileDetail;
             echo 'Setting number ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
         } elseif (is_string($fileDetail) && strlen($fileDetail)) {
