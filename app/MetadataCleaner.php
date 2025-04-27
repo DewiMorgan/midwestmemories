@@ -189,7 +189,7 @@ class MetadataCleaner
      */
     private static function cleanBool(mixed $item): ?bool
     {
-        Log::debug(__METHOD__ . ", Parsing bool $item"); // DELETEME DEBUG
+        Log::debug(__METHOD__ . ', Parsing bool ' . var_export($item, true)); // DELETEME DEBUG
         if (
             is_array($item) ||
             (is_object($item) && !method_exists($item, '__toString')) ||
@@ -213,7 +213,7 @@ class MetadataCleaner
      */
     private static function cleanInt(mixed $item): ?int
     {
-        Log::debug(__METHOD__ . ", Parsing int $item"); // DELETEME DEBUG
+        Log::debug(__METHOD__ . ', Parsing int ' . var_export($item, true)); // DELETEME DEBUG
         if (is_numeric($item)) {
             $result = (int)$item; // Casting to int always parses as decimal.
         } else {
@@ -232,7 +232,7 @@ class MetadataCleaner
      */
     private static function cleanCsvLine(mixed $item, int $maxLength = null, bool $parseSlashes = true): array
     {
-        Log::debug(__METHOD__ . ", Parsing CSV $item"); // DELETEME DEBUG
+        Log::debug(__METHOD__ . ', Parsing CSV ' . var_export($item, true)); // DELETEME DEBUG
         if (!is_string($item)) {
             Log::warn('CSV property was not string', $item);
             return [];
@@ -256,7 +256,7 @@ class MetadataCleaner
      */
     private static function cleanDate(mixed $item): ?int
     {
-        Log::debug(__METHOD__ . ", Parsing date $item"); // DELETEME DEBUG
+        Log::debug(__METHOD__ . ', Parsing date ' . var_export($item, true)); // DELETEME DEBUG
         $result = strtotime($item);
         if (false === $result) {
             Log::warn(__METHOD__ . ', unable to parse, returning NULL'); // DELETEME DEBUG
@@ -305,7 +305,7 @@ class MetadataCleaner
      */
     private static function cleanString(mixed $item, int $maxLength = null, bool $parseSlashes = false): string
     {
-        Log::debug(__METHOD__ . ", Parsing string $item"); // DELETEME DEBUG
+        Log::debug(__METHOD__ . ', Parsing string ' . var_export($item, true)); // DELETEME DEBUG
         if (!is_string($item)) {
             Log::warn('String property was not string', $item);
             return '';
