@@ -278,7 +278,16 @@ class MetadataCleaner
      */
     private static function cleanAwfulDate(string $string): string
     {
-        // Try to avoid false positives from eg "Maybe Mark can Separate out the Junk."
+        // If it looks like a whole date string, then yay, we're done.
+        if (preg_match(
+            '/(?<!\d)(?:\d|\d\d|\d\d\d\d)([-.\/])(?:\d|\d\d)\1(?:\d|\d\d|\d\d\d\d)(?!\d)/',
+            $string,
+            $matches
+        )) {
+            return $matches[0];
+        }
+
+        // Find string months, but try to avoid false positives from eg "Maybe Mark can Separate out the Junk."
         preg_match_all(
             '/\b(Jan|Feb|Mar(?!k)|Apr|May(?!\s*be)|Jun(?!k)|Jul|Aug|Sep(?![ae])|Oct|Nov|Dec(?![cr]))/i',
             $string,
@@ -295,50 +304,42 @@ class MetadataCleaner
         }
         $foundYear = count($matches[0]) ? $matches[0][0] : '';
 
-        // Sequences of 1, 2, or 4 digits, possibly grouped together as dates.
-        preg_match_all(
-            '/(?<!\d)((\d{1,2}|\d{4})(?!\d))(([-.\/](\d{1,2}(?!\d)))([-.\/](\d{1,2}|\d{4}(?!\d))))?/',
-            $string,
-            $matches
-        );
         $foundMaybeYears = [];
         $foundMaybeMonths = [];
         $foundMaybeDays = [];
-        foreach ($matches[0] as $str) {
-            // If it looks like a whole date string, then yay, we're done.
-            if (preg_match('/^(\d{1,2}|\d{4})\D\d{1,2}\D(\d{1,2}|\d{4})/', $str)) {
-                return $str;
-            }
-            // Get what might be date fragments.
-            if (preg_match('/^\d\d?$/', $str)) {
-                if (!$foundYear && preg_match('/^\d\d$/', $str)) { // Years are 2-4 digits. We handled 4 digits above.
-                    $foundMaybeYears[] = $str;
-                }
-                if (!$foundMonth && preg_match('/^(0?[1-9]|1[0-2])$/', $str)) { // Months are 1-9, 01-09, or 10-12.
-                    $foundMaybeMonths[] = $str;
-                }
-                if (preg_match('/^(0?[1-9]|[12]\d|3[01])$/', $str)) { // Days should be 1-9, 01-09, or 10-31.
-                    $foundMaybeDays[] = $str;
-                }
-            }
+        // Short years are 2 digits. We already handled the case of 4 digits.
+        if (!$foundYear && preg_match_all('/(?<!\d)\d\d(?!\d)/', $string, $matches)) {
+            $foundMaybeYears = $matches[0];
+        }
+        // Months are 1-9, 01-09, or 10-12.
+        if (!$foundMonth && preg_match('/(?<!\d)(0?[1-9]|1[0-2])(?!\d)/', $string, $matches)) {
+            $foundMaybeMonths[] = $matches[0];
+        }
+        // Days are 1-9, 01-09, or 10-31.
+        if (preg_match('/(?<!\d)(0?[1-9]|[12]\d|3[01])(?!\d)/', $string, $matches)) {
+            $foundMaybeDays[] = $matches[0];
         }
 
-        // Try to build a date.
-        if (count($foundMaybeYears) === 1) {
+        // Build a date by finding valid values in the right order,
+        // then removing it from the possibilities for the other fields.
+        if (count($foundMaybeYears) === 1) { // If there's only one valid year, use that.
             $foundYear = self::applyFirstValue($foundYear, '', $foundMaybeYears, $foundMaybeMonths, $foundMaybeDays);
         }
-        // Assuming they might be writing in US format, (month day year), build in that order.
+        // Assuming they might be writing in US format, (month day year), build in that order. Default month to 01, Jan.
         $foundMonth = self::applyFirstValue($foundMonth, '01', $foundMaybeMonths, $foundMaybeYears, $foundMaybeDays);
-        if (count($foundMaybeYears) === 1) {
+        if (count($foundMaybeYears) === 1) {  // If there's only one valid year after applying our month, use that.
             $foundYear = self::applyFirstValue($foundYear, '', $foundMaybeYears, $foundMaybeDays);
         }
+        // Grab the day, if any, or default to 1st.
         $foundDay = self::applyFirstValue('', '01', $foundMaybeDays, $foundMaybeYears);
+        // If we haven't yet grabbed our year, then do so. If there are none, our default year is 1066.
         $foundYear = self::applyFirstValue($foundYear, '1066', $foundMaybeYears);
+        // If we've got a 2-digit year, assume it was in the 1900s.
         if (strlen($foundYear) === 2) {
             $foundYear = '19' . $foundYear;
         }
 
-        // Build date from the three pieces. Year-month-day format is unambiguous.
+        // Build date from the three pieces. Year-month-day format is unambiguous and parses OK even with text months.
         return "$foundYear-$foundMonth-$foundDay";
     }
 
