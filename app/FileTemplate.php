@@ -34,7 +34,7 @@ foreach ($fileDetails as $key => $fileDetail) {
         $fileDetail = implode(', ', $fileDetail);
 echo 'Converting array ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
     }
-    if ((is_string($fileDetail) || is_numeric($fileDetail)) && strlen($fileDetail)) {
+    if (is_numeric($fileDetail) || (is_string($fileDetail) && strlen($fileDetail))) {
         $h_fd[$key] = htmlspecialchars($fileDetail);
 echo 'Escaping valid ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
     } else {
