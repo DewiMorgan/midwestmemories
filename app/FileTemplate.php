@@ -32,17 +32,18 @@ $h_fd = [];
 foreach ($fileDetails as $key => $fileDetail) {
     if (is_array($fileDetail)) {
         $fileDetail = implode(', ', $fileDetail);
+echo 'Converting array ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
     }
     if (is_string($fileDetail) && strlen($fileDetail)) {
         $h_fd[$key] = htmlspecialchars($fileDetail);
+echo 'Escaping valid ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
     } else {
-echo 'Setting ' . var_export($h_fd[$key], true); // DELETEME DEBUG
         $h_fd[$key] = match ($key) {
             'slideorigin', 'slidenumber', 'slidesubsection' => '?',
             'displayname' => 'unknown image',
             default => 'unknown',
         };
-echo ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+echo 'Defaulting empty ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
     }
 }
 
