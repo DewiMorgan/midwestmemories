@@ -155,8 +155,8 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             Metadata::loadFromInis($webDir);
 //            echo "<pre>$dir:\n" . var_export(Metadata::getData(), true) . '</pre>';
 //            Metadata::saveToIni('x', true);
-            echo 'IniFile:<br><pre>' . Metadata::getIniString('/', Metadata::getData()) . '</pre>';
-            echo 'ArrayDump:<br><pre>' . var_export(Metadata::getData(), true) . '</pre>';
+            // echo 'IniFile:<br><pre>' . Metadata::getIniString('/', Metadata::getData()) . '</pre>';
+            // echo 'ArrayDump:<br><pre>' . var_export(Metadata::getData(), true) . '</pre>';
             // END DELETEME DEBUG
         }
 

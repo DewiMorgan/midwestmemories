@@ -161,13 +161,10 @@ See also list at the top of this file.
 Current task:
 
 * TreeTemplate
-    * DONE: Should probably bold the selected item, too.
-        * Child elements should not be bolded.
-        * We also need to UN-bold selected items, and bold NEW ones, as they are clicked.
-    * Bug: it doesn't show the selected files, nor the other files in its folder, on the left. The folder is collapsed.
-        * That is, when you select a file, it collapses the current folder.
+    * We also need to UN-bold selected items, and bold NEW ones, as they are clicked.
     * ToDo: Clean up: move all debug to the bottom below a HR tag.
     * ToDo: Stop the thumbnails from listing in TreeTemplate.
+    * ToDo: Stop the forbidden files like index.txt and index.txt.bak from listing in TreeTemplate.
     * ToDo: Make it accept one or more callbacks to say how to recurse into, skip, or display entries.
     * ToDo: Migrate TreeTemplate's JS out to TreeTemplate.js.
     * ToDo: Migrate ScanDirectory out to... maybe Path.php? Its own file?

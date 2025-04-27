@@ -8,6 +8,10 @@ Newest items at top.
 * DONE: Parse info texts.
 * DONE: Display info texts with images.
 * DONE: Understand and document how templating works.
+* DONE: Should probably bold the selected item.
+* FIXED: Child elements should not be bolded.
+* FIXED: It doesn't show the selected files, nor the other files in its folder, on the left. The folder loads collapsed.
+* FIXED: When you select a file, it collapses the current folder.
 
 ## 4/26/2025
 
