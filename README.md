@@ -161,9 +161,9 @@ See also list at the top of this file.
 Current task:
 
 * TreeTemplate
-    * We also need to UN-bold selected items, and bold NEW ones, as they are clicked.
     * ToDo: Stop the thumbnails from listing in TreeTemplate.
     * ToDo: Stop the forbidden files like index.txt and index.txt.bak from listing in TreeTemplate.
+    * We also need to UN-bold selected items, and bold NEW ones, as they are clicked.
     * ToDo: Make it accept one or more callbacks to say how to recurse into, skip, or display entries.
     * ToDo: Migrate TreeTemplate's JS out to TreeTemplate.js.
     * ToDo: Migrate ScanDirectory out to... maybe Path.php? Its own file?

@@ -118,10 +118,11 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             // Loop through the items and output a list item for each one.
             $files = '';
             foreach ($items as $item) {
-                // Skip the current and parent directories, and any hidden ones.
-                if (str_starts_with($item, '.')) {
+                // Skip the current and parent directories, and any hidden ones. Also skip thumbnails, even for folders.
+                if (str_starts_with($item, '.') || str_starts_with($item, 'tn_')) {
                     continue;
                 }
+
                 $h_item = htmlspecialchars($item);
                 $webDir = str_replace(Path::$imageBasePath, '', "$dir/$item");
                 $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($webDir) . '&amp;i=1';
@@ -139,13 +140,11 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
                     echo "<ul>\n";
                     scanDirectory("$dir/$item", $targetPath);
                     echo "</ul></li>\n";
-                } else {
+                } elseif (preg_match('/\.(txt|gif|png|jpg)$/', $item)) {
+                    // Append whitelisted filetypes to the list of files.
                     $selectClass = ("$dir/$item" === $targetPath) ? 'selected' : '';
-                    // Otherwise, append to the list of files.
                     $files .= "<li class='file $selectClass'><a href='$u_linkUrl' class='path-link'>$h_item</a></li>\n";
-                    Log::debug(
-                        "Filing: expand='$expandClass', select='$selectClass'"
-                        . " : $dir/$item from $targetPath"); // DELETEME DEBUG
+                    Log::debug("Filing: select='$selectClass' : $dir/$item from $targetPath"); // DELETEME DEBUG
                 }
             }
             echo $files;
