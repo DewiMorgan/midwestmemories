@@ -118,8 +118,9 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             // Loop through the items and output a list item for each one.
             $files = '';
             foreach ($items as $item) {
-                // Skip the current and parent directories, and any hidden ones. Also skip thumbnails, even for folders.
-                if (str_starts_with($item, '.') || str_starts_with($item, 'tn_')) {
+                // Apply blacklist even to folders. Skip the current and parent directories, and any hidden ones.
+                // Also skip thumbnails and index files.
+                if (preg_match('/^(\.|tn_|index\.)/', $item)) {
                     continue;
                 }
 

@@ -13,6 +13,9 @@ Newest items at top.
 * FIXED: Child elements should not be bolded.
 * FIXED: It doesn't show the selected files, nor the other files in its folder, on the left. The folder loads collapsed.
 * FIXED: When you select a file, it collapses the current folder.
+* FIXED: Stop the thumbnails from listing in TreeTemplate.
+* FIXED: Stop the forbidden files like index.txt and index.txt.bak from listing in TreeTemplate.
+* DONE: Expand to, and select, currently passed $path.
 
 ## 4/26/2025
 
