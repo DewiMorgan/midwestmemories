@@ -248,7 +248,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
 
     function handleNavigation(e) {
         if (e.state) {
-            openLinkInline(e.state.html + "&amp;i=1", false);
+            openLinkInline(e.state.html + "&i=1", false);
             document.title = e.state.pageTitle;
         }
     }
