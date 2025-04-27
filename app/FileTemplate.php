@@ -36,11 +36,13 @@ foreach ($fileDetails as $key => $fileDetail) {
     if (is_string($fileDetail) && strlen($fileDetail)) {
         $h_fd[$key] = htmlspecialchars($fileDetail);
     } else {
+echo 'Setting ' . var_export($h_fd[$key], true); // DELETEME DEBUG
         $h_fd[$key] = match ($key) {
             'slideorigin', 'slidenumber', 'slidesubsection' => '?',
             'displayname' => 'unknown image',
             default => 'unknown',
         };
+echo ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
     }
 }
 
@@ -50,8 +52,12 @@ $h_altText = $h_fd['displayname'];
 $h_date = ($h_fd['date'] === 'unknown') ? 'unknown' : date('Y-m-d', $h_fd['date']);
 ?>
 
-<img src="<?= $u_linkUrl ?>" alt="<?= $h_altText ?>"><br><?= $h_fd['displayName'] ?>
+<img src="<?= $u_linkUrl ?>" alt="<?= $h_altText ?>">
 <table>
+    <tr>
+        <td>Name:</td>
+        <td><?= $h_fd['displayName'] ?></td>
+    </tr>
     <tr>
         <td>Slide:</td>
         <td><?= $h_slide ?></td>
