@@ -243,22 +243,14 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
     // Add a click event listener to each folder
     links.forEach(addLinkClickHandler);
 
+    // Add a listener to handle browser back/forward buttons.
     window.onpopstate = handleNavigation;
-
-    window.addEventListener('pageshow', handlePageShow);
-
-    function handlePageShow(event) {
-        if (event.persisted) {
-            // This means the page was restored from the bfcache (back/forward cache)
-            console.log('Page was restored by the back/forward cache.');
-        } else {
-            console.log('Normal page show (fresh load).');
-        }
-    }
 
     function handleNavigation(e) {
         if (e.state) {
-            document.getElementById("content").innerHTML = e.state.html;
+            // document.getElementById("content").innerHTML = e.state.html;
+            // ToDo: Might need to make openLinkInline NOT add this item to the history. Optional param?
+            openLinkInline(e.state.html, false);
             document.title = e.state.pageTitle;
         }
     }
@@ -268,7 +260,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
      * @param {string} url The link to load.
      * @returns {Promise<void>}
      */
-    async function openLinkInline(url) {
+    async function openLinkInline(url, saveHistory = true) {
         console.log("Opening link inline: " + url);
 
         const content = document.getElementById("content");
@@ -286,9 +278,11 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         }
 
         // Make sure that history will work.
-        const historyUrl = url.replace(/&(?:amp;)?i=\d+/, ''); // Strip out "inline" instruction.
-        console.log("Updating URL to '" + historyUrl + "'.");
-        window.history.pushState({"html": historyUrl, "pageTitle": "Todo: Title"}, '', historyUrl);
+        if (saveHistory) {
+            const historyUrl = url.replace(/&(?:amp;)?i=\d+/, ''); // Strip out "inline" instruction.
+            console.log("Updating URL to '" + historyUrl + "'.");
+            window.history.pushState({"html": historyUrl, "pageTitle": "Todo: Title (from history)"}, '', historyUrl);
+        }
     }
 
     /**
