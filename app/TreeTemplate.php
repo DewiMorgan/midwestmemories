@@ -141,7 +141,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
                     echo "<ul>\n";
                     scanDirectory("$dir/$item", $targetPath);
                     echo "</ul></li>\n";
-                } elseif (preg_match('/\.(txt|gif|png|jpg)$/', $item)) {
+                } elseif (preg_match('/\.(gif|png|jpg|jpeg|svg|bmp|webp)$/', $item)) {
                     // Append whitelisted filetypes to the list of files.
                     $selectClass = ("$dir/$item" === $targetPath) ? 'selected' : '';
                     $files .= "<li class='file $selectClass'><a href='$u_linkUrl' class='path-link'>$h_item</a></li>\n";

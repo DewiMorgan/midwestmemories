@@ -189,23 +189,6 @@ Urgent:
     * Should I instead have a getInheritedValue($filename, $key), for templates to call for missing values?
     * Versioned comments: how to represent, store, and so on? Just backup copies of the ini file? In a backup subfolder?
     * File w no data in ini file, getFileDetails returns empty array: should be populated w empty fields.
-
-* FileTemplate
-    * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif
-    * Add next/prev buttons (disappear when editing? Or just prompt to save?)
-    * Add edit button to change fields to editable.
-        * Switch view mode to edit mode on edit button click? All fields edit-on-click? Always editable? Pen by each?
-    * Style this template.
-        * Display the file, centered, scaled to the window.
-        * The various fields, both for display and for edit.
-    * How do we visually distinguish inherited data from local data?
-        * Is there even a programmatic difference?
-        * We don't care about this for now.
-        * I think inherited data should be greyed out. Editing it saves locally. Button to go to page of parent/origin?
-
-* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2
-  (mod_rewrite)
-* Index: Inline file view
 * PHP: Parse Metadata TO ini file.
 * PHP: Parse Metadata TO database.
 * PHP: Parse Metadata FROM database.
@@ -219,11 +202,28 @@ Urgent:
     * Location picker (ditto)
     * Keyword picker (ditto)
     * Each with who-can-edit level (nobody, owner, admin, regular, guest)
+
+* FileTemplate
+    * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif
+    * Add next/prev buttons (disappear when editing? Or just prompt to save?)
+    * Add edit button to change fields to editable.
+        * Switch view mode to edit mode on edit button click? All fields edit-on-click? Always editable? Pen by each?
+    * Style this template.
+        * Display the file, centered, scaled to the window.
+        * The various fields, both for display and for edit.
+    * How do we visually distinguish inherited data from local data?
+        * Is there even a programmatic difference?
+        * We don't care about this for now.
+        * I think inherited data should be greyed out. Editing it saves locally. Button to go to page of parent/origin?
+    * CSS: Make the inline file view look like not ass.
+* Index: Inline file view
+
+* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2
+  (mod_rewrite)
 * PHP: Parse form input to database, with validation, errors, etc.
 * JS: Parse and display form errors.
-* CSS: Make the inline file view look like not ass.
-
 * Index: Inline search view.
+* Index: Additional file types (txt? More images?)
 * replace innerHTML use (mem leaks as doesn't remove handlers for old content; and doesn't run script tags.)
 * ThumbsTemplate: Alt text when displaying images.
 * ThumbsTemplate: Display title.
