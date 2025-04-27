@@ -295,15 +295,17 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         // Prevent link from navigating.
         e.preventDefault();
 
-        // Remove 'selected' from any previously selected li.
-        document.querySelectorAll('li.selected').forEach(selectedLi => {
-            selectedLi.classList.remove('selected');
-        });
-        // Add 'selected' to the clicked link's parent li.
+        // Remove 'selected' from any previously selected li and apply to current.
+        const selectedItems = document.querySelectorAll('li.selected');
+        selectedItems.forEach(removeSelectedClass);
         this.parentElement.classList.add('selected');
 
         const attr = this.getAttribute("href");
         openLinkInline(attr);
+    }
+
+    function removeSelectedClass(listItem) {
+        listItem.classList.remove('selected');
     }
 
     /**
