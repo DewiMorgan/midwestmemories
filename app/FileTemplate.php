@@ -31,14 +31,10 @@ $h_slide = $h_fd['slideorigin'] . ':' . $h_fd['slidenumber'] . ':' . $h_fd['slid
 $h_altText = $h_fd['displayname'];
 ?>
 <h1 class="center"><?= $h_fd['displayname'] ?></h1>
-<p><?= $h_fd['writtennotes'] ?></p>
 
 <img src="<?= $u_linkUrl ?>" alt="<?= $h_altText ?>">
+<p><?= $h_fd['writtennotes'] ?></p>
 <table>
-    <tr>
-        <td>Name:</td>
-        <td><?= $h_fd['displayname'] ?></td>
-    </tr>
     <tr>
         <td>Slide:</td>
         <td><?= $h_slide ?></td>
@@ -46,10 +42,6 @@ $h_altText = $h_fd['displayname'];
     <tr>
         <td>Date:</td>
         <td><?= $h_fd['date'] ?></td>
-    </tr>
-    <tr>
-        <td>Notes:</td>
-        <td><?= $h_fd['writtennotes'] ?></td>
     </tr>
     <tr>
         <td>Location:</td>
@@ -103,30 +95,34 @@ function cleanFileDetails(array $fileDetails): array {
         if (is_array($fileDetail)) {
             if ('date' === $key) {
                 $h_fd[$key] = htmlspecialchars($fileDetail['dateString']);
-                echo 'Using dateString ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+//                echo 'Using dateString ' . var_export($fileDetail, true) .
+//                    ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
             } else {
                 $fileDetail = htmlspecialchars(implode(', ', $fileDetail));
-                echo 'Converting array ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+//                echo 'Converting array ' . var_export($fileDetail, true) .
+//                    ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
             }
         } elseif (is_numeric($fileDetail)) {
             $h_fd[$key] = $fileDetail;
-            echo 'Setting number ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+//            echo 'Setting number ' . var_export($fileDetail, true) .
+//                ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
         } elseif (is_string($fileDetail) && strlen($fileDetail)) {
             $h_fd[$key] = htmlspecialchars($fileDetail);
-            echo 'Escaping valid ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+//            echo 'Escaping valid ' . var_export($fileDetail, true) .
+//                ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
         } else {
             $h_fd[$key] = match ($key) {
                 'slideorigin', 'slidenumber', 'slidesubsection' => '?',
                 'displayname' => 'unknown image',
                 default => 'unknown',
             };
-            echo 'Defaulting empty ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+//            echo 'Defaulting empty ' . var_export($fileDetail, true) .
+//                ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
         }
     }
     return $h_fd;
 }
 
 ?>
-
 </body>
 </html>
