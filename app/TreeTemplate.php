@@ -67,12 +67,14 @@ namespace MidwestMemories;
             display: block;
         }
 
-        li .path-link {
-            font-weight: normal; /* Default */
-        }
-
+        /* Bolding for selected items. */
         li.selected > .path-link {
             font-weight: bold;
+        }
+
+        /* Override bolding for children of selected items. */
+        .path-link {
+            font-weight: normal;
         }
 
         /* Files in the tree view. */
@@ -129,7 +131,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
                     $expandClass = Path::isChildInPath($targetPath, "$dir/$item") ? 'expanded' : 'collapsed';
                     $selectClass = ("$dir/$item" === $targetPath) ? 'selected' : '';
                     Log::debug("Folder: expand='$expandClass', select='$selectClass' : $dir/$item from $targetPath"); // DELETEME DEBUG
-                    echo "<li class='folder $expandClass $selectClass'><span class='expand-collapse '>+</span>";
+                    echo "<li class='folder $expandClass $selectClass'><span class='expand-collapse'>(+)</span>";
                     echo "<a href='$u_linkUrl' class='path-link'>$h_item</a>";
                     echo "<ul>\n";
                     scanDirectory("$dir/$item", $targetPath);
@@ -202,7 +204,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
     // Tree view event listeners to handle expand/collapse behavior.
 
     // Get all the folder elements in the tree view.
-    const folders = document.querySelectorAll('.folder');
+    const folders = document.querySelectorAll('.expand-collapse');
 
     // Add a click event listener to each folder
     folders.forEach(addFoldClickHandler);

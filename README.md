@@ -162,6 +162,7 @@ Current task:
 
 * TreeTemplate
     * DONE: Should probably bold the selected item, too.
+        * Child elements should not be bolded.
         * We also need to UN-bold selected items, and bold NEW ones, as they are clicked.
     * Bug: it doesn't show the selected files, nor the other files in its folder, on the left. The folder is collapsed.
         * That is, when you select a file, it collapses the current folder.
