@@ -34,7 +34,15 @@ foreach ($fileDetails as $key => $fileDetail) {
         $fileDetail = implode(', ', $fileDetail);
 echo 'Converting array ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
     }
-    if (is_numeric($fileDetail) || (is_string($fileDetail) && strlen($fileDetail))) {
+    if (is_numeric($fileDetail)) {
+        if ('date' === $key) {
+            $h_fd['date'] = date('Y-m-d', $fileDetail);
+echo 'Copying number ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+        } else {
+            $h_fd[$key] = htmlspecialchars($fileDetail);
+echo 'Setting date ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+        }
+    } elseif (is_string($fileDetail) && strlen($fileDetail)) {
         $h_fd[$key] = htmlspecialchars($fileDetail);
 echo 'Escaping valid ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
     } else {
@@ -47,10 +55,9 @@ echo 'Defaulting empty ' . var_export($fileDetail, true) . ' to ' . var_export($
     }
 }
 
-// Handle special cases.
+// Special cases.
 $h_slide = $h_fd['slideorigin'] . ':' . $h_fd['slidenumber'] . ':' . $h_fd['slidesubsection'];
 $h_altText = $h_fd['displayname'];
-$h_date = ($h_fd['date'] === 'unknown') ? 'unknown' : date('Y-m-d', $h_fd['date']);
 ?>
 
 <img src="<?= $u_linkUrl ?>" alt="<?= $h_altText ?>">
@@ -65,7 +72,7 @@ $h_date = ($h_fd['date'] === 'unknown') ? 'unknown' : date('Y-m-d', $h_fd['date'
     </tr>
     <tr>
         <td>Date:</td>
-        <td><?= $h_date ?></td>
+        <td><?= $h_fd['date'] ?></td>
     </tr>
     <tr>
         <td>Notes:</td>
