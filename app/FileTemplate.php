@@ -30,15 +30,14 @@ $h_fd = cleanFileDetails($fileDetails);
 $h_slide = $h_fd['slideorigin'] . ':' . $h_fd['slidenumber'] . ':' . $h_fd['slidesubsection'];
 $h_altText = $h_fd['displayname'];
 ?>
-<h1 class="center"><?= $h_fd['displayName'] ?></h1>
+<h1 class="center"><?= $h_fd['displayname'] ?></h1>
 <p><?= $h_fd['writtennotes'] ?></p>
-
 
 <img src="<?= $u_linkUrl ?>" alt="<?= $h_altText ?>">
 <table>
     <tr>
         <td>Name:</td>
-        <td><?= $h_fd['displayName'] ?></td>
+        <td><?= $h_fd['displayname'] ?></td>
     </tr>
     <tr>
         <td>Slide:</td>
