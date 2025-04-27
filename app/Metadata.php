@@ -60,7 +60,8 @@ class Metadata
         $iniUnixPath = Path::webToUnixPath(preg_replace('#//#', '/', "$webPath/index.txt"), false);
         if (!file_exists($iniUnixPath)) {
             Log::debug("loadFolderIni found no ini from webPath $webPath at unix path", $iniUnixPath);
-            Index::showError('No ini file for this folder.');
+            // Can't print this as we call it for every parent/ancestor folder, too.
+            // Index::showError('No ini file for this folder.');
             return [];
         }
         Log::debug("loadFolderIni found ini from webPath $webPath at unix path", $iniUnixPath);
