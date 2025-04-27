@@ -4,6 +4,7 @@ Newest items at top.
 
 ## 4/27/2025
 
+* DONE: Clean up: move all debug to the bottom below a `HR` tag.
 * DONE: Strict typing everywhere!
 * DONE: Parse info texts.
 * DONE: Display info texts with images.
