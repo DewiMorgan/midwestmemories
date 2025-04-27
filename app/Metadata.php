@@ -169,7 +169,6 @@ class Metadata
      */
     public static function getFileDataByUnixPath(string $unixFilePath): array
     {
-        echo __METHOD__ . '(' . $unixFilePath . ")<br>\n"; // DELETEME DEBUG
         return self::getFileDataByWebPath(Path::unixToWebPath($unixFilePath));
     }
 
@@ -190,19 +189,17 @@ class Metadata
      */
     public static function getFileDataByWebPath(string $webFilePath, bool $loadIfNotFound = true): array
     {
-        echo __METHOD__ . '(' . $webFilePath . ',' . ($loadIfNotFound ? 'y' : 'n') . ")<br>\n"; // DELETEME DEBUG
-
         $segments = explode('/', trim($webFilePath, '/'));
         Log::debug(__METHOD__ . ': Segments 1: ', $segments);
 
         if ($webFilePath[-1] === '/') {
             // This is a folder, as last character is slash, so append a slash element.
             $segments[] = '/';
-            Log::debug(__METHOD__ . ': Segments 2: ', $segments);
+//             Log::debug(__METHOD__ . ': Segments 2: ', $segments);
         } else {
             // This is a file, so insert the 'data' element.
             array_splice($segments, -1, 0, ['data']);
-            Log::debug(__METHOD__ . ': Segments 3: ', $segments);
+//             Log::debug(__METHOD__ . ': Segments 3: ', $segments);
         }
 
         // Reference to traverse the array.
@@ -211,17 +208,17 @@ class Metadata
         foreach ($segments as $segment) {
             if (is_array($currentLevel) && array_key_exists($segment, $currentLevel)) {
                 $currentLevel = $currentLevel[$segment]; // Go one level deeper
-                Log::debug(__METHOD__ . ": Found path segment '$segment' of '$webFilePath' not loaded: continuing.");
+//                Log::debug(__METHOD__ . ": Found path segment '$segment' of '$webFilePath' not loaded: continuing.");
             } else {
                 if ($loadIfNotFound) {
-                    Log::debug(__METHOD__ . ": Path segment '$segment' of '$webFilePath' not loaded: reloading.");
+//                    Log::debug(__METHOD__ . ": Path segment '$segment' of '$webFilePath' not loaded: reloading.");
                     self::loadFromInis(dirname($webFilePath));
                     return self::getFileDataByWebPath($webFilePath, false);
                 }
-                Log::debug(
-                    __METHOD__ . ": Path segment '$segment' of '$webFilePath' not loaded: returning empty.",
-                    self::$folderTree
-                );
+//                Log::debug(
+//                    __METHOD__ . ": Path segment '$segment' of '$webFilePath' not loaded: returning empty.",
+//                    self::$folderTree
+//                );
                 return [];
             }
         }
@@ -230,7 +227,7 @@ class Metadata
             Log::warning(__METHOD__ . ': Never iterated over segments: ', $segments);
         }
 
-        Log::debug(__METHOD__ . ': All path segments found', $webFilePath);
+//        Log::debug(__METHOD__ . ': All path segments found', $webFilePath);
         if (is_array($currentLevel)) {
             return $currentLevel;
         }

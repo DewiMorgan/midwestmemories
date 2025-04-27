@@ -156,8 +156,7 @@ Current task:
         * Convert the dump to real output fields.
     * Add image alt text (the name? Description?).
     * Add edit button to change fields to editable.
-        * Switch view mode to edit mode on edit button click? Or have all fields edit-on-click? Or pen by each?
-    * Add next/prev buttons (disappear when editing?)
+        * Switch view mode to edit mode on edit button click? All fields edit-on-click? Always editable? Pen by each?
     * Style this template.
         * Display the file, centered, scaled to the window.
         * The various fields, both for display and for edit.
@@ -179,11 +178,16 @@ Urgent:
     * Show subfolders as thumbs, too.
 
 * Metadata class
+    * Add hasNext and hasPrev properties to enable next/prev buttons in FileTemplate.
     * data from all parent folders isn't loaded at all.
     * Saving inherited data: do we save it only if it was modified? Seems sensible.
     * How do we distinguish inherited data in the returned data structure?
     * Should I instead have a getInheritedValue($filename, $key), for templates to call for missing values?
     * Versioned comments: how to represent, store, and so on? Just backup copies of the ini file? In a backup subfolder?
+
+* FileTemplate:
+    * Add next/prev buttons (disappear when editing? Or just prompt to save?)
+
 
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2
   (mod_rewrite)

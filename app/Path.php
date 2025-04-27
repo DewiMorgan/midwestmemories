@@ -144,12 +144,9 @@ class Path
      */
     public static function unixToWebPath(string $unixPath): string
     {
-        echo __METHOD__ . '(' . $unixPath . ")<br>\n"; // DELETEME DEBUG
         if (str_contains($unixPath, self::$imageBasePath)) {
-            echo 'Contains ' . self::$imageBasePath . "<br>\n"; // DELETEME DEBUG
             return str_replace(self::$imageBasePath, '', $unixPath);
         }
-        echo 'Did not contain' . self::$imageBasePath . "<br>\n"; // DELETEME DEBUG
         return '';
     }
 }
