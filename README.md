@@ -162,13 +162,13 @@ Current task:
 
 * TreeTemplate
     * We also need to UN-bold selected items, and bold NEW ones, as they are clicked.
-    * ToDo: Migrate TreeTemplate's JS out to TreeTemplate.js.
-    * ToDo: Migrate ScanDirectory out to... maybe Path.php? Its own file?
     * ToDo: Set page title. Should be non-fixed.
         * We already have `document.title = e.state.pageTitle;` - why doesn't that work?
     * ToDo: app/TreeTemplate.php:JS:handleDragBar*
         * Dragbar does not work. Changes cursor, but no drag.
         * Drag bar may not persist when navigating back/forth. Check.
+    * ToDo: Migrate TreeTemplate's JS out to TreeTemplate.js.
+    * ToDo: Migrate ScanDirectory out to... maybe Path.php? Its own file?
     * ToDo: Make it accept one or more callbacks to say how to recurse into, skip, or display entries.
         * Why?
 
@@ -206,6 +206,8 @@ Urgent:
 * FileTemplate
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif
     * Add next/prev buttons (disappear when editing? Or just prompt to save?)
+    * Better formatting for visitor notes (nl2br?).
+    * MVP for editing: just "add a comment".
     * Add edit button to change fields to editable.
         * Switch view mode to edit mode on edit button click? All fields edit-on-click? Always editable? Pen by each?
     * Style this template.
@@ -216,25 +218,22 @@ Urgent:
         * We don't care about this for now.
         * I think inherited data should be greyed out. Editing it saves locally. Button to go to page of parent/origin?
     * CSS: Make the inline file view look like not ass.
-* Index: Inline file view
 
-* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2
-  (mod_rewrite)
+* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2 
+    * (mod_rewrite)
 * PHP: Parse form input to database, with validation, errors, etc.
 * JS: Parse and display form errors.
 * Index: Inline search view.
-* Index: Additional file types (txt? More images?)
 * replace innerHTML use (mem leaks as doesn't remove handlers for old content; and doesn't run script tags.)
 * ThumbsTemplate: Alt text when displaying images.
 * ThumbsTemplate: Display title.
 * ThumbsTemplate: Display breadcrumbs?
 * ThumbsTemplate: Check width and height when displaying images.
 * Some kinda push tech to display error messages through Javascript in Index::ShowError().
-
+* Update the URL as the page changes.
 * "Download files from DB queue" and "Process downloaded files" are both giving me:
     * Cursor='',"Cursor was not set in client.", but I am not sure if that is even a true error.
     * No reproduction steps yet.
-* Update the URL as the page changes.
 
 From Code comments:
 
@@ -258,13 +257,15 @@ From Code comments:
 
 Low priority:
 
+* Index: Additional file types (txt? More images?)
 * Migrate templates into a sub-folder.
 * Files within the mm folder aren't navigable to.
 * site.webmanifest file could do with populating properly.
 * Allow log level to be specified as a string
 * Split a FileProcessor class out from DropboxManager?
 * Log rolling.
-* It logs the connection twice for each page load, but needn't.
+* It logs the connection twice for each page load, because of the way templates work.
+    * Could maybe not log unless i is set, or error?
 * Make all Log methods also echo, like Log::adminDebug(), depending on a config var something like LOG_ADMIN_ECHO_LEVEL.
 * Get rid of Log::adminDebug() method. Replace w Log::debug() throughout.
 * Create an always-present error-div, that's shown if it has any content. Sorta like an in-page console.

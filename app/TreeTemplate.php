@@ -292,7 +292,16 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
 
     function clickLink(e) {
         console.log("Onclick link.");
+        // Prevent link from navigating.
         e.preventDefault();
+
+        // Remove 'selected' from any previously selected li.
+        document.querySelectorAll('li.selected').forEach(selectedLi => {
+            selectedLi.classList.remove('selected');
+        });
+        // Add 'selected' to the clicked link's parent li.
+        this.parentElement.classList.add('selected');
+
         const attr = this.getAttribute("href");
         openLinkInline(attr);
     }

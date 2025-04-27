@@ -1,6 +1,7 @@
 # Changelog
 
-Newest items at top.
+Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
+which might not be when they were actually implemented/committed.
 
 ## 4/27/2025
 
@@ -16,6 +17,7 @@ Newest items at top.
 * FIXED: Stop the thumbnails from listing in TreeTemplate.
 * FIXED: Stop the forbidden files like index.txt and index.txt.bak from listing in TreeTemplate.
 * DONE: Expand to, and select, currently passed $path.
+* DONE: Inline file view
 
 ## 4/26/2025
 
