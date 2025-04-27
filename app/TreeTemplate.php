@@ -248,9 +248,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
 
     function handleNavigation(e) {
         if (e.state) {
-            // document.getElementById("content").innerHTML = e.state.html;
-            // ToDo: Might need to make openLinkInline NOT add this item to the history. Optional param?
-            openLinkInline(e.state.html, false);
+            openLinkInline(e.state.html + "&amp;i=1", false);
             document.title = e.state.pageTitle;
         }
     }
@@ -258,6 +256,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
     /**
      * Handle link clicking, to load content into the content div
      * @param {string} url The link to load.
+     * @param saveHistory True to add followed link to browser history: false for back/forward button handling.
      * @returns {Promise<void>}
      */
     async function openLinkInline(url, saveHistory = true) {
