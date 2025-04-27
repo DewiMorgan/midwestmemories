@@ -9,6 +9,7 @@ namespace MidwestMemories;
 <html lang="en">
 <head>
     <title>Folder navigation</title>
+    <!--suppress CssUnusedSymbol -->
     <style>
         /* Page layout. */
         body {
@@ -66,8 +67,8 @@ namespace MidwestMemories;
             display: block;
         }
 
-        li.selected > ul {
-            font-weight: bold;
+        li .path-link {
+            font-weight: normal; /* Default */
         }
 
         li.selected > .path-link {
