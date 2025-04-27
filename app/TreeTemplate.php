@@ -123,7 +123,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
                     // Collapse, unless our target path is within this branch.
                     $expandClass = Path::isChildInPath($targetPath, "$dir/$item") ? 'expanded' : 'collapsed';
                     $selectClass = ("$dir/$item" === $targetPath) ? 'selected' : '';
-                    Log::debug("Writing: expand='$expandClass', select='$selectClass' : $dir/$item from $targetPath"); // DELETEME DEBUG
+                    Log::debug("Folder: expand='$expandClass', select='$selectClass' : $dir/$item from $targetPath"); // DELETEME DEBUG
                     echo "<li class='folder $expandClass $selectClass'><span class='expand-collapse '>+</span>";
                     echo "<a href='$u_linkUrl' class='path-link'>$h_item</a>";
                     echo "<ul>\n";
@@ -133,6 +133,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
                     $selectClass = ("$dir/$item" === $targetPath) ? 'selected' : '';
                     // Otherwise, append to the list of files.
                     $files .= "<li class='file $selectClass'><a href='$u_linkUrl' class='path-link'>$h_item</a></li>\n";
+                    Log::debug("Filing: expand='$expandClass', select='$selectClass' : $dir/$item from $targetPath"); // DELETEME DEBUG
                 }
             }
             echo $files;
