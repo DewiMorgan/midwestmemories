@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <!DOCTYPE html>
 <!-- ToDo: DELETEME DEBUG: this file is only to get info on the local PHP install. Not a useful part of the project. -->
 <html lang="en">

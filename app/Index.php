@@ -21,8 +21,8 @@ class Index
         Path::validateBaseDir();
         static::initSession();
 
-        $requestedWebPath = $_REQUEST['path'] ?? '/';
-        self::$requestUnixPath = Path::webToUnixPath($requestedWebPath); // Dies if not correct.
+        $requestWebPath = $_REQUEST['path'] ?? '/';
+        self::$requestUnixPath = Path::webToUnixPath($requestWebPath); // Dies if not correct.
 
         static::showPage();
     }

@@ -218,7 +218,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
 
 <!--suppress InnerHTMLJS -->
 <script>
-    // Tree view event listeners to handle link-click behavior.
+    // Tree view event listeners to handle link-click behavior, and the initial onLoad().
 
     // Get all the folder elements in the tree view.
     const links = document.querySelectorAll('.path-link');
@@ -247,6 +247,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         removeAllChildNodes(content); // Ensure event listeners are removed.
         try {
             const response = await fetch(url);
+            // Set the content of the div to the fetched data.
             content.innerHTML = await response.text();
             // ToDo: set document title.
             console.log("Got to writing.");
@@ -256,7 +257,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             console.error(error);
         }
 
-        // set the content of the div to the fetched data
+        // Make sure that history will work.
         const historyUrl = url.replace(/&(?:amp;)?i=\d+/, ''); // Strip out "inline" instruction.
         console.log("Updating URL to '" + historyUrl + "'.");
         window.history.pushState({"html": historyUrl, "pageTitle": "Todo: Title"}, '', historyUrl);

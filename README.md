@@ -93,9 +93,8 @@ Next:
 
 Then:
 
-* PHP 8 features: readonly properties and promoted properties. Strict typing everywhere!
-* Parse info texts.
-* Display info texts with folders and images.
+* PHP 8 features: readonly properties and promoted properties.
+* Display info texts with folders.
 * Allow users to add more info texts.
 * Allow click people/things to name them, stores position in the pic.
 * OR: allow creation of clickable faces in a pic, maybe manually.
@@ -107,10 +106,7 @@ Later:
 * Display images in a search result-set with next/previous.
 * Delete files deleted from dropbox?
 
-## Test workflow
-
-I've been avoiding working on this as it became a bigger and bigger molehill-mountain in my head,
-partly because I forget the dev workflow. So here are the steps:
+## Dev/Test workflow
 
 1) Open the project in PHPStorm EAP (OK, in PHPStorm regular: I went and bought the license).
 2) In Bash, do "service mysql start". See MySqAuth.ini for auth info.
@@ -118,6 +114,11 @@ partly because I forget the dev workflow. So here are the steps:
 4) Browser tab: https://dewimorgan.com/midwestmemories/inst-mwm.php to run the git pull.
 5) Browser tab: https://midwestmemories.dewimorgan.com/admin.php to admin it.
 6) Browser tab: https://midwestmemories.dewimorgan.com/ to view the actual content.
+
+To push a change:
+
+1) Git push in PHPStorm.
+2) Git pull in inst-mwm.
 
 What do the commands in the admin page MEAN?
 
@@ -139,10 +140,19 @@ This should happen automatically from the Dropbox callback. I'm not sure whether
 
 **Process downloaded files**: Makes thumbnails, publicly publishes the files, etc.
 
-To push a change:
+## Templating flow
 
-1) Git push in PHPStorm.
-2) Git pull in inst-mwm.
+* /index.php::global - All user page processing starts here. Sets up autoloading, new Index(), and exits.
+* app/Index.php::__construct() - Handles session and path.
+* app/Index.php::showPage() - `i` param unset means user request: include TreeTemplate.
+* app/TreeTemplate.php::global - display leftbar, set an onLoad JS to load body page.
+* app/TreeTemplate.php::scanDirectory() - display leftbar, set an onLoad JS to load body page, add dragbar listeners.
+* app/TreeTemplate.php:JS:handleDragBar*() - handle dragbar resizing.
+* app/TreeTemplate.php:JS:openLinkInline() - handle onLoad and onClick, to load target into "content" div & fix history.
+* /index.php::global & app/Index.php::__construct() - as above, but for the subpage.
+* app/Index.php::showPage() - `i` param set by JS means internal request: include FileTemplate, ThumbsTemplate, etc.
+
+Templates have headers... unsure how it works when JS includes them inline. Styles seem respected?
 
 ## Current Issues
 
@@ -150,11 +160,42 @@ See also list at the top of this file.
 
 Current task:
 
-* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif
-* This is FileTemplate: get that working before worrying about TreeTemplate or ThumbsTemplate.
-    * Get FileTemplate to populate fully with readonly text from Metadata.
-        * Convert the dump to real output fields.
-    * Add image alt text (the name? Description?).
+* TreeTemplate
+    * Bug: it doesn't show the selected files, nor the other files in its folder, on the left. The folder is collapsed.
+        * That is, when you select a file, it collapses the current folder.
+    * ToDo: Should probably bold the selected item, too.
+    * ToDo: Clean up: move all debug to the bottom below a HR tag.
+    * ToDo: Stop the thumbnails from listing in TreeTemplate.
+    * ToDo: Make it accept one or more callbacks to say how to recurse into, skip, or display entries.
+    * ToDo: Migrate TreeTemplate's JS out to TreeTemplate.js.
+    * ToDo: Set page title. Should be non-fixed.
+    * ToDo: Expand to, and select, currently passed $path.
+    * ToDo: make it accept one or more callbacks to say how to recurse into, skip, or display entries.
+    * ToDo: app/TreeTemplate.php:JS:handleDragBar*
+        * Dragbar does not work. Changes cursor, but no drag.
+        * Drag bar may not persist. Check.
+
+Urgent:
+
+* ThumbsTemplate
+    * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
+    * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.
+        * The data is stored/read into Metadata. Treat same as FileTemplate
+    * Show subfolders as thumbs, too.
+        * Ini files don't handle subfolder details. Probably details should come from ini files in subfolders?
+
+* Metadata class
+    * Add hasNext and hasPrev properties to enable next/prev buttons in FileTemplate.
+    * data from all parent folders isn't loaded at all.
+    * Saving inherited data: do we save it only if it was modified? Seems sensible.
+    * How do we distinguish inherited data in the returned data structure?
+    * Should I instead have a getInheritedValue($filename, $key), for templates to call for missing values?
+    * Versioned comments: how to represent, store, and so on? Just backup copies of the ini file? In a backup subfolder?
+    * File w no data in ini file, getFileDetails returns empty array: should be populated w empty fields.
+
+* FileTemplate
+    * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif
+    * Add next/prev buttons (disappear when editing? Or just prompt to save?)
     * Add edit button to change fields to editable.
         * Switch view mode to edit mode on edit button click? All fields edit-on-click? Always editable? Pen by each?
     * Style this template.
@@ -164,35 +205,9 @@ Current task:
         * Is there even a programmatic difference?
         * We don't care about this for now.
         * I think inherited data should be greyed out. Editing it saves locally. Button to go to page of parent/origin?
-* Bug: it doesn't show the selected files, nor the other files in its folder, on the left. The folder is collapsed.
-    * That's in TreeTemplate.
-    * Should probably bold the selected item, too.
-
-Urgent:
-
-* ThumbsTemplate
-    * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
-    * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.
-    * But the instructions are vague. Where is the data stored/read in?
-    * In Metadata. We're using that in FileTemplate first: get that working before worrying about TreeTemplate.
-    * Show subfolders as thumbs, too.
-
-* Metadata class
-    * Add hasNext and hasPrev properties to enable next/prev buttons in FileTemplate.
-    * data from all parent folders isn't loaded at all.
-    * Saving inherited data: do we save it only if it was modified? Seems sensible.
-    * How do we distinguish inherited data in the returned data structure?
-    * Should I instead have a getInheritedValue($filename, $key), for templates to call for missing values?
-    * Versioned comments: how to represent, store, and so on? Just backup copies of the ini file? In a backup subfolder?
-
-* FileTemplate:
-    * Add next/prev buttons (disappear when editing? Or just prompt to save?)
-
 
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2
   (mod_rewrite)
-* https://midwestmemories.dewimorgan.com/?path=%2FDewi doesn't show the subfolder "2". (edit: fixed? Works for me!)
-* Ini files don't handle subfolder details? Probably those details should come from ini files in the subfolders I guess?
 * Index: Inline file view
 * PHP: Parse Metadata TO ini file.
 * PHP: Parse Metadata TO database.
@@ -210,7 +225,6 @@ Urgent:
 * PHP: Parse form input to database, with validation, errors, etc.
 * JS: Parse and display form errors.
 * CSS: Make the inline file view look like not ass.
-* Stop the thumbnails from listing in TreeTemplate.
 
 * Index: Inline search view.
 * replace innerHTML use (mem leaks as doesn't remove handlers for old content; and doesn't run script tags.)
@@ -244,13 +258,11 @@ From Code comments:
 * Connection: Ability to change passwords
 * DropboxManager::processTextFile(): Some processing.
 * DropboxManager::convertToJpeg(): How should this be reflected in the DB?
-* TreeTemplate: Make it accept one or more callbacks to say how to recurse into, skip, or display entries.
 
 Low priority:
 
 * Migrate templates into a sub-folder.
 * Files within the mm folder aren't navigable to.
-* Migrate TreeTemplate's JS out to TreeTemplate.js.
 * site.webmanifest file could do with populating properly.
 * Allow log level to be specified as a string
 * Split a FileProcessor class out from DropboxManager?
@@ -263,51 +275,4 @@ Low priority:
 * ThumbsTemplate: indent HTML lines for file list.
 * Dark mode
 
-Fixed:
-
-* FIXED: Change FileTemplate page title from "Folder Navigation".
-* FIXED: ThumbsTemplate wasn't ignoring the right files.
-* FIXED - https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill out the right hand side ("hello world").
-    * Just had to populate the ONLOAD call.
-* FIXED: Index: Clicking links seems broken, they don't open inline.
-    * Reproduction steps:
-        * Go to the index (https://midwestmemories.dewimorgan.com/).
-        * Click "Dewi". It should open in the pane to the right, but opens in full page.
-        * This is handled serverside by index.php:showPage(), and clientside by TreeTemplate.php:openLinkInline(url)
-        * This typically breaks when there's a 500 error somewhere.
-* FIXED: Bug: ini params with spaces are not read in correctly.
-* FIXED: PHP: Parse Metadata FROM ini file.
-* FIXED: Convert existing DBs to InnoDB, locally and remotely.
-* FIXED: DB: Add index to midmem_file_queue.full_path.
-* FIXED: DB: Create rest of schema.
-* FIXED: The admin page may be broken.
-* FIXED: Log class is not logging.
-* FIXED: back button doesn't populate page correctly (doesn't parse path=...).
-* FIXED: Need to change expand/collapse to be a style/class thing, so we can set the style when building the list.
-* FIXED: Reloading page doesn't repopulate correctly.
-* FIXED: "Span is null" error when clicking "Home". Probably any empty/root folder.
-* FIXED: CSS-based folding is not working.
-* FIXED: Get rid of (ideally, FIX) all code warnings. They just slow me down.
-* FIXED: TreeTemplate: Expand to, and select, currently passed $path.
-* FIXED: isOnTargetPath() - write this, though I've likely already got a similar class.
-* FIXED: Migrate the path manipulation methods from Index to their own class.
-* FIXED: Need a link to home at the top of tree-view template.
-* FIXED: ThumbsTemplate: Folders first.
-* FIXED: ThumbsTemplate: break HTML lines for file list.
-* FIXED: back button doesn't populate page correctly (unnecessary i=1).
-* FIXED: Update browser history when navigating.
-* FIXED: Db::mkRefArray(): There's apparently a `...` operator that makes this kludge redundant: see man page.
-* FIXED: The ThumbTemplate doesn't fill out - maybe no suitable files with thumbs?
-* FIXED: Argument #5 ($port) must be of type ?int, string given in .../public_html/midwestmemories/app/Db.php:41
-* FIXED: index.php double-loads the tree template.
-* FIXED: Content div has it as a class but not an ID.
-* FIXED: OpenLinkInline doesn't seem to do so. I had the wrong classnames.
-* FIXED: Create a config file for non-secret info.
-* FIXED: Read auth info through the config class.
-* FIXED: Unify pre-existing logging (as in Db class) to use Log class.
-* FIXED: Refactor dropboxcallback to a class, and move the class into the app/ folder.
-* FIXED: Create a simple static logger class. Log::error($str), etc.
-* FIXED: Create a simple static config class. Conf::get(Conf::LOG_LEVEL), etc.
-* FIXED: DropboxManager has some very poor naming. `dbm.iterations` and `dbm.extracted` need renaming.
-* FIXED: Main page doesn't load.
-* FIXED: Remove logging from autoloader.
+See also [CHANGELOG.md](CHANGELOG.md)
