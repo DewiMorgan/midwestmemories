@@ -222,8 +222,8 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
     function foldElement(e) {
         // Get the span element that was clicked: should probably be a class rather than just span.
         // Toggle the expand/collapse state of the folder.
-        this.classList.toggle("expanded");
-        this.classList.toggle("collapsed");
+        this.parentElement.classList.toggle("expanded");
+        this.parentElement.classList.toggle("collapsed");
         const span = this.querySelector('span');
         if (span) {
             if ('(+)' === span.textContent) {
