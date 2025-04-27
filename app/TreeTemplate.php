@@ -224,13 +224,10 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         // Toggle the expand/collapse state of the folder.
         this.parentElement.classList.toggle("expanded");
         this.parentElement.classList.toggle("collapsed");
-        const span = this.querySelector('span');
-        if (span) {
-            if ('(+)' === span.textContent) {
-                span.textContent = '(-)';
-            } else if ('(-)' === span.textContent) { // The explicit elseif allows OTHER spans to go untouched.
-                span.textContent = '(+)';
-            }
+        if ('(+)' === this.textContent) {
+            this.textContent = '(-)';
+        } else if ('(-)' === this.textContent) { // The explicit elseif allows OTHER spans to go untouched.
+            this.textContent = '(+)';
         }
         e.stopPropagation();
     }
