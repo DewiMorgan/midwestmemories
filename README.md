@@ -161,16 +161,16 @@ See also list at the top of this file.
 Current task:
 
 * TreeTemplate
+    * ToDo: Should probably bold the selected item, too.
     * Bug: it doesn't show the selected files, nor the other files in its folder, on the left. The folder is collapsed.
         * That is, when you select a file, it collapses the current folder.
-    * ToDo: Should probably bold the selected item, too.
     * ToDo: Clean up: move all debug to the bottom below a HR tag.
     * ToDo: Stop the thumbnails from listing in TreeTemplate.
     * ToDo: Make it accept one or more callbacks to say how to recurse into, skip, or display entries.
     * ToDo: Migrate TreeTemplate's JS out to TreeTemplate.js.
+    * ToDo: Migrate ScanDirectory out to... maybe Path.php? Its own file?
     * ToDo: Set page title. Should be non-fixed.
     * ToDo: Expand to, and select, currently passed $path.
-    * ToDo: make it accept one or more callbacks to say how to recurse into, skip, or display entries.
     * ToDo: app/TreeTemplate.php:JS:handleDragBar*
         * Dragbar does not work. Changes cursor, but no drag.
         * Drag bar may not persist. Check.

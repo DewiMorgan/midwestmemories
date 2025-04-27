@@ -66,6 +66,10 @@ namespace MidwestMemories;
             display: block;
         }
 
+        li.selected > ul {
+            font-weight: bold;
+        }
+
         /* Files in the tree view. */
         .file {
             cursor: default;
@@ -87,6 +91,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         // Set the root directory to display in the tree view.
         $root = Path::$imageBasePath;
 
+        // This is the treeview component.
         echo '<ul>';
         echo "<li class='folder'><a href='?path=%2F&amp;i=1' class='path-link'>Home</a></li>";
         scanDirectory($root, Index::$requestUnixPath);
@@ -117,15 +122,17 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
                 if (is_dir("$dir/$item")) {
                     // Collapse, unless our target path is within this branch.
                     $expandClass = Path::isChildInPath($targetPath, "$dir/$item") ? 'expanded' : 'collapsed';
-                    Log::debug("Writing: $expandClass : $dir/$item"); // DELETEME DEBUG
-                    echo "<li class='folder $expandClass'><span class='expand-collapse '>+</span>";
+                    $selectClass = ("$dir/$item" === $targetPath) ? 'selected' : '';
+                    Log::debug("Writing: expand='$expandClass', select='$selectClass' : $dir/$item"); // DELETEME DEBUG
+                    echo "<li class='folder $expandClass $selectClass'><span class='expand-collapse '>+</span>";
                     echo "<a href='$u_linkUrl' class='path-link'>$h_item</a>";
                     echo "<ul>\n";
                     scanDirectory("$dir/$item", $targetPath);
                     echo "</ul></li>\n";
                 } else {
+                    $selectClass = ("$dir/$item" === $targetPath) ? 'selected' : '';
                     // Otherwise, append to the list of files.
-                    $files .= "<li class='file'><a href='$u_linkUrl' class='path-link'>$h_item</a></li>\n";
+                    $files .= "<li class='file $selectClass'><a href='$u_linkUrl' class='path-link'>$h_item</a></li>\n";
                 }
             }
             echo $files;
