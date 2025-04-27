@@ -263,9 +263,8 @@ class MetadataCleaner
             Log::warn(__METHOD__ . ', unable to parse, returning a null for the timestamp'); // DELETEME DEBUG
             $result = null;
         }
-        Log::debug(__METHOD__ . ", returning $result"); // DELETEME DEBUG
-
         $cleanedString = self::cleanString($item);
+        Log::debug(__METHOD__ . ", returning $result from $cleanedString"); // DELETEME DEBUG
         return ['timestamp' => $result, 'dateString' => $cleanedString];
     }
 

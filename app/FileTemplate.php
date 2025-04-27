@@ -14,10 +14,6 @@ namespace MidwestMemories;
     <title>File</title>
 </head>
 <body>
-<h1 class="center">File title goes here</h1>
-<p>This is a description of the file.</p>
-
-
 <?php
 // ToDo: Style this.
 // ToDo: Add edit button.
@@ -28,37 +24,15 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb(Index
 $fileDetails = Metadata::getFileDataByUnixPath(Index::$requestUnixPath);
 
 // Escape the whole details array.
-$h_fd = [];
-foreach ($fileDetails as $key => $fileDetail) {
-    if (is_array($fileDetail)) {
-        if ('date' === $key) {
-            $h_fd[$key] = htmlspecialchars($fileDetail['dateString']);
-            echo 'Using dateString ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
-        } else {
-            $fileDetail = implode(', ', $fileDetail);
-echo 'Converting array ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
-        }
-    }
-    if (is_numeric($fileDetail)) {
-        $h_fd[$key] = $fileDetail;
-echo 'Setting number ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
-    } elseif (is_string($fileDetail) && strlen($fileDetail)) {
-        $h_fd[$key] = htmlspecialchars($fileDetail);
-echo 'Escaping valid ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
-    } else {
-        $h_fd[$key] = match ($key) {
-            'slideorigin', 'slidenumber', 'slidesubsection' => '?',
-            'displayname' => 'unknown image',
-            default => 'unknown',
-        };
-echo 'Defaulting empty ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
-    }
-}
+$h_fd = cleanFileDetails($fileDetails);
 
 // Special cases.
 $h_slide = $h_fd['slideorigin'] . ':' . $h_fd['slidenumber'] . ':' . $h_fd['slidesubsection'];
 $h_altText = $h_fd['displayname'];
 ?>
+<h1 class="center"><?= $h_fd['displayName'] ?></h1>
+<p><?= $h_fd['writtennotes'] ?></p>
+
 
 <img src="<?= $u_linkUrl ?>" alt="<?= $h_altText ?>">
 <table>
@@ -116,7 +90,44 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Index::$requestUnixPath) 
 
 echo '<pre>' . basename(Index::$requestUnixPath) . " file details:\n" . var_export($fileDetails, true) . "</pre>\n";
 
+
 // END DELETEME DEBUG
+
+/**
+ * Convert the raw file details into a HTML escaped version.
+ * @param array $fileDetails Array from which to html escape all fields.
+ * @return array The resulting escaped array.
+ */
+function cleanFileDetails(array $fileDetails): array {
+    $h_fd = [];
+    foreach ($fileDetails as $key => $fileDetail) {
+        if (is_array($fileDetail)) {
+            if ('date' === $key) {
+                $h_fd[$key] = htmlspecialchars($fileDetail['dateString']);
+                echo 'Using dateString ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+            } else {
+                $fileDetail = implode(', ', $fileDetail);
+                echo 'Converting array ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+            }
+        }
+        if (is_numeric($fileDetail)) {
+            $h_fd[$key] = $fileDetail;
+            echo 'Setting number ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+        } elseif (is_string($fileDetail) && strlen($fileDetail)) {
+            $h_fd[$key] = htmlspecialchars($fileDetail);
+            echo 'Escaping valid ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+        } else {
+            $h_fd[$key] = match ($key) {
+                'slideorigin', 'slidenumber', 'slidesubsection' => '?',
+                'displayname' => 'unknown image',
+                default => 'unknown',
+            };
+            echo 'Defaulting empty ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+        }
+    }
+    return $h_fd;
+}
+
 ?>
 
 </body>
