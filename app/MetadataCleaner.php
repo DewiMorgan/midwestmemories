@@ -250,20 +250,133 @@ class MetadataCleaner
     }
 
     /**
-     * Given a date string, return a valid timestamp, or null.
+     * Given a human date string, return a tuple of valid timestamp guess, and the original cleaned as a string.
      * @param mixed $item The item to try parsing for a date.
-     * @return int|null The valid timestamp, or null if it could not be parsed.
+     * @return array as ['timestamp'=>323423019, 'dateString'="Around 1980ish, probably early May?"]
      */
-    private static function cleanDate(mixed $item): ?int
+    private static function cleanDate(mixed $item): array
     {
         Log::debug(__METHOD__ . ', Parsing date ' . var_export($item, true)); // DELETEME DEBUG
-        $result = strtotime($item);
+        // We could try parsing it as a valid date first, but we know that fails for years on their own.
+        $result = strtotime(self::cleanAwfulDate($item));
         if (false === $result) {
-            Log::warn(__METHOD__ . ', unable to parse, returning NULL'); // DELETEME DEBUG
-            return null;
+            Log::warn(__METHOD__ . ', unable to parse, returning a null for the timestamp'); // DELETEME DEBUG
+            $result = null;
         }
         Log::debug(__METHOD__ . ", returning $result"); // DELETEME DEBUG
-        return $result;
+
+        $cleanedString = self::cleanString($item);
+        return ['timestamp' => $result, 'dateString' => $cleanedString];
+    }
+
+    /**
+     * If a date is in a very human format, like "Late 60s or early 70s. It may be april?", or "Cinco de Mayo '60!"
+     * ...it'll do it's best and guess April 1st 1960.
+     * It's guaranteed to return SOME valid date string, even if it's not the right one.
+     * @param string $string
+     * @return string
+     */
+    private static function cleanAwfulDate(string $string): string
+    {
+        // Try to avoid false positives from eg "Maybe Mark can Separate out the Junk."
+        preg_match_all(
+            '/\b(Jan|Feb|Mar(?!k)|Apr|May(?!\s*be)|Jun(?!k)|Jul|Aug|Sep(?![ae])|Oct|Nov|Dec(?![cr]))/i',
+            $string,
+            $matches
+        );
+        $foundMonth = count($matches[0]) ? $matches[0][0] : '';
+
+        // Find easy years.
+        preg_match_all('/(?<!\d)(18|19|20)\d\d(?!\d)/', $string, $matches);
+        if (!count($matches[0])) {
+            // Find harder years like "'63" or "60s". We assume they're all in the 1900s.
+            $string = preg_replace("/^[`']\d\ds?(?!\d)|(?<!\d)(\d0)s\b$/", '19$1$2', $string);
+            preg_match_all('/(?<!\d)19\d\d(?!\d)/', $string, $matches);
+        }
+        $foundYear = count($matches[0]) ? $matches[0][0] : '';
+
+        // Sequences of 1, 2, or 4 digits, possibly grouped together as dates.
+        preg_match_all(
+            '/(?<!\d)((\d{1,2}|\d{4})(?!\d))(([-.\/](\d{1,2}(?!\d)))([-.\/](\d{1,2}|\d{4}(?!\d))))?/',
+            $string,
+            $matches
+        );
+        $foundMaybeYears = [];
+        $foundMaybeMonths = [];
+        $foundMaybeDays = [];
+        foreach ($matches[0] as $str) {
+            // If it looks like a whole date string, then yay, we're done.
+            if (preg_match('/^(\d{1,2}|\d{4})\D\d{1,2}\D(\d{1,2}|\d{4})/', $str)) {
+                return $str;
+            }
+            // Get what might be date fragments.
+            if (preg_match('/^\d\d?$/', $str)) {
+                if (!$foundYear && preg_match('/^\d\d$/', $str)) { // Years are 2-4 digits. We handled 4 digits above.
+                    $foundMaybeYears[] = $str;
+                }
+                if (!$foundMonth && preg_match('/^(0?[1-9]|1[0-2])$/', $str)) { // Months are 1-9, 01-09, or 10-12.
+                    $foundMaybeMonths[] = $str;
+                }
+                if (preg_match('/^(0?[1-9]|[12]\d|3[01])$/', $str)) { // Days should be 1-9, 01-09, or 10-31.
+                    $foundMaybeDays[] = $str;
+                }
+            }
+        }
+
+        // Try to build a date.
+        if (count($foundMaybeYears) === 1) {
+            $foundYear = self::applyFirstValue($foundYear, '', $foundMaybeYears, $foundMaybeMonths, $foundMaybeDays);
+        }
+        // Assuming they might be writing in US format, (month day year), build in that order.
+        $foundMonth = self::applyFirstValue($foundMonth, '01', $foundMaybeMonths, $foundMaybeYears, $foundMaybeDays);
+        if (count($foundMaybeYears) === 1) {
+            $foundYear = self::applyFirstValue($foundYear, '', $foundMaybeYears, $foundMaybeDays);
+        }
+        $foundDay = self::applyFirstValue('', '01', $foundMaybeDays, $foundMaybeYears);
+        $foundYear = self::applyFirstValue($foundYear, '1066', $foundMaybeYears);
+        if (strlen($foundYear) === 2) {
+            $foundYear = '19' . $foundYear;
+        }
+
+        // Build date from the three pieces. Year-month-day format is unambiguous.
+        return "$foundYear-$foundMonth-$foundDay";
+    }
+
+    /**
+     * Apply a value and remove it from any other valid lists.
+     * @param string $found The value, if we've already found it yet. Otherwise, empty string.
+     * @param string $default The value to apply if the list of possible valid values is empty.
+     * @param array $foundMaybe A list of possible valid values. Apply the first.
+     * @param array|null $other1 Optional list of values to remove the one we applied from.
+     * @param array|null $other2 Optional list of values to remove the one we applied from.
+     * @return string
+     */
+    private static function applyFirstValue(
+        string $found,
+        string $default,
+        array $foundMaybe,
+        array &$other1 = null,
+        array &$other2 = null
+    ): string {
+        if (!$found) {
+            $found = count($foundMaybe) ? $foundMaybe[0] : $default;
+            self::removeFirst($found, $other1);
+            self::removeFirst($found, $other2);
+        }
+        return $found;
+    }
+
+
+    /**
+     * Helper to remove the first matching element from an array.
+     * @param mixed $value The value to remove.
+     * @param array|null $array $array The array to remove from.
+     */
+    private static function removeFirst(mixed $value, array &$array = null): void
+    {
+        if (!is_null($array) && false !== ($key = array_search($value, $array, true))) {
+            unset($array[$key]);
+        }
     }
 
     /**

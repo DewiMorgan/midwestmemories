@@ -31,17 +31,17 @@ $fileDetails = Metadata::getFileDataByUnixPath(Index::$requestUnixPath);
 $h_fd = [];
 foreach ($fileDetails as $key => $fileDetail) {
     if (is_array($fileDetail)) {
-        $fileDetail = implode(', ', $fileDetail);
+        if ('date' === $key) {
+            $h_fd[$key] = htmlspecialchars($fileDetail['dateString']);
+            echo 'Using dateString ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+        } else {
+            $fileDetail = implode(', ', $fileDetail);
 echo 'Converting array ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+        }
     }
     if (is_numeric($fileDetail)) {
-        if ('date' === $key) {
-            $h_fd['date'] = date('Y-m-d', $fileDetail);
-echo 'Copying number ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
-        } else {
-            $h_fd[$key] = htmlspecialchars($fileDetail);
-echo 'Setting date ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
-        }
+        $h_fd[$key] = $fileDetail;
+echo 'Setting number ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
     } elseif (is_string($fileDetail) && strlen($fileDetail)) {
         $h_fd[$key] = htmlspecialchars($fileDetail);
 echo 'Escaping valid ' . var_export($fileDetail, true) . ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
