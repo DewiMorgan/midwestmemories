@@ -161,7 +161,7 @@ See also list at the top of this file.
 Current task:
 
 * TreeTemplate
-    * We also need to UN-bold selected items, and bold NEW ones, as they are clicked.
+    * Back button doesn't work.
     * ToDo: Set page title. Should be non-fixed.
         * We already have `document.title = e.state.pageTitle;` - why doesn't that work?
     * ToDo: app/TreeTemplate.php:JS:handleDragBar*
@@ -180,6 +180,7 @@ Urgent:
         * The data is stored/read into Metadata. Treat same as FileTemplate
     * Show subfolders as thumbs, too.
         * Ini files don't handle subfolder details. Probably details should come from ini files in subfolders?
+    * Clicking images doesn't load them in TreeTemplate, I think because they have a double-leading-slash.
 
 * Metadata class
     * Add hasNext and hasPrev properties to enable next/prev buttons in FileTemplate.

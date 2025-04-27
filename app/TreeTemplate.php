@@ -245,6 +245,17 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
 
     window.onpopstate = handleNavigation;
 
+    window.addEventListener('pageshow', handlePageShow);
+
+    function handlePageShow(event) {
+        if (event.persisted) {
+            // This means the page was restored from the bfcache (back/forward cache)
+            console.log('Page was restored by the back/forward cache.');
+        } else {
+            console.log('Normal page show (fresh load).');
+        }
+    }
+
     function handleNavigation(e) {
         if (e.state) {
             document.getElementById("content").innerHTML = e.state.html;

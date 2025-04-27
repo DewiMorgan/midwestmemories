@@ -18,6 +18,7 @@ which might not be when they were actually implemented/committed.
 * FIXED: Stop the forbidden files like index.txt and index.txt.bak from listing in TreeTemplate.
 * DONE: Expand to, and select, currently passed $path.
 * DONE: Inline file view
+* FIXED: We also need to UN-bold selected items, and bold NEW ones, as they are clicked.
 
 ## 4/26/2025
 
