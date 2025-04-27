@@ -70,7 +70,7 @@ namespace MidwestMemories;
             font-weight: bold;
         }
 
-        li.selected > a {
+        li.selected > .path-link {
             font-weight: bold;
         }
 
