@@ -266,8 +266,8 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
 
         let title;
         try {
+            // Fetch the new content.
             const response = await fetch(url);
-            // Set the content of the div to the fetched data.
             const html = await response.text();
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
@@ -310,12 +310,9 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
     }
 
     // Safely clear the div using the DOM, so all event handlers are cleanly killed without memory leaks.
-    function clearContentDiv() {
+    function clearContentDiv(oldContentDiv) {
         // Find the parent element (where the div is located)
         const parent = document.getElementById('parent-container'); // The parent of the 'content' div
-
-        // Find the div to remove
-        const oldContentDiv = document.getElementById('content');
 
         // Remove the old content div
         let nextSibling = null;

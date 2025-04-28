@@ -76,9 +76,6 @@ $h_altText = $h_fd['displayname'];
 // DELETEME DEBUG
 echo '<hr><h3>Debugging stuff below this line</h3>';
 
-$u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Index::$requestUnixPath) . '&amp;i=2';
-?><img src="<?= $u_linkUrl ?>" alt="<?= $h_altText ?>"><br><?= $h_fd['displayName'] ?><?php
-
 echo '<pre>' . basename(Index::$requestUnixPath) . " file details:\n" . var_export($fileDetails, true) . "</pre>\n";
 
 // END DELETEME DEBUG
