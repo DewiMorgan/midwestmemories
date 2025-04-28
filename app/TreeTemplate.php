@@ -12,10 +12,14 @@ namespace MidwestMemories;
     <!--suppress CssUnusedSymbol -->
     <style>
         img {
+            /* Sane size */
             max-width: 100%;
-            max-height: 80vh;
+            max-height: 70vh; /* % of visible height */
             width: auto;
             height: auto;
+            /* Center */
+            display: block;
+            margin: 0 auto;
         }
 
         /* Page layout. */
