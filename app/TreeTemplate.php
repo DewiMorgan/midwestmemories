@@ -11,6 +11,13 @@ namespace MidwestMemories;
     <title><?php Index::getSiteName(); ?> - Folder Tree</title>
     <!--suppress CssUnusedSymbol -->
     <style>
+        img {
+            max-width: 100%;
+            max-height: 400px;
+            width: auto;
+            height: auto;
+        }
+
         /* Page layout. */
         body {
             overflow: hidden;

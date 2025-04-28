@@ -160,16 +160,12 @@ See also list at the top of this file.
 
 Current task:
 
-* Getting the files down and thumbnailed.
-* Might need to update composer, either needs on the server, or through CLI, or through DOS PHP.
-
-* TreeTemplate
-    * ToDo: Migrate TreeTemplate's JS out to TreeTemplate.js.
-    * ToDo: Migrate ScanDirectory out to... maybe Path.php? Its own file?
-    * ToDo: Make it accept one or more callbacks to say how to recurse into, skip, or display entries.
-        * Why?
+* Getting the files thumbnailed. (not working?)
 
 Urgent:
+
+* TreeTemplate
+    * It would be nice to hide the ICE images, and have the user able to toggle between ice/non-ice.
 
 * ThumbsTemplate
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
@@ -254,6 +250,12 @@ From Code comments:
 * DropboxManager::convertToJpeg(): How should this be reflected in the DB?
 
 Low priority:
+
+* TreeTemplate
+    * ToDo: Migrate TreeTemplate's JS out to TreeTemplate.js.
+    * ToDo: Migrate ScanDirectory out to... maybe Path.php? Its own file?
+    * ToDo: Make it accept one or more callbacks to say how to recurse into, skip, or display entries.
+    * Why?
 
 * Index: Additional file types (txt? svg|bmp|webp?).
     * Add a template
