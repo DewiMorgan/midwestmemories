@@ -277,10 +277,10 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             title = doc.querySelector('title')?.innerText;
 
             // Import all new body children safely
-            Array.from(doc.body.children).forEach(child => {
-                newContent.appendChild(child.cloneNode(true));
-            });
-
+            for (const child of doc.body.children) {
+                const clone = child.cloneNode(true);
+                newContent.appendChild(clone);
+            }
             console.log("Got to writing.");
         } catch (error) {
             console.error(error);
@@ -293,8 +293,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         document.title = getSiteName() + ' - ' + title;
 
         // Ensure our handler loads all child links in the content div.
-        const links = content.querySelectorAll('a');
-        links.forEach(addLinkClickHandler);
+        addLinksToContent(content);
 
         // Ensure that history will work.
         if (saveHistory) {
@@ -304,6 +303,13 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         }
     }
 
+    // Ensure our handler loads all child links in the content div.
+    function addLinksToContent(content) {
+        const links = content.querySelectorAll('a');
+        links.forEach(addLinkClickHandler);
+    }
+
+    // Safely clear the div using the DOM, so all event handlers are cleanly killed without memory leaks.
     function clearContentDiv() {
         // Find the parent element (where the div is located)
         const parent = document.getElementById('parentContainer'); // The parent of the 'content' div
