@@ -161,7 +161,6 @@ See also list at the top of this file.
 Current task:
 
 * TreeTemplate
-    * ToDo: Set page title. Should be non-fixed.
     * ToDo: Migrate TreeTemplate's JS out to TreeTemplate.js.
     * ToDo: Migrate ScanDirectory out to... maybe Path.php? Its own file?
     * ToDo: Make it accept one or more callbacks to say how to recurse into, skip, or display entries.
@@ -223,7 +222,6 @@ Urgent:
 * PHP: Parse form input to database, with validation, errors, etc.
 * JS: Parse and display form errors.
 * Index: Inline search view.
-* replace innerHTML use (mem leaks as doesn't remove handlers for old content; and doesn't run script tags.)
 * ThumbsTemplate: Alt text when displaying images.
 * ThumbsTemplate: Display title.
 * ThumbsTemplate: Display breadcrumbs?

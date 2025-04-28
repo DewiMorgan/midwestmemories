@@ -233,7 +233,6 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
     }
 </script>
 
-<!--suppress InnerHTMLJS -->
 <script>
     // Tree view event listeners to handle link-click behavior, and the initial onLoad().
 
@@ -274,20 +273,22 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             const doc = parser.parseFromString(html, 'text/html');
 
             // Clear old content safely
-            content.innerHTML = '';
+            const newContent = clearContentDiv();
             title = doc.querySelector('title')?.innerText;
 
             // Import all new body children safely
             Array.from(doc.body.children).forEach(child => {
-                content.appendChild(child.cloneNode(true));
+                newContent.appendChild(child.cloneNode(true));
             });
 
-            // ToDo: set document title.
             console.log("Got to writing.");
         } catch (error) {
-            title = 'Error loading page';
-            content.innerHTML = error;
             console.error(error);
+            title = 'Error loading page';
+            const newContent = clearContentDiv();
+            const element = document.createElement('h1');
+            element.textContent = title;
+            newContent.appendChild(element);
         }
         document.title = getSiteName() + ' - ' + title;
 
@@ -301,6 +302,33 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             console.log("Updating URL to '" + historyUrl + "'.");
             window.history.pushState({"html": historyUrl, "pageTitle": title}, '', historyUrl);
         }
+    }
+
+    function clearContentDiv() {
+        // Find the parent element (where the div is located)
+        const parent = document.getElementById('parentContainer'); // The parent of the 'content' div
+
+        // Find the div to remove
+        const oldContentDiv = document.getElementById('content');
+
+        // Remove the old content div
+        let nextSibling = null;
+        if (oldContentDiv) {
+            nextSibling = oldContentDiv.nextSibling;
+            oldContentDiv.remove(); // Remove the div along with its children and event listeners
+        }
+
+        // Create the new content div
+        const newContentDiv = document.createElement('div');
+        newContentDiv.id = 'content'; // Set the same ID as the original
+
+        // Insert the new div at the same position
+        if (nextSibling) {
+            parent.insertBefore(newContentDiv, nextSibling); // Insert it before the next sibling of the old div.
+        } else {
+            parent.appendChild(newContentDiv); // If no next sibling (i.e., it's the last child), append the new div.
+        }
+        return newContentDiv;
     }
 
     /**

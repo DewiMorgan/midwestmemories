@@ -23,6 +23,8 @@ which might not be when they were actually implemented/committed.
 * FIXED: Drag bar does not work. Changes cursor, but no drag.
 * DONE: Drag bar may not persist when navigating back/forth. Check.
 * FIXED: Child page links lack handlers, so they aren't handling the `&i=1` links well.
+* ToDo: Set page title. Should be non-fixed.
+* replace innerHTML use (mem leaks as doesn't remove handlers for old content; and doesn't run script tags.)
 
 ## 4/26/2025
 
