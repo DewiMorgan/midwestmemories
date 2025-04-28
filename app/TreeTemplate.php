@@ -273,7 +273,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             const doc = parser.parseFromString(html, 'text/html');
 
             // Clear old content safely
-            const newContent = clearContentDiv();
+            const newContent = clearContentDiv(content);
             title = doc.querySelector('title')?.innerText;
 
             // Import all new body children safely
@@ -285,7 +285,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         } catch (error) {
             console.error(error);
             title = 'Error loading page';
-            const newContent = clearContentDiv();
+            const newContent = clearContentDiv(content);
             const element = document.createElement('h1');
             element.textContent = title;
             newContent.appendChild(element);
@@ -310,12 +310,9 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
     }
 
     // Safely clear the div using the DOM, so all event handlers are cleanly killed without memory leaks.
-    function clearContentDiv(ignoredDiv) {
+    function clearContentDiv(oldContentDiv) {
         // Find the parent element (where the div is located)
         const parent = document.getElementById('parent-container'); // The parent of the 'content' div
-
-        // Find the div to remove
-        const oldContentDiv = document.getElementById('content');
 
         // Remove the old content div
         let nextSibling = null;
