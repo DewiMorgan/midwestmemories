@@ -131,7 +131,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             foreach ($items as $item) {
                 // Apply blacklist even to folders. Skip the current and parent directories, and any hidden ones.
                 // Also skip thumbnails, index files, and ICE files.
-                if (preg_match('/^(\.|tn_|index\.|-ICE.jpg)/', $item)) {
+                if (preg_match('/^(\.|tn_|index\.)|-ICE.jpg$/', $item)) {
                     continue;
                 }
 
