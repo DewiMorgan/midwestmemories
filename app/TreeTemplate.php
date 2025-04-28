@@ -11,7 +11,7 @@ namespace MidwestMemories;
     <title><?php Index::getSiteName(); ?> - Folder Tree</title>
     <!--suppress CssUnusedSymbol -->
     <style>
-        img {
+        img.file {
             /* Sane size */
             max-width: 100%;
             max-height: 70vh; /* % of visible height */

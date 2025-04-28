@@ -32,7 +32,7 @@ $h_altText = $h_fd['displayname'];
 ?>
 <h1 class="center"><?= $h_fd['displayname'] ?></h1>
 
-<img src="<?= $u_linkUrl ?>" alt="<?= $h_altText ?>">
+<img src="<?= $u_linkUrl ?>" alt="<?= $h_altText ?>" class="file">
 <p><?= $h_fd['writtennotes'] ?></p>
 <table>
     <tr>

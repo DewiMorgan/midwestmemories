@@ -166,6 +166,7 @@ Urgent:
 
 * TreeTemplate
     * It would be nice to hide the ICE images, and have the user able to toggle between ice/non-ice.
+    * When first displaying, all open folders are '(+)', should be '(-)'.
 
 * ThumbsTemplate
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
@@ -174,6 +175,7 @@ Urgent:
     * Show subfolders as thumbs, too.
         * Ini files don't handle subfolder details. Probably details should come from ini files in subfolders?
     * Clicking images doesn't load them in TreeTemplate, I think because they have a double-leading-slash.
+    * In the absence of a thumbnail, show the real image, but sized down.
 
 * Metadata class
     * Add hasNext and hasPrev properties to enable next/prev buttons in FileTemplate.

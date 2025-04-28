@@ -29,6 +29,10 @@ which might not be when they were actually implemented/committed.
 * DONE: Delete `phpinfoz.php`
 * DONE: Get the files down. (done so far)
 * DONE: Update composer files.
+* DONE: Keep huge images visible.
+* DONE: Center images.
+* DONE: Hide ICE files.
+* DONE: Autogenerate the ini files from the new files.
 
 ## 4/26/2025
 
