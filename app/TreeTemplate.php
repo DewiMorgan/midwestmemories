@@ -13,7 +13,7 @@ namespace MidwestMemories;
     <style>
         img {
             max-width: 100%;
-            max-height: 400px;
+            max-height: 80vh;
             width: auto;
             height: auto;
         }
