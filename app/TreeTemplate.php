@@ -171,7 +171,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
     // DragBar behavior.
     const dragBar = document.querySelector('.drag-bar');
     const leftColumn = document.querySelector('.left-column');
-    const rightColumn = document.querySelector('.right-column');
+    let rightColumn = document.querySelector('.right-column');
 
     let isDragging = false;
     let currentX;
@@ -194,6 +194,8 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
     }
 
     function handleDragBarMouseDown(e) {
+        // Reselect this as it may have been recreated.
+        rightColumn = document.querySelector('.right-column');
         isDragging = true;
         currentX = e.clientX;
         leftColumnWidth = leftColumn.offsetWidth;
