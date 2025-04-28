@@ -8,7 +8,7 @@ namespace MidwestMemories;
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Folder navigation</title>
+    <title><?php Index::getSiteName();?> - Folder Tree</title>
     <!--suppress CssUnusedSymbol -->
     <style>
         /* Page layout. */
@@ -264,26 +264,31 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
 
         const content = document.getElementById("content");
         removeAllChildNodes(content); // Ensure event listeners are removed.
+
+        let title;
         try {
             const response = await fetch(url);
             // Set the content of the div to the fetched data.
             content.innerHTML = await response.text();
             // ToDo: set document title.
             console.log("Got to writing.");
+            title = response.title;
         } catch (error) {
-            document.title = 'Error loading page';
+            title = 'Error loading page';
             content.innerHTML = error;
             console.error(error);
         }
+        document.title = getSiteName() + ' - ' + title;
 
+        // Ensure our handler loads all child links in the content div.
         const links = content.querySelectorAll('a');
         links.forEach(addLinkClickHandler);
 
-        // Make sure that history will work.
+        // Ensure that history will work.
         if (saveHistory) {
             const historyUrl = url.replace(/&(?:amp;)?i=\d+/, ''); // Strip out "inline" instruction.
             console.log("Updating URL to '" + historyUrl + "'.");
-            window.history.pushState({"html": historyUrl, "pageTitle": "Todo: Title (from history)"}, '', historyUrl);
+            window.history.pushState({"html": historyUrl, "pageTitle": title}, '', historyUrl);
         }
     }
 
@@ -327,6 +332,15 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         while (parent.firstChild) {
             parent.removeChild(parent.firstChild);
         }
+    }
+
+    /** Just to troll my wife, get a random name for the site. */
+    function getSiteName() {
+        const a = [
+            'Memories', 'Mayhem', 'Merriment', 'Madness', 'Moonshine', 'Mountains', 'Mastery', 'Machines',
+            'Messages', 'Metaphor', 'Meteor', 'Mistakes', 'Mondays', 'Mornings', 'Moaning', 'Mystery'
+        ];
+        return 'Midwest ' + a[~~(Math.random() * a.length)];
     }
 </script>
 

@@ -25,7 +25,7 @@ namespace MidwestMemories;
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Thumbs</title>
+    <title>ToDo: a folder title here</title>
     <style>
         body {
             font: 10pt sans-serif;

@@ -22,6 +22,7 @@ which might not be when they were actually implemented/committed.
 * FIXED: Back button doesn't work.
 * FIXED: Drag bar does not work. Changes cursor, but no drag.
 * DONE: Drag bar may not persist when navigating back/forth. Check.
+* FIXED: Child page links lack handlers, so they aren't handling the `&i=1` links well.
 
 ## 4/26/2025
 

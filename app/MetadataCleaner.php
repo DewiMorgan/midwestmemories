@@ -26,7 +26,7 @@ class MetadataCleaner
         'slideorigin', // Where the slide was kept.
         'slidenumber', // Where the slide was kept.
         'slidesubsection', // Where the slide was kept.
-        'unfiltered', // Boolean, false if ICE.
+        'filtered', // Boolean, true if ICE.
         'date',
         'writtennotes', // Slide text.
         'visitornotes',
@@ -167,7 +167,7 @@ class MetadataCleaner
                 case 'slidesubsection':
                     $newFileData[$strippedKey] = self::cleanInt($item);
                     break;
-                case 'unfiltered':
+                case 'filtered':
                     $newFileData[$strippedKey] = self::cleanBool($item);
                     break;
                 default:

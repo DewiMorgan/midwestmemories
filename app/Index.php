@@ -108,4 +108,15 @@ class Index
     {
         echo $string;
     }
+
+    public static function getSiteName(): string
+    {
+        $a = array_rand(
+            [
+                'Memories', 'Mayhem', 'Merriment', 'Madness', 'Moonshine', 'Mountains', 'Mastery', 'Machines',
+                'Messages', 'Metaphor', 'Meteor', 'Mistakes', 'Mondays', 'Mornings', 'Moaning', 'Mystery'
+            ]
+        );
+        return 'Midwest ' . $a;
+    }
 }

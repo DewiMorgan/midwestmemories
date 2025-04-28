@@ -11,7 +11,7 @@ namespace MidwestMemories;
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>File</title>
+    <title>ToDo: a file title here</title>
 </head>
 <body>
 <?php
