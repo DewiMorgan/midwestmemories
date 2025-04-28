@@ -165,9 +165,12 @@ Current task:
 Urgent:
 
 * TreeTemplate
-    * It would be nice to hide the ICE images, and have the user able to toggle between ice/non-ice.
+    * It would be nice to let the user able to toggle between ice/non-ice if available.
     * When first displaying, all open folders are '(+)', should be '(-)'.
-
+    * Bug: the slide numbers at the end are reversed from how they are in the filename.
+    * Bug: The field for "text on slide" isn't in the table, it's above.
+    * Bug: Right-clicking "open image in new tab" doesn't work 
+ 
 * ThumbsTemplate
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
     * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.

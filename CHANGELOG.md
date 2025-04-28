@@ -31,7 +31,7 @@ which might not be when they were actually implemented/committed.
 * DONE: Update composer files.
 * DONE: Keep huge images visible.
 * DONE: Center images.
-* DONE: Hide ICE files.
+* DONE: It would be nice to hide the ICE images.
 * DONE: Autogenerate the ini files from the new files.
 
 ## 4/26/2025
