@@ -274,5 +274,9 @@ Low priority:
 * Handle empty folders.
 * ThumbsTemplate: indent HTML lines for file list.
 * Dark mode
+* MetadataCleaner::cleanNamesInData():
+    * Optional param $checkExists to accept only pre-existing names?
+    * This is why they're all bundled together, so it can be done in one query.
+    * Restrict the characters that can be in a name? Remove <script>, etc.
 
 See also [CHANGELOG.md](CHANGELOG.md)

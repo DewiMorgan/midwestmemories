@@ -139,7 +139,7 @@ class Metadata
     /** Populate and overwrite our values with the values from another object.
      * @param array $sourceArray The Metadata object to copy from, in the same format as self::$folderTree.
      */
-    private static function updateFromArray(array $sourceArray): void
+    public static function updateFromArray(array $sourceArray): void
     {
         foreach ($sourceArray as $key => $entry) {
             // Go into the first level of arrays and copy their contents.
@@ -151,15 +151,6 @@ class Metadata
                 }
             }
         }
-    }
-
-    /**
-     * Get the data structure for ths metadata.
-     * @return array
-     */
-    public static function getData(): array
-    {
-        return self::$folderTree;
     }
 
     /**

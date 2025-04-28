@@ -8,7 +8,7 @@ namespace MidwestMemories;
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title><?php Index::getSiteName();?> - Folder Tree</title>
+    <title><?php Index::getSiteName(); ?> - Folder Tree</title>
     <!--suppress CssUnusedSymbol -->
     <style>
         /* Page layout. */
@@ -269,10 +269,21 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         try {
             const response = await fetch(url);
             // Set the content of the div to the fetched data.
-            content.innerHTML = await response.text();
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // Clear old content safely
+            content.innerHTML = '';
+            title = doc.querySelector('title')?.innerText;
+
+            // Import all new body children safely
+            Array.from(doc.body.children).forEach(child => {
+                content.appendChild(child.cloneNode(true));
+            });
+
             // ToDo: set document title.
             console.log("Got to writing.");
-            title = response.title;
         } catch (error) {
             title = 'Error loading page';
             content.innerHTML = error;

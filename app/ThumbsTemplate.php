@@ -84,8 +84,8 @@ namespace MidwestMemories;
 <div class="thumb-content">
     <h1 class="center">Folder title goes here</h1>
     <p>This is a description of the folder/album and its contents.</p>
-    <p>This is a <a href="http://www.google.com">test link to make sure that external links work.</a></p>
-    <p>This is a <a href="http://www.google.com?x&i=1">test link to find what happens if I break external links.</a></p>
+    <p>This is a <a href="https://www.google.com">test link to make sure that external links work.</a></p>
+    <p>This is a <a href="https://www.google.com?x&i=1">test link to try breaking external links.</a></p>
 </div>
 
 <div class="thumb-pad" id="rounded">

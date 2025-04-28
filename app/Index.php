@@ -109,6 +109,10 @@ class Index
         echo $string;
     }
 
+    /**
+     * Purely to troll my wife, it generates a random name for the site each time it's called.
+     * @return string
+     */
     public static function getSiteName(): string
     {
         $a = array_rand(

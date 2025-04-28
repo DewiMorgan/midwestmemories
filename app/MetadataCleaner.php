@@ -395,10 +395,6 @@ class MetadataCleaner
      * Take lists of name-lists, and ensure that they are valid, in some sense.
      * @param array $newDirData A data array that should have the name lists inserted/updated into.
      * @param array $nameLists A list of name-lists, keyed by their key within the data array.
-     * @ToDo: Currently a no-op. Maybe:
-     *   - Optional param $checkExists to accept only pre-existing names?
-     *   - This is why they're all bundled together, so it can be done in one query.
-     *   - Restrict the characters that can be in a name? Remove <script>, etc.
      */
     private static function cleanNamesInData(array &$newDirData, array $nameLists): void
     {
@@ -411,7 +407,6 @@ class MetadataCleaner
      * Given a string, make sure it's trimmed, and truncate it to the max length, if any.
      * @param mixed $item The item to clean as a string.
      * @param ?int $maxLength optional max length to truncate to.
-     * @param bool $parseSlashes Whether to parse C slashes (\f, \n, \r, \t, \v, numeric escapes) in the string.
      * @return string The cleaned string, which may be empty.
      */
     private static function cleanString(mixed $item, int $maxLength = null): string
@@ -426,14 +421,6 @@ class MetadataCleaner
             Log::warn('String property was too long', $trimmed);
             $trimmed = substr($trimmed, 0, $maxLength);
         }
-
-        //// This is a hack, since stripcslashes() will remove a slash that precedes a non-special character.
-        //// Instead, this only escapes the special characters \f, \n, \r, \t, \v, and octal and hex escapes.
-        //$trimmed = preg_replace_callback(
-        //    '/\\\\([fnrtv\\\\$"]|[0-7]{1,3}|\x[0-9A-Fa-f]{1,2})/',
-        //    static fn($matches) => stripcslashes($matches[0]),
-        //    $trimmed
-        //);
 
         Log::debug(__METHOD__ . ", returning $trimmed"); // DELETEME DEBUG
         return $trimmed;

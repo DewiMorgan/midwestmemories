@@ -81,7 +81,6 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Index::$requestUnixPath) 
 
 echo '<pre>' . basename(Index::$requestUnixPath) . " file details:\n" . var_export($fileDetails, true) . "</pre>\n";
 
-
 // END DELETEME DEBUG
 
 /**
@@ -89,7 +88,8 @@ echo '<pre>' . basename(Index::$requestUnixPath) . " file details:\n" . var_expo
  * @param array $fileDetails Array from which to html escape all fields.
  * @return array The resulting escaped array.
  */
-function cleanFileDetails(array $fileDetails): array {
+function cleanFileDetails(array $fileDetails): array
+{
     $h_fd = [];
     foreach ($fileDetails as $key => $fileDetail) {
         if (is_array($fileDetail)) {
