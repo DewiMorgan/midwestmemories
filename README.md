@@ -145,9 +145,9 @@ This should happen automatically from the Dropbox callback. I'm not sure whether
 * /index.php::global - All user page processing starts here. Sets up autoloading, new Index(), and exits.
 * app/Index.php::__construct() - Handles session and path.
 * app/Index.php::showPage() - `i` param unset means user request: include TreeTemplate.
-* app/TreeTemplate.php::global - display leftbar, set an onLoad JS to load body page.
-* app/TreeTemplate.php::scanDirectory() - display leftbar, set an onLoad JS to load body page, add dragbar listeners.
-* app/TreeTemplate.php:JS:handleDragBar*() - handle dragbar resizing.
+* app/TreeTemplate.php::global - display left-bar, set an onLoad JS to load body page.
+* app/TreeTemplate.php::scanDirectory() - display left-bar, set an onLoad JS to load body page, add drag-bar listeners.
+* app/TreeTemplate.php:JS:handleDragBar*() - handle drag-bar resizing.
 * app/TreeTemplate.php:JS:openLinkInline() - handle onLoad and onClick, to load target into "content" div & fix history.
 * /index.php::global & app/Index.php::__construct() - as above, but for the subpage.
 * app/Index.php::showPage() - `i` param set by JS means internal request: include FileTemplate, ThumbsTemplate, etc.
@@ -161,11 +161,10 @@ See also list at the top of this file.
 Current task:
 
 * TreeTemplate
-    * Back button doesn't work.
     * ToDo: Set page title. Should be non-fixed.
         * We already have `document.title = e.state.pageTitle;` - why doesn't that work?
     * ToDo: app/TreeTemplate.php:JS:handleDragBar*
-        * Dragbar does not work. Changes cursor, but no drag.
+        * Drag bar does not work. Changes cursor, but no drag.
         * Drag bar may not persist when navigating back/forth. Check.
     * ToDo: Migrate TreeTemplate's JS out to TreeTemplate.js.
     * ToDo: Migrate ScanDirectory out to... maybe Path.php? Its own file?
@@ -190,12 +189,12 @@ Urgent:
     * Should I instead have a getInheritedValue($filename, $key), for templates to call for missing values?
     * Versioned comments: how to represent, store, and so on? Just backup copies of the ini file? In a backup subfolder?
     * File w no data in ini file, getFileDetails returns empty array: should be populated w empty fields.
-* PHP: Parse Metadata TO ini file.
-* PHP: Parse Metadata TO database.
-* PHP: Parse Metadata FROM database.
-* PHP: Parse Metadata TO web form.
-* PHP: Parse Metadata FROM web form.
-* PHP: Display ini file contents in inline file view, tagged by type.
+    * PHP: Parse Metadata TO ini file.
+    * PHP: Parse Metadata TO database.
+    * PHP: Parse Metadata FROM database.
+    * PHP: Parse Metadata TO web form.
+    * PHP: Parse Metadata FROM web form.
+    * PHP: Display ini file contents in inline file view, tagged by type.
     * Single-line string (strip WS, strip HTML, replace \n), fixed length (display chars remaining once close/over).
     * Multi-line string (strip WS, strip HTML), unlimited or fixed length (display chars remaining once close/over).
     * Date
@@ -220,7 +219,10 @@ Urgent:
         * I think inherited data should be greyed out. Editing it saves locally. Button to go to page of parent/origin?
     * CSS: Make the inline file view look like not ass.
 
-* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2 
+* DropboxManager
+    * Split off upload handling/parsing methods to their own class.
+
+* https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2
     * (mod_rewrite)
 * PHP: Parse form input to database, with validation, errors, etc.
 * JS: Parse and display form errors.
@@ -258,7 +260,7 @@ From Code comments:
 
 Low priority:
 
-* Index: Additional file types (txt? More images?)
+* Index: Additional file types (txt? More images?). Will need to add a template and change DropboxManager to handle.
 * Migrate templates into a sub-folder.
 * Files within the mm folder aren't navigable to.
 * site.webmanifest file could do with populating properly.
@@ -266,7 +268,7 @@ Low priority:
 * Split a FileProcessor class out from DropboxManager?
 * Log rolling.
 * It logs the connection twice for each page load, because of the way templates work.
-    * Could maybe not log unless i is set, or error?
+    * Could maybe not log unless `i` is set, or error?
 * Make all Log methods also echo, like Log::adminDebug(), depending on a config var something like LOG_ADMIN_ECHO_LEVEL.
 * Get rid of Log::adminDebug() method. Replace w Log::debug() throughout.
 * Create an always-present error-div, that's shown if it has any content. Sorta like an in-page console.

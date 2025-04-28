@@ -85,7 +85,7 @@ echo '<pre>' . basename(Index::$requestUnixPath) . " file details:\n" . var_expo
 // END DELETEME DEBUG
 
 /**
- * Convert the raw file details into a HTML escaped version.
+ * Convert the raw file details into an HTML-escaped version.
  * @param array $fileDetails Array from which to html escape all fields.
  * @return array The resulting escaped array.
  */
@@ -95,29 +95,19 @@ function cleanFileDetails(array $fileDetails): array {
         if (is_array($fileDetail)) {
             if ('date' === $key) {
                 $h_fd[$key] = htmlspecialchars($fileDetail['dateString']);
-//                echo 'Using dateString ' . var_export($fileDetail, true) .
-//                    ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
             } else {
-                $fileDetail = htmlspecialchars(implode(', ', $fileDetail));
-//                echo 'Converting array ' . var_export($fileDetail, true) .
-//                    ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
+                $h_fd[$key] = htmlspecialchars(implode(', ', $fileDetail));
             }
         } elseif (is_numeric($fileDetail)) {
             $h_fd[$key] = $fileDetail;
-//            echo 'Setting number ' . var_export($fileDetail, true) .
-//                ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
-        } elseif (is_string($fileDetail) && strlen($fileDetail)) {
+        } elseif (is_string($fileDetail) && '' !== $fileDetail) {
             $h_fd[$key] = htmlspecialchars($fileDetail);
-//            echo 'Escaping valid ' . var_export($fileDetail, true) .
-//                ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
         } else {
             $h_fd[$key] = match ($key) {
                 'slideorigin', 'slidenumber', 'slidesubsection' => '?',
                 'displayname' => 'unknown image',
                 default => 'unknown',
             };
-//            echo 'Defaulting empty ' . var_export($fileDetail, true) .
-//                ' to ' . var_export($h_fd[$key], true) . "<br>\n"; // DELETEME DEBUG
         }
     }
     return $h_fd;

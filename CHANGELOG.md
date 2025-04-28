@@ -19,6 +19,7 @@ which might not be when they were actually implemented/committed.
 * DONE: Expand to, and select, currently passed $path.
 * DONE: Inline file view
 * FIXED: We also need to UN-bold selected items, and bold NEW ones, as they are clicked.
+* FIXED: Back button doesn't work.
 
 ## 4/26/2025
 

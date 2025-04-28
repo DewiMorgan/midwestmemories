@@ -226,11 +226,9 @@ class MetadataCleaner
     /**
      * Given a single line of CSV, return an array of items, each truncated to a max length, if any.
      * @param mixed $item The item to parse into CSV items, if possible.
-     * @param ?int $maxLength optional max length to truncate to.
-     * @param bool $parseSlashes Whether to parse C slashes (\n, \r, \t, \v, \f, numeric escapes) in the string.
      * @return array
      */
-    private static function cleanCsvLine(mixed $item, int $maxLength = null, bool $parseSlashes = true): array
+    private static function cleanCsvLine(mixed $item): array
     {
         Log::debug(__METHOD__ . ', Parsing CSV ' . var_export($item, true)); // DELETEME DEBUG
         if (!is_string($item)) {
@@ -243,7 +241,7 @@ class MetadataCleaner
         }
         $parsed = str_getcsv($item);
         foreach ($parsed as $key => $csvSegment) {
-            $parsed[$key] = self::cleanString($csvSegment, $maxLength, $parseSlashes);
+            $parsed[$key] = self::cleanString($csvSegment);
         }
         Log::debug(__METHOD__ . ', returning ' . implode('#,#', $parsed)); // DELETEME DEBUG
         return $parsed;
@@ -416,7 +414,7 @@ class MetadataCleaner
      * @param bool $parseSlashes Whether to parse C slashes (\f, \n, \r, \t, \v, numeric escapes) in the string.
      * @return string The cleaned string, which may be empty.
      */
-    private static function cleanString(mixed $item, int $maxLength = null, bool $parseSlashes = false): string
+    private static function cleanString(mixed $item, int $maxLength = null): string
     {
         Log::debug(__METHOD__ . ', Parsing string ' . var_export($item, true)); // DELETEME DEBUG
         if (!is_string($item)) {
@@ -428,16 +426,15 @@ class MetadataCleaner
             Log::warn('String property was too long', $trimmed);
             $trimmed = substr($trimmed, 0, $maxLength);
         }
-        if ($parseSlashes) {
-            Log::debug('Parsing slashes'); // DELETEME DEBUG
-            // This is a hack, since stripcslashes() will remove a slash that precedes a non-special character.
-            // Instead, this only escapes the special characters \f, \n, \r, \t, \v, and octal and hex escapes.
-            $trimmed = preg_replace_callback(
-                '/\\\\([fnrtv\\\\$"]|[0-7]{1,3}|\x[0-9A-Fa-f]{1,2})/',
-                static fn($matches) => stripcslashes($matches[0]),
-                $trimmed
-            );
-        }
+
+        //// This is a hack, since stripcslashes() will remove a slash that precedes a non-special character.
+        //// Instead, this only escapes the special characters \f, \n, \r, \t, \v, and octal and hex escapes.
+        //$trimmed = preg_replace_callback(
+        //    '/\\\\([fnrtv\\\\$"]|[0-7]{1,3}|\x[0-9A-Fa-f]{1,2})/',
+        //    static fn($matches) => stripcslashes($matches[0]),
+        //    $trimmed
+        //);
+
         Log::debug(__METHOD__ . ", returning $trimmed"); // DELETEME DEBUG
         return $trimmed;
     }

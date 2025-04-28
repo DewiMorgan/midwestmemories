@@ -6,6 +6,7 @@ namespace MidwestMemories;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
+use JsonException;
 use Spatie\Dropbox\TokenProvider;
 
 /**
@@ -53,13 +54,13 @@ class TokenRefresher implements TokenProvider
 
         try {
             $decodedRequest = json_decode($request->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
+        } catch (JsonException $e) {
             Log::adminDebug("Failed to decode json: '{$e->getCode()}: {$e->getMessage()}'.");
             return false;
         }
         try {
             $encodedResponse = trim(json_encode($decodedRequest['access_token'], JSON_THROW_ON_ERROR), '"');
-        } catch (\JsonException $e) {
+        } catch (JsonException $e) {
             Log::adminDebug("Failed to encode json: '{$e->getCode()}: {$e->getMessage()}'.");
             return false;
         }

@@ -178,11 +178,11 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
     let leftColumnWidth;
     let rightColumnWidth;
 
-    function handleDragBarMouseMove(e) {
-        dragBar.addEventListener('mousedown', handleDragBarMouseDown);
-        document.addEventListener('mousemove', handleDragBarMouseMove);
-        document.addEventListener('mouseup', handleDragBarMouseUp);
+    dragBar.addEventListener('mousedown', handleDragBarMouseDown);
+    document.addEventListener('mousemove', handleDragBarMouseMove);
+    document.addEventListener('mouseup', handleDragBarMouseUp);
 
+    function handleDragBarMouseMove(e) {
         if (isDragging) {
             e.preventDefault();
             const deltaX = e.clientX - currentX;
