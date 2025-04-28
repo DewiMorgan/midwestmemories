@@ -323,6 +323,8 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
 
         // Create the new content div
         const newContentDiv = document.createElement('div');
+        newContentDiv.classList.add('content');
+        newContentDiv.classList.add('right-column');
         newContentDiv.id = 'content'; // Set the same ID as the original
 
         // Insert the new div at the same position
