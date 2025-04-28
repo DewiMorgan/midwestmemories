@@ -160,6 +160,9 @@ See also list at the top of this file.
 
 Current task:
 
+* Getting the files down and thumbnailed.
+* Might need to update composer, either needs on the server, or through CLI, or through DOS PHP.
+
 * TreeTemplate
     * ToDo: Migrate TreeTemplate's JS out to TreeTemplate.js.
     * ToDo: Migrate ScanDirectory out to... maybe Path.php? Its own file?
@@ -237,9 +240,7 @@ From Code comments:
 * Admin: Chain all admin processes up from the web hook handler, using a single timeout time.
 * Admin: Maybe have admin processes re-trigger each other or something.
 * Admin: Maybe a web cron to hit the webhook? Or does cpanel allow cron jobs? Edit crontab manually?
-* `gitpull`: Delete `gitpull.php`
 * `inst-mwm`: Delete `inst-mwm.php`
-* `phpinfoz`: Delete `phpinfoz.php`
 * Admin: Make Admin.php ShowPage() a template.
 * Admin: Wrap InitSession() logging in a connectionLogger.
 * Index: Wrap InitSession() logging in a connectionLogger.
