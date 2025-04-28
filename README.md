@@ -163,9 +163,6 @@ Current task:
 * TreeTemplate
     * ToDo: Set page title. Should be non-fixed.
         * We already have `document.title = e.state.pageTitle;` - why doesn't that work?
-    * ToDo: app/TreeTemplate.php:JS:handleDragBar*
-        * Drag bar does not work. Changes cursor, but no drag.
-        * Drag bar may not persist when navigating back/forth. Check.
     * ToDo: Migrate TreeTemplate's JS out to TreeTemplate.js.
     * ToDo: Migrate ScanDirectory out to... maybe Path.php? Its own file?
     * ToDo: Make it accept one or more callbacks to say how to recurse into, skip, or display entries.
@@ -260,7 +257,10 @@ From Code comments:
 
 Low priority:
 
-* Index: Additional file types (txt? More images?). Will need to add a template and change DropboxManager to handle.
+* Index: Additional file types (txt? svg|bmp|webp?).
+    * Add a template
+    * Edit filters in existing templates.
+    * Edit DropBoxManager upload handlers.
 * Migrate templates into a sub-folder.
 * Files within the mm folder aren't navigable to.
 * site.webmanifest file could do with populating properly.

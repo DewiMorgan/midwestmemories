@@ -20,6 +20,8 @@ which might not be when they were actually implemented/committed.
 * DONE: Inline file view
 * FIXED: We also need to UN-bold selected items, and bold NEW ones, as they are clicked.
 * FIXED: Back button doesn't work.
+* FIXED: Drag bar does not work. Changes cursor, but no drag.
+* DONE: Drag bar may not persist when navigating back/forth. Check.
 
 ## 4/26/2025
 

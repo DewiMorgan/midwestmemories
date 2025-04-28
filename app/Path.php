@@ -42,15 +42,16 @@ class Path
             Log::adminDebug("Converted path was not found: $filePath");
             return 'PATH_ERROR_404';
         }
-        $result = preg_replace('#^' . preg_quote(self::$imageBasePath, '#') . '#', '/', $realPath);
-        if (!$result) {
-            Log::adminDebug("Converted path gave an empty string or error: $filePath");
-            return 'PATH_ERROR_BAD';
-        }
         if (!str_starts_with($realPath, self::$imageBasePath)) {
             Log::adminDebug("Converted path was not within MM_BASE_DIR: $realPath from $filePath");
             return 'PATH_ERROR_401';
         }
+        $result = preg_replace('#^' . preg_quote(self::$imageBasePath, '#') . '/*#', '/', $realPath);
+        if (!$result) {
+            Log::adminDebug("Converted path gave an empty string or error: $filePath");
+            return 'PATH_ERROR_BAD';
+        }
+        Log::debug(__METHOD__ . " $result from $filePath");
         return $result;
     }
 
