@@ -276,6 +276,9 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             console.error(error);
         }
 
+        const links = content.querySelectorAll('a');
+        links.forEach(addLinkClickHandler);
+
         // Make sure that history will work.
         if (saveHistory) {
             const historyUrl = url.replace(/&(?:amp;)?i=\d+/, ''); // Strip out "inline" instruction.
@@ -290,8 +293,12 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
      */
     function addLinkClickHandler(link) {
         const attr = link.getAttribute("href");
-        console.log("Adding onClick to link: " + attr);
-        link.addEventListener('click', clickLink);
+        if (attr.includes('&i=1')) {
+            console.log("Adding onClick to child link: " + attr);
+            link.addEventListener('click', clickLink);
+        } else {
+            console.log("Not adding onClick to primary link: " + attr);
+        }
     }
 
     function clickLink(e) {
