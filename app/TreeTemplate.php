@@ -92,7 +92,7 @@ namespace MidwestMemories;
 $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/') . '&amp;i=1';
 ?>
 <body onload="openLinkInline('<?= $u_linkUrl ?>')">
-<div class="flex-container">
+<div class="flex-container" id="parent-container">
     <div class="tree-view left-column">
         <?php
         // Set the root directory to display in the tree view.
@@ -312,7 +312,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
     // Safely clear the div using the DOM, so all event handlers are cleanly killed without memory leaks.
     function clearContentDiv() {
         // Find the parent element (where the div is located)
-        const parent = document.getElementById('parentContainer'); // The parent of the 'content' div
+        const parent = document.getElementById('parent-container'); // The parent of the 'content' div
 
         // Find the div to remove
         const oldContentDiv = document.getElementById('content');
