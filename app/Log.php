@@ -19,7 +19,7 @@ class Log
     public static function debug(string $str, mixed $obj = null): void
     {
         if (Conf::get(Key::LOG_LEVEL) <= LogLevel::debug->value) {
-            self::log('Debug: ' . self::getCallerInfo() . ": $str", $obj);
+            self::log('Debug: ' . self::getCallerInfo() . $str, $obj);
         }
     }
 
@@ -32,7 +32,7 @@ class Log
     public static function info(string $str, mixed $obj = null): void
     {
         if (Conf::get(Key::LOG_LEVEL) <= LogLevel::info->value) {
-            self::log('Info: ' . self::getCallerInfo() . ": $str", $obj);
+            self::log('Info: ' . self::getCallerInfo() . $str, $obj);
         }
     }
 
@@ -45,7 +45,7 @@ class Log
     public static function warn(string $str, mixed $obj = null): void
     {
         if (Conf::get(Key::LOG_LEVEL) <= LogLevel::warn->value) {
-            self::log('Warning: ' . self::getCallerInfo() . ": $str", $obj);
+            self::log('Warning: ' . self::getCallerInfo() . $str, $obj);
         }
     }
 
@@ -58,7 +58,7 @@ class Log
     public static function warning(string $str, mixed $obj = null): void
     {
         if (Conf::get(Key::LOG_LEVEL) <= LogLevel::warn->value) {
-            self::log('Warning: ' . self::getCallerInfo() . ": $str", $obj);
+            self::log('Warning: ' . self::getCallerInfo() . $str, $obj);
         }
     }
 
@@ -71,7 +71,7 @@ class Log
     public static function error(string $str, mixed $obj = null): void
     {
         if (Conf::get(Key::LOG_LEVEL) <= LogLevel::error->value) {
-            self::log('ERROR: ' . self::getCallerInfo() . ": $str", $obj);
+            self::log('ERROR: ' . self::getCallerInfo() . $str, $obj);
         }
     }
 
