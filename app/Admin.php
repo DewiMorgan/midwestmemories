@@ -107,18 +107,20 @@ class Admin
         $fp = new DropboxManager();
         $list = [];
 
+        Log::debug("Starting. Cursor='$cursor', Request", $_REQUEST);
+
         // Handle API calls. Nothing must be output before these, and they must not output anything.
         switch ($formAction) {
             case 'list_files_to_download':
                 header('Content-Type: application/json');
                 $list = $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_NEW);
-                Log::debug('Returning list of ' . count($list) . 'files to download.');
+                Log::debug('Returning list of ' . count($list) . ' files to download.');
                 echo json_encode($list, JSON_THROW_ON_ERROR);
                 exit(0);
             case 'list_files_to_process':
                 header('Content-Type: application/json');
                 $list = $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_DOWNLOADED);
-                Log::debug('Returning list of ' . count($list) . 'files to process.');
+                Log::debug('Returning list of ' . count($list) . ' files to process.');
                 echo json_encode($list, JSON_THROW_ON_ERROR);
                 exit(0);
             case 'download_one_file':
@@ -134,8 +136,9 @@ class Admin
                 exit(0);
         }
 
-        // static::debug("<p>Starting. Cursor='$cursor', Request=" . var_export($_REQUEST, true) . '</p>');
+        static::showHeader();
 
+        // Handle web page calls. These are after the showHeader, so can print whatever we like.
         switch ($formAction) {
             case 'init_root':
                 static::debug("<h2>Initializing root cursor</h2>\n");
@@ -151,9 +154,7 @@ class Admin
                 break;
             case 'handle_queued_files':
                 static::debug("<h2>Handling queued files.</h2>\n");
-                static::showHeader();
                 include('AdminDownloadTemplate.php');
-//                exit(0);
             /*
             case 'download_files':
                 static::debug("<h2>Downloading files from the DB queue...</h2>\n");

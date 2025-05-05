@@ -161,14 +161,17 @@ See also list at the top of this file.
 
 Current task:
 
+* Delete the old code for thumbs and downloads.
 * Debug the dynamic downloading and thumbnail generation.
-* Make ALL admin processing use same dynamic endpoint pattern as downloads and thumbnails.
-* Parallelize maybe 4 downloads and thumbnail generations at a time?
+* Get it not to bother thumbsing the -ICE.jpg filtered versions (manually delete the thumbnails for now).
+* Check for quirks mode.
 
 Urgent:
 
-* Get thumbs working.
+* Get thumb view working.
 * Get it commentable.
+* Get it usable on a phone.
+* Search?
 
 * ThumbsTemplate
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
@@ -267,6 +270,8 @@ From Code comments:
 
 Low priority:
 
+* Make ALL admin processing use same dynamic endpoint pattern as downloads and thumbnails.
+* Parallelize maybe 4 downloads and thumbnail generations at a time?
 * come up with a fun thumbnail image for the website to go in the upper left of the tab.
 
 * TreeTemplate

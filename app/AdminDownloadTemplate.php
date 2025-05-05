@@ -19,15 +19,18 @@
 
     // Generic file task handler
     async function handleFileTask(actionName, listEndpoint, fileEndpoint) {
-        logMessage(`Getting list of files to ${actionName}...`);
+        logMessage(`Getting list of files for ${actionName}...`);
 
         const listResponse = await fetch(listEndpoint);
         if (listResponse.ok) {
             const files = await listResponse.json();
-            logMessage(`Got list of ${files.length} files to ${actionName}.`);
-
-            for (const filename of files) {
-                const messageElement = logMessage(`${actionName} ${filename}...`);
+            const numFiles = files.length;
+            if (0 === numFiles) {
+                logMessage(`Got zero files for ${actionName}.`);
+            }
+            // for (const filename of files) {
+            for (const [index, filename] of files.entries()) {
+                const messageElement = logMessage(`${index + 1}/${numFiles} ${actionName} ${filename}...`);
                 const fileResponse = await fetch(fileEndpoint);
                 if (fileResponse.ok) {
                     updateMessage(messageElement, ' OK');
@@ -35,8 +38,9 @@
                     updateMessage(messageElement, ' Failed');
                 }
             }
+            logMessage(`${actionName} complete!`);
         } else {
-            logMessage(`Failed to get list of files to ${actionName}.`);
+            logMessage(`Failed to get list of files for ${actionName}.`);
         }
     }
 
@@ -44,10 +48,10 @@
     async function runAll() {
         // Run prepare and then process
         await handleFileTask(
-            'prepare', './admin.php?action=list_files_to_download', './admin.php?action=download_one_file'
+            'Downloading', './admin.php?action=list_files_to_download', './admin.php?action=download_one_file'
         );
         await handleFileTask(
-            'process', './admin.php?action=list_files_to_process', './admin.php?action=process_one_file'
+            'Postprocessing', './admin.php?action=list_files_to_process', './admin.php?action=process_one_file'
         );
     }
     runAll();
