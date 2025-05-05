@@ -3,7 +3,20 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
-## 4/27/2025
+## 2025/05/05
+
+* DONE: Universal dates in CHANGELOG.md
+* DONE: Thumbnails are slow, and UI is unresponsive during it.
+* DONE: Replace with a responsive clientside way of doing it, adding two endpoints:
+* DONE: "get list of files needing thumbs" endpoint;
+* DONE: "process one thumb" endpoint (this also solves the timeout problem as we only ever process one);
+* DONE: Call those with JS;
+* DONE: Make Downloads handled on the same page, going first.
+* FIXED: Files aren't thumbnailing.
+* DONE: Get logging to be better (call stack info on each line).
+
+
+## 2025/04/27
 
 * DONE: Clean up: move all debug to the bottom below a `HR` tag.
 * DONE: Strict typing everywhere!
@@ -34,7 +47,7 @@ which might not be when they were actually implemented/committed.
 * DONE: It would be nice to hide the ICE images.
 * DONE: Autogenerate the ini files from the new files.
 
-## 4/26/2025
+## 2025/04/26
 
 * FIXED: Get FileTemplate to populate fully with readonly text from Metadata.
     * FIXED: Convert the dump to real output fields.

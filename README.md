@@ -161,15 +161,9 @@ See also list at the top of this file.
 
 Current task:
 
-* Thumbnails are slow, and UI is unresponsive during it.
-    * Replace with a responsive clientside way of doing it, adding two endpoints:
-    * "get list of files needing thumbs" endpoint;
-    * "process one thumb" endpoint (this also solves the timeout problem as we only ever process one);
-    * Call those with JS;
-    * Parallelize maybe 4 at a time?
-    * Make ALL admin processing follow this same "get list of things needing doing", "do one thing" endpoint pattern.
-* FIXED: Files aren't thumbnailing.
-* DONE: Get logging to be better (call stack info on each line).
+* Debug the dynamic downloading and thumbnail generation.
+* Make ALL admin processing use same dynamic endpoint pattern as downloads and thumbnails.
+* Parallelize maybe 4 downloads and thumbnail generations at a time?
 
 Urgent:
 
