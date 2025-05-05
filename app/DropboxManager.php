@@ -225,6 +225,7 @@ class DropboxManager
         foreach ($list as $entry) {
             // Drop out early if we hit the time limit.
             if (time() > $endTime) {
+                Log::adminDebug("Timeout processing $entry ($numProcessed of $numToProcess)");
                 return [$numProcessed, $numToProcess];
             }
 
