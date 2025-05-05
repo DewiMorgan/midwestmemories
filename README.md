@@ -167,13 +167,8 @@ Current task:
 
 Urgent:
 
-* TreeTemplate
-    * It would be nice to let the user able to toggle between ice/non-ice if available.
-    * When first displaying, all open folders are '(+)', should be '(-)'.
-    * Bug: the slide numbers at the end are reversed from how they are in the filename.
-    * Bug: The field for "text on slide" isn't in the table, it's above.
-    * Bug: Right-clicking "open image in new tab" doesn't work
-    * Left navbar should be overflow:scroll.
+* Get thumbs working.
+* Get it commentable.
 
 * ThumbsTemplate
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
@@ -186,6 +181,14 @@ Urgent:
     * Folder Descriptions from Dropbox\midwestmemories\Auora\Horst and Karin slide tray sections.txt
         * The descriptions are short enough, it feels like it'd maybe be worth also showing them on page for each
           individual file, as context of what's going on in the pic.
+
+* TreeTemplate
+    * It would be nice to let the user able to toggle between ice/non-ice if available.
+    * When first displaying, all open folders are '(+)', should be '(-)'.
+    * Bug: the slide numbers at the end are reversed from how they are in the filename.
+    * Bug: The field for "text on slide" isn't in the table, it's above.
+    * Bug: Right-clicking "open image in new tab" doesn't work
+    * Left navbar should be overflow:scroll.
 
 * Metadata class
     * Add hasNext and hasPrev properties to enable next/prev buttons in FileTemplate.

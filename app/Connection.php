@@ -16,6 +16,7 @@ namespace MidwestMemories;
  */
 class Connection
 {
+    public bool $pageStarted = false;
 
     /**
      * @param string $request -- URL requested, via $_SERVER['REQUEST_URI']

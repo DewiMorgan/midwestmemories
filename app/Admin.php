@@ -26,7 +26,8 @@ class Admin
         } catch (JsonException $e) {
             die('["Error: Could not encode list"]');
         }
-        static::showPage();
+        static::showHeader();
+        static::showContent();
     }
 
     /**
@@ -107,6 +108,34 @@ class Admin
 
         $fp = new DropboxManager();
         $list = [];
+
+        // Handle API calls. Nothing must be output before these, and they must not output anything.
+        switch ($formAction) {
+            case 'list_files_to_download':
+                header('Content-Type: application/json');
+                $list = $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_NEW);
+                Log::debug('Returning list of ' . count($list) . 'files to download.');
+                echo json_encode($list, JSON_THROW_ON_ERROR);
+                exit(0);
+            case 'list_files_to_process':
+                header('Content-Type: application/json');
+                $list = $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_DOWNLOADED);
+                Log::debug('Returning list of ' . count($list) . 'files to process.');
+                echo json_encode($list, JSON_THROW_ON_ERROR);
+                exit(0);
+            case 'download_one_file':
+                header('Content-Type: application/json');
+                Log::debug('Downloading one file from the DB queue...');
+                $result = $fp->downloadOneFile();
+                echo json_encode($result, JSON_THROW_ON_ERROR);
+                exit(0);
+            case 'process_one_file':
+                Log::debug('Processing one file from the DB queue...');
+                $result = $fp->processOneFile();
+                echo json_encode($result, JSON_THROW_ON_ERROR);
+                exit(0);
+        }
+
         switch ($formAction) {
             case 'init_root':
                 static::debug("<h2>Initializing root cursor</h2>\n");
@@ -120,28 +149,9 @@ class Admin
                 static::debug("<h2>Checking cursor for updates...</h2>\n");
                 $list = $fp->readCursorUpdate($entriesSoFar);
                 break;
-            case 'list_files_to_download':
-                $list = $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_NEW);
-                Log::debug('Returning list of ' . count($list) . 'files to download.');
-                echo json_encode($list, JSON_THROW_ON_ERROR);
-                exit(0);
-            case 'list_files_to_process':
-                $list = $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_DOWNLOADED);
-                Log::debug('Returning list of ' . count($list) . 'files to process.');
-                echo json_encode($list, JSON_THROW_ON_ERROR);
-                exit(0);
-            case 'download_one_file':
-                static::debug("<h2>Downloading one file from the DB queue...</h2>\n");
-                $result = $fp->downloadOneFile();
-                echo json_encode($result, JSON_THROW_ON_ERROR);
-                exit(0);
-            case 'process_one_file':
-                static::debug("<h2>Processing one file from the DB queue...</h2>\n");
-                $result = $fp->processOneFile();
-                echo json_encode($result, JSON_THROW_ON_ERROR);
-                exit(0);
             case 'handle_queued_files':
                 static::debug("<h2>Handling queued files.</h2>\n");
+                static::showHeader();
                 include('AdminDownloadTemplate.php');
 //                exit(0);
             /*
@@ -178,11 +188,16 @@ class Admin
     }
 
     /**
-     * Show the admin page itself.
+     * Show the HTML page.
      * ToDo: make this a template.
      */
-    private static function showPage(): void
+    private static function showHeader(): void
     {
+        global $connection;
+        if ($connection->pageStarted) {
+            return;
+        }
+        $connection->pageStarted = true;
         ?>
         <!DOCTYPE html>
         <html lang="en">
@@ -198,6 +213,16 @@ class Admin
         </head>
         <body>
         <h1>Midwest Memories - admin</h1>
+        <?php
+    }
+
+    /**
+     * Show the admin page itself.
+     * ToDo: make this a template.
+     */
+    private static function showContent(): void
+    {
+        ?>
         <form method="post">
             <button type="submit" name="action" value="init_root">Initialize new root cursor</button>
         </form>
