@@ -80,6 +80,7 @@ Index.php shows the nav, and the image listings.
     * [Browsing files/folders](https://www.youtube.com/watch?v=wfb6h9JyhBY)
     * [Text editor](https://www.youtube.com/watch?v=2puV9yXHiAA)
     * [Search filenames](https://www.youtube.com/watch?v=wlB276xVgsw)
+* [PHP Sandbox](https://onlinephp.io/)
 
 ## ToDo:
 
@@ -161,6 +162,7 @@ See also list at the top of this file.
 Current task:
 
 * Getting the files thumbnailed. (not working?)
+* Get logging to be better (call stack info on each line).
 
 Urgent:
 
@@ -169,8 +171,9 @@ Urgent:
     * When first displaying, all open folders are '(+)', should be '(-)'.
     * Bug: the slide numbers at the end are reversed from how they are in the filename.
     * Bug: The field for "text on slide" isn't in the table, it's above.
-    * Bug: Right-clicking "open image in new tab" doesn't work 
- 
+    * Bug: Right-clicking "open image in new tab" doesn't work
+    * Left navbar should be overflow:scroll.
+
 * ThumbsTemplate
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
     * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.
@@ -179,6 +182,9 @@ Urgent:
         * Ini files don't handle subfolder details. Probably details should come from ini files in subfolders?
     * Clicking images doesn't load them in TreeTemplate, I think because they have a double-leading-slash.
     * In the absence of a thumbnail, show the real image, but sized down.
+    * Folder Descriptions from Dropbox\midwestmemories\Auora\Horst and Karin slide tray sections.txt
+        * The descriptions are short enough, it feels like it'd maybe be worth also showing them on page for each
+          individual file, as context of what's going on in the pic.
 
 * Metadata class
     * Add hasNext and hasPrev properties to enable next/prev buttons in FileTemplate.
@@ -217,6 +223,7 @@ Urgent:
         * We don't care about this for now.
         * I think inherited data should be greyed out. Editing it saves locally. Button to go to page of parent/origin?
     * CSS: Make the inline file view look like not ass.
+    * The title at the top is mostly useless and takes up space, I think I'll remove it.
 
 * DropboxManager
     * Split off upload handling/parsing methods to their own class.
@@ -255,6 +262,7 @@ From Code comments:
 * DropboxManager::convertToJpeg(): How should this be reflected in the DB?
 
 Low priority:
+* come up with a fun thumbnail image for the website to go in the upper left of the tab.
 
 * TreeTemplate
     * ToDo: Migrate TreeTemplate's JS out to TreeTemplate.js.
