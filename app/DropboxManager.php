@@ -373,6 +373,7 @@ class DropboxManager
         );
 
         $newWidth = (int)$newWidth;
+        $newHeight = (int)$newHeight;
         /* Create a new, "virtual" image */
         $virtualImage = imagecreatetruecolor($newWidth, $newHeight);
         if (false === $virtualImage) {
