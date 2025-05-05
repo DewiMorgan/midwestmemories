@@ -104,8 +104,6 @@ class Admin
         $entriesSoFar = (int)($_REQUEST['entries_so_far'] ?? 0);
         $formAction = $_REQUEST['action'] ?? null;
 
-        static::debug("<p>Starting. Cursor='$cursor', Request=" . var_export($_REQUEST, true) . '</p>');
-
         $fp = new DropboxManager();
         $list = [];
 
@@ -135,6 +133,8 @@ class Admin
                 echo json_encode($result, JSON_THROW_ON_ERROR);
                 exit(0);
         }
+
+        // static::debug("<p>Starting. Cursor='$cursor', Request=" . var_export($_REQUEST, true) . '</p>');
 
         switch ($formAction) {
             case 'init_root':
