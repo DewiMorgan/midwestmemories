@@ -218,14 +218,14 @@ class DropboxManager
      */
     public function processDownloads(): array
     {
-        $endTime = time() + 20;
+        $endTime = time() + 40;
         $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue` WHERE `sync_status` = 'DOWNLOADED'");
         $numToProcess = count($list);
         $numProcessed = 0;
         foreach ($list as $entry) {
             // Drop out early if we hit the time limit.
             if (time() > $endTime) {
-                Log::adminDebug("Timeout processing $entry ($numProcessed of $numToProcess)");
+                Log::adminDebug("Timeout processing ($numProcessed of $numToProcess)", $entry);
                 return [$numProcessed, $numToProcess];
             }
 
@@ -245,6 +245,7 @@ class DropboxManager
 
             // Get the mime type.
             $mimeType = mime_content_type($fullPath);
+            echo "Processing $numProcessed of $numToProcess as $mimeType: $fullPath<br>\n";
             switch ($mimeType) {
                 case 'text/plain':
                     $this->processTextFile($fullPath);
