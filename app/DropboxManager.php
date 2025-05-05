@@ -214,18 +214,22 @@ class DropboxManager
 
     /**
      * Add thumbnails, resample images, and parse txt files, then set status to PROCESSED.
-     * @return int How many files were processed.
+     * @return array [How many files were processed, total files to process]
      */
-    public function processDownloads(): int
+    public function processDownloads(): array
     {
         $endTime = time() + 20;
         $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue` WHERE `sync_status` = 'DOWNLOADED'");
+        $numToProcess = count($list);
         $numProcessed = 0;
         foreach ($list as $entry) {
             // Drop out early if we hit the time limit.
             if (time() > $endTime) {
-                return $numProcessed;
+                return [$numProcessed, $numToProcess];
             }
+
+            Log::debug("processing: $entry");
+
             $numProcessed++;
             $fullPath = ltrim($entry['full_path'], '/\\');
             if (!file_exists($fullPath)) {
@@ -260,7 +264,7 @@ class DropboxManager
                     break;
             }
         }
-        return $numProcessed;
+        return [$numProcessed, $numToProcess];
     }
 
     /**
@@ -294,6 +298,7 @@ class DropboxManager
     /** Process a JPG file, generating thumbnail.*/
     private function processJpegFile(string $fullPath): void
     {
+        Log::debug("processing: $fullPath");
         $result = $this->makeThumb(imagecreatefromjpeg($fullPath), $fullPath);
         $this->setSyncStatus($fullPath, ($result ? 'PROCESSED' : 'ERROR'), 'Processed as JPG.');
     }
@@ -336,6 +341,7 @@ class DropboxManager
      */
     private function makeThumb($sourceImage, string $fullPath): bool
     {
+        Log::debug("processing: $fullPath");
         if (false === $sourceImage) {
             Log::adminDebug('Source image false for makeThumb', $fullPath);
             return false;
@@ -360,6 +366,10 @@ class DropboxManager
             $newWidth = self::MAX_THUMB_WIDTH;
             $newHeight = floor($origWidth * ($newWidth / $origWidth));
         }
+        Log::debug(
+            "vars: origWidth = $origWidth, origHeight = $origHeight, "
+            . "newWidth = $newWidth, newHeight = $newHeight, dest = $dest."
+        );
 
         /* Create a new, "virtual" image */
         $virtualImage = imagecreatetruecolor($newWidth, $newHeight);
@@ -390,6 +400,10 @@ class DropboxManager
             Log::adminDebug('imagejpeg failed for makeThumb', $fullPath);
             return false;
         }
+        Log::debug(
+            "vars: origWidth = $origWidth, origHeight = $origHeight, "
+            . "newWidth = $newWidth, newHeight = $newHeight, dest = $dest."
+        );
 
         return true;
     }

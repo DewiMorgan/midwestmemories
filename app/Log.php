@@ -19,7 +19,7 @@ class Log
     public static function debug(string $str, mixed $obj = null): void
     {
         if (Conf::get(Key::LOG_LEVEL) <= LogLevel::debug->value) {
-            self::log('Debug: ' . $str, $obj);
+            self::log('Debug: ' . self::getCallerInfo() . ": $str", $obj);
         }
     }
 
@@ -99,9 +99,29 @@ class Log
     {
         global $connection;
         $message = "A-DBG: $str" . (is_null($obj) ? '.' : ': ' . var_export($obj, true));
-        file_put_contents('error_log', "$message\n", FILE_APPEND);
+        self::debug($message);
         if (isset($connection) && $connection->isSuperAdmin) {
             echo "<pre>$message</pre>\n";
         }
+    }
+
+    /**
+     * Get call stack info about the external method that called this class, to prepend to log lines.
+     * @return string Brief one-line human-readable description of caller.
+     */
+    private static function getCallerInfo(): string
+    {
+        $prevFile = 'Unknown File';
+        $prevLine = '?';
+
+        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS,4) as $method) {
+            // Skip lines from this class.
+            if (!array_key_exists('class', $method) || __CLASS__ !== $method['class']) {
+                return basename($prevFile) . "($prevLine) $method[function](): ";
+            }
+            $prevFile = $method['file'] ?? 'Unknown File';
+            $prevLine = $method['line'] ?? '?';
+        }
+        return '[In global code]';
     }
 }

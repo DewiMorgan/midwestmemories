@@ -411,7 +411,7 @@ class MetadataCleaner
      */
     private static function cleanString(mixed $item, int $maxLength = null): string
     {
-        Log::debug(__METHOD__ . ', Parsing string ' . var_export($item, true)); // DELETEME DEBUG
+        Log::debug('Parsing string', $item); // DELETEME DEBUG
         if (!is_string($item)) {
             Log::warn('String property was not string', $item);
             return '';
@@ -422,7 +422,7 @@ class MetadataCleaner
             $trimmed = substr($trimmed, 0, $maxLength);
         }
 
-        Log::debug(__METHOD__ . ", returning $trimmed"); // DELETEME DEBUG
+        Log::debug("returning $trimmed"); // DELETEME DEBUG
         return $trimmed;
     }
 }

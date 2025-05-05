@@ -104,8 +104,8 @@ class Admin
             $list = ['NumberOfFilesDownloaded' => $numFiles];
         } elseif ($processDownloads) {
             static::debug("<h2>Processing downloaded files...</h2>\n");
-            $numFiles = $fp->processDownloads();
-            $list = ['NumberOfFilesProcessed' => $numFiles];
+            list($numFiles, $totalFiles) = $fp->processDownloads();
+            $list = ['NumberOfFilesProcessed' => $numFiles, 'TotalFilesToProcess' => $totalFiles];
         } else {
             static::debug("<h2>No command yet given.</h2>\n");
         }
