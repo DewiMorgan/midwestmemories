@@ -189,7 +189,7 @@ class MetadataCleaner
      */
     private static function cleanBool(mixed $item): ?bool
     {
-        Log::debug('Parsing bool ' . var_export($item, true)); // DELETEME DEBUG
+        Log::debug('Parsing bool', $item); // DELETEME DEBUG
         if (
             is_array($item) ||
             (is_object($item) && !method_exists($item, '__toString')) ||
@@ -213,7 +213,7 @@ class MetadataCleaner
      */
     private static function cleanInt(mixed $item): ?int
     {
-        Log::debug('Parsing int ' . var_export($item, true)); // DELETEME DEBUG
+        Log::debug('Parsing int', $item); // DELETEME DEBUG
         if (is_numeric($item)) {
             $result = (int)$item; // Casting to int always parses as decimal.
         } else {
@@ -230,7 +230,7 @@ class MetadataCleaner
      */
     private static function cleanCsvLine(mixed $item): array
     {
-        Log::debug('Parsing CSV ' . var_export($item, true)); // DELETEME DEBUG
+        Log::debug('Parsing CSV', $item); // DELETEME DEBUG
         if (!is_string($item)) {
             Log::warn('CSV property was not string', $item);
             return [];
@@ -254,7 +254,7 @@ class MetadataCleaner
      */
     private static function cleanDate(mixed $item): array
     {
-        Log::debug('Parsing date ' . var_export($item, true)); // DELETEME DEBUG
+        Log::debug('Parsing date', $item); // DELETEME DEBUG
         // We could try parsing it as a valid date first, but we know that fails for years on their own.
         $result = strtotime(self::cleanAwfulDate($item));
         if (false === $result) {
