@@ -229,7 +229,7 @@ class DropboxManager
                 return [$numProcessed, $numToProcess];
             }
 
-            Log::debug("processing: $entry");
+            Log::debug('Processing', $entry);
 
             $numProcessed++;
             $fullPath = ltrim($entry['full_path'], '/\\');
@@ -299,7 +299,7 @@ class DropboxManager
     /** Process a JPG file, generating thumbnail.*/
     private function processJpegFile(string $fullPath): void
     {
-        Log::debug("processing: $fullPath");
+        Log::debug("Processing", $fullPath);
         $result = $this->makeThumb(imagecreatefromjpeg($fullPath), $fullPath);
         $this->setSyncStatus($fullPath, ($result ? 'PROCESSED' : 'ERROR'), 'Processed as JPG.');
     }
@@ -342,7 +342,7 @@ class DropboxManager
      */
     private function makeThumb($sourceImage, string $fullPath): bool
     {
-        Log::debug("processing: $fullPath");
+        Log::debug('Processing', $fullPath);
         if (false === $sourceImage) {
             Log::adminDebug('Source image false for makeThumb', $fullPath);
             return false;
@@ -369,11 +369,11 @@ class DropboxManager
         }
         Log::debug(
             "vars: origWidth = $origWidth, origHeight = $origHeight, "
-            . "newWidth = $newWidth, newHeight = $newHeight, dest = $dest."
+            . "newWidth = (i)$newWidth, newHeight = (i)$newHeight, dest = $dest."
         );
 
         /* Create a new, "virtual" image */
-        $virtualImage = imagecreatetruecolor($newWidth, $newHeight);
+        $virtualImage = imagecreatetruecolor((int)$newWidth, (int)$newHeight);
         if (false === $virtualImage) {
             Log::adminDebug('Virtual image dimensions false for makeThumb', $fullPath);
             return false;
