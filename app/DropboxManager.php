@@ -246,6 +246,7 @@ class DropboxManager
             // Get the mime type.
             $mimeType = mime_content_type($fullPath);
             echo "Processing $numProcessed of $numToProcess as $mimeType: $fullPath<br>\n";
+            flush();
             switch ($mimeType) {
                 case 'text/plain':
                     $this->processTextFile($fullPath);
