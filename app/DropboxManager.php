@@ -11,31 +11,43 @@ use Spatie\Dropbox\Client;
  */
 class DropboxManager
 {
-    /** @var Client $client Dropbox Client object. */
+    /** Dropbox Client object. */
     private Client $client;
 
-    /** @var string $cursor The current position in a read of the file status. Long-lived, persistent, gets updates. */
+    /** The current position in a read of the file status. Long-lived, persistent, gets updates. */
     public string $cursor;
 
-    /** @var int $entries How many valid files were found. Used only for reporting. */
+    /** How many valid files were found. Used only for reporting. */
     public int $entries = 0;
 
-    /** @var int $iterations How many times we got the file list from the cursor because it responded "has more".
+    /** How many times we got the file list from the cursor because it responded "has more".
      * Only used for reporting display.
      */
     public int $iterations = 0;
 
-    /** @const int MAX_PNG_BYTES - Max PNG size in bytes before we resample to JPG. */
+    /** Max PNG size in bytes before we resample to JPG. */
     private const MAX_PNG_BYTES = 1024 * 1024;
 
-    /** @const int MAX_THUMB_WIDTH - Max image width in pixels before scaling down for thumbnail. */
+    /** Max image width in pixels before scaling down for thumbnail. */
     private const MAX_THUMB_WIDTH = 64;
 
-    /** @const int MAX_THUMB_HEIGHT - Max image height in pixels before scaling down for thumbnail. */
+    /** Max image height in pixels before scaling down for thumbnail. */
     private const MAX_THUMB_HEIGHT = 64;
 
-    /** @const string VALID_FILE_PATH_REGEX - The sub-folder within the dropbox repo that we're interested in. */
+    /** The sub-folder within the dropbox repo that we're interested in. */
     private const VALID_FILE_PATH_REGEX = '#^/midwestmemories/#';
+
+    /** The item has just been added from the Dropbox list. */
+    public const SYNC_STATUS_NEW = 'NEW';
+
+    /** The item has just been downloaded from Dropbox. */
+    public const SYNC_STATUS_DOWNLOADED = 'DOWNLOADED';
+
+    /** The item has been completely processed and no further work is needed on it. */
+    public const SYNC_STATUS_PROCESSED = 'PROCESSED';
+
+    /** The item has some permanent error, and needs manual remediation. */
+    public const SYNC_STATUS_ERROR = 'ERROR';
 
     public function __construct()
     {
@@ -164,11 +176,103 @@ class DropboxManager
                 'sss',
                 $entry['name'],
                 ltrim($entry['path_display'], '\\/'),
-                'NEW'
+                self::SYNC_STATUS_NEW
             );
         }
         return $numberOfFiles;
     }
+
+    /**
+     * Get the list of files in a certain sync_status.
+     * @return string[] List of file paths.
+     */
+    public function listFilesByStatus(string $status): array
+    {
+        return Db::sqlGetList(
+            "SELECT `full_path` FROM `midmem_file_queue` WHERE `sync_status` = '$status' ORDER BY `id`",
+            'full_path'
+        );
+    }
+
+    /**
+     * Get the first of a list of files in a certain sync_status.
+     * @return string List of file paths.
+     */
+    public function listFirstFileByStatus(string $status): string
+    {
+        return Db::sqlGetItem(
+            "
+                SELECT `full_path`
+                FROM `midmem_file_queue`
+                WHERE `sync_status` = '$status'
+                ORDER BY `id`
+            ",
+            'full_path'
+        );
+    }
+
+
+    /**
+     * Download the first file from the file queue table.
+     * @return string "OK" or "Error: ...", depending on the result.
+     */
+    public function downloadOneFile(): string
+    {
+        $untrimmedPath = $this->listFirstFileByStatus(self::SYNC_STATUS_NEW);
+
+        $fullPath = ltrim($untrimmedPath, '/\\');
+        // If the dir doesn't exist, then create it.
+        $dir = dirname($fullPath);
+        // Repeat is_dir() check twice to ensure it either exists, or got created.
+        if (!is_dir($dir) && !mkdir($dir, 0700, true) && !is_dir($dir)) {
+            $error = "mkdir($dir,0700,true) failed";
+            $this->setSyncStatus($fullPath, self::SYNC_STATUS_ERROR, $error);
+            return "Error: $error";
+        }
+        // Download the file from Dropbox. If it already exists, it might've been edited, so we get it anyway.
+        $url = $this->client->getTemporaryLink($untrimmedPath); // Requires NON-trimmed full path!
+        $result = $this->downloadFromUrl($url, $fullPath);
+        // Update the DB to DOWNLOADED or ERROR.
+        if ($result) {
+            $status = self::SYNC_STATUS_DOWNLOADED;
+            $error = '';
+        } else {
+            $status = self::SYNC_STATUS_ERROR;
+            $error = 'False result from downloadFromUrl.';
+        }
+        $this->setSyncStatus($fullPath, $status, $error);
+        return $error ? "Error: $error" : 'OK';
+    }
+
+    /**
+     * Process the first downloaded file from the file queue table.
+     * Add thumbnails, resample images, and parse txt files, then set status to PROCESSED.
+     * @return string "OK" or "Error: ...", depending on the result.
+     */
+    public function processOneFile(): string
+    {
+        $entry = $this->listFirstFileByStatus(self::SYNC_STATUS_DOWNLOADED);
+        Log::debug('Processing', $entry);
+        $fullPath = ltrim($entry, '/\\');
+        if (!file_exists($fullPath)) {
+            $error = 'file_exists failed';
+            $this->setSyncStatus($fullPath, self::SYNC_STATUS_ERROR, $error);
+            return "Error: $error";
+        }
+
+        // Get the mime type.
+        $mimeType = mime_content_type($fullPath);
+        echo "Processing as $mimeType: $fullPath<br>\n";
+        $error = match ($mimeType) {
+            'text/plain' => $this->processTextFile($fullPath),
+            'image/gif' => $this->processGifFile($fullPath),
+            'image/png' => $this->processPngFile($fullPath),
+            'image/jpeg' => $this->processJpegFile($fullPath),
+            default => $this->processOtherFile($fullPath),
+        };
+        return $error ? "Error: $error" : 'OK';
+    }
+
 
     /**
      * Download all files from the file queue table.
@@ -177,21 +281,26 @@ class DropboxManager
     public function downloadFiles(): int
     {
         $endTime = time() + 20;
-        $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue` WHERE `sync_status` = 'NEW'");
+        $list = $this->listFilesByStatus(self::SYNC_STATUS_NEW);
         $numProcessed = 0;
-        foreach ($list as $entry) {
+        foreach ($list as $untrimmedPath) {
             // Drop out early if we hit the time limit.
             if (time() > $endTime) {
                 return $numProcessed;
             }
             $numProcessed++;
-            $fullPath = ltrim($entry['full_path'], '/\\');
+            $fullPath = ltrim($untrimmedPath, '/\\');
             // If the dir doesn't exist, then create it.
             $dir = dirname($fullPath);
             // Repeat is_dir() check twice to ensure it either exists, or got created.
             if (!is_dir($dir) && !mkdir($dir, 0700, true) && !is_dir($dir)) {
                 Db::sqlExec(
-                    "UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_message` = ? WHERE full_path = ?",
+                    "
+                        UPDATE `midmem_file_queue`
+                        SET `sync_status` = '" . self::SYNC_STATUS_ERROR . "',
+                            `error_message` = ?
+                        WHERE full_path = ?
+                    ",
                     'ss',
                     "mkdir($dir,0700,true) failed",
                     $fullPath
@@ -199,13 +308,13 @@ class DropboxManager
                 continue;
             }
             // Download the file from Dropbox. If it already exists, it might've been edited, so we get it anyway.
-            $url = $this->client->getTemporaryLink($entry['full_path']); // Requires NON-trimmed full path!
+            $url = $this->client->getTemporaryLink($untrimmedPath); // Requires NON-trimmed full path!
             $result = $this->downloadFromUrl($url, $fullPath);
             // Update the DB to DOWNLOADED or ERROR.
             Db::sqlExec(
                 'UPDATE `midmem_file_queue` SET `sync_status` = ? WHERE full_path = ?',
                 'ss',
-                ($result ? 'DOWNLOADED' : 'ERROR'),
+                ($result ? self::SYNC_STATUS_DOWNLOADED : self::SYNC_STATUS_ERROR),
                 $fullPath
             );
         }
@@ -219,7 +328,7 @@ class DropboxManager
     public function processDownloads(): array
     {
         $endTime = time() + 40;
-        $list = Db::sqlGetTable("SELECT * FROM `midmem_file_queue` WHERE `sync_status` = 'DOWNLOADED'");
+        $list = $this->listFilesByStatus(self::SYNC_STATUS_DOWNLOADED);
         $numToProcess = count($list);
         $numProcessed = 0;
         foreach ($list as $entry) {
@@ -232,10 +341,13 @@ class DropboxManager
             Log::debug('Processing', $entry);
 
             $numProcessed++;
-            $fullPath = ltrim($entry['full_path'], '/\\');
+            $fullPath = ltrim($entry, '/\\');
             if (!file_exists($fullPath)) {
                 Db::sqlExec(
-                    "UPDATE `midmem_file_queue` SET `sync_status` = 'ERROR', `error_message` = 'file_exists failed' 
+                    "
+                        UPDATE `midmem_file_queue`
+                        SET `sync_status` = '" . self::SYNC_STATUS_ERROR . "',
+                            `error_message` = 'file_exists failed' 
                         WHERE full_path = ?",
                     's',
                     $fullPath
@@ -272,47 +384,70 @@ class DropboxManager
 
     /**
      * Process text file, parsing fields into the db.
+     * @return bool Success.
      */
-    private function processTextFile($fullPath): void
+    private function processTextFile($fullPath): bool
     {
         // ToDo: some parsing.
-        Db::sqlExec("UPDATE `midmem_file_queue` SET `sync_status` = 'PROCESSED' WHERE full_path = ?", 's', $fullPath);
+        return Db::sqlExec(
+            "UPDATE `midmem_file_queue` SET `sync_status` = '" . self::SYNC_STATUS_PROCESSED . "' WHERE full_path = ?",
+            's',
+            $fullPath
+        );
     }
 
-    /** Process a PNG file, generating thumbnail and converting to JPG if needed.*/
-    private function processPngFile(string $fullPath): void
+    /**
+     * Process a PNG file, generating thumbnail and converting to JPG if needed.
+     * @return bool Success.
+     */
+    private function processPngFile(string $fullPath): bool
     {
         if ((filesize($fullPath) > self::MAX_PNG_BYTES)) {
             // Thumbnail generation would be faster from the new JPG, so we roll this into convertToJpeg.
-            $result = $this->convertToJpeg($fullPath);
+            $thumbResult = $this->convertToJpeg($fullPath);
         } else {
-            $result = $this->makeThumb(imagecreatefrompng($fullPath), $fullPath);
+            $thumbResult = $this->makeThumb(imagecreatefrompng($fullPath), $fullPath);
         }
-        $this->setSyncStatus($fullPath, ($result ? 'PROCESSED' : 'ERROR'), 'Processed as PNG.');
+        $status = ($thumbResult ? self::SYNC_STATUS_PROCESSED : self::SYNC_STATUS_ERROR);
+        $syncResult = $this->setSyncStatus($fullPath, $status, 'Processed as PNG.');
+        return $thumbResult && $syncResult;
     }
 
-    /** Process a GIF file, generating thumbnail.*/
-    private function processGifFile(string $fullPath): void
+    /**
+     * Process a GIF file, generating thumbnail.
+     * @return bool Success.
+     */
+    private function processGifFile(string $fullPath): bool
     {
-        $result = $this->makeThumb(imagecreatefromgif($fullPath), $fullPath);
-        $this->setSyncStatus($fullPath, ($result ? 'PROCESSED' : 'ERROR'), 'Processed as GIF.');
+        $thumbResult = $this->makeThumb(imagecreatefromgif($fullPath), $fullPath);
+        $status = ($thumbResult ? self::SYNC_STATUS_PROCESSED : self::SYNC_STATUS_ERROR);
+        $syncResult = $this->setSyncStatus($fullPath, $status, 'Processed as GIF.');
+        return $thumbResult && $syncResult;
     }
 
-    /** Process a JPG file, generating thumbnail.*/
-    private function processJpegFile(string $fullPath): void
+    /**
+     * Process a JPG file, generating thumbnail.
+     * @return bool Success.
+     */
+    private function processJpegFile(string $fullPath): bool
     {
-        Log::debug("Processing", $fullPath);
-        $result = $this->makeThumb(imagecreatefromjpeg($fullPath), $fullPath);
-        $this->setSyncStatus($fullPath, ($result ? 'PROCESSED' : 'ERROR'), 'Processed as JPG.');
+        Log::debug('Processing', $fullPath);
+        $thumbResult = $this->makeThumb(imagecreatefromjpeg($fullPath), $fullPath);
+        $status = ($thumbResult ? self::SYNC_STATUS_PROCESSED : self::SYNC_STATUS_ERROR);
+        $syncResult = $this->setSyncStatus($fullPath, $status, 'Processed as JPG.');
+        return $thumbResult && $syncResult;
     }
 
-    /** Process an unknown file.*/
-    private function processOtherFile(string $fullPath): void
+    /**
+     * Process an unknown file.
+     * @return bool Success.
+     */
+    private function processOtherFile(string $fullPath): bool
     {
         // Nothing to do but mark it complete.
-        Db::sqlExec(
+        return Db::sqlExec(
             "UPDATE `midmem_file_queue` 
-                SET `sync_status` = 'PROCESSED', `error_message`='Unknown type' 
+                SET `sync_status` = '" . self::SYNC_STATUS_PROCESSED . "', `error_message`='Unknown type' 
                 WHERE full_path = ?",
             's',
             $fullPath
@@ -494,10 +629,11 @@ class DropboxManager
      * @param string $fullPath The path (unique key) of the record to change.
      * @param string $status The new status to give this record.
      * @param string $errorMessage Optional error message to log.
+     * @return bool Success.
      */
-    public function setSyncStatus(string $fullPath, string $status, string $errorMessage = ''): void
+    public function setSyncStatus(string $fullPath, string $status, string $errorMessage = ''): bool
     {
-        Db::sqlExec(
+        return Db::sqlExec(
             'UPDATE `midmem_file_queue` SET `sync_status` = ?, error_message = ? WHERE full_path = ?',
             'sss',
             $status,

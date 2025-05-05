@@ -25,8 +25,8 @@ class Connection
      * @param string $agent -- User-agent information.
      * @param string $user -- Best guess at the current user.
      * @param bool $isBot -- True if user looks like a known bot.
-     * @param bool $isAdmin
-     * @param bool $isSuperAdmin
+     * @param bool $isAdmin -- True if the user is recognized as a registered admin.
+     * @param bool $isSuperAdmin -- True if the user is recognized as me.
      */
     public function __construct(
         public string $request = '',

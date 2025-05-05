@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use JsonException;
+
 /**
  * The class for the main index.php file.
  */
@@ -17,8 +19,13 @@ class Admin
     {
         static::handleLogouts();
         static::initSession();
+        static::dieIfNotAdmin();
 
-        static::getUserInput();
+        try {
+            static::getUserInput();
+        } catch (JsonException $e) {
+            die('["Error: Could not encode list"]');
+        }
         static::showPage();
     }
 
@@ -65,50 +72,95 @@ class Admin
     }
 
     /**
+     * Verify that we are only being accessed by an admin user.
+     */
+    private static function dieIfNotAdmin(): void
+    {
+        global $connection;
+
+        if (!isset($connection) || !$connection->isAdmin) {
+            die('Access denied');
+        }
+    }
+
+    /**
      * Wrapper for debugging info. Likely to call a logging system in the future.
      * @param string $str The string to log.
      */
     private static function debug(string $str): void
     {
+        Log::debug($str);
         echo($str);
     }
 
-    /** Parse the input from the admin form. */
+    /** Parse the input from the admin form.
+     * @throws JsonException
+     */
     private static function getUserInput(): void
     {
         // Parse all the params we can look for in the request.
         $cursor = $_REQUEST['cursor'] ?? '';
-        $initRoot = $_REQUEST['init_root'] ?? null;
-        $continueRoot = $_REQUEST['continue_root'] ?? null;
-        $checkCursor = $_REQUEST['check_cursor'] ?? null;
-        $processFiles = $_REQUEST['download_files'] ?? null;
-        $processDownloads = $_REQUEST['process_downloaded'] ?? null;
         $entriesSoFar = (int)($_REQUEST['entries_so_far'] ?? 0);
+        $formAction = $_REQUEST['action'] ?? null;
 
         static::debug("<p>Starting. Cursor='$cursor', Request=" . var_export($_REQUEST, true) . '</p>');
 
         $fp = new DropboxManager();
         $list = [];
-        if ($initRoot) {
-            static::debug("<h2>Initializing root cursor</h2>\n");
-            $list = $fp->initRootCursor();
-        } elseif ($continueRoot) {
-            static::debug("<h2>Continuing with root cursor init</h2>\n");
-            $list = $fp->resumeRootCursor($entriesSoFar);
-        } elseif ($checkCursor) {
-            static::debug("<h2>Checking cursor for updates...</h2>\n");
-            $list = $fp->readCursorUpdate($entriesSoFar);
-        } elseif ($processFiles) {
-            static::debug("<h2>Downloading files from the DB queue...</h2>\n");
-            $numFiles = $fp->downloadFiles();
-            $list = ['NumberOfFilesDownloaded' => $numFiles];
-        } elseif ($processDownloads) {
-            static::debug("<h2>Processing downloaded files...</h2>\n");
-            [$numFiles, $totalFiles] = $fp->processDownloads();
-            $list = ['NumberOfFilesProcessed' => $numFiles, 'TotalFilesToProcess' => $totalFiles];
-        } else {
-            static::debug("<h2>No command yet given.</h2>\n");
+        switch ($formAction) {
+            case 'init_root':
+                static::debug("<h2>Initializing root cursor</h2>\n");
+                $list = $fp->initRootCursor();
+                break;
+            case 'continue_root':
+                static::debug("<h2>Continuing with root cursor init</h2>\n");
+                $list = $fp->resumeRootCursor($entriesSoFar);
+                break;
+            case 'check_cursor':
+                static::debug("<h2>Checking cursor for updates...</h2>\n");
+                $list = $fp->readCursorUpdate($entriesSoFar);
+                break;
+            case 'list_files_to_download':
+                $list = $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_NEW);
+                Log::debug('Returning list of ' . count($list) . 'files to download.');
+                echo json_encode($list, JSON_THROW_ON_ERROR);
+                exit(0);
+            case 'list_files_to_process':
+                $list = $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_DOWNLOADED);
+                Log::debug('Returning list of ' . count($list) . 'files to process.');
+                echo json_encode($list, JSON_THROW_ON_ERROR);
+                exit(0);
+            case 'download_one_file':
+                static::debug("<h2>Downloading one file from the DB queue...</h2>\n");
+                $result = $fp->downloadOneFile();
+                echo json_encode($result, JSON_THROW_ON_ERROR);
+                exit(0);
+            case 'process_one_file':
+                static::debug("<h2>Processing one file from the DB queue...</h2>\n");
+                $result = $fp->processOneFile();
+                echo json_encode($result, JSON_THROW_ON_ERROR);
+                exit(0);
+            case 'handle_queued_files':
+                static::debug("<h2>Handling queued files.</h2>\n");
+                include('AdminDownloadTemplate.php');
+                exit(0);
+            /*
+            case 'download_files':
+                static::debug("<h2>Downloading files from the DB queue...</h2>\n");
+                $numFiles = $fp->downloadFiles();
+                $list = ['NumberOfFilesDownloaded' => $numFiles];
+                break;
+            case 'process_downloaded':
+                static::debug("<h2>Processing downloaded files...</h2>\n");
+                [$numFiles, $totalFiles] = $fp->processDownloads();
+                $list = ['NumberOfFilesProcessed' => $numFiles, 'TotalFilesToProcess' => $totalFiles];
+                break;
+            */
+            default:
+                static::debug("<h2>No command yet given.</h2>\n");
+                break;
         }
+
         $entriesChange = $fp->entries - static::$entriesSoFar;
         echo '<p>Finished reading.<br>';
         if (empty($fp->cursor)) {
@@ -147,8 +199,7 @@ class Admin
         <body>
         <h1>Midwest Memories - admin</h1>
         <form method="post">
-            <input type="hidden" name="init_root" value="1">
-            <button type="submit">Initialize new root cursor</button>
+            <button type="submit" name="action" value="init_root">Initialize new root cursor</button>
         </form>
         <br>
         <form method="post">
@@ -158,8 +209,7 @@ class Admin
             <label>Cursor:
                 <input type="text" name="cursor" value="<?= htmlspecialchars(static::$cursor) ?>">
             </label>
-            <input type="hidden" name="continue_root" value="1">
-            <button type="submit">Continue initializing root cursor</button>
+            <button type="submit" name="action" value="continue_root">Continue initializing root cursor</button>
         </form>
         <form method="post">
             <label>Entries:
@@ -168,17 +218,14 @@ class Admin
             <label>Cursor:
                 <input type="text" name="cursor" value="<?= htmlspecialchars(static::$cursor) ?>">
             </label>
-            <input type="hidden" name="check_cursor" value="1">
-            <button type="submit">Get latest cursor updates into DB</button>
+            <button type="submit" name="action" value="check_cursor">Get latest cursor updates into DB</button>
         </form>
         <form method="post">
-            <input type="hidden" name="download_files" value="1">
-            <button type="submit">Download files from DB queue</button>
-        </form>
-        <br>
-        <form method="post">
-            <input type="hidden" name="process_downloaded" value="1">
-            <button type="submit">Process downloaded files</button>
+            <!-- <button type="submit" name="action" value="download_files">Download files from DB queue</button>
+            <br>
+            <button type="submit" name="action" value="process_downloaded">Process downloaded files</button>
+            <br> -->
+            <button type="submit" name="action" value="handle_queued_files">Handle Queued files</button>
         </form>
         <br>
         </body>

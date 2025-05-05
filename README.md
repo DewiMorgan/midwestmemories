@@ -161,8 +161,15 @@ See also list at the top of this file.
 
 Current task:
 
-* Getting the files thumbnailed. (not working?)
-* Get logging to be better (call stack info on each line).
+* Thumbnails are slow, and UI is unresponsive during it.
+    * Replace with a responsive clientside way of doing it, adding two endpoints:
+    * "get list of files needing thumbs" endpoint;
+    * "process one thumb" endpoint (this also solves the timeout problem as we only ever process one);
+    * Call those with JS;
+    * Parallelize maybe 4 at a time?
+    * Make ALL admin processing follow this same "get list of things needing doing", "do one thing" endpoint pattern.
+* FIXED: Files aren't thumbnailing.
+* DONE: Get logging to be better (call stack info on each line).
 
 Urgent:
 
@@ -262,6 +269,7 @@ From Code comments:
 * DropboxManager::convertToJpeg(): How should this be reflected in the DB?
 
 Low priority:
+
 * come up with a fun thumbnail image for the website to go in the upper left of the tab.
 
 * TreeTemplate

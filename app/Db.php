@@ -50,17 +50,18 @@ class Db
      * Execute a SQL statement.
      * @param string $sql The query to execute.
      * @param int|string ...$items type-string, then variables, eg 'sd', 'foo', 1.
+     * @return bool True on success, else false.
      */
-    public static function sqlExec(string $sql, int|string ...$items): void
+    public static function sqlExec(string $sql, int|string ...$items): bool
     {
         Log::adminDebug('sqlExec', [$sql, $items]);
         $db = self::getInstance()->db;
-        if ($query = $db->prepare($sql)) {
-            if (!empty($items)) {
-                $query->bind_param(...$items);
-            }
-            $query->execute();
+        $query = $db->prepare($sql);
+
+        if ($query && (empty($items) || $query->bind_param(...$items))) {
+            return $query->execute();
         }
+        return false;
     }
 
     /**
@@ -158,6 +159,28 @@ class Db
             }
             $result->free();
             return $table;
+        }
+        Log::adminDebug('query failed, db error', $db->error);
+        return [];
+    }
+
+    /**
+     * Return one column of results as a 1d array, or an empty array.
+     * @param string $sql Query with values replaced by '?'.
+     * @param string $fieldName The field to populate the list from.
+     * @return array A list of all values returned for that field, or empty.
+     */
+    public static function sqlGetList(string $sql, string $fieldName): array
+    {
+        Log::adminDebug('sqlGetTable', $sql);
+        $db = self::getInstance()->db;
+        if ($result = $db->query($sql)) {
+            $list = [];
+            while ($row = $result->fetch_assoc()) {
+                $list [] = $row[$fieldName];
+            }
+            $result->free();
+            return $list;
         }
         Log::adminDebug('query failed, db error', $db->error);
         return [];
