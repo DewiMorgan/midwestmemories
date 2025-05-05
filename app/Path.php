@@ -51,7 +51,7 @@ class Path
             Log::adminDebug("Converted path gave an empty string or error: $filePath");
             return 'PATH_ERROR_BAD';
         }
-        Log::debug(__METHOD__ . " $result from $filePath");
+        Log::debug("$result from $filePath");
         return $result;
     }
 
@@ -64,7 +64,7 @@ class Path
      */
     public static function isChildInPath(string $childPath, string $parentPath): bool
     {
-        Log::debug(__METHOD__ . "($childPath, $parentPath)"); // DELETEME DEBUG
+        Log::debug("($childPath, $parentPath)"); // DELETEME DEBUG
 
         // Check they both exist.
         $realChildPath = realpath($childPath);
