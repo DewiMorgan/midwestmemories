@@ -372,8 +372,9 @@ class DropboxManager
             . "newWidth = (i)$newWidth, newHeight = (i)$newHeight, dest = $dest."
         );
 
+        $newWidth = (int)$newWidth;
         /* Create a new, "virtual" image */
-        $virtualImage = imagecreatetruecolor((int)$newWidth, (int)$newHeight);
+        $virtualImage = imagecreatetruecolor($newWidth, $newHeight);
         if (false === $virtualImage) {
             Log::adminDebug('Virtual image dimensions false for makeThumb', $fullPath);
             return false;
