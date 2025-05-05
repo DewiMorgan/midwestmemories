@@ -143,7 +143,7 @@ class Admin
             case 'handle_queued_files':
                 static::debug("<h2>Handling queued files.</h2>\n");
                 include('AdminDownloadTemplate.php');
-                exit(0);
+//                exit(0);
             /*
             case 'download_files':
                 static::debug("<h2>Downloading files from the DB queue...</h2>\n");

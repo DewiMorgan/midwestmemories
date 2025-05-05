@@ -41,6 +41,14 @@
     }
 
     // Run prepare and then process
-    handleFileTask('prepare', './admin.php?action=list_files_to_download', './admin.php?action=download_one_file');
-    handleFileTask('process', './admin.php?action=list_files_to_process', './admin.php?action=process_one_file');
+    async function runAll() {
+        // Run prepare and then process
+        await handleFileTask(
+            'prepare', './admin.php?action=list_files_to_download', './admin.php?action=download_one_file'
+        );
+        await handleFileTask(
+            'process', './admin.php?action=list_files_to_process', './admin.php?action=process_one_file'
+        );
+    }
+    runAll();
 </script>
