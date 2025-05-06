@@ -180,7 +180,7 @@ Urgent:
         * The data is stored/read into Metadata. Treat same as FileTemplate
     * Show subfolders as thumbs, too.
         * Ini files don't handle subfolder details. Probably details should come from ini files in subfolders?
-    * Clicking images doesn't load them in TreeTemplate, I think because they have a double-leading-slash.
+    * Clicking images doesn't load them in TreeTemplate, I think because they have a double-leading-slash?
     * In the absence of a thumbnail, show the real image, but sized down.
     * Folder Descriptions from Dropbox\midwestmemories\Auora\Horst and Karin slide tray sections.txt
         * The descriptions are short enough, it feels like it'd maybe be worth also showing them on page for each

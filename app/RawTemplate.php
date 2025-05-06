@@ -19,15 +19,18 @@ class RawTemplate
     {
         $itemPath = Index::$requestUnixPath;
 
+        $mimeType = mime_content_type($itemPath);
+        header('Content-Type: $mineType');
+
         // DELETEME DEBUG
         if (!is_file($itemPath)) {
-            Log::adminDebug("Not a file: $itemPath");
+            Log::debug("Not a file: $itemPath");
         } elseif (str_starts_with($itemPath, 'tn_')) {
-            Log::adminDebug("Starts with tn_: $itemPath");
+            Log::debug("Starts with tn_: $itemPath");
         } elseif (str_starts_with($itemPath, '.')) {
-            Log::adminDebug("Hidden dot file: $itemPath");
+            Log::debug("Hidden dot file: $itemPath");
         } elseif (!preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath)) {
-            Log::adminDebug("Not an image file: $itemPath");
+            Log::debug("Not an image file: $itemPath");
         }
 
         readfile($itemPath);

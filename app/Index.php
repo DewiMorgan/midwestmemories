@@ -80,22 +80,22 @@ class Index
         if (!$isInlineRequest) {
             // This is a request by a user, perhaps to a bookmark.
             // Load the tree view, which will then call us back for the inline version of the pointed-at $path resource.
-            include('app/TreeTemplate.php');
+            include(__DIR__ . '/TreeTemplate.php');
         } elseif (2 === (int)$_REQUEST['i']) {
             // We're showing raw file view, such as for an img link.
-            include('app/RawTemplate.php');
+            include(__DIR__ . '/RawTemplate.php');
         } elseif (3 === (int)$_REQUEST['i']) {
             // We're showing an inline search view, by choice.
-            include('app/RawTemplate.php');
+            include(__DIR__ . '/SearchTemplate.php');
         } elseif (is_dir(static::$requestUnixPath)) {
             // We're showing an inline folder view; a list of thumbnails.
-            include('app/ThumbsTemplate.php');
+            include(__DIR__ . '/ThumbsTemplate.php');
         } elseif (is_file(static::$requestUnixPath)) {
             // We're showing an inline file view.
-            include('app/FileTemplate.php');
+            include(__DIR__ . '/FileTemplate.php');
         } else {
             // We're showing an inline search view, because we've nothing else to show.
-            include('app/SearchTemplate.php');
+            include(__DIR__ . '/SearchTemplate.php');
         }
     }
 
