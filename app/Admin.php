@@ -23,7 +23,7 @@ class Admin
 
         try {
             static::getUserInput();
-        } catch (JsonException $e) {
+        } catch (JsonException) {
             die('["Error: Could not encode list"]');
         }
         static::showHeader();
@@ -135,7 +135,7 @@ class Admin
         static::showHeader();
         switch ($formAction) {
             case 'handle_init_root':
-                static::debug("<h2>Handling queued files.</h2>\n");
+                static::debug("<h2>Handling init.</h2>\n");
                 include(__DIR__ . '/AdminDownloadTemplate.php');
                 break;
             case 'handle_queued_files':

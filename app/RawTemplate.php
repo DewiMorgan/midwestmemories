@@ -20,7 +20,7 @@ class RawTemplate
         $itemPath = Index::$requestUnixPath;
 
         $mimeType = mime_content_type($itemPath);
-        header('Content-Type: $mineType');
+        header("Content-Type: $mimeType");
 
         // DELETEME DEBUG
         if (!is_file($itemPath)) {

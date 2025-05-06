@@ -8,7 +8,7 @@ which might not be when they were actually implemented/committed.
 * DONE: Add correct headers for images so they can be opened in new tab.
 * DONE: Delete the old code for thumbs and downloads.
 * DONE: Debug the dynamic downloading and thumbnail generation.
-* DONE: Get it not to bother thumbsing the -ICE.jpg filtered versions (manually delete the thumbnails for now).
+* DONE: Get it not to bother thumbing the -ICE.jpg filtered versions (manually delete the thumbnails for now).
 * DONE: Check for quirks mode.
 * DONE: Webhook just displays an error to normal humans.
 
@@ -21,7 +21,7 @@ which might not be when they were actually implemented/committed.
 * DONE: "process one thumb" endpoint (this also solves the timeout problem as we only ever process one);
 * DONE: Call those with JS;
 * DONE: Make Downloads handled on the same page, going first.
-* FIXED: Files aren't thumbnailing.
+* FIXED: Files aren't thumb-nailing.
 * DONE: Get logging to be better (call stack info on each line).
 * DONE: Add counter for the files processed on admin page.
 
@@ -105,7 +105,7 @@ which might not be when they were actually implemented/committed.
 * FIXED: Create a config file for non-secret info.
 * FIXED: Read auth info through the config class.
 * FIXED: Unify pre-existing logging (as in Db class) to use Log class.
-* FIXED: Refactor dropboxwebhook to a class, and move the class into the app/ folder.
+* FIXED: Refactor dropbox webhook to a class, and move the class into the app/ folder.
 * FIXED: Create a simple static logger class. Log::error($str), etc.
 * FIXED: Create a simple static config class. Conf::get(Conf::LOG_LEVEL), etc.
 * FIXED: DropboxManager has some very poor naming. `dbm.iterations` and `dbm.extracted` need renaming.

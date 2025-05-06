@@ -114,7 +114,7 @@ class Log
         $prevFile = 'Unknown File';
         $prevLine = '?';
 
-        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS,4) as $method) {
+        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4) as $method) {
             // Skip lines from this class.
             if (!array_key_exists('class', $method) || __CLASS__ !== $method['class']) {
                 return basename($prevFile) . "($prevLine) $method[function](): ";

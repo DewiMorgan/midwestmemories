@@ -167,10 +167,12 @@ Current task:
     * Pretty up that template just a tiny bit: need a styled, scrolling output window.
     * Maybe merge the template and Admin.php together, and get the JS out to a .js file.
 * Investigate cursor init that isn't just always-ignore, and download that isn't just always-download.
-    * Detect changes! Dropbox may suck until I can do this. Or hide cursor regen as superadmin.
+    * Detect changes! Dropbox may suck until I can do this. Or hide cursor regen as super-admin.
     * Base it on date (beware timezones)? Checksum?
 * Make updating be triggered by visiting the admin page.
 * If the webhook was working then I shouldn't be able to do a manual update. But I could, and did!
+* I think file downloads are no longer checked against the right folder path. VALID_FILE_PATH_REGEX is unused.
+    * SaveFileQueue() probably does it, hardcoded.
 
 Urgent:
 
@@ -200,7 +202,7 @@ Urgent:
     * Bug: The field for "text on slide" isn't in the table, it's above.
     * Bug: Right-clicking "open image in new tab" doesn't work
     * Left navbar should be overflow:scroll.
-    * Bug: fail to resize rightbar: drag bar left, then ctrl+mwheel down.
+    * Bug: fail to resize right-bar: drag bar left, then ctrl+m-wheel down.
 
 * Metadata class
     * Add hasNext and hasPrev properties to enable next/prev buttons in FileTemplate.

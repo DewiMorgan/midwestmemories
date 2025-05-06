@@ -78,82 +78,6 @@ class Metadata
     }
 
     /**
-     * Write out to an Ini file
-     * @param string $webPath The folder to add/update the ini file for. Should have already been sanity-checked.
-     * ToDo: singleton.
-     */
-    public static function saveToInis(string $webPath): void
-    {
-        $pathSoFar = '';
-        foreach (explode('/', $webPath) AS $pathElement) {
-            $pathSoFar = preg_replace('#//#', '/', "$pathSoFar/$pathElement");
-            if (array_key_exists('dirty', self::$folderTree[$webPath]) && !empty(self::$folderTree[$webPath]['data'])) {
-                $iniUnixPath = Path::webToUnixPath("$pathSoFar/index.txt", false);
-                $iniString = self::getIniString('/', self::$folderTree[$webPath]['data']);
-                file_put_contents($iniUnixPath, $iniString);
-            }
-        }
-    }
-
-    /**
-     * Internal helper fn.
-     * @param string $key The key for the current section, or the top-level section when first called.
-     * @param mixed $data The data structure to recurse through to print.
-     * @param int $depth How deeply we have recursed. Used to prevent infinite recursion.
-     * @return string The contents of the ini fie, or the section that we've recursed into.
-     * @noinspection MissingOrEmptyGroupStatementInspection - Empty if clauses are the cleanest way, here.
-     */
-    public static function getIniString(string $key, mixed $data, int $depth = 0): string
-    {
-        $result = '';
-        if ($depth > 2) {
-            // Prevent infinite recursion: don't save if recursed too far.
-        } elseif (is_null($data)) {
-            // Don't save empty data.
-        } elseif (is_array($data)) {
-            // Recurse into sub-arrays.
-            $res = "[$key]\n"; // Ini file heading.
-            foreach ($data as $subKey => $value) {
-                $res .= self::getIniString((string)$subKey, $value, $depth + 1);
-            }
-            $result = $res . "\n";
-        } elseif (is_numeric($data)) {
-            // Handle all other data types.
-            $result = "$key = $data\n";
-        } elseif (is_bool($data)) {
-            $result = "$key = " . ($data ? 'yes' : 'no') . "\n";
-        } elseif (is_string($data)) {
-            $escaped = addcslashes($data, "\0..\37\177..\377\\"); // \377 octal = 255.
-            $result = "$key = \"$escaped\"\n";
-        } elseif (is_object($data) && method_exists($data, '__toString')) {
-            // This will have problems if __toString() doesn't return a string.
-            $escaped = addcslashes($data->__toString(), "\0..\37\177..\377\\");
-            $result = "$key = \"$escaped\"\n";
-        } else {
-            // Don't save Unknown datatypes.
-            Log::error("Unknown datatype for '$key'", $data);
-        }
-        return $result;
-    }
-
-    /** Populate and overwrite our values with the values from another object.
-     * @param array $sourceArray The Metadata object to copy from, in the same format as self::$folderTree.
-     */
-    public static function updateFromArray(array $sourceArray): void
-    {
-        foreach ($sourceArray as $key => $entry) {
-            // Go into the first level of arrays and copy their contents.
-            if (is_array($entry)) {
-                foreach ($entry as $subKey => $subEntry) {
-                    if (!is_null($subEntry)) {
-                        self::$folderTree[$key][$subKey] = $subEntry;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Get the directory's metadata entry for the given absolute file, or folder.
      * @see getFileDataByWebPath for more info.
      * @param string $unixFilePath The absolute unix file to get the information for.
@@ -226,4 +150,83 @@ class Metadata
         Log::warning("File entry at '$webFilePath' was not an array: returning empty.", $currentLevel);
         return [];
     }
+
+//    /** Populate and overwrite our values with the values from another object.
+//     * @param array $sourceArray The Metadata object to copy from, in the same format as self::$folderTree.
+//     */
+//    public static function updateFromArray(array $sourceArray): void
+//    {
+//        foreach ($sourceArray as $key => $entry) {
+//            // Go into the first level of arrays and copy their contents.
+//            if (is_array($entry)) {
+//                foreach ($entry as $subKey => $subEntry) {
+//                    if (!is_null($subEntry)) {
+//                        self::$folderTree[$key][$subKey] = $subEntry;
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    /**
+//     * Write out to an Ini file
+//     * @param string $webPath The folder to add/update the ini file for. Should have already been sanity-checked.
+//     * ToDo: singleton.
+//     */
+//    public static function saveToInis(string $webPath): void
+//    {
+//        $pathSoFar = '';
+//        foreach (explode('/', $webPath) AS $pathElement) {
+//            $pathSoFar = preg_replace('#//#', '/', "$pathSoFar/$pathElement");
+//            if (
+//                array_key_exists('dirty', self::$folderTree[$webPath])
+//                && !empty(self::$folderTree[$webPath]['data'])
+//            ) {
+//                $iniUnixPath = Path::webToUnixPath("$pathSoFar/index.txt", false);
+//                $iniString = self::getIniString('/', self::$folderTree[$webPath]['data']);
+//                file_put_contents($iniUnixPath, $iniString);
+//            }
+//        }
+//    }
+//
+//    /**
+//     * Internal helper fn.
+//     * @param string $key The key for the current section, or the top-level section when first called.
+//     * @param mixed $data The data structure to recurse through to print.
+//     * @param int $depth How deeply we have recursed. Used to prevent infinite recursion.
+//     * @return string The contents of the ini fie, or the section that we've recursed into.
+//     * @noinspection MissingOrEmptyGroupStatementInspection - Empty if clauses are the cleanest way, here.
+//     */
+//    public static function getIniString(string $key, mixed $data, int $depth = 0): string
+//    {
+//        $result = '';
+//        if ($depth > 2) {
+//            // Prevent infinite recursion: don't save if recursed too far.
+//        } elseif (is_null($data)) {
+//            // Don't save empty data.
+//        } elseif (is_array($data)) {
+//            // Recurse into sub-arrays.
+//            $res = "[$key]\n"; // Ini file heading.
+//            foreach ($data as $subKey => $value) {
+//                $res .= self::getIniString((string)$subKey, $value, $depth + 1);
+//            }
+//            $result = $res . "\n";
+//        } elseif (is_numeric($data)) {
+//            // Handle all other data types.
+//            $result = "$key = $data\n";
+//        } elseif (is_bool($data)) {
+//            $result = "$key = " . ($data ? 'yes' : 'no') . "\n";
+//        } elseif (is_string($data)) {
+//            $escaped = addcslashes($data, "\0..\37\177..\377\\"); // \377 octal = 255.
+//            $result = "$key = \"$escaped\"\n";
+//        } elseif (is_object($data) && method_exists($data, '__toString')) {
+//            // This will have problems if __toString() doesn't return a string.
+//            $escaped = addcslashes($data->__toString(), "\0..\37\177..\377\\");
+//            $result = "$key = \"$escaped\"\n";
+//        } else {
+//            // Don't save Unknown datatypes.
+//            Log::error("Unknown datatype for '$key'", $data);
+//        }
+//        return $result;
+//    }
 }

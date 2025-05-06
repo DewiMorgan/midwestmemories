@@ -34,9 +34,6 @@ class DropboxManager
     /** Max image height in pixels before scaling down for thumbnail. */
     private const MAX_THUMB_HEIGHT = 64;
 
-    /** The sub-folder within the dropbox repo that we're interested in. */
-    private const VALID_FILE_PATH_REGEX = '#^/midwestmemories/#';
-
     /** The item has just been added from the Dropbox list. */
     public const SYNC_STATUS_NEW = 'NEW';
 
@@ -133,30 +130,6 @@ class DropboxManager
         }
 
         return $result;
-    }
-
-    /**
-     * Filters a list of Dropbox file entries, appending those that match our valid file path with the known good ones.
-     * @param array $knownGoodFiles The current list of matching entries, which will be merged with.
-     * @param array $suspectFiles A list of file details to validate.
-     * @return array The filtered list of entries.
-     */
-    private function addValidEntries(array $knownGoodFiles, array $suspectFiles): array
-    {
-        $filteredEntries = array_filter($suspectFiles, [$this, 'isValidFileEntry']);
-
-        $this->entries += count($filteredEntries);
-        return array_merge($knownGoodFiles, $filteredEntries);
-    }
-
-    /**
-     * Private helper to validate file paths from DropBox.
-     * @param array $fileEntry The entry to validate.
-     * @return bool True if it's a valid file.
-     */
-    private function isValidFileEntry(array $fileEntry): bool
-    {
-        return preg_match(self::VALID_FILE_PATH_REGEX, $fileEntry['path_lower']) === 1;
     }
 
     /**
@@ -564,56 +537,4 @@ class DropboxManager
             $fullPath
         );
     }
-
-    /**
-     * Read from the cursor until it no longer response "has_more", filtering out files we're uninterested in.
-     * @param array $list The list of files or other responses from the cursor's listFolder call.
-     * @param int $endTime Maximum time() we can loop before we time out.
-     * @param array $knownGoodFiles The current list of matching entries, which will be merged with.
-     * @return array The list of files from the folder we're interested in.
-     */
-    public function readCursorToEnd(array $list, int $endTime, array $knownGoodFiles): array
-    {
-        while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
-            $list = $this->client->listFolderContinue($this->cursor);
-            $this->setNewCursor($list['cursor']);
-            $knownGoodFiles = $this->addValidEntries($knownGoodFiles, $list['entries']);
-            $this->iterations++;
-        }
-        return $knownGoodFiles;
-    }
-
-    /**
-     * Get the recursive list of all files for this website, up to a timeout.
-     * @return array List of file details.
-     */
-    /*
-        function getRecursiveList(): array {
-            $this->iterations = 0;
-            try {
-                $list = $this->client->listFolder(self::DROPBOX_PATH, true);
-                if (array_key_exists('entries', $list)) {
-                    $result = $list['entries'];
-                    $this->iterations = 1;
-                    $this->cursor = $list['cursor'];
-                }
-                while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor) {
-                    $list = $this->client->listFolderContinue($this->cursor);
-                    $this->cursor = $list['cursor'];
-                    if (array_key_exists('entries', $list)) {
-                        $result = array_merge($result, $list['entries']);
-                        $this->iterations ++;
-                    }
-                }
-                return $result;
-            } catch (Exception $e) {
-                Log::Error("", $e);
-                die(1);
-            }
-        }
-    */
-    /*
-     foreach ($list as $fileEntry) {
-     }
-     */
 }
