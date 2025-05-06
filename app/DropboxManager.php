@@ -108,6 +108,7 @@ class DropboxManager
             $list = $this->client->listFolderContinue($this->cursor);
             $this->setNewCursor($list['cursor']);
             $numValidFiles = $this->saveFileQueue($list['entries']);
+            Log::debug('List', $list);
             $result = [
                 static::KEY_VALID_FILES => $numValidFiles,
                 static::KEY_TOTAL_FILES => count($list['entries']),

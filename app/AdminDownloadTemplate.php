@@ -56,20 +56,23 @@
                     return;
                 }
 
+                // Enforce syntax.
+                data.moreFilesToGo ??= false;
+                data.numValidFiles ??= 0;
+                data.numTotalFiles ??= 0;
+                logMessage(`${data.numValidFiles} of ${data.numTotalFiles}, more to come...`);
+
                 if ("OK" !== data.error) {
                     logMessage(data.error);
                     return;
                 }
 
-                if (data.moreFilesToGo) {
+                if (true === data.moreFilesToGo) {
                     logMessage(`${data.numValidFiles} of ${data.numTotalFiles}, more to come...`);
                 } else {
                     logMessage(`${data.numValidFiles} of ${data.numTotalFiles}, finished!`);
                     return;
                 }
-
-                // Optional: wait a bit before the next request to avoid hammering the server
-                // await new Promise(resolve => setTimeout(resolve, 1000));
             }
         } catch (err) {
             logMessage(`Request failed: ${err.message}`);
@@ -89,5 +92,6 @@
         //     'Postprocessing', './admin.php?action=list_files_to_process', './admin.php?action=process_one_file'
         // );
     }
+
     runAll();
 </script>
