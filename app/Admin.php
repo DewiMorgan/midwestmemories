@@ -111,6 +111,17 @@ class Admin
 
         // Handle API calls. Nothing must be output before these, and they must not output anything.
         switch ($formAction) {
+            case 'update_dropbox_status':
+                header('Content-Type: application/json');
+                $result = $fp->readOneCursorUpdate();
+                Log::debug(
+                    "From Dropbox, saved {$result[DropboxManager::KEY_VALID_FILES]} of "
+                    . "{$result[DropboxManager::KEY_TOTAL_FILES]}, "
+                    . ($result[DropboxManager::KEY_MORE_FILES] ? 'more to come' : 'all done'),
+                    $result[DropboxManager::KEY_ERROR]
+                );
+                echo json_encode($result, JSON_THROW_ON_ERROR);
+                exit(0);
             case 'list_files_to_download':
                 header('Content-Type: application/json');
                 $list = $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_NEW);

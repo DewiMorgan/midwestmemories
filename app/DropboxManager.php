@@ -49,6 +49,11 @@ class DropboxManager
     /** The item has some permanent error, and needs manual remediation. */
     public const SYNC_STATUS_ERROR = 'ERROR';
 
+    public const KEY_VALID_FILES = 'numValidFiles';
+    public const KEY_TOTAL_FILES = 'numTotalFiles';
+    public const KEY_MORE_FILES = 'moreFilesToGo';
+    public const KEY_ERROR = 'error';
+
     public function __construct()
     {
         $tokenRefresher = new TokenRefresher();
@@ -93,6 +98,36 @@ class DropboxManager
     }
 
     /**
+     * Read a chunk of the list of updated files for the given DropBox cursor, and queue it in the MySQL.
+     * @return array of count read from DropBox & written to MySQL, whether there are more to read, and any errors.
+     */
+    public function readOneCursorUpdate(): array
+    {
+        $this->loadCursor();
+        if ($this->cursor) {
+            $list = $this->client->listFolderContinue($this->cursor);
+            $this->setNewCursor($list['cursor']);
+            $numValidFiles = $this->saveFileQueue($list['entries']);
+            $result = [
+                static::KEY_VALID_FILES => $numValidFiles,
+                static::KEY_TOTAL_FILES => count($list['entries']),
+                static::KEY_MORE_FILES => $list['has_more'] ?? false,
+                static::KEY_ERROR => 'OK'
+            ];
+        } else {
+            $result = [
+                static::KEY_VALID_FILES => 0,
+                static::KEY_TOTAL_FILES => 0,
+                static::KEY_MORE_FILES => false,
+                static::KEY_ERROR => 'Root cursor not set'
+            ];
+        }
+
+        return $result;
+    }
+
+
+    /**
      * Get the list of updated files for the given cursor, up to a timeout.
      * @param int $entriesSoFar How many entries have already been processed in this run of the script.
      * @return array List of file details.
@@ -124,12 +159,20 @@ class DropboxManager
      */
     private function addValidEntries(array $knownGoodFiles, array $suspectFiles): array
     {
-        $filteredEntries = array_filter($suspectFiles, static function ($fileEntry) {
-            return preg_match(self::VALID_FILE_PATH_REGEX, $fileEntry['path_lower']);
-        });
+        $filteredEntries = array_filter($suspectFiles, [$this, 'isValidFileEntry']);
 
         $this->entries += count($filteredEntries);
         return array_merge($knownGoodFiles, $filteredEntries);
+    }
+
+    /**
+     * Private helper to validate file paths from DropBox.
+     * @param array $fileEntry The entry to validate.
+     * @return bool True if it's a valid file.
+     */
+    private function isValidFileEntry(array $fileEntry): bool
+    {
+        return preg_match(self::VALID_FILE_PATH_REGEX, $fileEntry['path_lower']) === 1;
     }
 
     /**

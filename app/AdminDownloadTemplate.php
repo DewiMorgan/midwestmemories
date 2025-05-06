@@ -44,15 +44,50 @@
         }
     }
 
+    async function handleDropboxPolling(url) {
+        try {
+            while (true) {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                // Ensure HTTP-level success (status code 2xx)
+                if (!response.ok) {
+                    logMessage(`HTTP error: ${response.status}`);
+                    return;
+                }
+
+                if ("OK" !== data.error) {
+                    logMessage(data.error);
+                    return;
+                }
+
+                if (data.moreFilesToGo) {
+                    logMessage(`${data.numValidFiles} of ${data.numTotalFiles}, more to come...`);
+                } else {
+                    logMessage(`${data.numValidFiles} of ${data.numTotalFiles}, finished!`);
+                    return;
+                }
+
+                // Optional: wait a bit before the next request to avoid hammering the server
+                // await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        } catch (err) {
+            logMessage(`Request failed: ${err.message}`);
+        }
+    }
+
     // Run prepare and then process
     async function runAll() {
-        // Run prepare and then process
-        await handleFileTask(
-            'Downloading', './admin.php?action=list_files_to_download', './admin.php?action=download_one_file'
-        );
-        await handleFileTask(
-            'Postprocessing', './admin.php?action=list_files_to_process', './admin.php?action=process_one_file'
-        );
+        // Get and queue updates from Dropbox.
+        await handleDropboxPolling('./admin.php?action=update_dropbox_status');
+        // // Download queued downloads.
+        // await handleFileTask(
+        //     'Downloading', './admin.php?action=list_files_to_download', './admin.php?action=download_one_file'
+        // );
+        // // Generate queued thumbnails.
+        // await handleFileTask(
+        //     'Postprocessing', './admin.php?action=list_files_to_process', './admin.php?action=process_one_file'
+        // );
     }
     runAll();
 </script>
