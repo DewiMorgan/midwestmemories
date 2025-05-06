@@ -161,6 +161,7 @@ See also list at the top of this file.
 
 Current task:
 
+* https://midwestmemories.dewimorgan.com/admin.php?action=list_files_to_download no longer works.
 * Make cursor-ignoring be dynamic, too.
     * Mostly done, need to make the AdminDownloadTemplate handle that too.
     * Rename to AdminApiTemplate.

@@ -120,7 +120,7 @@ class Admin
             'process_one_file' => $fp->processOneFile(),
             default => '',
         };
-        if ($result) {
+        if ('' !== $result) {
             header('Content-Type: application/json');
             echo json_encode($result, JSON_THROW_ON_ERROR);
             if (str_starts_with($formAction, 'list_')) {
