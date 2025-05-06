@@ -14,7 +14,7 @@ which might not be when they were actually implemented/committed.
 * DONE: Make Downloads handled on the same page, going first.
 * FIXED: Files aren't thumbnailing.
 * DONE: Get logging to be better (call stack info on each line).
-
+* DONE: Add counter for the files processed on admin page.
 
 ## 2025/04/27
 
@@ -96,7 +96,7 @@ which might not be when they were actually implemented/committed.
 * FIXED: Create a config file for non-secret info.
 * FIXED: Read auth info through the config class.
 * FIXED: Unify pre-existing logging (as in Db class) to use Log class.
-* FIXED: Refactor dropboxcallback to a class, and move the class into the app/ folder.
+* FIXED: Refactor dropboxwebhook to a class, and move the class into the app/ folder.
 * FIXED: Create a simple static logger class. Log::error($str), etc.
 * FIXED: Create a simple static config class. Conf::get(Conf::LOG_LEVEL), etc.
 * FIXED: DropboxManager has some very poor naming. `dbm.iterations` and `dbm.extracted` need renaming.

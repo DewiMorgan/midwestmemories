@@ -4,11 +4,11 @@ Photo archive for the family.
 
 ## Current structure
 
-When a change is made in Dropbox, a Dropbox callback hook calls dropboxcallback.php.
+When a change is made in Dropbox, a Dropbox callback hook calls DropboxWebhook.php.
 This tags the user's cursor as "dirty", but doesn't actually download any updated files.
 
 Admins can log in and manually initiate an update through admin.php.
-Maybe in the future this could be automated by dropboxcallback.php or a periodic cron.
+Maybe in the future this could be automated by DropboxWebhook.php or a periodic cron.
 
 Index.php shows the nav, and the image listings.
 
@@ -134,8 +134,8 @@ but that isn't necessary, and the default is fine.
 Again, this is just initialization stuff, should never be needed.
 
 **Get latest cursor updates into the DB**: This is where it gets the list of new files and puts them in the DB.
-This is the list of files that have changed since the most last file listed by any of the above three commands.
-This should happen automatically from the Dropbox callback. I'm not sure whether it does.
+This is the list of files that have changed since the last file most recently listed by any of the above two commands.
+This should happen automatically from the DropboxWebhook callback. I'm not sure whether it does.
 
 **Download files from DB queue**: This downloads those new files from the previous command.
 
@@ -171,7 +171,8 @@ Urgent:
 * Get thumb view working.
 * Get it commentable.
 * Get it usable on a phone.
-* Search?
+* Add a search template?
+* Add correct headers for images so they can be opened in new tab.
 
 * ThumbsTemplate
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
@@ -192,6 +193,7 @@ Urgent:
     * Bug: The field for "text on slide" isn't in the table, it's above.
     * Bug: Right-clicking "open image in new tab" doesn't work
     * Left navbar should be overflow:scroll.
+    * Bug: fail to resize rightbar: drag bar left, then ctrl+mwheel down.
 
 * Metadata class
     * Add hasNext and hasPrev properties to enable next/prev buttons in FileTemplate.
@@ -270,6 +272,7 @@ From Code comments:
 
 Low priority:
 
+* Prettify the admin page, put the streaming actions into a separate box, show a list of errors needing attention, etc.
 * Make ALL admin processing use same dynamic endpoint pattern as downloads and thumbnails.
 * Parallelize maybe 4 downloads and thumbnail generations at a time?
 * come up with a fun thumbnail image for the website to go in the upper left of the tab.

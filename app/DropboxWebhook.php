@@ -8,9 +8,10 @@ use JetBrains\PhpStorm\NoReturn;
 use JsonException;
 
 /**
- * Callback for changes in DropBox. Only have 10 seconds to respond, so make it fast!
+ * Webhook Callback for changes in DropBox. Only have 10 seconds to respond, so make it fast!
+ * https://www.dropbox.com/developers/reference/webhooks
  */
-class DropboxCallback
+class DropboxWebhook
 {
     #[NoReturn] public function __construct()
     {

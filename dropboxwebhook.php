@@ -12,5 +12,5 @@ session_start();
 
 require_once('app/autoload.php');
 
-new DropboxCallback();
+new DropboxWebhook();
 exit(0);

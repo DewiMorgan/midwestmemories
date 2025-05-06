@@ -155,18 +155,6 @@ class Admin
             case 'handle_queued_files':
                 static::debug("<h2>Handling queued files.</h2>\n");
                 include('AdminDownloadTemplate.php');
-            /*
-            case 'download_files':
-                static::debug("<h2>Downloading files from the DB queue...</h2>\n");
-                $numFiles = $fp->downloadFiles();
-                $list = ['NumberOfFilesDownloaded' => $numFiles];
-                break;
-            case 'process_downloaded':
-                static::debug("<h2>Processing downloaded files...</h2>\n");
-                [$numFiles, $totalFiles] = $fp->processDownloads();
-                $list = ['NumberOfFilesProcessed' => $numFiles, 'TotalFilesToProcess' => $totalFiles];
-                break;
-            */
             default:
                 static::debug("<h2>No command yet given.</h2>\n");
                 break;
@@ -247,10 +235,6 @@ class Admin
             <button type="submit" name="action" value="check_cursor">Get latest cursor updates into DB</button>
         </form>
         <form method="post">
-            <!-- <button type="submit" name="action" value="download_files">Download files from DB queue</button>
-            <br>
-            <button type="submit" name="action" value="process_downloaded">Process downloaded files</button>
-            <br> -->
             <button type="submit" name="action" value="handle_queued_files">Handle Queued files</button>
         </form>
         <br>
