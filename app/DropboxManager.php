@@ -63,39 +63,47 @@ class DropboxManager
     }
 
     /**
-     * Get the recursive list of all files for this website. Might be LONG.
+     * Initialize the cursor, and get the start of the list of all files for this website. Might be LONG.
      * @return array List of file details.
      */
     public function initRootCursor(): array
     {
-        $this->iterations = 0;
-        $this->entries = 1;
-        $result = [];
-        $endTime = time() + 20;
         $list = $this->client->listFolder('', true);
-        if (array_key_exists('entries', $list)) {
-            $this->iterations = 1;
+        if (array_key_exists('cursor', $list)) {
             $this->setNewCursor($list['cursor']);
-            $result = $this->addValidEntries($result, $list['entries']);
+            $error = 'OK';
+        } else {
+            $error = 'Error: Root cursor not set';
         }
-        return $this->readCursorToEnd($list, $endTime, $result);
+        return [
+            static::KEY_TOTAL_FILES => count($list['entries'] ?? 0),
+            static::KEY_MORE_FILES => $list['has_more'] ?? false,
+            static::KEY_ERROR => $error
+        ];
     }
 
     /**
      * Get the list of updated files for the given cursor, up to a timeout.
-     * @param int $entriesSoFar How many entries have already been processed in this run of the script.
-     * @return array List of file details.
+     * @return array Details of what was done.
      */
-    public function resumeRootCursor(int $entriesSoFar): array
+    public function resumeRootCursor(): array
     {
         $this->loadCursor();
-        $this->iterations = 0;
-        $this->entries = $entriesSoFar;
-        $result = [];
-        $endTime = time() + 20;
-        $list = ['has_more' => true];
-        return $this->readCursorToEnd($list, $endTime, $result);
+        $list = [];
+        if ($this->cursor) {
+            $list = $this->client->listFolderContinue($this->cursor);
+            $this->setNewCursor($list['cursor']);
+            $error = 'OK';
+        } else {
+            $error = 'Error: Root cursor not set';
+        }
+        return [
+            static::KEY_TOTAL_FILES => count($list['entries'] ?? 0),
+            static::KEY_MORE_FILES => $list['has_more'] ?? false,
+            static::KEY_ERROR => $error
+        ];
     }
+
 
     /**
      * Read a chunk of the list of updated files for the given DropBox cursor, and queue it in the MySQL.
@@ -120,35 +128,10 @@ class DropboxManager
                 static::KEY_VALID_FILES => 0,
                 static::KEY_TOTAL_FILES => 0,
                 static::KEY_MORE_FILES => false,
-                static::KEY_ERROR => 'Root cursor not set'
+                static::KEY_ERROR => 'Error: Root cursor not set'
             ];
         }
 
-        return $result;
-    }
-
-
-    /**
-     * Get the list of updated files for the given cursor, up to a timeout.
-     * @param int $entriesSoFar How many entries have already been processed in this run of the script.
-     * @return array List of file details.
-     */
-    public function readCursorUpdate(int $entriesSoFar): array
-    {
-        $this->loadCursor();
-        $this->iterations = 0;
-        $this->entries = $entriesSoFar;
-        $result = ['numFilesQueued' => 0, 'numFilesProcessed' => 0];
-        $endTime = time() + 20;
-        $list = ['has_more' => true];
-        while (array_key_exists('has_more', $list) && $list['has_more'] && $this->cursor && time() < $endTime) {
-            $list = $this->client->listFolderContinue($this->cursor);
-            $this->setNewCursor($list['cursor']);
-            $result = $this->addValidEntries($result, $list['entries']);
-            $this->iterations++;
-            $result['numFilesQueued'] += $this->saveFileQueue($list['entries']);
-            $result['numFilesProcessed'] += count($list['entries']);
-        }
         return $result;
     }
 
@@ -366,8 +349,13 @@ class DropboxManager
      */
     private function processJpegFile(string $fullPath): bool
     {
-        Log::debug('Processing', $fullPath);
-        $thumbResult = $this->makeThumb(imagecreatefromjpeg($fullPath), $fullPath);
+        if (str_ends_with($fullPath, '-ICE.jpg')) {
+            Log::debug('Processing (skip ICE thumb)', $fullPath);
+            $thumbResult = true;
+        } else {
+            Log::debug('Processing', $fullPath);
+            $thumbResult = $this->makeThumb(imagecreatefromjpeg($fullPath), $fullPath);
+        }
         $status = ($thumbResult ? self::SYNC_STATUS_PROCESSED : self::SYNC_STATUS_ERROR);
         $syncResult = $this->setSyncStatus($fullPath, $status, 'Processed as JPG.');
         return $thumbResult && $syncResult;

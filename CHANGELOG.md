@@ -3,7 +3,16 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
-## 2025/05/05
+## 2025/05/05 Mon
+
+* DONE: Add correct headers for images so they can be opened in new tab.
+* DONE: Delete the old code for thumbs and downloads.
+* DONE: Debug the dynamic downloading and thumbnail generation.
+* DONE: Get it not to bother thumbsing the -ICE.jpg filtered versions (manually delete the thumbnails for now).
+* DONE: Check for quirks mode.
+* DONE: Webhook just displays an error to normal humans.
+
+## 2025/05/04 Sun
 
 * DONE: Universal dates in CHANGELOG.md
 * DONE: Thumbnails are slow, and UI is unresponsive during it.
@@ -16,7 +25,7 @@ which might not be when they were actually implemented/committed.
 * DONE: Get logging to be better (call stack info on each line).
 * DONE: Add counter for the files processed on admin page.
 
-## 2025/04/27
+## 2025/04/27 Sun
 
 * DONE: Clean up: move all debug to the bottom below a `HR` tag.
 * DONE: Strict typing everywhere!
@@ -47,7 +56,7 @@ which might not be when they were actually implemented/committed.
 * DONE: It would be nice to hide the ICE images.
 * DONE: Autogenerate the ini files from the new files.
 
-## 2025/04/26
+## 2025/04/26 Sat
 
 * FIXED: Get FileTemplate to populate fully with readonly text from Metadata.
     * FIXED: Convert the dump to real output fields.

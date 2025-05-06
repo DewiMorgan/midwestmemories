@@ -101,7 +101,7 @@ class Admin
     {
         // Parse all the params we can look for in the request.
         $cursor = $_REQUEST['cursor'] ?? '';
-        $entriesSoFar = (int)($_REQUEST['entries_so_far'] ?? 0);
+        static::$entriesSoFar = (int)($_REQUEST['entries_so_far'] ?? 0);
         $formAction = $_REQUEST['action'] ?? null;
 
         $fp = new DropboxManager();
@@ -110,62 +110,38 @@ class Admin
         Log::debug("Starting. Cursor='$cursor', Request", $_REQUEST);
 
         // Handle API calls. Nothing must be output before these, and they must not output anything.
-        switch ($formAction) {
-            case 'update_dropbox_status':
-                header('Content-Type: application/json');
-                $result = $fp->readOneCursorUpdate();
-                Log::debug(
-                    "From Dropbox, saved {$result[DropboxManager::KEY_VALID_FILES]} of "
-                    . "{$result[DropboxManager::KEY_TOTAL_FILES]}, "
-                    . ($result[DropboxManager::KEY_MORE_FILES] ? 'more to come' : 'all done'),
-                    $result[DropboxManager::KEY_ERROR]
-                );
-                echo json_encode($result, JSON_THROW_ON_ERROR);
-                exit(0);
-            case 'list_files_to_download':
-                header('Content-Type: application/json');
-                $list = $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_NEW);
-                Log::debug('Returning list of ' . count($list) . ' files to download.');
-                echo json_encode($list, JSON_THROW_ON_ERROR);
-                exit(0);
-            case 'list_files_to_process':
-                header('Content-Type: application/json');
-                $list = $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_DOWNLOADED);
-                Log::debug('Returning list of ' . count($list) . ' files to process.');
-                echo json_encode($list, JSON_THROW_ON_ERROR);
-                exit(0);
-            case 'download_one_file':
-                header('Content-Type: application/json');
-                Log::debug('Downloading one file from the DB queue...');
-                $result = $fp->downloadOneFile();
-                echo json_encode($result, JSON_THROW_ON_ERROR);
-                exit(0);
-            case 'process_one_file':
-                Log::debug('Processing one file from the DB queue...');
-                $result = $fp->processOneFile();
-                echo json_encode($result, JSON_THROW_ON_ERROR);
-                exit(0);
+        $result = match ($formAction) {
+            'update_dropbox_status' => $fp->readOneCursorUpdate(),
+            'init_root' => $fp->initRootCursor(),
+            'continue_root' => $fp->resumeRootCursor(),
+            'list_files_to_download' => $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_NEW),
+            'list_files_to_process' => $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_DOWNLOADED),
+            'download_one_file' => $fp->downloadOneFile(),
+            'process_one_file' => $fp->processOneFile(),
+            default => '',
+        };
+        if ($result) {
+            header('Content-Type: application/json');
+            echo json_encode($result, JSON_THROW_ON_ERROR);
+            if (str_starts_with($formAction, 'list_')) {
+                Log::debug('Returning list of ' . count($result) . ' files from $formAction.');
+            } else {
+                Log::debug("From $formAction", $result);
+            }
+            exit(0);
         }
 
-        static::showHeader();
-
         // Handle web page calls. These are after the showHeader, so can print whatever we like.
+        static::showHeader();
         switch ($formAction) {
-            case 'init_root':
-                static::debug("<h2>Initializing root cursor</h2>\n");
-                $list = $fp->initRootCursor();
-                break;
-            case 'continue_root':
-                static::debug("<h2>Continuing with root cursor init</h2>\n");
-                $list = $fp->resumeRootCursor($entriesSoFar);
-                break;
-            case 'check_cursor':
-                static::debug("<h2>Checking cursor for updates...</h2>\n");
-                $list = $fp->readCursorUpdate($entriesSoFar);
+            case 'handle_init_root':
+                static::debug("<h2>Handling queued files.</h2>\n");
+                include(__DIR__ . '/AdminDownloadTemplate.php');
                 break;
             case 'handle_queued_files':
                 static::debug("<h2>Handling queued files.</h2>\n");
-                include('AdminDownloadTemplate.php');
+                include(__DIR__ . '/AdminDownloadTemplate.php');
+                break;
             default:
                 static::debug("<h2>No command yet given.</h2>\n");
                 break;
@@ -224,29 +200,9 @@ class Admin
     {
         ?>
         <form method="post">
-            <button type="submit" name="action" value="init_root">Initialize new root cursor</button>
-        </form>
-        <br>
-        <form method="post">
-            <label>Entries:
-                <input type="text" name="entries_so_far" value="<?= static::$entriesSoFar ?>">
-            </label>
-            <label>Cursor:
-                <input type="text" name="cursor" value="<?= htmlspecialchars(static::$cursor) ?>">
-            </label>
-            <button type="submit" name="action" value="continue_root">Continue initializing root cursor</button>
-        </form>
-        <form method="post">
-            <label>Entries:
-                <input type="text" name="entries_so_far" value="<?= static::$entriesSoFar ?>">
-            </label>
-            <label>Cursor:
-                <input type="text" name="cursor" value="<?= htmlspecialchars(static::$cursor) ?>">
-            </label>
-            <button type="submit" name="action" value="check_cursor">Get latest cursor updates into DB</button>
-        </form>
-        <form method="post">
-            <button type="submit" name="action" value="handle_queued_files">Handle Queued files</button>
+            <button type="submit" name="action" value="handle_queued_files">Handle queued files (click me!)</button>
+            <br>
+            <button type="submit" name="action" value="handle_init_root">Replace root cursor (dangerous)</button>
         </form>
         <br>
         </body>

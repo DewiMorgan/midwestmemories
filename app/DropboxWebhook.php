@@ -18,11 +18,13 @@ class DropboxWebhook
         // If it's a validation, validate and exit.
         self::validate();
 
-        // Tag the user's cursor as "dirty".
-        self::recordHook();
-
-        // If caller is human, output readable text.
-        self::friendlyOutput();
+        if (array_key_exists('X-Dropbox-Signature', apache_request_headers())) {
+            // Tag the user's cursor as "dirty".
+            self::recordHook();
+        } else {
+            // If caller is human, output readable text.
+            self::friendlyOutput();
+        }
 
         exit(0);
     }
@@ -98,10 +100,6 @@ class DropboxWebhook
     /** Show a nice message for humans calling this page. */
     private static function friendlyOutput(): void
     {
-        $requestHeaders = apache_request_headers();
-        if (array_key_exists('X-Dropbox-Signature', $requestHeaders)) {
-            return;
-        }
         ?>
         <!DOCTYPE html>
         <html lang="en">

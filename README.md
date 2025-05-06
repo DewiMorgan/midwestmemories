@@ -133,13 +133,13 @@ If it timed out the first time. You can tell it to start at a certain offset, ig
 but that isn't necessary, and the default is fine.
 Again, this is just initialization stuff, should never be needed.
 
-**Get latest cursor updates into the DB**: This is where it gets the list of new files and puts them in the DB.
+**Handle Queued Files**: This is where it gets the list of new files and puts them in the DB.
 This is the list of files that have changed since the last file most recently listed by any of the above two commands.
-This should happen automatically from the DropboxWebhook callback. I'm not sure whether it does.
+This part (but not the download/thumbnail) *should* happen automatically from the DropboxWebhook callback.
 
-**Download files from DB queue**: This downloads those new files from the previous command.
+This also downloads those new files from the previous command.
 
-**Process downloaded files**: Makes thumbnails, publicly publishes the files, etc.
+This also makes thumbnails, publicly publishes the files, etc.
 
 ## Templating flow
 
@@ -161,20 +161,27 @@ See also list at the top of this file.
 
 Current task:
 
-* Delete the old code for thumbs and downloads.
-* Debug the dynamic downloading and thumbnail generation.
-* Get it not to bother thumbsing the -ICE.jpg filtered versions (manually delete the thumbnails for now).
-* Check for quirks mode.
+* Make cursor-ignoring be dynamic, too.
+    * Mostly done, need to make the AdminDownloadTemplate handle that too.
+    * Rename to AdminApiTemplate.
+    * Pretty up that template just a tiny bit: need a styled, scrolling output window.
+    * Maybe merge the template and Admin.php together, and get the JS out to a .js file.
+* Investigate cursor init that isn't just always-ignore, and download that isn't just always-download.
+    * Detect changes! Dropbox may suck until I can do this. Or hide cursor regen as superadmin.
+    * Base it on date (beware timezones)? Checksum?
+* Make updating be triggered by visiting the admin page.
+* If the webhook was working then I shouldn't be able to do a manual update. But I could, and did!
 
 Urgent:
 
 * Get thumb view working.
 * Get it commentable.
 * Get it usable on a phone.
-* Add a search template?
-* Add correct headers for images so they can be opened in new tab.
+* Search template?
 
 * ThumbsTemplate
+    * Images shouldn't be sized.
+    * Images aren't in wrapped lines.
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
     * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.
         * The data is stored/read into Metadata. Treat same as FileTemplate

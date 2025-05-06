@@ -83,14 +83,14 @@
     async function runAll() {
         // Get and queue updates from Dropbox.
         await handleDropboxPolling('./admin.php?action=update_dropbox_status');
-        // // Download queued downloads.
-        // await handleFileTask(
-        //     'Downloading', './admin.php?action=list_files_to_download', './admin.php?action=download_one_file'
-        // );
-        // // Generate queued thumbnails.
-        // await handleFileTask(
-        //     'Postprocessing', './admin.php?action=list_files_to_process', './admin.php?action=process_one_file'
-        // );
+        // Download queued downloads.
+        await handleFileTask(
+            'Downloading', './admin.php?action=list_files_to_download', './admin.php?action=download_one_file'
+        );
+        // Generate queued thumbnails.
+        await handleFileTask(
+            'Postprocessing', './admin.php?action=list_files_to_process', './admin.php?action=process_one_file'
+        );
     }
 
     runAll();
