@@ -161,10 +161,10 @@ See also list at the top of this file.
 
 Current task:
 
-* https://midwestmemories.dewimorgan.com/admin.php?action=list_files_to_download no longer works.
+* FIXED: https://midwestmemories.dewimorgan.com/admin.php?action=list_files_to_download no longer works.
 * Make cursor-ignoring be dynamic, too.
     * Mostly done, need to make the AdminDownloadTemplate handle that too.
-    * Rename to AdminApiTemplate.
+    * DONE: Rename to AdminApiTemplate.
     * Pretty up that template just a tiny bit: need a styled, scrolling output window.
     * Maybe merge the template and Admin.php together, and get the JS out to a .js file.
 * Investigate cursor init that isn't just always-ignore, and download that isn't just always-download.

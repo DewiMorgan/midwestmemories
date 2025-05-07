@@ -60,7 +60,6 @@
                 data.moreFilesToGo ??= false;
                 data.numValidFiles ??= 0;
                 data.numTotalFiles ??= 0;
-                logMessage(`${data.numValidFiles} of ${data.numTotalFiles}, more to come...`);
 
                 if ("OK" !== data.error) {
                     logMessage(data.error);
@@ -80,7 +79,15 @@
     }
 
     // Run prepare and then process
-    async function runAll() {
+    async function runAllInits() {
+        // Get the initial cursor.
+        await handleDropboxPolling('./admin.php?action=init_root');
+        // Get the remainder of the cursor.
+        await handleDropboxPolling('./admin.php?action=continue_root');
+    }
+
+    // Run prepare and then process
+    async function runAllUpdates() {
         // Get and queue updates from Dropbox.
         await handleDropboxPolling('./admin.php?action=update_dropbox_status');
         // Download queued downloads.
@@ -93,5 +100,16 @@
         );
     }
 
-    runAll();
+    function runRelevantTask() {
+        const params = new URLSearchParams(window.location.search);
+        const action = params.get("action");
+
+        if ("handle_init_root" === action) {
+            runAllInits();
+        } else if ("handle_queued_files" === action) {
+            runAllUpdates();
+        }
+    }
+
+    runRelevantTask();
 </script>

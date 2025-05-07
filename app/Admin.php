@@ -136,11 +136,11 @@ class Admin
         switch ($formAction) {
             case 'handle_init_root':
                 static::debug("<h2>Handling init.</h2>\n");
-                include(__DIR__ . '/AdminDownloadTemplate.php');
+                include(__DIR__ . '/AdminApiTemplate.php');
                 break;
             case 'handle_queued_files':
                 static::debug("<h2>Handling queued files.</h2>\n");
-                include(__DIR__ . '/AdminDownloadTemplate.php');
+                include(__DIR__ . '/AdminApiTemplate.php');
                 break;
             default:
                 static::debug("<h2>No command yet given.</h2>\n");
