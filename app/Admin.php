@@ -88,7 +88,7 @@ class Admin
      * Wrapper for debugging info. Likely to call a logging system in the future.
      * @param string $str The string to log.
      */
-    private static function debug(string $str): void
+    private static function printAndLog(string $str): void
     {
         Log::debug($str);
         echo($str);
@@ -135,20 +135,19 @@ class Admin
         static::showHeader();
         switch ($formAction) {
             case 'handle_init_root':
-                static::debug("<h2>Handling init.</h2>\n");
+                static::printAndLog("<h2>Handling init.</h2>\n");
                 include(__DIR__ . '/AdminApiTemplate.php');
                 break;
             case 'handle_queued_files':
-                static::debug("<h2>Handling queued files.</h2>\n");
+                static::printAndLog("<h2>Handling queued files.</h2>\n");
                 include(__DIR__ . '/AdminApiTemplate.php');
                 break;
             default:
-                static::debug("<h2>No command yet given.</h2>\n");
+                static::printAndLog("<h2>No command yet given.</h2>\n");
                 break;
         }
 
-        $entriesChange = $fp->entries - static::$entriesSoFar;
-        echo '<p>Finished reading.<br>';
+        echo '<p>Finished reading.</p>';
         if (empty($fp->cursor)) {
             echo 'Cursor was not set in client.<br>';
             static::$cursor = '';
@@ -158,9 +157,6 @@ class Admin
             $cursor = $fp->cursor;
             echo "Cursor reassigned to '$cursor'.<br>";
         }
-        echo "Iterations: $fp->iterations.<br>Entries: $fp->entries (+$entriesChange).</p>";
-        echo '<pre>' . var_export($list, true) . '</pre>';
-        static::$entriesSoFar = $fp->entries ?? static::$entriesSoFar;
     }
 
     /**

@@ -72,12 +72,14 @@ class DropboxManager
         } else {
             $error = 'Error: Root cursor not set';
         }
-        return [
+        $result = [
             static::KEY_TOTAL_FILES => count($list['entries'] ?? 0),
             static::KEY_VALID_FILES => count($list['entries'] ?? 0),
             static::KEY_MORE_FILES => $list['has_more'] ?? false,
             static::KEY_ERROR => $error
         ];
+        Log::debug('Result:', $result);
+        return $result;
     }
 
     /**
@@ -97,12 +99,14 @@ class DropboxManager
         } else {
             $error = 'Error: Root cursor not initially set';
         }
-        return [
+        $result = [
             static::KEY_TOTAL_FILES => count($list['entries'] ?? 0),
             static::KEY_VALID_FILES => count($list['entries'] ?? 0),
             static::KEY_MORE_FILES => $list['has_more'] ?? false,
             static::KEY_ERROR => $error
         ];
+        Log::debug('Result:', $result);
+        return $result;
     }
 
 
@@ -133,6 +137,7 @@ class DropboxManager
             ];
         }
 
+        Log::debug('Result:', $result);
         return $result;
     }
 
