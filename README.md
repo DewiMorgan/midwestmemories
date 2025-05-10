@@ -81,6 +81,7 @@ Index.php shows the nav, and the image listings.
     * [Text editor](https://www.youtube.com/watch?v=2puV9yXHiAA)
     * [Search filenames](https://www.youtube.com/watch?v=wlB276xVgsw)
 * [PHP Sandbox](https://onlinephp.io/)
+* [Setting up Git access to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
 
 ## ToDo:
 
