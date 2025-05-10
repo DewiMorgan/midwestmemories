@@ -3,6 +3,13 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/05/10 Sat
+
+* DONE: Add laptop dev env.
+* FIXED: https://midwestmemories.dewimorgan.com/admin.php?action=list_files_to_download no longer works.
+* DONE: Rename AdminDownloadTemplate to AdminApiTemplate.
+
+
 ## 2025/05/05 Mon
 
 * DONE: Add correct headers for images so they can be opened in new tab.

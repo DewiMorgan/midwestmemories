@@ -51,19 +51,6 @@ Index.php shows the nav, and the image listings.
 
 * Display breadcrumb, album notes, and all images as thumbs in a fluid table. Likely need to generate thumbnails.
 * Clicking individual images shows image details and the image.
-* Future: limit to N items/page.
-* Future: Next/prev page pagination controls at top and bottom of page.
-* Future: "N items per page" option.
-* Future: search box, advanced search link.
-    * Clicking names shows table of search results for that name.
-    * Clicking locations show nearby images.
-    * Clicking dates shows images with a date range search.
-
-* Future: back up db data to dropbox.
-* For now, we only need to use dropbox in the admin page, so it should be secure.
-* Future: download zip of an album or search result. Let them choose between original images, or jpgs.
-* Future: create webhooks for Dropbox to call when the folder is updated.
-* Future: upload thumbs and jpgs and updated txt files to dropbox?
 
 ## Useful links
 
@@ -81,16 +68,16 @@ Index.php shows the nav, and the image listings.
     * [Text editor](https://www.youtube.com/watch?v=2puV9yXHiAA)
     * [Search filenames](https://www.youtube.com/watch?v=wlB276xVgsw)
 * [PHP Sandbox](https://onlinephp.io/)
-* [Setting up Git access to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
+* [Setting up Git access to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 
 ## ToDo:
 
 Next:
 
-* Download files added to dropbox.
-* Create thumbnails for all files.
-* Create jpgs for over-sized pngs.
-* Display thumbnails with a click-through to the images.
+* DONE: Download files added to dropbox.
+* DONE: Create thumbnails for all files.
+* DONE: Create jpgs for over-sized pngs.
+* DONE: Display thumbnails with a click-through to the images.
 * Display images in a folder with next/previous.
 
 Then:
@@ -162,12 +149,6 @@ See also list at the top of this file.
 
 Current task:
 
-* FIXED: https://midwestmemories.dewimorgan.com/admin.php?action=list_files_to_download no longer works.
-* Make cursor-ignoring be dynamic, too.
-    * Mostly done, need to make the AdminDownloadTemplate handle that too.
-    * DONE: Rename to AdminApiTemplate.
-    * Pretty up that template just a tiny bit: need a styled, scrolling output window.
-    * Maybe merge the template and Admin.php together, and get the JS out to a .js file.
 * Investigate cursor init that isn't just always-ignore, and download that isn't just always-download.
     * Detect changes! Dropbox may suck until I can do this. Or hide cursor regen as super-admin.
     * Base it on date (beware timezones)? Checksum?
@@ -248,6 +229,12 @@ Urgent:
 * DropboxManager
     * Split off upload handling/parsing methods to their own class.
 
+* Admin:
+    * Make cursor-ignoring be dynamic, too.
+        * Mostly done, need to make the AdminApiTemplate handle that too.
+        * Pretty up that template just a tiny bit: need a styled, scrolling output window.
+        * Maybe merge the template and Admin.php together, and get the JS out to a .js file.
+
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2
     * (mod_rewrite)
 * PHP: Parse form input to database, with validation, errors, etc.
@@ -316,5 +303,18 @@ Low priority:
     * Optional param $checkExists to accept only pre-existing names?
     * This is why they're all bundled together, so it can be done in one query.
     * Restrict the characters that can be in a name? Remove <script>, etc.
+
+* Future: limit to N items/page.
+* Future: Next/prev page pagination controls at top and bottom of page.
+* Future: "N items per page" option.
+* Future: search box, advanced search link.
+    * Clicking names shows table of search results for that name.
+    * Clicking locations show nearby images.
+    * Clicking dates shows images with a date range search.
+* Future: back up db data to dropbox.
+* For now, we only need to use dropbox in the admin page, so it should be secure.
+* Future: download zip of an album or search result. Let them choose between original images, or jpgs.
+* Future: create webhooks for Dropbox to call when the folder is updated.
+* Future: upload thumbs and jpgs and updated txt files to dropbox?
 
 See also [CHANGELOG.md](CHANGELOG.md)
