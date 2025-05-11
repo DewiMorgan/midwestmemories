@@ -121,6 +121,7 @@ Templates have headers... unsure how it works when JS includes them inline. Styl
 ## ToDo:
 
 Next:
+Going to URLs doesn't load the folder, just shows "Hello, world!"
 
 * Clicking folders doesn't change the folders on the leftbar.
 * DONE: Download files added to dropbox.

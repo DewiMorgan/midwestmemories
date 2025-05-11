@@ -243,10 +243,10 @@ $u_linkUrl = Index::MM_BASE_URL . ($_REQUEST['path'] ?? '/') . '?i=1';
         this.parentElement.classList.toggle("expanded");
         this.parentElement.classList.toggle("collapsed");
         if ('<?= ICON_EXPANDED ?>' === this.textContent) {
-            console.log("Collapsing " + this.parentElement.textContent); // DELETEME DEBUG
+            console.log("Collapsing " + this.parentElement.textContent.split('\n')[0]); // DELETEME DEBUG
             this.textContent = '<?= ICON_COLLAPSED ?>';
         } else if ('<?= ICON_COLLAPSED ?>' === this.textContent) { // Explicit elseif lets OTHER spans to go untouched.
-            console.log("Expanding " + this.parentElement.textContent); // DELETEME DEBUG
+            console.log("Expanding " + this.parentElement.textContent.split('\n')[0]); // DELETEME DEBUG
             this.textContent = '<?= ICON_EXPANDED ?>';
         }
 
@@ -412,10 +412,16 @@ $u_linkUrl = Index::MM_BASE_URL . ($_REQUEST['path'] ?? '/') . '?i=1';
             if (selectedParent.classList.contains('collapsed')) {
                 const child = selectedParent.querySelector('.expand-collapse');
                 if (child && 'function' === typeof child.onclick) {
-                    console.log("Launching onclick on: " + child.textContent); // DELETEME DEBUG
+                    console.log("Launching onclick on: " + child.textContent.split('\n')[0]); // DELETEME DEBUG
                     child.onclick(); // Call the onclick handler of the expander, to expand and swap icons.
+                } else {
+                    console.log("Child with onclick was not found.");
                 }
+            } else {
+                console.log("Selected parent was not collapsed");
             }
+        } else {
+            console.log("Could not find parent with URL: " + targetUrl);
         }
 
         const attr = this.getAttribute("href");
