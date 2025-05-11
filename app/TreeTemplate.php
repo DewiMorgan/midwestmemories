@@ -100,7 +100,7 @@ namespace MidwestMemories;
     </style>
 </head>
 <?php
-$u_linkUrl = Index::MM_BASE_URL . urlencode($_REQUEST['path'] ?? '/') . '&amp;i=1';
+$u_linkUrl = Index::MM_BASE_URL . ($_REQUEST['path'] ?? '/') . '?i=1';
 ?>
 <body onload="openLinkInline('<?= $u_linkUrl ?>')">
 <div class="flex-container" id="parent-container">
@@ -113,7 +113,7 @@ $u_linkUrl = Index::MM_BASE_URL . urlencode($_REQUEST['path'] ?? '/') . '&amp;i=
 
         // This is the treeview component.
         echo '<ul>';
-        echo "<li class='folder'><a href='/&i=1' class='path-link'>Home</a></li>";
+        echo "<li class='folder'><a href='/?i=1' class='path-link'>Home</a></li>";
         scanDirectory($root, Index::$requestUnixPath);
         echo '</ul>';
 
@@ -139,7 +139,7 @@ $u_linkUrl = Index::MM_BASE_URL . urlencode($_REQUEST['path'] ?? '/') . '&amp;i=
 
                 $h_item = htmlspecialchars($item);
                 $webDir = str_replace(Path::$imageBasePath, '', "$dir/$item");
-                $u_linkUrl = Index::MM_BASE_URL . urlencode($webDir) . '&amp;i=1';
+                $u_linkUrl = Index::MM_BASE_URL . $webDir . '?i=1';
                 // If the item is a directory, output a list item with a nested ul element.
                 if (is_dir("$dir/$item")) {
                     // Collapse, unless our target path is within this branch.
@@ -265,7 +265,7 @@ $u_linkUrl = Index::MM_BASE_URL . urlencode($_REQUEST['path'] ?? '/') . '&amp;i=
 
     function handleNavigation(e) {
         if (e.state) {
-            openLinkInline(e.state.html + "&i=1", false);
+            openLinkInline(e.state.html + "?i=1", false);
             document.title = e.state.pageTitle;
         }
     }
@@ -384,7 +384,7 @@ $u_linkUrl = Index::MM_BASE_URL . urlencode($_REQUEST['path'] ?? '/') . '&amp;i=
      */
     function addLinkClickHandler(link) {
         const attr = link.getAttribute("href");
-        if (attr.includes('&i=1')) {
+        if (attr.includes('?i=1')) {
             console.log("Adding onClick to child link: " + attr);
             link.addEventListener('click', clickLink);
         } else {

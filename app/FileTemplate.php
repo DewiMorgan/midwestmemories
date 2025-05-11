@@ -20,10 +20,10 @@ namespace MidwestMemories;
 // ToDo: Add form input fields.
 // ToDo: Add next/prev buttons.
 
-$u_linkUrl = Index::MM_BASE_URL . urlencode(Path::filePathToWeb(Index::$requestUnixPath)) . '&amp;i=2';
+$u_linkUrl = Index::MM_BASE_URL . Path::filePathToWeb(Index::$requestUnixPath) . '?i=2';
 $fileDetails = Metadata::getFileDataByUnixPath(Index::$requestUnixPath);
 
-// Escape the whole details array.
+// Escape the details array.
 $h_fd = cleanFileDetails($fileDetails);
 
 // Special cases.
@@ -82,7 +82,7 @@ echo '<pre>' . basename(Index::$requestUnixPath) . " file details:\n" . var_expo
 
 /**
  * Convert the raw file details into an HTML-escaped version.
- * @param array $fileDetails Array from which to html escape all fields.
+ * @param array $fileDetails Array from which to HTML escape all fields.
  * @return array The resulting escaped array.
  */
 function cleanFileDetails(array $fileDetails): array
