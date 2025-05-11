@@ -8,6 +8,10 @@ which might not be when they were actually implemented/committed.
 * DONE: Add laptop dev env.
 * FIXED: https://midwestmemories.dewimorgan.com/admin.php?action=list_files_to_download no longer works.
 * DONE: Rename AdminDownloadTemplate to AdminApiTemplate.
+* DONE: Thumb images shouldn't be sized.
+* FIXED: Thumb images aren't in wrapped lines.
+* SKIPPED: If no thumbnail, show the real image, but sized down. Won't fix, too slow.
+* DONE: Show subfolders as thumbs, too.
 
 
 ## 2025/05/05 Mon

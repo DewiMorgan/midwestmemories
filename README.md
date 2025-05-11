@@ -155,15 +155,11 @@ Current task:
 * Search template?
 
 * ThumbsTemplate
-    * DONE: Images shouldn't be sized.
-    * Images aren't in wrapped lines.
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
     * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.
         * The data is stored/read into Metadata. Treat same as FileTemplate.
-    * Show subfolders as thumbs, too.
-        * Ini files don't handle subfolder details. Probably details should come from ini files in subfolders?
+    * Ini files don't handle subfolder details. Probably details should come from ini files in subfolders?
     * Clicking images doesn't load them in TreeTemplate, I think because they have a double-leading-slash?
-    * If no thumbnail, show the real image, but sized down.
     * Folder Descriptions from Dropbox\midwestmemories\Auora\Horst and Karin slide tray sections.txt.
         * The descriptions are short enough, it feels like it'd maybe be worth also showing them on the page for each
           file, as context of what's going on in the pic.
