@@ -145,7 +145,7 @@ namespace MidwestMemories;
                 continue;
             }
             Log::adminDebug("Creating thumb-link for image: $thumbUnixPath from $itemPath");
-            $u_thumbUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($thumbUnixPath)) . '&i=2';
+            $u_thumbUrl = Index::MM_BASE_URL . urlencode(Path::filePathToWeb($thumbUnixPath)) . '&i=2';
             $fileNum++;
             $h_thumbTitle = htmlspecialchars($item);
         } elseif ('..' === $item) {
@@ -155,7 +155,7 @@ namespace MidwestMemories;
             $h_thumbTitle = htmlspecialchars($item);
             $u_thumbUrl = Index::MM_BASE_URL . '/tn_folder.png&i=2';
         }
-        $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($itemPath)) . '&i=1';
+        $u_linkUrl = Index::MM_BASE_URL . urlencode(Path::filePathToWeb($itemPath)) . '&i=1';
 
         echo("<div class='thumb'><figure>");
 
