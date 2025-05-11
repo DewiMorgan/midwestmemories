@@ -165,7 +165,7 @@ Urgent:
 * Search template?
 
 * ThumbsTemplate
-    * Images shouldn't be sized.
+    * DONE: Images shouldn't be sized.
     * Images aren't in wrapped lines.
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
     * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.
@@ -218,14 +218,14 @@ Urgent:
         * Switch view mode to edit mode on edit button click? All fields edit-on-click? Always editable? Pen by each?
     * Style this template.
         * Display the file, centered, scaled to the window.
-        * The various fields, both for display and for edit.
+        * The various fields, both for display and for editing.
     * How do we visually distinguish inherited data from local data?
         * Is there even a programmatic difference?
         * We don't care about this for now.
         * I think inherited data should be greyed out. Editing it saves locally. Button to go to page of parent/origin?
     * CSS: Make the inline file view look like not ass.
     * The title at the top is mostly useless and takes up space, I think I'll remove it.
-
+  
 * DropboxManager
     * Split off upload handling/parsing methods to their own class.
 
@@ -234,6 +234,7 @@ Urgent:
         * Mostly done, need to make the AdminApiTemplate handle that too.
         * Pretty up that template just a tiny bit: need a styled, scrolling output window.
         * Maybe merge the template and Admin.php together, and get the JS out to a .js file.
+    * Move Git pull and log clearing into admin.php.
 
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2
     * (mod_rewrite)
