@@ -407,6 +407,12 @@ $u_linkUrl = Index::MM_BASE_URL . ($_REQUEST['path'] ?? '/') . '?i=1';
         const selectedParent = document.querySelector(`li > a[href="${targetUrl}"]`)?.parentElement;
         if (selectedParent) {
             selectedParent.classList.add('selected'); // Assumes the href is an immediate child of the li.
+            if (selectedParent.classList.contains('collapsed')) {
+                const child = selectedParent.querySelector('.expand-collapse');
+                if (child && 'function' === typeof child.onclick) {
+                    child.onclick(); // Call the onclick handler of the expander, to expand and swap icons.
+                }
+            }
         }
 
         const attr = this.getAttribute("href");
