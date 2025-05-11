@@ -155,7 +155,7 @@ namespace MidwestMemories;
             $h_thumbTitle = htmlspecialchars($item);
             $u_thumbUrl = Index::MM_BASE_URL . '/tn_folder.png?i=2';
         }
-        $u_linkUrl = Index::MM_BASE_URL . Path::filePathToWeb($itemPath) . '?i=1';
+        $u_linkUrl = Index::MM_BASE_URL . urlencode(Path::filePathToWeb($itemPath)) . '?i=1';
 
         echo("<div class='thumb'><figure>");
 
