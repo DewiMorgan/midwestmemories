@@ -5,6 +5,10 @@ which might not be when they were actually implemented/committed.
 
 ## 2025/05/10 Sat
 
+* DONE: Download files added to dropbox.
+* DONE: Create thumbnails for all files.
+* DONE: Create jpgs for over-sized pngs.
+* DONE: Display thumbnails with a click-through to the images.
 * DONE: Add laptop dev env.
 * DONE: `mod_rewrite` to get nicer URLs working.
 * DONE: Rename AdminDownloadTemplate to AdminApiTemplate.
@@ -21,6 +25,8 @@ which might not be when they were actually implemented/committed.
 * FIXED: Bug: Right-clicking "open image in a new tab" doesn't work.
 * SKIPPED: If no thumbnail, show the real image, but sized down. (Won't fix, too slow, not needed).
 * FIXED: CSS of templated files being ignored.
+* SKIPPED: Make all Log methods also echo, depending on a config var like LOG_ADMIN_ECHO_LEVEL. (too flaky)
+* DONE: Get rid of Log::adminDebug() method. Replace w Log::debug() throughout.
 
 ## 2025/05/05 Mon
 

@@ -386,7 +386,7 @@ class DropboxManager
     {
         Log::debug('Processing', $fullPath);
         if (false === $sourceImage) {
-            Log::adminDebug('Source image false for makeThumb', $fullPath);
+            Log::debug('Source image false for makeThumb', $fullPath);
             return false;
         }
         $dest = self::getThumbName($fullPath);
@@ -394,7 +394,7 @@ class DropboxManager
         $origWidth = imagesx($sourceImage);
         $origHeight = imagesy($sourceImage);
         if (false === $origWidth || false === $origHeight) {
-            Log::adminDebug('Source image dimensions false for makeThumb', [$origWidth, $origHeight, $fullPath]);
+            Log::debug('Source image dimensions false for makeThumb', [$origWidth, $origHeight, $fullPath]);
             return false;
         }
         $newWidth = $origWidth;
@@ -419,7 +419,7 @@ class DropboxManager
         /* Create a new, "virtual" image */
         $virtualImage = imagecreatetruecolor($newWidth, $newHeight);
         if (false === $virtualImage) {
-            Log::adminDebug('Virtual image dimensions false for makeThumb', $fullPath);
+            Log::debug('Virtual image dimensions false for makeThumb', $fullPath);
             return false;
         }
 
@@ -436,13 +436,13 @@ class DropboxManager
                 $origWidth,
                 $origHeight
             )) {
-            Log::adminDebug('imagecopyresampled failed for makeThumb', $fullPath);
+            Log::debug('imagecopyresampled failed for makeThumb', $fullPath);
             return false;
         }
 
         /* Create the physical thumbnail image at its destination */
         if (false === imagejpeg($virtualImage, $dest, 70)) {
-            Log::adminDebug('imagejpeg failed for makeThumb', $fullPath);
+            Log::debug('imagejpeg failed for makeThumb', $fullPath);
             return false;
         }
         Log::debug(
@@ -463,7 +463,7 @@ class DropboxManager
     {
         $sourceImage = imagecreatefrompng($fullPath);
         if (false === $sourceImage) {
-            Log::adminDebug('Source image false for convertToJpeg', $fullPath);
+            Log::debug('Source image false for convertToJpeg', $fullPath);
             return false;
         }
 
@@ -471,7 +471,7 @@ class DropboxManager
 
         /* Save as a renamed JPG at its destination */
         if (false === imagejpeg($sourceImage, $newFullPath, 70)) {
-            Log::adminDebug('imagejpeg failed for convertToJpeg', $fullPath);
+            Log::debug('imagejpeg failed for convertToJpeg', $fullPath);
             return false;
         }
         // Try to delete the huge file. If we can't, no big loss.
@@ -496,9 +496,9 @@ class DropboxManager
 
         // Check and log each step of downloading the file. Daisy-chained elseif ensures handles get closed at the end.
         if (false === $fp = fopen($fullPath, 'wb+')) {
-            Log::adminDebug('fopen failed for downloadUrlToPath', [$url, $fullPath]);
+            Log::debug('fopen failed for downloadUrlToPath', [$url, $fullPath]);
         } elseif (false === $ch = curl_init($url)) {
-            Log::adminDebug('curl_init failed for downloadUrlToPath', [$url, $fullPath]);
+            Log::debug('curl_init failed for downloadUrlToPath', [$url, $fullPath]);
         } elseif (false === (
                 // if timeout (seconds) is too low, download will be interrupted
                 curl_setopt($ch, CURLOPT_TIMEOUT, 600)
@@ -508,13 +508,13 @@ class DropboxManager
                 // && curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0)
                 // && curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0)
             )) {
-            Log::adminDebug('curl_setopt failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
+            Log::debug('curl_setopt failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
         } elseif (false === curl_exec($ch)) { // Get curl response
-            Log::adminDebug('curl_exec failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
+            Log::debug('curl_exec failed for downloadUrlToPath', [$url, $fullPath, curl_error($ch)]);
         } elseif (false === file_exists($fullPath)) {
-            Log::adminDebug('File creation failed for downloadUrlToPath', [$url, $fullPath]);
+            Log::debug('File creation failed for downloadUrlToPath', [$url, $fullPath]);
         } else {
-            Log::adminDebug('Success: downloadUrlToPath', [$url, $fullPath]);
+            Log::debug('Success: downloadUrlToPath', [$url, $fullPath]);
             $success = true;
         }
 

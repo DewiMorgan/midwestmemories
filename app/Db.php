@@ -41,7 +41,7 @@ class Db
                 (int)Conf::get(Key::MYSQL_PORT)
             );
         } catch (Exception $e) {
-            Log::adminDebug('DB connection failed: ' . $e->getMessage());
+            Log::debug('DB connection failed: ' . $e->getMessage());
             die(1);
         }
     }
@@ -54,7 +54,7 @@ class Db
      */
     public static function sqlExec(string $sql, int|string ...$items): bool
     {
-        Log::adminDebug('sqlExec', [$sql, $items]);
+        Log::debug('sqlExec', [$sql, $items]);
         $db = self::getInstance()->db;
         $query = $db->prepare($sql);
 
@@ -73,36 +73,36 @@ class Db
      */
     public static function sqlGetItem(string $sql, string $field, int|string ...$items): ?string
     {
-        Log::adminDebug('sqlGetItem', [$sql, $items]);
+        Log::debug('sqlGetItem', [$sql, $items]);
         $db = self::getInstance()->db;
         if (!($query = $db->prepare($sql))) {
-            Log::adminDebug('prepare failed, db error', $db->error);
+            Log::debug('prepare failed, db error', $db->error);
             return null;
         }
         if (!empty($items) && !$query->bind_param(...$items)) {
-            Log::adminDebug('bind_param failed, db error', $db->error);
-            Log::adminDebug('bind_param failed, sql error', $query->error);
+            Log::debug('bind_param failed, db error', $db->error);
+            Log::debug('bind_param failed, sql error', $query->error);
             return null;
         }
         if (!$query->execute()) {
-            Log::adminDebug('execute failed, db error', $db->error);
-            Log::adminDebug('execute failed, sql error', $query->error);
+            Log::debug('execute failed, db error', $db->error);
+            Log::debug('execute failed, sql error', $query->error);
             return null;
         }
         if (!($result = $query->get_result())) {
-            Log::adminDebug('get_result failed, db error', $db->error);
-            Log::adminDebug('get_result failed, sql error', $query->error);
+            Log::debug('get_result failed, db error', $db->error);
+            Log::debug('get_result failed, sql error', $query->error);
             return null;
         }
         if (!($row = $result->fetch_assoc())) {
-            Log::adminDebug('fetch_assoc failed, db error', $db->error);
-            Log::adminDebug('fetch_assoc failed, sql error', $query->error);
+            Log::debug('fetch_assoc failed, db error', $db->error);
+            Log::debug('fetch_assoc failed, sql error', $query->error);
             $result->free();
             return null;
         }
 
         $result->free();
-        Log::adminDebug('sqlGetItem success: ' . $row[$field] . ' is $field of', $row);
+        Log::debug('sqlGetItem success: ' . $row[$field] . ' is $field of', $row);
         return $row[$field];
     }
 
@@ -115,31 +115,31 @@ class Db
      */
     public static function sqlGetRow(string $sql, int|string ...$items): array
     {
-        Log::adminDebug('sqlGetRow', [$sql, $items]);
+        Log::debug('sqlGetRow', [$sql, $items]);
         $db = self::getInstance()->db;
         if (!($query = $db->prepare($sql))) {
-            Log::adminDebug('prepare failed, db error', $db->error);
+            Log::debug('prepare failed, db error', $db->error);
             return [];
         }
         if (!empty($items) && !$query->bind_param(...$items)) {
-            Log::adminDebug('bind_param failed, db error', $db->error);
-            Log::adminDebug('bind_param failed, sql error', $query->error);
+            Log::debug('bind_param failed, db error', $db->error);
+            Log::debug('bind_param failed, sql error', $query->error);
             return [];
         }
         if (!$query->execute()) {
-            Log::adminDebug('execute failed, db error', $db->error);
-            Log::adminDebug('execute failed, sql error', $query->error);
+            Log::debug('execute failed, db error', $db->error);
+            Log::debug('execute failed, sql error', $query->error);
             return [];
         }
         if (!($result = $query->get_result())) {
-            Log::adminDebug('get_result failed, db error', $db->error);
-            Log::adminDebug('get_result failed, sql error', $query->error);
+            Log::debug('get_result failed, db error', $db->error);
+            Log::debug('get_result failed, sql error', $query->error);
             return [];
         }
 
         $row = $result->fetch_assoc();
         $result->free();
-        Log::adminDebug('sqlGetRow success', $row);
+        Log::debug('sqlGetRow success', $row);
         return $row;
     }
 
@@ -150,7 +150,7 @@ class Db
      */
     public static function sqlGetTable(string $sql): array
     {
-        Log::adminDebug('sqlGetTable', $sql);
+        Log::debug('sqlGetTable', $sql);
         $db = self::getInstance()->db;
         if ($result = $db->query($sql)) {
             $table = [];
@@ -160,7 +160,7 @@ class Db
             $result->free();
             return $table;
         }
-        Log::adminDebug('query failed, db error', $db->error);
+        Log::debug('query failed, db error', $db->error);
         return [];
     }
 
@@ -172,7 +172,7 @@ class Db
      */
     public static function sqlGetList(string $sql, string $fieldName): array
     {
-        Log::adminDebug('sqlGetTable', $sql);
+        Log::debug('sqlGetTable', $sql);
         $db = self::getInstance()->db;
         if ($result = $db->query($sql)) {
             $list = [];
@@ -182,7 +182,7 @@ class Db
             $result->free();
             return $list;
         }
-        Log::adminDebug('query failed, db error', $db->error);
+        Log::debug('query failed, db error', $db->error);
         return [];
     }
 

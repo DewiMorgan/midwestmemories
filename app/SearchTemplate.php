@@ -39,7 +39,7 @@ namespace MidwestMemories;
         $thumbName = DropboxManager::getThumbName($itemPath);
         if (!is_file($thumbName)) {
             if (!str_starts_with($thumbName, 'tn_')) { // Avoid log spam from thumbs.
-                Log::adminDebug("No thumb found for image: $thumbName from $itemPath");
+                Log::debug("No thumb found for image: $thumbName from $itemPath");
             }
             continue;
         }

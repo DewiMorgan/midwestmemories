@@ -120,18 +120,8 @@ Templates have headers... unsure how it works when JS includes them inline. Styl
 
 ## ToDo:
 
-Next:
-Going to URLs doesn't load the folder, just shows "Hello, world!"
-
 * Clicking folders doesn't change the folders on the leftbar.
-* DONE: Download files added to dropbox.
-* DONE: Create thumbnails for all files.
-* DONE: Create jpgs for over-sized pngs.
-* DONE: Display thumbnails with a click-through to the images.
 * Display images in a folder with next/previous.
-
-Then:
-
 * PHP 8 features: readonly properties and promoted properties.
 * Display info texts with folders.
 * Allow users to add more info texts.
@@ -139,9 +129,6 @@ Then:
 * OR: allow creation of clickable faces in a pic, maybe manually.
 * Highlight the clicked area when you mouseover a name?
 * Search for all images of a person when you click their name.
-
-Later:
-
 * Display images in a search result-set with next/previous.
 * Delete files deleted from dropbox?
 
@@ -150,6 +137,9 @@ Later:
 See also ToDo, above.
 
 Current task:
+
+* Going to URLs doesn't load the folder, just shows "Hello, world!"
+* Thumb images no longer show, instead showing as src="PATH ERROR 404"
 
 * Get it commentable.
 * Get it usable on a phone.
@@ -286,8 +276,6 @@ Low priority:
 * Log rolling.
 * It logs the connection twice for each page load, because of the way templates work.
     * Could maybe not log unless `i` is set, or error?
-* Make all Log methods also echo, like Log::adminDebug(), depending on a config var something like LOG_ADMIN_ECHO_LEVEL.
-* Get rid of Log::adminDebug() method. Replace w Log::debug() throughout.
 * Create an always-present error-div, that's shown if it has any content. Sorta like an in-page console.
 * Handle empty folders.
 * ThumbsTemplate: indent HTML lines for file list.

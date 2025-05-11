@@ -91,21 +91,6 @@ class Log
     }
 
     /**
-     * Log a message and an optional object to the log and maybe to the screen.
-     * @param string $str
-     * @param mixed $obj
-     */
-    public static function adminDebug(string $str, mixed $obj = null): void
-    {
-        global $connection;
-        $message = "A-DBG: $str" . (is_null($obj) ? '.' : ': ' . var_export($obj, true));
-        self::debug($message);
-        if (isset($connection) && $connection->isSuperAdmin) {
-            echo "<pre>$message</pre>\n";
-        }
-    }
-
-    /**
      * Get call stack info about the external method that called this class, to prepend to log lines.
      * @return string Brief one-line human-readable description of caller.
      */

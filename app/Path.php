@@ -27,8 +27,8 @@ class Path
         /** @noinspection RealpathInStreamContextInspection */
         $baseDir = realpath(__DIR__ . '/../' . self::IMAGE_DIR . '/');
         if (empty($baseDir)) {
-            Log::adminDebug('MM_BASE_DIR empty from "' . __DIR__ . ' + /../ + ' . self::IMAGE_DIR . ' + /".');
-            Log::adminDebug('Not safe to continue');
+            Log::debug('MM_BASE_DIR empty from "' . __DIR__ . ' + /../ + ' . self::IMAGE_DIR . ' + /".');
+            Log::debug('Not safe to continue');
             http_response_code(500); // Internal Server Error.
             die(1);
         }
@@ -44,16 +44,16 @@ class Path
     {
         $realPath = realpath($filePath);
         if (!$realPath) {
-            Log::adminDebug("Converted path was not found: $filePath");
+            Log::debug("Converted path was not found: $filePath");
             return 'PATH_ERROR_404';
         }
         if (!str_starts_with($realPath, self::$imgBaseUnixPath)) {
-            Log::adminDebug("Converted path was not within MM_BASE_DIR: $realPath from $filePath");
+            Log::debug("Converted path was not within MM_BASE_DIR: $realPath from $filePath");
             return 'PATH_ERROR_401';
         }
         $result = preg_replace('#^' . preg_quote(self::$imgBaseUnixPath, '#') . '/*#', '/', $realPath);
         if (!$result) {
-            Log::adminDebug("Converted path gave an empty string or error: $filePath");
+            Log::debug("Converted path gave an empty string or error: $filePath");
             return 'PATH_ERROR_BAD';
         }
 
@@ -80,20 +80,20 @@ class Path
         // Check they both exist.
         $realChildPath = realpath($childPath);
         if (false === $realChildPath) {
-            Log::adminDebug("Child path was not found: $childPath");
+            Log::debug("Child path was not found: $childPath");
             http_response_code(404); // Not found.
             die(1);
         }
         $realParentPath = realpath($parentPath);
         if (false === $realParentPath) {
-            Log::adminDebug("Parent path was not found: $parentPath");
+            Log::debug("Parent path was not found: $parentPath");
             http_response_code(404); // Not found.
             die(1);
         }
 
         // Only need to check that parent is in basedir.
         if (!str_starts_with($realParentPath, self::$imgBaseUnixPath)) {
-            Log::adminDebug("Parent path was not within MM_BASE_DIR: $parentPath");
+            Log::debug("Parent path was not within MM_BASE_DIR: $parentPath");
             http_response_code(404); // Not found.
             die(1);
         }
@@ -121,7 +121,7 @@ class Path
         $realPath = realpath(self::$imgBaseUnixPath . '/' . $webPath);
         if (false === $realPath) {
             if (true === $mustExist) {
-                Log::adminDebug("Validated path was not found: $webPath");
+                Log::debug("Validated path was not found: $webPath");
                 http_response_code(404); // Not found.
                 die(1);
             }
@@ -131,21 +131,21 @@ class Path
             $realPath = realpath($fullFolder);
             if (false === $realPath) {
                 // DEBUG DELETEME
-                Log::adminDebug("Validating missing $fullFolder via $folder & $file, folder not found: $webPath");
-                Log::adminDebug('Backtrace', debug_backtrace());
+                Log::debug("Validating missing $fullFolder via $folder & $file, folder not found: $webPath");
+                Log::debug('Backtrace', debug_backtrace());
                 // End DEBUG DELETEME
-                Log::adminDebug("Validated folder was not found: $webPath");
+                Log::debug("Validated folder was not found: $webPath");
                 http_response_code(404); // Not found.
                 die(1);
             }
             $realPath = "$realPath/$file";
         }
         if (!str_starts_with($realPath, self::$imgBaseUnixPath)) {
-            Log::adminDebug("Validated path was not within MM_BASE_DIR: $webPath");
+            Log::debug("Validated path was not within MM_BASE_DIR: $webPath");
             http_response_code(404); // Not found.
             die(1);
         }
-        Log::adminDebug("Validated path: $webPath as $realPath");
+        Log::debug("Validated path: $webPath as $realPath");
         return $realPath;
     }
 
