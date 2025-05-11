@@ -108,6 +108,8 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         <?php
         // Set the root directory to display in the tree view.
         $root = Path::$imageBasePath;
+        const ICON_EXPANDED = '(-)';
+        const ICON_COLLAPSED = '(+)';
 
         // This is the treeview component.
         echo '<ul>';
@@ -147,7 +149,9 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
                         "Folder: expand='$expandClass', select='$selectClass'"
                         . " : $dir/$item from $targetPath"
                     ); // DELETEME DEBUG
-                    echo "<li class='folder $expandClass $selectClass'><span class='expand-collapse'>(+)</span>";
+                    $h_expandIcon = ('expanded' === $expandClass) ? ICON_EXPANDED : ICON_COLLAPSED;
+                    echo "<li class='folder $expandClass $selectClass'>";
+                    echo "<span class='expand-collapse'>$h_expandIcon</span>";
                     echo " <a href='$u_linkUrl' class='path-link'>$h_item</a>";
                     echo "<ul>\n";
                     scanDirectory("$dir/$item", $targetPath);
@@ -237,11 +241,12 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         // Toggle the expand/collapse state of the folder.
         this.parentElement.classList.toggle("expanded");
         this.parentElement.classList.toggle("collapsed");
-        if ('(+)' === this.textContent) {
-            this.textContent = '(-)';
-        } else if ('(-)' === this.textContent) { // The explicit elseif allows OTHER spans to go untouched.
-            this.textContent = '(+)';
+        if ('<?= ICON_EXPANDED ?>' === this.textContent) {
+            this.textContent = '<?= ICON_COLLAPSED ?>';
+        } else if ('<?= ICON_COLLAPSED ?>' === this.textContent) { // Explicit elseif lets OTHER spans to go untouched.
+            this.textContent = '<?= ICON_EXPANDED ?>';
         }
+
         e.stopPropagation();
     }
 </script>
