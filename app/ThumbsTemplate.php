@@ -80,6 +80,19 @@ namespace MidwestMemories;
             max-width: <?= DropboxManager::MAX_THUMB_WIDTH ?>px;
             max-height: <?= DropboxManager::MAX_THUMB_HEIGHT ?>px;
         }
+
+        figure {
+            margin: 0;
+            padding: 0;
+            display: block;
+        }
+
+        figcaption {
+            display: block;
+            margin-top: 4px;
+            font-size: 0.9em;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -147,7 +160,7 @@ namespace MidwestMemories;
 
         echo("<div class='thumb'><figure>");
         // ToDo: alt texts and title.
-        echo("<a href='$u_linkUrl'><img src='$u_thumbUrl' title='$h_thumbTitle' alt='$h_thumbTitle></a><br>");
+        echo("<a href='$u_linkUrl'><img src='$u_thumbUrl' title='$h_thumbTitle' alt='$h_thumbTitle'></a>");
         echo("<figcaption><p><strong>$fileNum: </strong><a href='$u_linkUrl'>$h_thumbTitle</a></figcaption>");
         echo("</figure></div>");
     }
