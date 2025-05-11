@@ -70,31 +70,6 @@ Index.php shows the nav, and the image listings.
 * [PHP Sandbox](https://onlinephp.io/)
 * [Setting up Git access to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 
-## ToDo:
-
-Next:
-
-* DONE: Download files added to dropbox.
-* DONE: Create thumbnails for all files.
-* DONE: Create jpgs for over-sized pngs.
-* DONE: Display thumbnails with a click-through to the images.
-* Display images in a folder with next/previous.
-
-Then:
-
-* PHP 8 features: readonly properties and promoted properties.
-* Display info texts with folders.
-* Allow users to add more info texts.
-* Allow click people/things to name them, stores position in the pic.
-* OR: allow creation of clickable faces in a pic, maybe manually.
-* Highlight the clicked area when you mouseover a name?
-* Search for all images of a person when you click their name.
-
-Later:
-
-* Display images in a search result-set with next/previous.
-* Delete files deleted from dropbox?
-
 ## Dev/Test workflow
 
 1) Open the project in PHPStorm EAP (OK, in PHPStorm regular: I went and bought the license).
@@ -143,21 +118,36 @@ This also makes thumbnails, publicly publishes the files, etc.
 
 Templates have headers... unsure how it works when JS includes them inline. Styles seem respected?
 
+## ToDo:
+
+Next:
+
+* DONE: Download files added to dropbox.
+* DONE: Create thumbnails for all files.
+* DONE: Create jpgs for over-sized pngs.
+* DONE: Display thumbnails with a click-through to the images.
+* Display images in a folder with next/previous.
+
+Then:
+
+* PHP 8 features: readonly properties and promoted properties.
+* Display info texts with folders.
+* Allow users to add more info texts.
+* Allow click people/things to name them, stores position in the pic.
+* OR: allow creation of clickable faces in a pic, maybe manually.
+* Highlight the clicked area when you mouseover a name?
+* Search for all images of a person when you click their name.
+
+Later:
+
+* Display images in a search result-set with next/previous.
+* Delete files deleted from dropbox?
+
 ## Current Issues
 
-See also list at the top of this file.
+See also ToDo, above.
 
 Current task:
-
-* Investigate cursor init that isn't just always-ignore, and download that isn't just always-download.
-    * Detect changes! Dropbox may suck until I can do this. Or hide cursor regen as super-admin.
-    * Base it on date (beware timezones)? Checksum?
-* Make updating be triggered by visiting the admin page.
-* If the webhook was working then I shouldn't be able to do a manual update. But I could, and did!
-* I think file downloads are no longer checked against the right folder path. VALID_FILE_PATH_REGEX is unused.
-    * SaveFileQueue() probably does it, hardcoded.
-
-Urgent:
 
 * Get thumb view working.
 * Get it commentable.
@@ -169,21 +159,21 @@ Urgent:
     * Images aren't in wrapped lines.
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
     * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.
-        * The data is stored/read into Metadata. Treat same as FileTemplate
+        * The data is stored/read into Metadata. Treat same as FileTemplate.
     * Show subfolders as thumbs, too.
         * Ini files don't handle subfolder details. Probably details should come from ini files in subfolders?
     * Clicking images doesn't load them in TreeTemplate, I think because they have a double-leading-slash?
-    * In the absence of a thumbnail, show the real image, but sized down.
-    * Folder Descriptions from Dropbox\midwestmemories\Auora\Horst and Karin slide tray sections.txt
-        * The descriptions are short enough, it feels like it'd maybe be worth also showing them on page for each
-          individual file, as context of what's going on in the pic.
+    * If no thumbnail, show the real image, but sized down.
+    * Folder Descriptions from Dropbox\midwestmemories\Auora\Horst and Karin slide tray sections.txt.
+        * The descriptions are short enough, it feels like it'd maybe be worth also showing them on the page for each
+          file, as context of what's going on in the pic.
 
 * TreeTemplate
     * It would be nice to let the user able to toggle between ice/non-ice if available.
     * When first displaying, all open folders are '(+)', should be '(-)'.
     * Bug: the slide numbers at the end are reversed from how they are in the filename.
-    * Bug: The field for "text on slide" isn't in the table, it's above.
-    * Bug: Right-clicking "open image in new tab" doesn't work
+    * Bug: The field for "text on the slide" is above the table, rather than in it.
+    * Bug: Right-clicking "open image in a new tab" doesn't work.
     * Left navbar should be overflow:scroll.
     * Bug: fail to resize right-bar: drag bar left, then ctrl+m-wheel down.
 
@@ -209,6 +199,40 @@ Urgent:
     * Keyword picker (ditto)
     * Each with who-can-edit level (nobody, owner, admin, regular, guest)
 
+U+1F4C1
+📁
+File Folder
+
+U+1F4C2
+📂
+Open File Folder
+
+U+1F5BF
+🖿
+Black Folder
+
+U+1F5C0
+🗀
+Folder
+
+U+1F5C1
+🗁
+Open Folder
+
+U+1F4F7
+📷
+Camera
+
+U+1F4C4
+📄
+Page Facing Up
+
+U+1F5BB
+🖻
+Document with Picture
+
+
+
 * FileTemplate
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif
     * Add next/prev buttons (disappear when editing? Or just prompt to save?)
@@ -225,16 +249,23 @@ Urgent:
         * I think inherited data should be greyed out. Editing it saves locally. Button to go to page of parent/origin?
     * CSS: Make the inline file view look like not ass.
     * The title at the top is mostly useless and takes up space, I think I'll remove it.
-  
+
 * DropboxManager
     * Split off upload handling/parsing methods to their own class.
 
 * Admin:
     * Make cursor-ignoring be dynamic, too.
         * Mostly done, need to make the AdminApiTemplate handle that too.
-        * Pretty up that template just a tiny bit: need a styled, scrolling output window.
+        * Pretty up that template bit: need a styled, scrolling output window.
         * Maybe merge the template and Admin.php together, and get the JS out to a .js file.
-    * Move Git pull and log clearing into admin.php.
+    * Move Git pull and log clearing into the admin.php.
+    * Investigate cursor init that isn't just always-ignore, and download that isn't just always-download.
+        * Detect changes! Dropbox may suck until I can do this. Or hide cursor regen as super-admin.
+        * Base it on date (beware timezones)? Checksum?
+    * Make updating be triggered by visiting the admin page.
+    * If the webhook was working then I shouldn't be able to do a manual update. But I could, and did!
+    * I think file downloads are no longer checked against the right folder path. VALID_FILE_PATH_REGEX is unused.
+        * SaveFileQueue() probably does it, hardcoded.
 
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 should be https://midwestmemories.dewimorgan.com/Dewi/2
     * (mod_rewrite)
@@ -248,7 +279,7 @@ Urgent:
 * Some kinda push tech to display error messages through Javascript in Index::ShowError().
 * Update the URL as the page changes.
 * "Download files from DB queue" and "Process downloaded files" are both giving me:
-    * Cursor='',"Cursor was not set in client.", but I am not sure if that is even a true error.
+    * `Cursor='',"Cursor was not set in client."`, but I am not sure if that is even a true error.
     * No reproduction steps yet.
 
 From Code comments:
@@ -282,7 +313,7 @@ Low priority:
     * ToDo: Make it accept one or more callbacks to say how to recurse into, skip, or display entries.
     * Why?
 
-* Index: Additional file types (txt? svg|bmp|webp?).
+* Index: Additional file types (TXT|SVG|BMP|WEBP?).
     * Add a template
     * Edit filters in existing templates.
     * Edit DropBoxManager upload handlers.
