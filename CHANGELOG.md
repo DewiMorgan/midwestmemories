@@ -6,13 +6,21 @@ which might not be when they were actually implemented/committed.
 ## 2025/05/10 Sat
 
 * DONE: Add laptop dev env.
-* FIXED: https://midwestmemories.dewimorgan.com/admin.php?action=list_files_to_download no longer works.
+* DONE: `mod_rewrite` to get nicer URLs working.
 * DONE: Rename AdminDownloadTemplate to AdminApiTemplate.
+* DONE: Get thumb view working.
+* DONE: show filenames in thumbsTemplate.
 * DONE: Thumb images shouldn't be sized.
 * FIXED: Thumb images aren't in wrapped lines.
-* SKIPPED: If no thumbnail, show the real image, but sized down. Won't fix, too slow.
+* FIXED: Clicking thumbs doesn't load them in TreeTemplate, I think because they have a double-leading-slash?
 * DONE: Show subfolders as thumbs, too.
-
+* DONE: Subfolder thumbs should select the folder in the tree.
+* DONE: Subfolder thumbs should expand the folder in the tree, if not expanded.
+* FIXED: When first displaying, all open folders are '(+)', should be '(-)'.
+* DONE: Add nicer collapse/expand icons for folders in treeview.
+* FIXED: Bug: Right-clicking "open image in a new tab" doesn't work.
+* SKIPPED: If no thumbnail, show the real image, but sized down. (Won't fix, too slow, not needed).
+* FIXED: CSS of templated files being ignored.
 
 ## 2025/05/05 Mon
 

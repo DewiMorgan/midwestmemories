@@ -108,8 +108,19 @@ $u_linkUrl = Index::MM_BASE_URL . ($_REQUEST['path'] ?? '/') . '?i=1';
         <?php
         // Set the root directory to display in the tree view.
         $root = Path::$imgBaseUnixPath;
-        const ICON_EXPANDED = '(-)';
-        const ICON_COLLAPSED = '(+)';
+
+        /* Alternatives and options for image files include:
+         * U+1F4C1 📁 File Folder
+         * U+1F4C2 📂 Open File Folder
+         * U+1F5BF 🖿 Black Folder
+         * U+1F5C0 🗀 Folder
+         * U+1F5C1 🗁 Open Folder
+         * U+1F4F7 📷 Camera
+         * U+1F4C4 📄 Page Facing Up
+         * U+1F5BB 🖻 Document with Picture
+         */
+        const ICON_EXPANDED = '📂'; // U+1F4C2 Open File Folder
+        const ICON_COLLAPSED = '📁'; // U+1F4C1 File Folder
 
         // This is the treeview component.
         echo '<ul>';
@@ -243,10 +254,8 @@ $u_linkUrl = Index::MM_BASE_URL . ($_REQUEST['path'] ?? '/') . '?i=1';
         this.parentElement.classList.toggle("expanded");
         this.parentElement.classList.toggle("collapsed");
         if ('<?= ICON_EXPANDED ?>' === this.textContent) {
-            console.log("Collapsing " + this.parentElement.textContent.split('\n')[0]); // DELETEME DEBUG
             this.textContent = '<?= ICON_COLLAPSED ?>';
         } else if ('<?= ICON_COLLAPSED ?>' === this.textContent) { // Explicit elseif lets OTHER spans to go untouched.
-            console.log("Expanding " + this.parentElement.textContent.split('\n')[0]); // DELETEME DEBUG
             this.textContent = '<?= ICON_EXPANDED ?>';
         }
 
@@ -412,16 +421,9 @@ $u_linkUrl = Index::MM_BASE_URL . ($_REQUEST['path'] ?? '/') . '?i=1';
             if (selectedParent.classList.contains('collapsed')) {
                 const child = selectedParent.querySelector('.expand-collapse');
                 if (child && 'function' === typeof child.click) {
-                    console.log("Launching click on: " + child.textContent.split('\n')[0]); // DELETEME DEBUG
                     child.click(); // Call the click handler of the expander, to expand and swap icons.
-                } else {
-                    console.log("Child with click was not found.");
                 }
-            } else {
-                console.log("Selected parent was not collapsed");
             }
-        } else {
-            console.log("Could not find parent with URL: " + targetUrl);
         }
 
         const attr = this.getAttribute("href");

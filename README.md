@@ -151,7 +151,6 @@ See also ToDo, above.
 
 Current task:
 
-* Get thumb view working.
 * Get it commentable.
 * Get it usable on a phone.
 * Search template?
@@ -161,17 +160,11 @@ Current task:
     * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.
         * The data is stored/read into Metadata. Treat same as FileTemplate.
     * Ini files don't handle subfolder details. Probably details should come from ini files in subfolders?
-    * Clicking images doesn't load them in TreeTemplate, I think because they have a double-leading-slash?
     * Folder Descriptions from Dropbox\midwestmemories\Auora\Horst and Karin slide tray sections.txt.
         * The descriptions are short enough, it feels like it'd maybe be worth also showing them on the page for each
           file, as context of what's going on in the pic.
 
 * TreeTemplate
-    * It would be nice to let the user able to toggle between ice/non-ice if available.
-    * When first displaying, all open folders are '(+)', should be '(-)'.
-    * Bug: the slide numbers at the end are reversed from how they are in the filename.
-    * Bug: The field for "text on the slide" is above the table, rather than in it.
-    * Bug: Right-clicking "open image in a new tab" doesn't work.
     * Left navbar should be overflow:scroll.
     * Bug: fail to resize right-bar: drag bar left, then ctrl+m-wheel down.
 
@@ -197,40 +190,6 @@ Current task:
     * Keyword picker (ditto)
     * Each with who-can-edit level (nobody, owner, admin, regular, guest)
 
-U+1F4C1
-📁
-File Folder
-
-U+1F4C2
-📂
-Open File Folder
-
-U+1F5BF
-🖿
-Black Folder
-
-U+1F5C0
-🗀
-Folder
-
-U+1F5C1
-🗁
-Open Folder
-
-U+1F4F7
-📷
-Camera
-
-U+1F4C4
-📄
-Page Facing Up
-
-U+1F5BB
-🖻
-Document with Picture
-
-
-
 * FileTemplate
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2%2Ftest1.gif
     * Add next/prev buttons (disappear when editing? Or just prompt to save?)
@@ -247,11 +206,15 @@ Document with Picture
         * I think inherited data should be greyed out. Editing it saves locally. Button to go to page of parent/origin?
     * CSS: Make the inline file view look like not ass.
     * The title at the top is mostly useless and takes up space, I think I'll remove it.
+    * It would be nice to let the user able to toggle between ice/non-ice if available.
+    * Bug: the slide numbers at the end are reversed from how they are in the filename.
+    * Bug: The field for "text on the slide" is above the table, rather than in it.
 
 * DropboxManager
     * Split off upload handling/parsing methods to their own class.
 
 * Admin:
+    * https://midwestmemories.dewimorgan.com/admin.php?action=list_files_to_download no longer works.
     * Make cursor-ignoring be dynamic, too.
         * Mostly done, need to make the AdminApiTemplate handle that too.
         * Pretty up that template bit: need a styled, scrolling output window.
