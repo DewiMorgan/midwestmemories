@@ -268,55 +268,28 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
     /**
      * Handle link clicking, to load content into the content div
      * @param {string} url The link to load.
-     * @param saveHistory True to add followed link to browser history: false for back/forward button handling.
+     * @param saveHistory True to add the followed link to browser history: false for back/forward button handling.
      * @returns {Promise<void>}
      */
     async function openLinkInline(url, saveHistory = true) {
         console.log("Opening link inline: " + url);
 
         const content = document.getElementById("content");
-        removeAllChildNodes(content); // Ensure event listeners are removed.
+        const newContent = clearContentDiv(content); // Ensure event listeners are removed.
+        clearAddedStyles(); // Remove any styles we loaded from a previous page load.
 
         let title;
         try {
-            // Fetch the new content.
-            const response = await fetch(url);
-            const html = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-
-
-            // Copy <style> and <link rel="stylesheet"> elements from the fetched head
-            const stylesAndLinks = doc.head.querySelectorAll('style, link[rel="stylesheet"]');
-            for (const el of stylesAndLinks) {
-                // Avoid duplicates by checking href for <link> or content for <style>
-                if ('link' === el.tagName.toLowerCase()) {
-                    const href = el.getAttribute('href');
-                    if (href && !document.querySelector(`link[href="${href}"]`)) {
-                        const clonedChild = el.cloneNode(true);
-                        document.head.appendChild(clonedChild);
-                    }
-                } else if ('style' === el.tagName.toLowerCase()) {
-                    // Optionally check if style already exists
-                    const clonedChild = el.cloneNode(true);
-                    document.head.appendChild(clonedChild);
-                }
-            }
-
-            // Clear old content safely
-            const newContent = clearContentDiv(content);
+            // Import the title, body and styles from the loaded document.
+            const doc = await fetchRemoteDocument(url);
             title = doc.querySelector('title')?.innerText;
-
-            // Import all new body children safely
-            for (const child of doc.body.children) {
-                const clone = child.cloneNode(true);
-                newContent.appendChild(clone);
-            }
+            importRemoteStyles(doc.head);
+            importRemoteContent(doc.body, newContent);
             console.log("Got to writing.");
         } catch (error) {
+            // Import the title, body and styles from the loaded document.
             console.error(error);
             title = 'Error loading page';
-            const newContent = clearContentDiv(content);
             const element = document.createElement('h1');
             element.textContent = title;
             newContent.appendChild(element);
@@ -334,16 +307,49 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         }
     }
 
-    // Ensure our handler loads all child links in the content div.
+    /** Fetch and parse the HTML document from a URL. */
+    async function fetchRemoteDocument(url) {
+        const response = await fetch(url);
+        const html = await response.text();
+        const parser = new DOMParser();
+        return parser.parseFromString(html, 'text/html');
+    }
+
+    /** Remove all <style> and <link rel="stylesheet"> tags from the document's <head> node, except the first one. */
+    function clearAddedStyles() {
+        const stylesAndLinks = document.head.querySelectorAll('style, link[rel="stylesheet"]');
+        for (let i = 1; i < stylesAndLinks.length; i++) {
+            stylesAndLinks[i].remove();
+        }
+    }
+
+    /** Append all <style> and <link rel="stylesheet"> elements from a <head> element into the current document. */
+    function importRemoteStyles(remoteHead) {
+        const remoteStylesAndLinks = remoteHead.querySelectorAll('style, link[rel="stylesheet"]');
+        for (const el of remoteStylesAndLinks) {
+            const clonedChild = el.cloneNode(true);
+            document.head.appendChild(clonedChild);
+        }
+    }
+
+    /** Clone and append all children from the remote <body> to the target container. */
+    function importRemoteContent(remoteBody, targetContainer) {
+        for (const child of remoteBody.children) {
+            const clone = child.cloneNode(true);
+            targetContainer.appendChild(clone);
+        }
+    }
+
+    /** Ensure our handler loads all child links in the content div. */
     function addLinksToContent(content) {
         const links = content.querySelectorAll('a');
         links.forEach(addLinkClickHandler);
     }
 
-    // Safely clear the div using the DOM, so all event handlers are cleanly killed without memory leaks.
+    /** Safely clear the div using the DOM, so all event handlers are cleanly killed without memory leaks. */
     function clearContentDiv(oldContentDiv) {
         // Find the parent element (where the div is located)
-        const parent = document.getElementById('parent-container'); // The parent of the 'content' div
+        const parent = document.getElementById('parent-container');
 
         // Remove the old content div
         let nextSibling = null;
@@ -352,17 +358,17 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             oldContentDiv.remove(); // Remove the div along with its children and event listeners
         }
 
-        // Create the new content div
+        // Create the new content div, with the same properties as the original.
         const newContentDiv = document.createElement('div');
         newContentDiv.classList.add('content');
         newContentDiv.classList.add('right-column');
-        newContentDiv.id = 'content'; // Set the same ID as the original
+        newContentDiv.id = 'content';
 
         // Insert the new div at the same position
         if (nextSibling) {
             parent.insertBefore(newContentDiv, nextSibling); // Insert it before the next sibling of the old div.
         } else {
-            parent.appendChild(newContentDiv); // If no next sibling (i.e., it's the last child), append the new div.
+            parent.appendChild(newContentDiv); // If no next sibling (so, the last child), append the new div.
         }
         return newContentDiv;
     }
@@ -397,16 +403,6 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
 
     function removeSelectedClass(listItem) {
         listItem.classList.remove('selected');
-    }
-
-    /**
-     * Clear all child nodes from a parent.
-     * @param {HTMLElement} parent
-     */
-    function removeAllChildNodes(parent) {
-        while (parent.firstChild) {
-            parent.removeChild(parent.firstChild);
-        }
     }
 
     /** Just to troll my wife, get a random name for the site. */
