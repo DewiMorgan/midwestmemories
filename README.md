@@ -122,6 +122,7 @@ Templates have headers... unsure how it works when JS includes them inline. Styl
 
 Next:
 
+* Clicking folders doesn't change the folders on the leftbar.
 * DONE: Download files added to dropbox.
 * DONE: Create thumbnails for all files.
 * DONE: Create jpgs for over-sized pngs.

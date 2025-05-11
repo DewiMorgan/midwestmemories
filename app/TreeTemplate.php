@@ -306,7 +306,7 @@ $u_linkUrl = Index::MM_BASE_URL . ($_REQUEST['path'] ?? '/') . '?i=1';
 
         // Ensure that history will work.
         if (saveHistory) {
-            const historyUrl = url.replace(/&(?:amp;)?i=\d+/, ''); // Strip out "inline" instruction.
+            const historyUrl = url.replace(/(?:\?|&(?:amp;)?)i=\d+/, ''); // Strip out "inline" instruction.
             console.log("Updating URL to '" + historyUrl + "'.");
             window.history.pushState({"html": historyUrl, "pageTitle": title}, '', historyUrl);
         }
