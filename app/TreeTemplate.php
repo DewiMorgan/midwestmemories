@@ -297,7 +297,7 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
         document.title = getSiteName() + ' - ' + title;
 
         // Ensure our handler loads all child links in the content div.
-        addLinksToContent(content);
+        addLinksToContent(newContent);
 
         // Ensure that history will work.
         if (saveHistory) {

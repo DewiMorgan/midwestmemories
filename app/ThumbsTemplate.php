@@ -148,18 +148,16 @@ namespace MidwestMemories;
             $u_thumbUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($thumbUnixPath)) . '&i=2';
             $fileNum++;
             $h_thumbTitle = htmlspecialchars($item);
+        } elseif ('..' === $item) {
+            $h_thumbTitle = '<strong>..</strong> - up one folder.';
+            $u_thumbUrl = Index::MM_BASE_URL . '/tn_folder_up.png&i=2';
         } else {
-            if ('..' === $item) {
-                $h_thumbTitle = '.. - up one folder.';
-            } else {
-                $h_thumbTitle = htmlspecialchars($item);
-            }
+            $h_thumbTitle = htmlspecialchars($item);
             $u_thumbUrl = Index::MM_BASE_URL . '/tn_folder.png&i=2';
         }
         $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($itemPath)) . '&i=1';
 
         echo("<div class='thumb'><figure>");
-        // ToDo: alt texts and title.
 
         echo("<a href='$u_linkUrl'><img src='$u_thumbUrl' title='$h_thumbTitle' alt='$h_thumbTitle'></a>");
         echo('<figcaption>');
