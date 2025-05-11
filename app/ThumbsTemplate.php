@@ -113,7 +113,7 @@ namespace MidwestMemories;
     foreach ($items as $item) {
         $itemPath = Index::$requestUnixPath . '/' . $item;
         if (is_dir($itemPath)) {
-            if ('.' === $itemPath || ('..' === $itemPath && (Index::$requestUnixPath === Path::$imageBasePath))) {
+            if ('.' === $item || ('..' === $item && (Index::$requestUnixPath === Path::$imageBasePath))) {
                 Log::adminDebug("Ignoring folder: $itemPath");
             } else {
                 $dirs[] = $item;
