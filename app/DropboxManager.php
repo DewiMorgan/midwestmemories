@@ -29,10 +29,10 @@ class DropboxManager
     private const MAX_PNG_BYTES = 1024 * 1024;
 
     /** Max image width in pixels before scaling down for thumbnail. */
-    private const MAX_THUMB_WIDTH = 64;
+    public const MAX_THUMB_WIDTH = 64;
 
     /** Max image height in pixels before scaling down for thumbnail. */
-    private const MAX_THUMB_HEIGHT = 64;
+    public const MAX_THUMB_HEIGHT = 64;
 
     /** The item has just been added from the Dropbox list. */
     public const SYNC_STATUS_NEW = 'NEW';
