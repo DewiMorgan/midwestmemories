@@ -100,7 +100,7 @@ namespace MidwestMemories;
     </style>
 </head>
 <?php
-$u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/');
+$u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
 ?>
 <body onload="openLinkInline('<?= $u_linkUrl ?>')">
 <div class="flex-container" id="parent-container">
