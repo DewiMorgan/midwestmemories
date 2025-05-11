@@ -411,11 +411,11 @@ $u_linkUrl = Index::MM_BASE_URL . ($_REQUEST['path'] ?? '/') . '?i=1';
             selectedParent.classList.add('selected'); // Assumes the href is an immediate child of the li.
             if (selectedParent.classList.contains('collapsed')) {
                 const child = selectedParent.querySelector('.expand-collapse');
-                if (child && 'function' === typeof child.onclick) {
-                    console.log("Launching onclick on: " + child.textContent.split('\n')[0]); // DELETEME DEBUG
-                    child.onclick(); // Call the onclick handler of the expander, to expand and swap icons.
+                if (child && 'function' === typeof child.click) {
+                    console.log("Launching click on: " + child.textContent.split('\n')[0]); // DELETEME DEBUG
+                    child.click(); // Call the click handler of the expander, to expand and swap icons.
                 } else {
-                    console.log("Child with onclick was not found.");
+                    console.log("Child with click was not found.");
                 }
             } else {
                 console.log("Selected parent was not collapsed");
