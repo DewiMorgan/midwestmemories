@@ -139,7 +139,6 @@ See also ToDo, above.
 Current task:
 
 * Going to URLs doesn't load the folder, just shows "Hello, world!"
-* Thumb images no longer show, instead showing as src="PATH ERROR 404"
 
 * Get it commentable.
 * Get it usable on a phone.

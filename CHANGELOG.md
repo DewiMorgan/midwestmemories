@@ -27,6 +27,8 @@ which might not be when they were actually implemented/committed.
 * FIXED: CSS of templated files being ignored.
 * SKIPPED: Make all Log methods also echo, depending on a config var like LOG_ADMIN_ECHO_LEVEL. (too flaky)
 * DONE: Get rid of Log::adminDebug() method. Replace w Log::debug() throughout.
+* FIXED: Thumb images no longer show, instead showing as src="PATH ERROR 404"
+* DONE: "PATH_ERROR_404" appears as "PATH ERROR 404" in links, complicating debugging. Rename to "PATH-ERROR-404"
 
 ## 2025/05/05 Mon
 
