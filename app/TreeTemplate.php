@@ -285,6 +285,24 @@ $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode($_REQUEST['path'] ?? '/')
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
 
+
+            // Copy <style> and <link rel="stylesheet"> elements from the fetched head
+            const stylesAndLinks = doc.head.querySelectorAll('style, link[rel="stylesheet"]');
+            for (const el of stylesAndLinks) {
+                // Avoid duplicates by checking href for <link> or content for <style>
+                if ('link' === el.tagName.toLowerCase()) {
+                    const href = el.getAttribute('href');
+                    if (href && !document.querySelector(`link[href="${href}"]`)) {
+                        const clonedChild = el.cloneNode(true);
+                        document.head.appendChild(clonedChild);
+                    }
+                } else if ('style' === el.tagName.toLowerCase()) {
+                    // Optionally check if style already exists
+                    const clonedChild = el.cloneNode(true);
+                    document.head.appendChild(clonedChild);
+                }
+            }
+
             // Clear old content safely
             const newContent = clearContentDiv(content);
             title = doc.querySelector('title')?.innerText;
