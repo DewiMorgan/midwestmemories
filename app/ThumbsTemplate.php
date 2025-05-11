@@ -99,7 +99,7 @@ namespace MidwestMemories;
 <div class="thumb-content">
     <h1 class="center">Folder title goes here</h1>
     <p>This is a description of the folder/album and its contents.</p>
-    <p>This is a <a href="https://www.google.com">test link to make sure that external links work.</a></p>
+    <p>This is a <a href="https://www.google.com">test link to make sure external links work.</a></p>
     <p>This is a <a href="https://www.google.com?x&i=1">test link to try breaking external links.</a></p>
 </div>
 
@@ -118,7 +118,7 @@ namespace MidwestMemories;
             } else {
                 $dirs[] = $item;
             }
-        } elseif (is_file($itemPath)){
+        } elseif (is_file($itemPath)) {
             if (
                 preg_match('/\/(?:\.|tn_)[^\/]+$/', $itemPath) // In blocklist.
                 || !preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath) // Not in allowlist.
@@ -160,9 +160,14 @@ namespace MidwestMemories;
 
         echo("<div class='thumb'><figure>");
         // ToDo: alt texts and title.
+
         echo("<a href='$u_linkUrl'><img src='$u_thumbUrl' title='$h_thumbTitle' alt='$h_thumbTitle'></a>");
-        echo("<figcaption><p><strong>$fileNum: </strong><a href='$u_linkUrl'>$h_thumbTitle</a></figcaption>");
-        echo("</figure></div>");
+        echo('<figcaption>');
+        if ($fileNum) {
+            echo("<strong>$fileNum: </strong>");
+        }
+        echo("<a href='$u_linkUrl'>$h_thumbTitle</a></figcaption>");
+        echo('</figure></div>');
     }
     ?>
     <div class="spacer">&nbsp;</div>
