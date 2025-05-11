@@ -20,7 +20,7 @@ namespace MidwestMemories;
 // ToDo: Add form input fields.
 // ToDo: Add next/prev buttons.
 
-$u_linkUrl = Path::filePathToUrl(Index::$requestUnixPath, Path::LINK_RAW);
+$u_linkUrl = Path::unixPathToUrl(Index::$requestUnixPath, Path::LINK_RAW);
 $fileDetails = Metadata::getFileDataByUnixPath(Index::$requestUnixPath);
 
 // Escape the details array.

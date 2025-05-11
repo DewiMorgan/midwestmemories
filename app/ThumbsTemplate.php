@@ -113,7 +113,7 @@ namespace MidwestMemories;
     foreach ($items as $item) {
         $itemPath = Index::$requestUnixPath . '/' . $item;
         if (is_dir($itemPath)) {
-            if ('.' === $item || ('..' === $item && (Index::$requestUnixPath === Path::$imageBasePath))) {
+            if ('.' === $item || ('..' === $item && (Index::$requestUnixPath === Path::$imgBaseUnixPath))) {
                 Log::adminDebug("Ignoring folder: $itemPath");
             } else {
                 $dirs[] = $item;
@@ -145,17 +145,17 @@ namespace MidwestMemories;
                 continue;
             }
             Log::adminDebug("Creating thumb-link for image: $thumbUnixPath from $itemPath");
-            $u_thumbUrl = Path::filePathToUrl($thumbUnixPath, Path::LINK_RAW);
+            $u_thumbUrl = Path::unixPathToUrl($thumbUnixPath, Path::LINK_RAW);
             $fileNum++;
             $h_thumbTitle = htmlspecialchars($item);
         } elseif ('..' === $item) {
             $h_thumbTitle = '<strong>..</strong> - up one folder.';
-            $u_thumbUrl = Path::filePathToUrl('/tn_folder_up.png', Path::LINK_RAW);
+            $u_thumbUrl = Path::unixPathToUrl('/tn_folder_up.png', Path::LINK_RAW);
         } else {
             $h_thumbTitle = htmlspecialchars($item);
-            $u_thumbUrl = Path::filePathToUrl('/tn_folder.png', Path::LINK_RAW);
+            $u_thumbUrl = Path::unixPathToUrl('/tn_folder.png', Path::LINK_RAW);
         }
-        $u_linkUrl = Path::filePathToUrl($itemPath, Path::LINK_INLINE);
+        $u_linkUrl = Path::unixPathToUrl($itemPath, Path::LINK_INLINE);
 
         echo("<div class='thumb'><figure>");
 

@@ -107,7 +107,7 @@ $u_linkUrl = Index::MM_BASE_URL . ($_REQUEST['path'] ?? '/') . '?i=1';
     <div class="tree-view left-column">
         <?php
         // Set the root directory to display in the tree view.
-        $root = Path::$imageBasePath;
+        $root = Path::$imgBaseUnixPath;
         const ICON_EXPANDED = '(-)';
         const ICON_COLLAPSED = '(+)';
 
@@ -121,52 +121,53 @@ $u_linkUrl = Index::MM_BASE_URL . ($_REQUEST['path'] ?? '/') . '?i=1';
          * Recursively scan a directory and output its contents in a format appropriate for this template.
          * ToDo: Expand to, and select, currently passed $path.
          * ToDo: make it accept one or more callbacks to say how to recurse into, skip, or display entries.
-         * @param string $dir The full path to the dir being scanned. When first calling, pass the root of the tree.
-         * @param string $targetPath The current item selected/expanded/viewed by the user.
+         * @param string $scanUnixDir Full path to the dir being scanned. When first calling, pass the root of the tree.
+         * @param string $targetUnixPath The current item selected/expanded/viewed by the user.
          */
-        function scanDirectory(string $dir, string $targetPath = ''): void
+        function scanDirectory(string $scanUnixDir, string $targetUnixPath = ''): void
         {
-            $items = scandir($dir);
+            $items = scandir($scanUnixDir);
 
             // Loop through the items and output a list item for each one.
             $files = '';
             foreach ($items as $item) {
                 // Apply blacklist even to folders. Skip the current and parent directories, and any hidden ones.
                 // Also skip thumbnails, index files, and ICE files.
+                // ToDo: This blocklist and later allowlist is repeated code in thumbsTemplate, etc. Centralize it.
                 if (preg_match('/^(\.|tn_|index\.)|-ICE.jpg$/', $item)) {
                     continue;
                 }
 
                 $h_item = htmlspecialchars($item);
-                $webDir = str_replace(Path::$imageBasePath, '', "$dir/$item");
-                $u_linkUrl = Index::MM_BASE_URL . $webDir . '?i=1';
+                $itemUnixPath = "$scanUnixDir/$item";
+                $u_linkUrl = Path::unixPathToUrl($itemUnixPath, Path::LINK_INLINE);
+                $selectClass = ($itemUnixPath === $targetUnixPath) ? 'selected' : '';
                 // If the item is a directory, output a list item with a nested ul element.
-                if (is_dir("$dir/$item")) {
+                if (is_dir($itemUnixPath)) {
                     // Collapse, unless our target path is within this branch.
-                    $expandClass = Path::isChildInPath($targetPath, "$dir/$item") ? 'expanded' : 'collapsed';
-                    $selectClass = ("$dir/$item" === $targetPath) ? 'selected' : '';
+                    $expandClass = Path::isChildInPath($targetUnixPath, $itemUnixPath) ? 'expanded' : 'collapsed';
                     Log::debug(
                         "Folder: expand='$expandClass', select='$selectClass'"
-                        . " : $dir/$item from $targetPath"
+                        . " : $itemUnixPath from $targetUnixPath"
                     ); // DELETEME DEBUG
                     $h_expandIcon = ('expanded' === $expandClass) ? ICON_EXPANDED : ICON_COLLAPSED;
                     echo "<li class='folder $expandClass $selectClass'>";
                     echo "<span class='expand-collapse'>$h_expandIcon</span>";
                     echo " <a href='$u_linkUrl' class='path-link'>$h_item</a>";
                     echo "<ul>\n";
-                    scanDirectory("$dir/$item", $targetPath);
+                    // ToDo: If dir is empty, we make an empty UL. Output to a var, and only print if var has data.
+                    scanDirectory($itemUnixPath, $targetUnixPath);
                     echo "</ul></li>\n";
                 } elseif (preg_match('/\.(gif|png|jpg|jpeg)$/', $item)) {
                     // Append whitelisted filetypes to the list of files.
-                    $selectClass = ("$dir/$item" === $targetPath) ? 'selected' : '';
                     $files .= "<li class='file $selectClass'><a href='$u_linkUrl' class='path-link'>$h_item</a></li>\n";
-                    Log::debug("Filing: select='$selectClass' : $dir/$item from $targetPath"); // DELETEME DEBUG
+                    Log::debug("Filing: select='$selectClass' : $itemUnixPath from $targetUnixPath"); // DELETEME DEBUG
                 }
             }
             echo $files;
 
             // DELETEME DEBUG
-            $webDir = str_replace(Path::$imageBasePath, '', $dir);
+            $webDir = str_replace(Path::$imgBaseUnixPath, '', $scanUnixDir);
             Metadata::loadFromInis($webDir);
 //            echo "<pre>$dir:\n" . var_export(Metadata::getData(), true) . '</pre>';
 //            Metadata::saveToIni('x', true);
@@ -400,7 +401,12 @@ $u_linkUrl = Index::MM_BASE_URL . ($_REQUEST['path'] ?? '/') . '?i=1';
         // Remove 'selected' from any previously selected li and apply to current.
         const selectedItems = document.querySelectorAll('li.selected');
         selectedItems.forEach(removeSelectedClass);
-        this.parentElement.classList.add('selected');
+
+        // Can't just use this.parent, as it might be from a link in a template.
+        const selectedParent = document.querySelector(`li > a[href="${targetUrl}"]`)?.parentElement;
+        if (selectedParent) {
+            selectedParent.classList.add('selected'); // Assumes the href is an immediate child of the li.
+        }
 
         const attr = this.getAttribute("href");
         openLinkInline(attr);

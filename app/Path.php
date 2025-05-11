@@ -17,7 +17,7 @@ class Path
     public const LINK_USER = '';
 
     // The full filesystem path to the image folder. We don't allow access to files outside this folder.
-    public static string $imageBasePath;
+    public static string $imgBaseUnixPath;
 
     /**
      * Handle base dir: being empty could allow arbitrary file access, so check it very early on.
@@ -32,26 +32,26 @@ class Path
             http_response_code(500); // Internal Server Error.
             die(1);
         }
-        self::$imageBasePath = $baseDir;
+        self::$imgBaseUnixPath = $baseDir;
     }
 
     /**
-     * Take a filesystem path of an object on the filesystem, and return an absolute web path, from the document root.
+     * Take a filesystem path of an object on the filesystem, and return an absolute URL.
      * @param string $filePath The filesystem path to convert.
      * @return string The converted path, or a string like 'PATH_ERROR_...' on failure, to avoid exploits.
      */
-    public static function filePathToUrl(string $filePath, $linkType = self::LINK_USER): string
+    public static function unixPathToUrl(string $filePath, $linkType = self::LINK_USER): string
     {
         $realPath = realpath($filePath);
         if (!$realPath) {
             Log::adminDebug("Converted path was not found: $filePath");
             return 'PATH_ERROR_404';
         }
-        if (!str_starts_with($realPath, self::$imageBasePath)) {
+        if (!str_starts_with($realPath, self::$imgBaseUnixPath)) {
             Log::adminDebug("Converted path was not within MM_BASE_DIR: $realPath from $filePath");
             return 'PATH_ERROR_401';
         }
-        $result = preg_replace('#^' . preg_quote(self::$imageBasePath, '#') . '/*#', '/', $realPath);
+        $result = preg_replace('#^' . preg_quote(self::$imgBaseUnixPath, '#') . '/*#', '/', $realPath);
         if (!$result) {
             Log::adminDebug("Converted path gave an empty string or error: $filePath");
             return 'PATH_ERROR_BAD';
@@ -92,7 +92,7 @@ class Path
         }
 
         // Only need to check that parent is in basedir.
-        if (!str_starts_with($realParentPath, self::$imageBasePath)) {
+        if (!str_starts_with($realParentPath, self::$imgBaseUnixPath)) {
             Log::adminDebug("Parent path was not within MM_BASE_DIR: $parentPath");
             http_response_code(404); // Not found.
             die(1);
@@ -111,14 +111,14 @@ class Path
     }
 
     /**
-     * Safely convert a web path to a unix filesystem path, or die if it's not within MM_BASE_DIR.
+     * Safely convert a web path to a unix filesystem path, or die if it isn't within MM_BASE_DIR.
      * @param string $webPath The web path to validate and correct, relative to MM_BASE_DIR.
      * @param bool $mustExist True (default) if the file must exist in the folder (folder must always exist!)
      * @return string The converted path, relative to filesystem root.
      */
     public static function webToUnixPath(string $webPath, bool $mustExist = true): string
     {
-        $realPath = realpath(self::$imageBasePath . '/' . $webPath);
+        $realPath = realpath(self::$imgBaseUnixPath . '/' . $webPath);
         if (false === $realPath) {
             if (true === $mustExist) {
                 Log::adminDebug("Validated path was not found: $webPath");
@@ -126,7 +126,7 @@ class Path
                 die(1);
             }
             $folder = dirname($webPath);
-            $fullFolder = self::$imageBasePath . $folder;
+            $fullFolder = self::$imgBaseUnixPath . $folder;
             $file = basename($webPath);
             $realPath = realpath($fullFolder);
             if (false === $realPath) {
@@ -140,7 +140,7 @@ class Path
             }
             $realPath = "$realPath/$file";
         }
-        if (!str_starts_with($realPath, self::$imageBasePath)) {
+        if (!str_starts_with($realPath, self::$imgBaseUnixPath)) {
             Log::adminDebug("Validated path was not within MM_BASE_DIR: $webPath");
             http_response_code(404); // Not found.
             die(1);
@@ -150,14 +150,14 @@ class Path
     }
 
     /**
-     * Convert a unix path to a web path, or return empty string if it's not within the web folder.
+     * Convert a unix path to a web path, or return empty string if it isn't within the web folder.
      * @param string $unixPath The path to convert to a web path.
-     * @return string The converted path.
+     * @return string The converted path, relative to document root ($imgBaseUnixPath), or empty string.
      */
     public static function unixToWebPath(string $unixPath): string
     {
-        if (str_contains($unixPath, self::$imageBasePath)) {
-            return str_replace(self::$imageBasePath, '', $unixPath);
+        if (str_contains($unixPath, self::$imgBaseUnixPath)) {
+            return str_replace(self::$imgBaseUnixPath, '', $unixPath);
         }
         return '';
     }
