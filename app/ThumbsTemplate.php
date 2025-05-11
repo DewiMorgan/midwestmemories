@@ -150,10 +150,10 @@ namespace MidwestMemories;
             $h_thumbTitle = htmlspecialchars($item);
         } elseif ('..' === $item) {
             $h_thumbTitle = '<strong>..</strong> - up one folder.';
-            $u_thumbUrl = Path::unixPathToUrl('/tn_folder_up.png', Path::LINK_RAW);
+            $u_thumbUrl = Path::unixPathToUrl('./tn_folder_up.png', Path::LINK_RAW);
         } else {
             $h_thumbTitle = htmlspecialchars($item);
-            $u_thumbUrl = Path::unixPathToUrl('/tn_folder.png', Path::LINK_RAW);
+            $u_thumbUrl = Path::unixPathToUrl('./tn_folder.png', Path::LINK_RAW);
         }
         $u_linkUrl = Path::unixPathToUrl($itemPath, Path::LINK_INLINE);
 
