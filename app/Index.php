@@ -75,6 +75,10 @@ class Index
     private static function showPage(): void
     {
         // Inline requires are internal requests, rather than user requests.
+        // blank = user request.
+        // 1 = inline thing (file or folder sub-template).
+        // 2 = raw thing (image). ToDo: sniff this by type?
+        // 3 = search view.
         $isInlineRequest = isset($_REQUEST['i']);
 
         if (!$isInlineRequest) {

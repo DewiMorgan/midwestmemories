@@ -145,17 +145,17 @@ namespace MidwestMemories;
                 continue;
             }
             Log::adminDebug("Creating thumb-link for image: $thumbUnixPath from $itemPath");
-            $u_thumbUrl = Index::MM_BASE_URL . Path::filePathToWeb($thumbUnixPath) . '?i=2';
+            $u_thumbUrl = Path::filePathToUrl($thumbUnixPath, Path::LINK_RAW);
             $fileNum++;
             $h_thumbTitle = htmlspecialchars($item);
         } elseif ('..' === $item) {
             $h_thumbTitle = '<strong>..</strong> - up one folder.';
-            $u_thumbUrl = Index::MM_BASE_URL . '/tn_folder_up.png?i=2';
+            $u_thumbUrl = Path::filePathToUrl('/tn_folder_up.png', Path::LINK_RAW);
         } else {
             $h_thumbTitle = htmlspecialchars($item);
-            $u_thumbUrl = Index::MM_BASE_URL . '/tn_folder.png?i=2';
+            $u_thumbUrl = Path::filePathToUrl('/tn_folder.png', Path::LINK_RAW);
         }
-        $u_linkUrl = Index::MM_BASE_URL . str_replace('%2F', '/', urlencode(Path::filePathToWeb($itemPath))) . '?i=1';
+        $u_linkUrl = Path::filePathToUrl($itemPath, Path::LINK_INLINE);
 
         echo("<div class='thumb'><figure>");
 

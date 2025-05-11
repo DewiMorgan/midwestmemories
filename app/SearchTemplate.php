@@ -44,8 +44,8 @@ namespace MidwestMemories;
             continue;
         }
 
-        $u_linkUrl = Index::MM_BASE_URL . Path::filePathToWeb($itemPath) . '?i=1';
-        $u_thumbUrl = Index::MM_BASE_URL . Path::filePathToWeb($thumbName) . '?i=2';
+        $u_linkUrl = Path::filePathToUrl($itemPath, Path::LINK_INLINE);
+        $u_thumbUrl = Path::filePathToUrl($thumbName, Path::LINK_RAW);
 
         echo("<div class='thumb'><p><strong>1:</strong><a href='$u_linkUrl'></a></p>");
         // ToDo: alt texts.

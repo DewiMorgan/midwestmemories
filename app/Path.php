@@ -11,6 +11,11 @@ class Path
 {
     public const IMAGE_DIR = 'midwestmemories';
 
+    public const LINK_INLINE = '1';
+    public const LINK_RAW = '2';
+    public const LINK_SEARCH = '3';
+    public const LINK_USER = '';
+
     // The full filesystem path to the image folder. We don't allow access to files outside this folder.
     public static string $imageBasePath;
 
@@ -35,7 +40,7 @@ class Path
      * @param string $filePath The filesystem path to convert.
      * @return string The converted path, or a string like 'PATH_ERROR_...' on failure, to avoid exploits.
      */
-    public static function filePathToWeb(string $filePath): string
+    public static function filePathToUrl(string $filePath, $linkType = self::LINK_USER): string
     {
         $realPath = realpath($filePath);
         if (!$realPath) {
@@ -50,6 +55,12 @@ class Path
         if (!$result) {
             Log::adminDebug("Converted path gave an empty string or error: $filePath");
             return 'PATH_ERROR_BAD';
+        }
+
+        // Folder names may need escaping, but the slashes must remain.
+        $result = Index::MM_BASE_URL . str_replace('%2F', '/', urlencode($result));
+        if (self::LINK_USER !== (string)$linkType) {
+            $result .= '?i=' . $linkType;
         }
         Log::debug("$result from $filePath");
         return $result;
