@@ -403,6 +403,7 @@ $u_linkUrl = Index::MM_BASE_URL . ($_REQUEST['path'] ?? '/') . '?i=1';
         selectedItems.forEach(removeSelectedClass);
 
         // Can't just use this.parent, as it might be from a link in a template.
+        const targetUrl = e.currentTarget.href;
         const selectedParent = document.querySelector(`li > a[href="${targetUrl}"]`)?.parentElement;
         if (selectedParent) {
             selectedParent.classList.add('selected'); // Assumes the href is an immediate child of the li.
