@@ -132,12 +132,12 @@ namespace MidwestMemories;
                 continue;
             }
             Log::adminDebug("Creating thumb-link for image: $thumbName from $itemPath");
-            $u_thumbUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($thumbName)) . '&amp;i=2';
+            $u_thumbUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($thumbName)) . '&i=2';
             $fileNum++;
         } else {
-            $u_thumbUrl = Path::$imageBasePath . '/tn_folder.png';
+            $u_thumbUrl = Path::$imageBasePath . '/tn_folder.png&i=2';
         }
-        $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($itemPath)) . '&amp;i=1';
+        $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($itemPath)) . '&i=1';
 
         echo("<div class='thumb'><figure>");
         // ToDo: alt texts and title.
