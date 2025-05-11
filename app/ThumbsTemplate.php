@@ -114,7 +114,7 @@ namespace MidwestMemories;
         $itemPath = Index::$requestUnixPath . '/' . $item;
         if (is_dir($itemPath)) {
             if ('.' === $item || ('..' === $item && (Index::$requestUnixPath === Path::$imgBaseUnixPath))) {
-                Log::debug("Ignoring folder: $itemPath");
+                Log::debug('Ignoring folder', $itemPath);
             } else {
                 $dirs[] = $item;
             }
@@ -123,12 +123,12 @@ namespace MidwestMemories;
                 preg_match('/\/(?:\.|tn_)[^\/]+$/', $itemPath) // In blocklist.
                 || !preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath) // Not in allowlist.
             ) {
-                Log::debug("Ignoring file: $itemPath");
+                Log::debug('Ignoring file', $itemPath);
             } else {
                 $files[] = $item;
             }
         } else {
-            Log::debug("Ignoring unknown FS object: $itemPath");
+            Log::debug('Ignoring unknown FS object', $itemPath);
         }
     }
 
@@ -141,10 +141,10 @@ namespace MidwestMemories;
         if (is_file($itemPath)) {
             $thumbUnixPath = DropboxManager::getThumbName($itemPath);
             if (!is_file($thumbUnixPath)) {
-                Log::debug("No thumb found for image: $thumbUnixPath from $itemPath");
+                Log::debug("No thumb found for image: '$thumbUnixPath' from '$itemPath'");
                 continue;
             }
-            Log::debug("Creating thumb-link for image: $thumbUnixPath from $itemPath");
+            Log::debug("Creating thumb-link for image: '$thumbUnixPath' from '$itemPath'");
             $u_thumbUrl = Path::unixPathToUrl($thumbUnixPath, Path::LINK_RAW);
             $fileNum++;
             $h_thumbTitle = htmlspecialchars($item);

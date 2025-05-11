@@ -38,23 +38,23 @@ class Path
     /**
      * Take a filesystem path of an object on the filesystem, and return an absolute URL.
      * @param string $filePath The filesystem path to convert.
-     * @return string The converted path, or a string like 'PATH_ERROR_...' on failure, to avoid exploits.
+     * @return string The converted path, or a string like 'PATH-ERROR-...' on failure, to avoid exploits.
      */
     public static function unixPathToUrl(string $filePath, $linkType = self::LINK_USER): string
     {
         $realPath = realpath($filePath);
         if (!$realPath) {
-            Log::debug("Converted path was not found: $filePath");
-            return 'PATH_ERROR_404';
+            Log::debug('Converted path was not found', $filePath);
+            return 'PATH-ERROR-404';
         }
         if (!str_starts_with($realPath, self::$imgBaseUnixPath)) {
-            Log::debug("Converted path was not within MM_BASE_DIR: $realPath from $filePath");
-            return 'PATH_ERROR_401';
+            Log::debug("Converted path was not within MM_BASE_DIR: '$realPath' from '$filePath'");
+            return 'PATH-ERROR-401';
         }
         $result = preg_replace('#^' . preg_quote(self::$imgBaseUnixPath, '#') . '/*#', '/', $realPath);
         if (!$result) {
-            Log::debug("Converted path gave an empty string or error: $filePath");
-            return 'PATH_ERROR_BAD';
+            Log::debug('Converted path gave an empty string or error', $filePath);
+            return 'PATH-ERROR-BAD';
         }
 
         // Folder names may need escaping, but the slashes must remain.
@@ -121,7 +121,7 @@ class Path
         $realPath = realpath(self::$imgBaseUnixPath . '/' . $webPath);
         if (false === $realPath) {
             if (true === $mustExist) {
-                Log::debug("Validated path was not found: $webPath");
+                Log::debug('Validated path was not found', $webPath);
                 http_response_code(404); // Not found.
                 die(1);
             }
@@ -131,21 +131,21 @@ class Path
             $realPath = realpath($fullFolder);
             if (false === $realPath) {
                 // DEBUG DELETEME
-                Log::debug("Validating missing $fullFolder via $folder & $file, folder not found: $webPath");
+                Log::debug("Validating missing $fullFolder via $folder & $file, folder not found", $webPath);
                 Log::debug('Backtrace', debug_backtrace());
                 // End DEBUG DELETEME
-                Log::debug("Validated folder was not found: $webPath");
+                Log::debug('Validated folder was not found', $webPath);
                 http_response_code(404); // Not found.
                 die(1);
             }
             $realPath = "$realPath/$file";
         }
         if (!str_starts_with($realPath, self::$imgBaseUnixPath)) {
-            Log::debug("Validated path was not within MM_BASE_DIR: $webPath");
+            Log::debug('Validated path was not within MM_BASE_DIR', $webPath);
             http_response_code(404); // Not found.
             die(1);
         }
-        Log::debug("Validated path: $webPath as $realPath");
+        Log::debug("Validated path: '$webPath' as '$realPath'");
         return $realPath;
     }
 
