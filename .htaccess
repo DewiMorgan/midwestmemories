@@ -16,8 +16,8 @@ RewriteCond %{REQUEST_URI} ^/dropboxwebhook\.php$ [NC]
 RewriteRule ^ - [L]
 
 # Redirect index.php?path=/... to clean /... URL
-RewriteCond %{THE_REQUEST} \s/+index\.php\?path=([^\s&]+) [NC]
-RewriteRule ^index\.php$ /%1? [R=301,L]
+#RewriteCond %{THE_REQUEST} \s/+index\.php\?path=([^\s&]+) [NC]
+#RewriteRule ^index\.php$ /%1? [R=301,L]
 
 # Skip existing files or directories
 RewriteCond %{REQUEST_FILENAME} -f [OR]
