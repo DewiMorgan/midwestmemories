@@ -126,23 +126,29 @@ namespace MidwestMemories;
 
         // Skip files without a matching thumbnail file: they have not been fully processed.
         if (is_file($itemPath)) {
-            $thumbName = DropboxManager::getThumbName($itemPath);
-            if (!is_file($thumbName)) {
-                Log::adminDebug("No thumb found for image: $thumbName from $itemPath");
+            $thumbUnixPath = DropboxManager::getThumbName($itemPath);
+            if (!is_file($thumbUnixPath)) {
+                Log::adminDebug("No thumb found for image: $thumbUnixPath from $itemPath");
                 continue;
             }
-            Log::adminDebug("Creating thumb-link for image: $thumbName from $itemPath");
-            $u_thumbUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($thumbName)) . '&i=2';
+            Log::adminDebug("Creating thumb-link for image: $thumbUnixPath from $itemPath");
+            $u_thumbUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($thumbUnixPath)) . '&i=2';
             $fileNum++;
+            $h_thumbTitle = htmlspecialchars($item);
         } else {
+            if ('..' === $item) {
+                $h_thumbTitle = '.. - up one folder.';
+            } else {
+                $h_thumbTitle = htmlspecialchars($item);
+            }
             $u_thumbUrl = Index::MM_BASE_URL . '/tn_folder.png&i=2';
         }
         $u_linkUrl = Index::MM_BASE_URL . '?path=' . urlencode(Path::filePathToWeb($itemPath)) . '&i=1';
 
         echo("<div class='thumb'><figure>");
         // ToDo: alt texts and title.
-        echo("</figure><a href='$u_linkUrl'><img src='$u_thumbUrl' title='ToDo' alt='ToDo'></a><br>");
-        echo("<p><strong>$fileNum:</strong><a href='$u_linkUrl'>todo something here</a>");
+        echo("<a href='$u_linkUrl'><img src='$u_thumbUrl' title='$h_thumbTitle' alt='$h_thumbTitle></a><br>");
+        echo("<figcaption><p><strong>$fileNum: </strong><a href='$u_linkUrl'>$h_thumbTitle</a></figcaption>");
         echo("</figure></div>");
     }
     ?>
