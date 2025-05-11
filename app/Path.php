@@ -42,6 +42,10 @@ class Path
      */
     public static function unixPathToUrl(string $filePath, $linkType = self::LINK_USER): string
     {
+        if (!str_starts_with($filePath, self::$imgBaseUnixPath)) {
+            Log::debug('Prepending MM_BASE_DIR', $filePath);
+            $filePath = self::$imgBaseUnixPath . $filePath;
+        }
         $realPath = realpath($filePath);
         if (!$realPath) {
             Log::debug('Converted path was not found', $filePath);
