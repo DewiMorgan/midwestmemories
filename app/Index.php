@@ -138,7 +138,7 @@ class Index
 
     /**
      * Looks at the request method and the first element of the path, to generate an endpoint string.
-     * So "GET /messages/test" => "getMessages". Then performs an operation depending on that string.
+     * So "GET v1/messages/test" => "getMessages". Then performs an operation depending on that string.
      * @return string The output of the API call, as JSON.
      */
     private static function execApiCall(): string
@@ -146,10 +146,11 @@ class Index
         Log::debug('Starting...');
         $firstPart = preg_split('#/#', self::$requestWebPath, 2, PREG_SPLIT_NO_EMPTY);
         if (is_array($firstPart)) {
-            $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($firstPart[0]);
-            $param1 = $firstPart[1] ?? null;
+            $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($firstPart[1]);
+            $param1 = $firstPart[2] ?? null;
             $data = match ($endpoint) {
                 'getMessage' => self::execGetMessages(intval($param1)),
+                default => "['error': 'Unknown endpoint {$endpoint}']"
             };
             try {
                 $encoded = json_encode($data, JSON_THROW_ON_ERROR);
