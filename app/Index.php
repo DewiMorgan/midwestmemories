@@ -184,7 +184,7 @@ class Index
         $startItemCapped = max(0, min(1000, $startItem));
         $sql = '
             WITH comment_count AS (
-                SELECT MIN(COUNT(*), 1000) AS `num_pages`
+                SELECT LEAST(COUNT(*), 1000) AS `num_pages`
                 FROM `midmem_comments`
                 WHERE `fk_file` = ? AND NOT `hidden`
             )
