@@ -111,5 +111,98 @@ function cleanFileDetails(array $fileDetails): array
 }
 
 ?>
+<div id="comments"></div>
+<script>
+    async function fetchAllComments(imageId) {
+        const allComments = [];
+        let currentPage = 1;
+        let totalPages = 0; // start assuming only 1 page (page zero) until we know otherwise.
+
+        do {
+            const response = await fetch(`/v1/comment/${imageId}/${currentPage}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch page ${currentPage}: ${response.statusText}`);
+            }
+
+            const comments = await response.json();
+            allComments.push(...comments);
+
+            // Update `num_pages` from latest comment objects, as more pages may be added as we get the first ones.
+            if (0 !== comments.length) {
+                totalPages = comments[0]["num_pages"];
+            }
+
+            currentPage++;
+        } while (currentPage <= totalPages);
+
+        return allComments;
+    }
+
+
+    async function displayComments(imageId) {
+        const oldCommentDiv = document.getElementById('comments');
+        const commentsContainer = clearCommentDiv(oldCommentDiv);
+
+        try {
+            const comments = await fetchAllComments(imageId);
+
+            comments.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment';
+
+                const userElem = document.createElement('strong');
+                userElem.textContent = comment.user;
+
+                const dateElem = document.createElement('span');
+                dateElem["style"].marginLeft = '10px';
+                dateElem.textContent = '(' + comment["date_created"] + ')';
+
+                const bodyElem = document.createElement('pre'); // preserves formatting
+                bodyElem.textContent = comment['body_text'];
+
+                const brElem = document.createElement('br');
+
+                commentDiv.appendChild(userElem);
+                commentDiv.appendChild(dateElem);
+                commentDiv.appendChild(brElem);
+                commentDiv.appendChild(bodyElem);
+
+                commentsContainer.appendChild(commentDiv);
+            });
+        } catch (error) {
+            commentsContainer.textContent = 'Failed to load comments.';
+            console.error('Error displaying comments:', error);
+        }
+    }
+
+    /** Safely clear the div using the DOM, so all event handlers are cleanly killed without memory leaks. */
+    function clearCommentDiv(oldCommentDiv) {
+        // Find the parent element (where the div is located)
+        const parent = document.getElementById('parent-container');
+
+        // Remove the old content div
+        let nextSibling = null;
+        if (oldCommentDiv) {
+            nextSibling = oldCommentDiv.nextSibling;
+            oldCommentDiv.remove(); // Remove the div along with its children and event listeners
+        }
+
+        // Create the new content div, with the same properties as the original.
+        const newCommentDiv = document.createElement('div');
+        newCommentDiv.id = 'comment';
+
+        // Insert the new div at the same position
+        if (nextSibling) {
+            parent.insertBefore(newCommentDiv, nextSibling); // Insert it before the next sibling of the old div.
+        } else {
+            parent.appendChild(newCommentDiv); // If no next sibling (so, the last child), append the new div.
+        }
+        return newCommentDiv;
+    }
+
+    fetchAllComments(<?= 6 ?>);
+
+</script>
+
 </body>
 </html>
