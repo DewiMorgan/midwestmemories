@@ -193,7 +193,7 @@ class Index
                 c.`date_created`, 
                 c.`user`, 
                 c.`body_text`,
-                cc.`numPages`
+                cc.`num_pages`
             FROM `midmem_comments` c
             CROSS JOIN comment_count cc
             WHERE c.`fk_file` = ?
