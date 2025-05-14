@@ -144,7 +144,7 @@ class Index
     private static function execApiCall(): string
     {
         Log::debug('Starting...', self::$requestWebPath);
-        $firstPart = preg_split('#/#', self::$requestWebPath, 2, PREG_SPLIT_NO_EMPTY);
+        $firstPart = preg_split('#/#', self::$requestWebPath, -1, PREG_SPLIT_NO_EMPTY);
         if (is_array($firstPart)) {
             $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($firstPart[1]);
             $param1 = $firstPart[2] ?? null;
