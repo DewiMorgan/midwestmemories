@@ -134,6 +134,7 @@ function cleanFileDetails(array $fileDetails): array
 
             currentPage++;
         } while (currentPage < totalPages);
+        console.log("Returning comments...", allComments);
 
         return allComments;
     }
@@ -169,6 +170,7 @@ function cleanFileDetails(array $fileDetails): array
 
                 commentsContainer.appendChild(commentDiv);
             });
+            console.log("Displayed comments!");
         } catch (error) {
             commentsContainer.textContent = 'Failed to load comments.';
             console.error('Error displaying comments:', error);
@@ -177,6 +179,7 @@ function cleanFileDetails(array $fileDetails): array
 
     /** Safely clear the div using the DOM, so all event handlers are cleanly killed without memory leaks. */
     function clearCommentDiv(oldCommentDiv) {
+        console.log("Clearing old comments!");
         // Find the parent element (where the div is located)
         const parent = document.getElementById('parent-container');
 
@@ -200,6 +203,7 @@ function cleanFileDetails(array $fileDetails): array
         return newCommentDiv;
     }
 
+    console.log("Fetching comments...");
     fetchAllComments(<?= 6 ?>);
 
 </script>
