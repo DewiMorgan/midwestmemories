@@ -176,6 +176,6 @@ class Path
      */
     public static function isApiPath(mixed $requestWebPath): bool
     {
-        return (bool)preg_match('#^v\d+(/\w+)*/?$#', $requestWebPath);
+        return (bool)preg_match('#^/?v\d+(/\w+)*/?$#', $requestWebPath);
     }
 }
