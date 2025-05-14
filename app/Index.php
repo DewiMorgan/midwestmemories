@@ -75,6 +75,7 @@ class Index
      */
     private static function showPage(): void
     {
+        Log::debug('Search "' . self::$requestUnixPath . '"', self::$requestWebPath);
         // Inline requires are internal requests, rather than user requests.
         // blank = user or API request.
         // 1 = inline thing (file or folder sub-template).
@@ -84,8 +85,10 @@ class Index
 
         if (Path::isApiPath(self::$requestWebPath)) {
             // We're outputting an API call.
+            Log::debug('API');
             echo static::execApiCall();
         } elseif (!$isInlineRequest) {
+            Log::debug('User');
             // This is a request by a user, perhaps to a bookmark.
             // Load the tree view, which will then call us back for the inline version of the pointed-at $path resource.
             include(__DIR__ . '/TreeTemplate.php');
@@ -95,13 +98,14 @@ class Index
         } elseif (3 === (int)$_REQUEST['i']) {
             // We're showing an inline search view, by choice.
             include(__DIR__ . '/SearchTemplate.php');
-        } elseif (is_dir(static::$requestUnixPath)) {
+        } elseif (is_dir(self::$requestUnixPath)) {
             // We're showing an inline folder view; a list of thumbnails.
             include(__DIR__ . '/ThumbsTemplate.php');
-        } elseif (is_file(static::$requestUnixPath)) {
+        } elseif (is_file(self::$requestUnixPath)) {
             // We're showing an inline file view.
             include(__DIR__ . '/FileTemplate.php');
         } else {
+            Log::debug('Search');
             // We're showing an inline search view, because we've nothing else to show.
             include(__DIR__ . '/SearchTemplate.php');
         }
@@ -139,6 +143,7 @@ class Index
      */
     private static function execApiCall(): string
     {
+        Log::debug('Starting...');
         $firstPart = preg_split('#/#', self::$requestWebPath, 2, PREG_SPLIT_NO_EMPTY);
         if (is_array($firstPart)) {
             $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($firstPart[0]);
@@ -156,7 +161,7 @@ class Index
             Log::error('Bad API request path', self::$requestWebPath);
             $encoded = "{'error':'Bad API request path'}";
         }
-        Log::debug('Returning', $encoded);
+        Log::debug('...returning', $encoded);
         return $encoded;
     }
 
