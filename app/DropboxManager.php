@@ -17,14 +17,6 @@ class DropboxManager
     /** The current position in a read of the file status. Long-lived, persistent, gets updates. */
     public string $cursor;
 
-    /** How many valid files were found. Used only for reporting. */
-    public int $entries = 0;
-
-    /** How many times we got the file list from the cursor because it responded "has more".
-     * Only used for reporting display.
-     */
-    public int $iterations = 0;
-
     /** Max PNG size in bytes before we resample to JPG. */
     private const MAX_PNG_BYTES = 1024 * 1024;
 
@@ -112,7 +104,7 @@ class DropboxManager
 
     /**
      * Read a chunk of the list of updated files for the given DropBox cursor, and queue it in the MySQL.
-     * @return array of count read from DropBox & written to MySQL, whether there are more to read, and any errors.
+     * @return array of count read from DropBox & written to MySQL, more can be read, and any errors.
      */
     public function readOneCursorUpdate(): array
     {
@@ -192,19 +184,20 @@ class DropboxManager
     }
 
     /**
-     * Get the list of files in a certain sync_status.
+     * Get the list of files in a certain `sync_status`.
      * @return string[] List of file paths.
      */
     public function listFilesByStatus(string $status): array
     {
         return Db::sqlGetList(
-            "SELECT `full_path` FROM `midmem_file_queue` WHERE `sync_status` = '$status' ORDER BY `id`",
-            'full_path'
+            'full_path',
+            'SELECT `full_path` FROM `midmem_file_queue` WHERE `sync_status` = ? ORDER BY `id`',
+            $status
         );
     }
 
     /**
-     * Get the first of a list of files in a certain sync_status.
+     * Get the first of a list of files in a certain `sync_status`.
      * @return string List of file paths.
      */
     public function listFirstFileByStatus(string $status): string
@@ -366,8 +359,8 @@ class DropboxManager
     }
 
     /**
-     * Convert an image filename to a thumbnail filename, eg 'foo/bar.png' => 'foo/tn_bar.jpg'.
-     * Note: Files that begin with a dot and have no extension, e.g. '.example', will get thumbs called 'tn_.jpg'.
+     * Convert an image filename to a thumbnail filename, like 'foo/bar.png' => 'foo/tn_bar.jpg'.
+     * Note: Files that begin with a dot and have no extension, like '.example', will get thumbs called 'tn_.jpg'.
      * @param string $imagePath Path and filename of the source image.
      * @return string The resulting filename.
      */

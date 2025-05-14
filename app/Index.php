@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use JsonException;
+
 /**
  * The class for the main index.php file.
  */
@@ -14,17 +16,18 @@ class Index
 
     // Full user-requested path relative to hdd /. If set, exists in Path::$imageBasePath. No trailing slash on folders.
     public static string $requestUnixPath;
+    public static string $requestWebPath;
 
     public function __construct()
     {
-        static::handleLogouts();
+        self::handleLogouts();
         Path::validateBaseDir();
-        static::initSession();
+        self::initSession();
 
-        $requestWebPath = $_REQUEST['path'] ?? '/';
-        self::$requestUnixPath = Path::webToUnixPath($requestWebPath); // Dies if not correct.
+        self::$requestWebPath = $_REQUEST['path'] ?? '/';
+        self::$requestUnixPath = Path::webToUnixPath(self::$requestWebPath); // Dies if not correct.
 
-        static::showPage();
+        self::showPage();
     }
 
     /**
@@ -48,8 +51,6 @@ class Index
      */
     private static function initSession(): void
     {
-        global $connection;
-
         $_SESSION['login'] = 'true';
         $_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
 
@@ -75,11 +76,13 @@ class Index
     private static function showPage(): void
     {
         // Inline requires are internal requests, rather than user requests.
-        // blank = user request.
+        // blank = user or API request.
         // 1 = inline thing (file or folder sub-template).
         // 2 = raw thing (image). ToDo: sniff this by type?
         // 3 = search view.
         $isInlineRequest = isset($_REQUEST['i']);
+        // API calls look like https://www.example.com/v1/comments/1
+        $isApiRequest = preg_match('#^v\d+(/\w+)*/?$#', self::$requestWebPath);
 
         if (!$isInlineRequest) {
             // This is a request by a user, perhaps to a bookmark.
@@ -91,6 +94,9 @@ class Index
         } elseif (3 === (int)$_REQUEST['i']) {
             // We're showing an inline search view, by choice.
             include(__DIR__ . '/SearchTemplate.php');
+        } elseif (4 === (int)$_REQUEST['i']) {
+            // We're outputting an API call.
+            echo static::execApiCall();
         } elseif (is_dir(static::$requestUnixPath)) {
             // We're showing an inline folder view; a list of thumbnails.
             include(__DIR__ . '/ThumbsTemplate.php');
@@ -114,7 +120,7 @@ class Index
     }
 
     /**
-     * Purely to troll my wife, it generates a random name for the site each time it's called.
+     * Purely to troll my wife, it generates a random name for the site each time it is called.
      * @return string
      */
     public static function getSiteName(): string
@@ -126,5 +132,46 @@ class Index
             ]
         );
         return 'Midwest ' . $a;
+    }
+
+    /**
+     * Looks at the request method and the first element of the path, to generate an endpoint string.
+     * So "GET /messages/test" => "getMessages". Then performs an operation depending on that string.
+     * @return string The output of the API call, as JSON.
+     */
+    private static function execApiCall(): string
+    {
+        $firstPart = preg_split('#/#', self::$requestWebPath, 2, PREG_SPLIT_NO_EMPTY);
+        if (is_array($firstPart)) {
+            $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($firstPart[0]);
+            $param1 = $firstPart[1] ?? null;
+            $data = match ($endpoint) {
+                'getMessage' => self::execGetMessages(intval($param1)),
+            };
+            try {
+                $encoded = json_encode($data, JSON_THROW_ON_ERROR);
+            } catch (JsonException) {
+                $encoded = "{'error':'Failed to encode data'}";
+            }
+        } else {
+            Log::error('Bad API request path', self::$requestWebPath);
+            $encoded = "{'error':'Bad API request path'}";
+        }
+        return $encoded;
+    }
+
+    /**
+     * @param int $fileId The `id` field of the file that we want comments for.
+     * @return array Comments as a list of [sequence, date_created, user, body_text].
+     */
+    private static function execGetMessages(int $fileId): array
+    {
+        $sql = '
+            SELECT sequence, date_created, user, body_text FROM midmem_comments c
+            WHERE c.fk_file = ?
+            AND hidden != true
+            ORDER BY c.sequence
+         ';
+        return Db::sqlGetTable($sql, $fileId);
     }
 }

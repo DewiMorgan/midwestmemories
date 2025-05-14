@@ -120,7 +120,6 @@ Templates have headers... unsure how it works when JS includes them inline. Styl
 
 ## ToDo:
 
-* Clicking folders doesn't change the folders on the leftbar.
 * Display images in a folder with next/previous.
 * PHP 8 features: readonly properties and promoted properties.
 * Display info texts with folders.
@@ -138,8 +137,6 @@ See also ToDo, above.
 
 Current task:
 
-* Going to URLs doesn't load the folder, just shows "Hello, world!"
-
 * Get it commentable.
 * Get it usable on a phone.
 * Search template?
@@ -152,10 +149,15 @@ Current task:
     * Folder Descriptions from Dropbox\midwestmemories\Auora\Horst and Karin slide tray sections.txt.
         * The descriptions are short enough, it feels like it'd maybe be worth also showing them on the page for each
           file, as context of what's going on in the pic.
+    * At certain widths in the folder "section 1", one image goes to a second line, giving row lengths of 7, 7, 1, 7, 3.
 
 * TreeTemplate
     * Left navbar should be overflow:scroll.
     * Bug: fail to resize right-bar: drag bar left, then ctrl+m-wheel down.
+    * Feature? Clicking folder thumbs doesn't open *parent* folders if the current was collapsed.
+    * Add some visual hint to the drag-bar to show it can be dragged. Like a vertically-centered "⋮" or something.
+    * Using "fold/folder" is confusing, replace with collapse/collapser.
+    * Can we get rid of the `i` param and replace it with leading /img, /api, /tpl, /search, etc.?
 
 * Metadata class
     * Add hasNext and hasPrev properties to enable next/prev buttons in FileTemplate.

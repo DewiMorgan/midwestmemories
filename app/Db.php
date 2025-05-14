@@ -6,6 +6,7 @@ namespace MidwestMemories;
 
 use mysqli;
 use Exception;
+use mysqli_result;
 
 /**
  * Database connection singleton class.
@@ -13,6 +14,10 @@ use Exception;
  */
 class Db
 {
+    private const TYPE_EXEC = 0; // `TYPE_EXEC` returns [1] on success.
+    private const TYPE_RESULT = 1; // `TYPE_RESULT` returns a result that must be freed.
+    private const TYPE_ROW = 2; // `TYPE_ROW` is an associative array for the row.
+
     private mysqli $db;
 
     private static ?Db $instance = null;
@@ -49,19 +54,13 @@ class Db
     /**
      * Execute a SQL statement.
      * @param string $sql The query to execute.
-     * @param int|string ...$items type-string, then variables, eg 'sd', 'foo', 1.
+     * @param int|string ...$items type-string, then variables, like 'sd', 'foo', 1.
      * @return bool True on success, else false.
      */
     public static function sqlExec(string $sql, int|string ...$items): bool
     {
-        Log::debug('sqlExec', [$sql, $items]);
-        $db = self::getInstance()->db;
-        $query = $db->prepare($sql);
-
-        if ($query && (empty($items) || $query->bind_param(...$items))) {
-            return $query->execute();
-        }
-        return false;
+        Log::debug('Exec...', [$sql, $items]);
+        return (bool)self::getQueryResult(self::TYPE_EXEC, $sql, ...$items);
     }
 
     /**
@@ -69,40 +68,19 @@ class Db
      * @param string $sql Query with values replaced by '?'.
      * @param string $field Field name to extract and return from the result.
      * @param int|string ...$items A string describing the types of all following values, then the values.
-     * @return null|string
+     * @return null|string The retrieved value, or null on error.
      */
     public static function sqlGetItem(string $sql, string $field, int|string ...$items): ?string
     {
-        Log::debug('sqlGetItem', [$sql, $items]);
-        $db = self::getInstance()->db;
-        if (!($query = $db->prepare($sql))) {
-            Log::debug('prepare failed, db error', $db->error);
+        Log::debug('Start...', [$sql, $items]);
+        if (!($row = self::getQueryResult(self::TYPE_ROW, $sql, ...$items))) {
             return null;
         }
-        if (!empty($items) && !$query->bind_param(...$items)) {
-            Log::debug('bind_param failed, db error', $db->error);
-            Log::debug('bind_param failed, sql error', $query->error);
+        if (!array_key_exists($field, $row)) {
+            Log::warn("get item failed, field '$field' not found in row", $row);
             return null;
         }
-        if (!$query->execute()) {
-            Log::debug('execute failed, db error', $db->error);
-            Log::debug('execute failed, sql error', $query->error);
-            return null;
-        }
-        if (!($result = $query->get_result())) {
-            Log::debug('get_result failed, db error', $db->error);
-            Log::debug('get_result failed, sql error', $query->error);
-            return null;
-        }
-        if (!($row = $result->fetch_assoc())) {
-            Log::debug('fetch_assoc failed, db error', $db->error);
-            Log::debug('fetch_assoc failed, sql error', $query->error);
-            $result->free();
-            return null;
-        }
-
-        $result->free();
-        Log::debug('sqlGetItem success: ' . $row[$field] . ' is $field of', $row);
+        Log::debug("...success: '$row[$field]' is in", $row);
         return $row[$field];
     }
 
@@ -110,80 +88,102 @@ class Db
      * Return the first row from the results, or an empty array.
      * @param string $sql Query with values replaced by '?'.
      * @param int|string ...$items A string describing the types of all following values, then the values.
-     * @return array
+     * @return array The retrieved associative array of field to value, or empty array on error.
      * @noinspection PhpUnused
      */
     public static function sqlGetRow(string $sql, int|string ...$items): array
     {
-        Log::debug('sqlGetRow', [$sql, $items]);
-        $db = self::getInstance()->db;
-        if (!($query = $db->prepare($sql))) {
-            Log::debug('prepare failed, db error', $db->error);
+        Log::debug('Start...', [$sql, $items]);
+        if (!($row = self::getQueryResult(self::TYPE_ROW, $sql, ...$items))) {
             return [];
         }
-        if (!empty($items) && !$query->bind_param(...$items)) {
-            Log::debug('bind_param failed, db error', $db->error);
-            Log::debug('bind_param failed, sql error', $query->error);
-            return [];
-        }
-        if (!$query->execute()) {
-            Log::debug('execute failed, db error', $db->error);
-            Log::debug('execute failed, sql error', $query->error);
-            return [];
-        }
-        if (!($result = $query->get_result())) {
-            Log::debug('get_result failed, db error', $db->error);
-            Log::debug('get_result failed, sql error', $query->error);
-            return [];
-        }
-
-        $row = $result->fetch_assoc();
-        $result->free();
-        Log::debug('sqlGetRow success', $row);
+        Log::debug('...success', $row);
         return $row;
     }
 
     /**
      * Return the all the results as a 2d array, or an empty array.
      * @param string $sql Query with values replaced by '?'.
-     * @return array
+     * @param int|string ...$items A string describing the types of all following values, then the values.
+     * @return array The retrieved list of associative arrays of field to value, or empty array on error.
      */
-    public static function sqlGetTable(string $sql): array
+    public static function sqlGetTable(string $sql, int|string ...$items): array
     {
-        Log::debug('sqlGetTable', $sql);
-        $db = self::getInstance()->db;
-        if ($result = $db->query($sql)) {
-            $table = [];
-            while ($row = $result->fetch_assoc()) {
-                $table [] = $row;
-            }
-            $result->free();
-            return $table;
+        Log::debug('Start...', [$sql, $items]);
+        if (!($result = self::getQueryResult(self::TYPE_RESULT, $sql, ...$items))) {
+            return [];
         }
-        Log::debug('query failed, db error', $db->error);
-        return [];
+        $table = [];
+        while ($row = $result->fetch_assoc()) {
+            $table [] = $row;
+        }
+        $result->free();
+        return $table;
     }
 
     /**
      * Return one column of results as a 1d array, or an empty array.
-     * @param string $sql Query with values replaced by '?'.
      * @param string $fieldName The field to populate the list from.
+     * @param string $sql Query with values replaced by '?'.
      * @return array A list of all values returned for that field, or empty.
      */
-    public static function sqlGetList(string $sql, string $fieldName): array
+    public static function sqlGetList(string $fieldName, string $sql, int|string ...$items): array
     {
-        Log::debug('sqlGetTable', $sql);
-        $db = self::getInstance()->db;
-        if ($result = $db->query($sql)) {
-            $list = [];
-            while ($row = $result->fetch_assoc()) {
-                $list [] = $row[$fieldName];
-            }
-            $result->free();
-            return $list;
+        Log::debug('Start...', [$sql, $items]);
+        if (!($result = self::getQueryResult(self::TYPE_RESULT, $sql, ...$items))) {
+            return [];
         }
-        Log::debug('query failed, db error', $db->error);
-        return [];
+        $list = [];
+        while ($row = $result->fetch_assoc()) {
+            $list [] = $row[$fieldName];
+        }
+        $result->free();
+        return $list;
+    }
+
+    /**
+     * Perform a safe query. Helper used by other functions.
+     * @param int $queryType - one of the `TYPE_` constants.
+     * @param string $sql - SQL query, with unknowns as '?'s.
+     * @param int|string ...$items - The items to replace the unknowns from the SQL query.
+     * @return mysqli_result|array Empty array on error.
+     */
+    private static function getQueryResult(int $queryType, string $sql, int|string ...$items): mysqli_result|array
+    {
+        $db = self::getInstance()->db;
+        if (!($query = $db->prepare($sql))) {
+            Log::warn('prepare failed, db error', $db->error);
+            return [];
+        }
+        if (!empty($items) && !$query->bind_param(...$items)) {
+            Log::warn('bind_param failed, db error', $db->error);
+            Log::warn('bind_param failed, sql error', $query->error);
+            return [];
+        }
+        if (!$query->execute()) {
+            Log::warn('execute failed, db error', $db->error);
+            Log::warn('execute failed, sql error', $query->error);
+            return [];
+        }
+        if (self::TYPE_EXEC == $queryType) {
+            return [1];
+        }
+        if (!($result = $query->get_result())) {
+            Log::warn('get_result failed, db error', $db->error);
+            Log::warn('get_result failed, sql error', $query->error);
+            return [];
+        }
+        if (self::TYPE_RESULT == $queryType) {
+            return $result;
+        }
+        $result->free();
+        if (!($row = $result->fetch_assoc())) {
+            Log::warn('fetch_assoc failed, db error', $db->error);
+            Log::warn('fetch_assoc failed, sql error', $query->error);
+            $result->free();
+            return [];
+        }
+        return $row;
     }
 
     /**

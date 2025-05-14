@@ -29,10 +29,12 @@ which might not be when they were actually implemented/committed.
 * DONE: Get rid of Log::adminDebug() method. Replace w Log::debug() throughout.
 * FIXED: Thumb images no longer show, instead showing as src="PATH ERROR 404"
 * DONE: "PATH_ERROR_404" appears as "PATH ERROR 404" in links, complicating debugging. Rename to "PATH-ERROR-404"
+* FIXED: Going to URLs doesn't load the folder, just shows "Hello, world!"
+* FIXED: Clicking folders doesn't change the folders on the left-bar.
 
 ## 2025/05/05 Mon
 
-* DONE: Add correct headers for images so they can be opened in new tab.
+* DONE: Add correct headers for images, so they can be opened in a new tab.
 * DONE: Delete the old code for thumbs and downloads.
 * DONE: Debug the dynamic downloading and thumbnail generation.
 * DONE: Get it not to bother thumbing the -ICE.jpg filtered versions (manually delete the thumbnails for now).
@@ -41,7 +43,7 @@ which might not be when they were actually implemented/committed.
 
 ## 2025/05/04 Sun
 
-* DONE: Universal dates in CHANGELOG.md
+* DONE: Universal dates in `CHANGELOG.md`
 * DONE: Thumbnails are slow, and UI is unresponsive during it.
 * DONE: Replace with a responsive clientside way of doing it, adding two endpoints:
 * DONE: "get list of files needing thumbs" endpoint;
@@ -65,7 +67,7 @@ which might not be when they were actually implemented/committed.
 * FIXED: When you select a file, it collapses the current folder.
 * FIXED: Stop the thumbnails from listing in TreeTemplate.
 * FIXED: Stop the forbidden files like index.txt and index.txt.bak from listing in TreeTemplate.
-* DONE: Expand to, and select, currently passed $path.
+* DONE: Expand to, and select, the current passed $path.
 * DONE: Inline file view
 * FIXED: We also need to UN-bold selected items, and bold NEW ones, as they are clicked.
 * FIXED: Back button doesn't work.
@@ -87,45 +89,45 @@ which might not be when they were actually implemented/committed.
 
 * FIXED: Get FileTemplate to populate fully with readonly text from Metadata.
     * FIXED: Convert the dump to real output fields.
-* FIXED: Add image alt text (the name? Description?).
+* FIXED: Add an image alt text (the name? Description?).
 * https://midwestmemories.dewimorgan.com/?path=%2FDewi doesn't show the subfolder "2". (edit: fixed? Works for me!)
 
 ## Before
 
 * FIXED: Change FileTemplate page title from "Folder Navigation".
-* FIXED: ThumbsTemplate wasn't ignoring the right files.
+* FIXED: ThumbsTemplate was not ignoring the right files.
 * FIXED - https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill out the right hand side ("hello world").
     * Just had to populate the ONLOAD call.
 * FIXED: Index: Clicking links seems broken, they don't open inline.
     * Reproduction steps:
         * Go to the index (https://midwestmemories.dewimorgan.com/).
         * Click "Dewi". It should open in the pane to the right, but opens in full page.
-        * This is handled serverside by index.php:showPage(), and clientside by TreeTemplate.php:openLinkInline(url)
+        * This is handled serverside by `index.php:showPage()`, and clientside by TreeTemplate.php:openLinkInline(url)
         * This typically breaks when there's a 500 error somewhere.
 * FIXED: Bug: ini params with spaces are not read in correctly.
 * FIXED: PHP: Parse Metadata FROM ini file.
 * FIXED: Convert existing DBs to InnoDB, locally and remotely.
-* FIXED: DB: Add index to midmem_file_queue.full_path.
+* FIXED: DB: Add an index to midmem_file_queue.full_path.
 * FIXED: DB: Create rest of schema.
 * FIXED: The admin page may be broken.
 * FIXED: Log class is not logging.
-* FIXED: back button doesn't populate page correctly (doesn't parse path=...).
+* FIXED: back button doesn't populate the page correctly (doesn't parse path=...).
 * FIXED: Need to change expand/collapse to be a style/class thing, so we can set the style when building the list.
 * FIXED: Reloading page doesn't repopulate correctly.
 * FIXED: "Span is null" error when clicking "Home". Probably any empty/root folder.
 * FIXED: CSS-based folding is not working.
 * FIXED: Get rid of (ideally, FIX) all code warnings. They just slow me down.
-* FIXED: TreeTemplate: Expand to, and select, currently passed $path.
+* FIXED: TreeTemplate: Expand to, and select, the current passed $path.
 * FIXED: isOnTargetPath() - write this, though I've likely already got a similar class.
 * FIXED: Migrate the path manipulation methods from Index to their own class.
 * FIXED: Need a link to home at the top of tree-view template.
 * FIXED: ThumbsTemplate: Folders first.
 * FIXED: ThumbsTemplate: break HTML lines for file list.
-* FIXED: back button doesn't populate page correctly (unnecessary i=1).
+* FIXED: back button doesn't populate the page correctly (unnecessary i=1).
 * FIXED: Update browser history when navigating.
 * FIXED: Db::mkRefArray(): There's apparently a `...` operator that makes this kludge redundant: see man page.
 * FIXED: The ThumbTemplate doesn't fill out - maybe no suitable files with thumbs?
-* FIXED: Argument #5 ($port) must be of type ?int, string given in .../public_html/midwestmemories/app/Db.php:41
+* FIXED: Fifth argument ($port) must be of type ?int, string given in `.../public_html/midwestmemories/app/Db.php:41`.
 * FIXED: index.php double-loads the tree template.
 * FIXED: Content div has it as a class but not an ID.
 * FIXED: OpenLinkInline doesn't seem to do so. I had the wrong classnames.
@@ -134,7 +136,7 @@ which might not be when they were actually implemented/committed.
 * FIXED: Unify pre-existing logging (as in Db class) to use Log class.
 * FIXED: Refactor dropbox webhook to a class, and move the class into the app/ folder.
 * FIXED: Create a simple static logger class. Log::error($str), etc.
-* FIXED: Create a simple static config class. Conf::get(Conf::LOG_LEVEL), etc.
+* FIXED: Create a simple static config class. `Conf::get(Conf::LOG_LEVEL)`, etc.
 * FIXED: DropboxManager has some very poor naming. `dbm.iterations` and `dbm.extracted` need renaming.
-* FIXED: Main page doesn't load.
+* FIXED: The main page doesn't load.
 * FIXED: Remove logging from autoloader.

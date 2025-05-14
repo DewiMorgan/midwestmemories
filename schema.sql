@@ -115,3 +115,20 @@ CREATE TABLE `midmem_keyword_files`
 ) ENGINE = InnoDB
   COLLATE = utf8mb4_unicode_ci
     COMMENT 'A mapping of keywords to files.';
+
+CREATE TABLE `midmem_comments`
+(
+    `id`           int(11)      NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `fk_file`      int(11)      NOT NULL COMMENT 'fk to midmem_file_queue',
+    `hidden`       tinyint(1)   NOT NULL DEFAULT 0 COMMENT 'True if the comment is hidden by admin action, editing...',
+    `sequence`     int(11)      NOT NULL DEFAULT 1 COMMENT 'Their order within the file comments. For edits etc.',
+    `date_created` datetime     NOT NULL DEFAULT current_timestamp(),
+    `user`         varchar(255) NOT NULL COMMENT 'Who wrote it - should be fk int.',
+    `body_text`    text         NOT NULL COMMENT 'The content of their comment',
+    FOREIGN KEY (`fk_file`) REFERENCES midmem_file_queue (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    UNIQUE KEY `file_id_index` (`fk_file`),
+    UNIQUE KEY `user_index` (`user`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+    COMMENT 'Comments left by visitors';

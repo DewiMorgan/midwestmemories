@@ -13,7 +13,6 @@ class Admin
 {
 
     private static string $cursor;
-    private static int $entriesSoFar = 0;
 
     public function __construct()
     {
@@ -101,7 +100,6 @@ class Admin
     {
         // Parse all the params we can look for in the request.
         $cursor = $_REQUEST['cursor'] ?? '';
-        static::$entriesSoFar = (int)($_REQUEST['entries_so_far'] ?? 0);
         $formAction = $_REQUEST['action'] ?? null;
 
         $fp = new DropboxManager();
@@ -149,7 +147,7 @@ class Admin
 
         echo '<p>Finished reading.</p>';
         if (empty($fp->cursor)) {
-            echo 'Cursor was not set in client.<br>';
+            echo 'Cursor was not set in the client.<br>';
             static::$cursor = '';
         } elseif (static::$cursor === $fp->cursor) {
             echo 'Cursor unchanged.<br>';
@@ -165,11 +163,10 @@ class Admin
      */
     private static function showHeader(): void
     {
-        global $connection;
-        if ($connection->pageStarted) {
+        if (Connection::$pageStarted) {
             return;
         }
-        $connection->pageStarted = true;
+        Connection::$pageStarted = true;
         ?>
         <!DOCTYPE html>
         <html lang="en">

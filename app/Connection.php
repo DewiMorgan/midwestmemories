@@ -16,7 +16,7 @@ namespace MidwestMemories;
  */
 class Connection
 {
-    public bool $pageStarted = false;
+    public static bool $pageStarted = false;
 
     /**
      * @param string $request -- URL requested, via $_SERVER['REQUEST_URI']
@@ -48,7 +48,7 @@ class Connection
         // $date.
         $this->date = gmdate('c');
 
-        // $ip (set by fn) and $ipList.
+        // $ip (set by the fn) and $ipList.
         $ipData = $this->getIpData();
         $this->ipList = implode(',', $ipData);
 
@@ -59,7 +59,7 @@ class Connection
         if (!empty($_SERVER['HTTP_COOKIE'])) {
             $this->agent .= 'cookie:' . $_SERVER['HTTP_COOKIE'] . ', ';
         }
-        // Grab regional client/proxy values like HTTP_ACCEPT_LANGUAGE, etc
+        // Grab regional client/proxy values like HTTP_ACCEPT_LANGUAGE, etc.
         foreach ($_SERVER as $serverKey => $value) {
             if (preg_match('/country|language|region/', $serverKey)) {
                 $this->agent .= "$serverKey:$value, ";
