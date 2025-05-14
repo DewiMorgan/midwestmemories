@@ -149,8 +149,9 @@ class Index
             $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($firstPart[1]);
             $param1 = $firstPart[2] ?? null;
             $param2 = $firstPart[3] ?? null;
+            $param3 = $firstPart[4] ?? null;
             $data = match ($endpoint) {
-                'getComment' => self::execGetComments(intval($param1), intval($param2)),
+                'getComment' => self::execGetComments(intval($param1), intval($param2), intval($param3)),
                 default => ['error' => "Unknown endpoint {$endpoint}"]
             };
             try {
@@ -169,13 +170,14 @@ class Index
 
     /**
      * @param int $fileId The `id` field of the file that we want comments for.
-     * @param int $pageOffset Which page of $pageSize results to return.
+     * @param int $pageNumber Which page of $pageSize results to return. Capped between 1 and 1000.
      * @param int $pageSize Max quantity of records to return. Capped between 1 and 100.
      * @return array Comments as a list of [sequence, date_created, user, body_text].
      */
-    private static function execGetComments(int $fileId, int $pageOffset, int $pageSize=10): array
+    private static function execGetComments(int $fileId, int $pageSize, int $pageNumber): array
     {
         $pageSizeCapped = max(1, min(100, $pageSize));
+        $pageNumberCapped = max(1, min(1000, $pageNumber));
         $sql = '
             WITH comment_count AS (
                 SELECT COUNT(*) AS `numPages`
@@ -195,6 +197,6 @@ class Index
             ORDER BY c.`sequence`
             LIMIT ? OFFSET ?
         ';
-        return Db::sqlGetTable($sql, 'ssss', $fileId, $fileId, $pageSizeCapped, $pageOffset);
+        return Db::sqlGetTable($sql, 'ssss', $fileId, $fileId, $pageSizeCapped, $pageNumberCapped);
     }
 }
