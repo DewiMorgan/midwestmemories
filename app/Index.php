@@ -81,10 +81,11 @@ class Index
         // 2 = raw thing (image). ToDo: sniff this by type?
         // 3 = search view.
         $isInlineRequest = isset($_REQUEST['i']);
-        // API calls look like https://www.example.com/v1/comments/1
-        $isApiRequest = Path::isApiPath(self::$requestWebPath);
 
-        if (!$isInlineRequest) {
+        if (Path::isApiPath(self::$requestWebPath)) {
+            // We're outputting an API call.
+            echo static::execApiCall();
+        } elseif (!$isInlineRequest) {
             // This is a request by a user, perhaps to a bookmark.
             // Load the tree view, which will then call us back for the inline version of the pointed-at $path resource.
             include(__DIR__ . '/TreeTemplate.php');
@@ -94,9 +95,6 @@ class Index
         } elseif (3 === (int)$_REQUEST['i']) {
             // We're showing an inline search view, by choice.
             include(__DIR__ . '/SearchTemplate.php');
-        } elseif (4 === (int)$_REQUEST['i']) {
-            // We're outputting an API call.
-            echo static::execApiCall();
         } elseif (is_dir(static::$requestUnixPath)) {
             // We're showing an inline folder view; a list of thumbnails.
             include(__DIR__ . '/ThumbsTemplate.php');
