@@ -184,7 +184,7 @@ class Index
         $startItemCapped = max(0, min(1000, $startItem));
         $sql = '
             WITH comment_count AS (
-                SELECT LEAST(COUNT(*), 1000) AS `num_pages`
+                SELECT LEAST(CEIL(COUNT(*)/?), 1000) AS `num_pages`
                 FROM `midmem_comments`
                 WHERE `fk_file` = ? AND NOT `hidden`
             )
@@ -201,6 +201,6 @@ class Index
             ORDER BY c.`sequence`
             LIMIT ? OFFSET ?
         ';
-        return Db::sqlGetTable($sql, 'ssss', $fileId, $fileId, $pageSizeCapped, $startItemCapped);
+        return Db::sqlGetTable($sql, 'sssss', $pageSizeCapped, $fileId, $fileId, $pageSizeCapped, $startItemCapped);
     }
 }
