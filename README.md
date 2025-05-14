@@ -138,6 +138,14 @@ See also ToDo, above.
 Current task:
 
 * Get it commentable.
+    * Javascript to list comments.
+    * API to add comments.
+    * Javascript to add comments.
+    * API to edit comments.
+    * Javascript to edit comments.
+    * API to hide comments.
+    * Admin Javascript to edit comments.
+
 * Get it usable on a phone.
 * Search template?
 
