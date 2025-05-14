@@ -122,6 +122,10 @@ class Path
      */
     public static function webToUnixPath(string $webPath, bool $mustExist = true): string
     {
+        if (self::isApiPath($webPath)) {
+            return 'NO UNIX PATH FOR API CALLS';
+        }
+
         $realPath = realpath(self::$imgBaseUnixPath . '/' . $webPath);
         if (false === $realPath) {
             if (true === $mustExist) {
@@ -164,5 +168,14 @@ class Path
             return str_replace(self::$imgBaseUnixPath, '', $unixPath);
         }
         return '';
+    }
+
+    /**
+     * @param mixed $requestWebPath A path that either begins like v1/comments (an API path), or does not.
+     * @return bool Whether it matched.
+     */
+    public static function isApiPath(mixed $requestWebPath): bool
+    {
+        return (bool)preg_match('#^v\d+(/\w+)*/?$#', $requestWebPath);
     }
 }

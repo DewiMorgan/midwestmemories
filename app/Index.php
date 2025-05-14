@@ -82,7 +82,7 @@ class Index
         // 3 = search view.
         $isInlineRequest = isset($_REQUEST['i']);
         // API calls look like https://www.example.com/v1/comments/1
-        $isApiRequest = preg_match('#^v\d+(/\w+)*/?$#', self::$requestWebPath);
+        $isApiRequest = Path::isApiPath(self::$requestWebPath);
 
         if (!$isInlineRequest) {
             // This is a request by a user, perhaps to a bookmark.
