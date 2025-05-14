@@ -178,6 +178,6 @@ class Index
             AND hidden != true
             ORDER BY c.sequence
          ';
-        return Db::sqlGetTable($sql, $fileId);
+        return Db::sqlGetTable($sql, 's', $fileId);
     }
 }
