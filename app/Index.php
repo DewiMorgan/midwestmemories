@@ -149,12 +149,14 @@ class Index
             try {
                 $encoded = json_encode($data, JSON_THROW_ON_ERROR);
             } catch (JsonException) {
+                Log::error('Failed to encode data', self::$requestWebPath);
                 $encoded = "{'error':'Failed to encode data'}";
             }
         } else {
             Log::error('Bad API request path', self::$requestWebPath);
             $encoded = "{'error':'Bad API request path'}";
         }
+        Log::debug('Returning', $encoded);
         return $encoded;
     }
 
