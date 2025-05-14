@@ -148,8 +148,9 @@ class Index
         if (is_array($firstPart)) {
             $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($firstPart[1]);
             $param1 = $firstPart[2] ?? null;
+            $param2 = $firstPart[3] ?? null;
             $data = match ($endpoint) {
-                'getComment' => self::execGetComments(intval($param1)),
+                'getComment' => self::execGetComments(intval($param1), intval($param2)),
                 default => ['error' => "Unknown endpoint {$endpoint}"]
             };
             try {
@@ -168,16 +169,32 @@ class Index
 
     /**
      * @param int $fileId The `id` field of the file that we want comments for.
+     * @param int $pageOffset Which page of $pageSize results to return.
+     * @param int $pageSize Max quantity of records to return. Capped between 1 and 100.
      * @return array Comments as a list of [sequence, date_created, user, body_text].
      */
-    private static function execGetComments(int $fileId): array
+    private static function execGetComments(int $fileId, int $pageOffset, int $pageSize=10): array
     {
+        $pageSizeCapped = max(1, min(100, $pageSize));
         $sql = '
-            SELECT sequence, date_created, user, body_text FROM midmem_comments c
-            WHERE c.fk_file = ?
-            AND hidden != true
-            ORDER BY c.sequence
-         ';
-        return Db::sqlGetTable($sql, 's', $fileId);
+            WITH comment_count AS (
+                SELECT COUNT(*) AS `numPages`
+                FROM `midmem_comments`
+                WHERE `fk_file` = ? AND NOT `hidden`
+            )
+            SELECT 
+                c.`sequence`, 
+                c.`date_created`, 
+                c.`user`, 
+                c.`body_text`,
+                cc.`numPages`
+            FROM `midmem_comments` c
+            CROSS JOIN comment_count cc
+            WHERE c.`fk_file` = ?
+            AND NOT c.`hidden`
+            ORDER BY c.`sequence`
+            LIMIT ? OFFSET ?
+        ';
+        return Db::sqlGetTable($sql, 'ssss', $fileId, $fileId, $pageSizeCapped, $pageOffset);
     }
 }
