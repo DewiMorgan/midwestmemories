@@ -170,14 +170,14 @@ class Index
 
     /**
      * @param int $fileId The `id` field of the file that we want comments for.
-     * @param int $pageNumber Which page of $pageSize results to return. Capped between 1 and 1000.
      * @param int $pageSize Max quantity of records to return. Capped between 1 and 100.
+     * @param int $startItem Which item in the list to start at, starting at 0. Capped between 0 and 1000.
      * @return array Comments as a list of [sequence, date_created, user, body_text].
      */
-    private static function execGetComments(int $fileId, int $pageSize, int $pageNumber): array
+    private static function execGetComments(int $fileId, int $pageSize, int $startItem): array
     {
         $pageSizeCapped = max(1, min(100, $pageSize));
-        $pageNumberCapped = max(1, min(1000, $pageNumber));
+        $startItemCapped = max(0, min(1000, $startItem));
         $sql = '
             WITH comment_count AS (
                 SELECT COUNT(*) AS `numPages`
@@ -197,6 +197,6 @@ class Index
             ORDER BY c.`sequence`
             LIMIT ? OFFSET ?
         ';
-        return Db::sqlGetTable($sql, 'ssss', $fileId, $fileId, $pageSizeCapped, $pageNumberCapped);
+        return Db::sqlGetTable($sql, 'ssss', $fileId, $fileId, $pageSizeCapped, $startItemCapped);
     }
 }
