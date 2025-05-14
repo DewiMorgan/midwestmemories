@@ -149,8 +149,8 @@ class Index
             $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($firstPart[1]);
             $param1 = $firstPart[2] ?? null;
             $data = match ($endpoint) {
-                'getMessage' => self::execGetMessages(intval($param1)),
-                default => "['error': 'Unknown endpoint {$endpoint}']"
+                'getComment' => self::execGetComments(intval($param1)),
+                default => ['error' => "Unknown endpoint {$endpoint}"]
             };
             try {
                 $encoded = json_encode($data, JSON_THROW_ON_ERROR);
@@ -170,7 +170,7 @@ class Index
      * @param int $fileId The `id` field of the file that we want comments for.
      * @return array Comments as a list of [sequence, date_created, user, body_text].
      */
-    private static function execGetMessages(int $fileId): array
+    private static function execGetComments(int $fileId): array
     {
         $sql = '
             SELECT sequence, date_created, user, body_text FROM midmem_comments c
