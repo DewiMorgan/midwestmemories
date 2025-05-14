@@ -147,11 +147,15 @@ class Index
         $firstPart = preg_split('#/#', self::$requestWebPath, -1, PREG_SPLIT_NO_EMPTY);
         if (is_array($firstPart)) {
             $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($firstPart[1]);
-            $param1 = $firstPart[2] ?? null;
-            $param2 = $firstPart[3] ?? null;
-            $param3 = $firstPart[4] ?? null;
+
+            // Sadly these will likely have to be converted into unnamed params for more than one API endpoint.
+            $imageId = $firstPart[2] ?? null;
+            $requestedPage = intval($firstPart[3] ?? 0);
+            $pageSize = 2;
+            $startItem = $requestedPage * $pageSize;
+
             $data = match ($endpoint) {
-                'getComment' => self::execGetComments(intval($param1), intval($param2), intval($param3)),
+                'getComment' => self::execGetComments(intval($imageId), 2, $startItem),
                 default => ['error' => "Unknown endpoint {$endpoint}"]
             };
             try {
@@ -172,7 +176,7 @@ class Index
      * @param int $fileId The `id` field of the file that we want comments for.
      * @param int $pageSize Max quantity of records to return. Capped between 1 and 100.
      * @param int $startItem Which item in the list to start at, starting at 0. Capped between 0 and 1000.
-     * @return array Comments as a list of [sequence, date_created, user, body_text].
+     * @return array Comments as a list of [sequence, date_created, user, body_text, num_pages].
      */
     private static function execGetComments(int $fileId, int $pageSize, int $startItem): array
     {
@@ -180,7 +184,7 @@ class Index
         $startItemCapped = max(0, min(1000, $startItem));
         $sql = '
             WITH comment_count AS (
-                SELECT COUNT(*) AS `numPages`
+                SELECT MIN(COUNT(*), 1000) AS `num_pages`
                 FROM `midmem_comments`
                 WHERE `fk_file` = ? AND NOT `hidden`
             )
