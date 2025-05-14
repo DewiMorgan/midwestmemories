@@ -115,8 +115,8 @@ function cleanFileDetails(array $fileDetails): array
 <script>
     async function fetchAllComments(imageId) {
         const allComments = [];
-        let currentPage = 1;
-        let totalPages = 0; // start assuming only 1 page (page zero) until we know otherwise.
+        let currentPage = 0; // Pages start at zero.
+        let totalPages = 1; // start assuming only 1 page until we know otherwise.
 
         do {
             const response = await fetch(`/v1/comment/${imageId}/${currentPage}`);
@@ -133,7 +133,7 @@ function cleanFileDetails(array $fileDetails): array
             }
 
             currentPage++;
-        } while (currentPage <= totalPages);
+        } while (currentPage < totalPages);
 
         return allComments;
     }
