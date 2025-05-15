@@ -6,6 +6,7 @@ which might not be when they were actually implemented/committed.
 ## 2025/05/15 Wed
 
 * FIXED: JS on loaded templates doesn't run!
+* FIXED: Javascript to list comments.
 
 ## 2025/05/14 Tue
 

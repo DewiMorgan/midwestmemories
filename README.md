@@ -138,14 +138,16 @@ See also ToDo, above.
 Current task:
 
 * Get it commentable.
-    * Javascript to list comments.
-        * Convert template loading to an API? Have the API specify what script to run on display of a page?
     * API to add comments.
     * Javascript to add comments.
+    * CSS to make comments usable.
+    * Clean up debugging output from files template.
+* Lower priority
     * API to edit comments.
     * Javascript to edit comments.
     * API to hide comments.
     * Admin Javascript to edit comments.
+    * Convert template loading to an API? Have the API specify what script to run on display of a page?
 
 * Get it usable on a phone.
 * Search template?
