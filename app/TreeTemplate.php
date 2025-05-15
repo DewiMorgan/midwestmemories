@@ -304,7 +304,7 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
             importRemoteContent(doc.body, newContent);
             console.log("Got to writing.");
         } catch (error) {
-            // Import the title, body and styles from the loaded document.
+            // Report our failure.
             console.error(error);
             title = 'Error loading page';
             const element = document.createElement('h1');
@@ -349,13 +349,24 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
         }
     }
 
-    /** Clone and append all children from the remote <body> to the target container. */
+    /** Get predefined template elements from the remote page to the target container.
+     * @param remoteBody The downloaded web page.
+     * @param targetContainer The div we should put the body text into.
+     */
     function importRemoteContent(remoteBody, targetContainer) {
-        for (const child of remoteBody.children) {
-            const clone = child.cloneNode(true);
-            targetContainer.appendChild(clone);
-        }
+    const content = remoteBody.querySelector('#templateContent');
+    const script = remoteBody.querySelector('#templateScript');
+
+    if (content) {
+        targetContainer.appendChild(content.cloneNode(true));
     }
+
+    if (script) {
+        const newScript = document.createElement('script');
+        newScript.textContent = script.textContent;
+        targetContainer.appendChild(newScript);
+    }
+}
 
     /** Ensure our handler loads all child links in the content div. */
     function addLinksToContent(content) {
