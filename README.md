@@ -139,7 +139,6 @@ Current task:
 
 * Get it commentable.
     * Javascript to list comments.
-        * Likely JS on loaded templates doesn't run!
         * Convert template loading to an API? Have the API specify what script to run on display of a page?
     * API to add comments.
     * Javascript to add comments.

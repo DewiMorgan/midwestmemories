@@ -96,80 +96,84 @@ namespace MidwestMemories;
     </style>
 </head>
 <body>
-<div class="thumb-content">
-    <h1 class="center">Folder title goes here</h1>
-    <p>This is a description of the folder/album and its contents.</p>
-    <p>This is a <a href="https://www.google.com">test link to make sure external links work.</a></p>
-    <p>This is a <a href="https://www.google.com?x&i=1">test link to try breaking external links.</a></p>
-</div>
+<div id="templateContent">
+    <div class="thumb-content">
+        <h1 class="center">Folder title goes here</h1>
+        <p>This is a description of the folder/album and its contents.</p>
+        <p>This is a <a href="https://www.google.com">test link to make sure external links work.</a></p>
+        <p>This is a <a href="https://www.google.com?x&i=1">test link to try breaking external links.</a></p>
+    </div>
 
-<div class="thumb-pad" id="rounded">
-    <div class="spacer">&nbsp;</div>
-    <?php
-    $items = scandir(Index::$requestUnixPath);
+    <div class="thumb-pad" id="rounded">
+        <div class="spacer">&nbsp;</div>
+        <?php
+        $items = scandir(Index::$requestUnixPath);
 
-    $dirs = [];
-    $files = [];
-    foreach ($items as $item) {
-        $itemPath = Index::$requestUnixPath . '/' . $item;
-        if (is_dir($itemPath)) {
-            if ('.' === $item || ('..' === $item && (Index::$requestUnixPath === Path::$imgBaseUnixPath))) {
-                Log::debug('Ignoring folder', $itemPath);
+        $dirs = [];
+        $files = [];
+        foreach ($items as $item) {
+            $itemPath = Index::$requestUnixPath . '/' . $item;
+            if (is_dir($itemPath)) {
+                if ('.' === $item || ('..' === $item && (Index::$requestUnixPath === Path::$imgBaseUnixPath))) {
+                    Log::debug('Ignoring folder', $itemPath);
+                } else {
+                    $dirs[] = $item;
+                }
+            } elseif (is_file($itemPath)) {
+                if (
+                    preg_match('/\/(?:\.|tn_)[^\/]+$/', $itemPath) // In blocklist.
+                    || !preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath) // Not in allowlist.
+                ) {
+                    Log::debug('Ignoring file', $itemPath);
+                } else {
+                    $files[] = $item;
+                }
             } else {
-                $dirs[] = $item;
+                Log::debug('Ignoring unknown FS object', $itemPath);
             }
-        } elseif (is_file($itemPath)) {
-            if (
-                preg_match('/\/(?:\.|tn_)[^\/]+$/', $itemPath) // In blocklist.
-                || !preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath) // Not in allowlist.
-            ) {
-                Log::debug('Ignoring file', $itemPath);
+        }
+
+        // Output
+        $fileNum = 0;
+        foreach (array_merge($dirs, $files) as $item) {
+            $itemPath = Index::$requestUnixPath . '/' . $item;
+
+            // Skip files without a matching thumbnail file: they have not been fully processed.
+            if (is_file($itemPath)) {
+                $thumbUnixPath = DropboxManager::getThumbName($itemPath);
+                if (!is_file($thumbUnixPath)) {
+                    Log::debug("No thumb found for image: '$thumbUnixPath' from '$itemPath'");
+                    continue;
+                }
+                Log::debug("Creating thumb-link for image: '$thumbUnixPath' from '$itemPath'");
+                $u_thumbUrl = Path::unixPathToUrl($thumbUnixPath, Path::LINK_RAW);
+                $fileNum++;
+                $h_thumbTitle = htmlspecialchars($item);
+            } elseif ('..' === $item) {
+                $h_thumbTitle = '<strong>..</strong> - up one folder.';
+                $u_thumbUrl = Path::unixPathToUrl('/tn_folder_up.png', Path::LINK_RAW);
             } else {
-                $files[] = $item;
+                $h_thumbTitle = htmlspecialchars($item);
+                $u_thumbUrl = Path::unixPathToUrl('/tn_folder.png', Path::LINK_RAW);
             }
-        } else {
-            Log::debug('Ignoring unknown FS object', $itemPath);
-        }
-    }
+            $u_linkUrl = Path::unixPathToUrl($itemPath, Path::LINK_INLINE);
 
-    // Output
-    $fileNum = 0;
-    foreach (array_merge($dirs, $files) as $item) {
-        $itemPath = Index::$requestUnixPath . '/' . $item;
+            echo("<div class='thumb'><figure>");
 
-        // Skip files without a matching thumbnail file: they have not been fully processed.
-        if (is_file($itemPath)) {
-            $thumbUnixPath = DropboxManager::getThumbName($itemPath);
-            if (!is_file($thumbUnixPath)) {
-                Log::debug("No thumb found for image: '$thumbUnixPath' from '$itemPath'");
-                continue;
+            echo("<a href='$u_linkUrl'><img src='$u_thumbUrl' title='$h_thumbTitle' alt='$h_thumbTitle'></a>");
+            echo('<figcaption>');
+            if ($fileNum) {
+                echo("<strong>$fileNum: </strong>");
             }
-            Log::debug("Creating thumb-link for image: '$thumbUnixPath' from '$itemPath'");
-            $u_thumbUrl = Path::unixPathToUrl($thumbUnixPath, Path::LINK_RAW);
-            $fileNum++;
-            $h_thumbTitle = htmlspecialchars($item);
-        } elseif ('..' === $item) {
-            $h_thumbTitle = '<strong>..</strong> - up one folder.';
-            $u_thumbUrl = Path::unixPathToUrl('/tn_folder_up.png', Path::LINK_RAW);
-        } else {
-            $h_thumbTitle = htmlspecialchars($item);
-            $u_thumbUrl = Path::unixPathToUrl('/tn_folder.png', Path::LINK_RAW);
+            echo("<a href='$u_linkUrl'>$h_thumbTitle</a></figcaption>");
+            echo('</figure></div>');
         }
-        $u_linkUrl = Path::unixPathToUrl($itemPath, Path::LINK_INLINE);
-
-        echo("<div class='thumb'><figure>");
-
-        echo("<a href='$u_linkUrl'><img src='$u_thumbUrl' title='$h_thumbTitle' alt='$h_thumbTitle'></a>");
-        echo('<figcaption>');
-        if ($fileNum) {
-            echo("<strong>$fileNum: </strong>");
-        }
-        echo("<a href='$u_linkUrl'>$h_thumbTitle</a></figcaption>");
-        echo('</figure></div>');
-    }
-    ?>
-    <div class="spacer">&nbsp;</div>
-</div><!-- thumb-content -->
-
+        ?>
+        <div class="spacer">&nbsp;</div>
+    </div><!-- thumb-content -->
+</div><!-- End templateContent div-->
+<script id="templateScript">
+    alert("Script got added and executed!"); // DELETEME DEBUG
+</script>
 </body>
 </html>

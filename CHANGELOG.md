@@ -3,7 +3,11 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
-## 2025/05/14 Tues
+## 2025/05/15 Wed
+
+* FIXED: JS on loaded templates doesn't run!
+
+## 2025/05/14 Tue
 
 * DONE: Set up the DB for comments.
 * DONE: Write API for listing comments.
