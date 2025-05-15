@@ -14,6 +14,7 @@ namespace MidwestMemories;
     <title>ToDo: a file title here</title>
 </head>
 <body>
+<div id="templateContent">
 <?php
 // ToDo: Style this.
 // ToDo: Add edit button.
@@ -112,7 +113,8 @@ function cleanFileDetails(array $fileDetails): array
 
 ?>
 <div id="comments"></div>
-<script>
+</div><!-- End templateContent div-->
+<script id="templateScript">
     async function fetchAllComments(imageId) {
         const allComments = [];
         let currentPage = 0; // Pages start at zero.
