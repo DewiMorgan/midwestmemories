@@ -166,9 +166,7 @@ namespace MidwestMemories;
         const parent = document.getElementById('parent-container');
 
         // Remove the old content div
-        let nextSibling = null;
         if (oldCommentDiv) {
-            nextSibling = oldCommentDiv.nextSibling;
             oldCommentDiv.remove(); // Remove the div along with its children and event listeners
         }
 
@@ -176,12 +174,8 @@ namespace MidwestMemories;
         const newCommentDiv = document.createElement('div');
         newCommentDiv.id = 'comment';
 
-        // Insert the new div at the same position
-        if (nextSibling) {
-            parent.insertBefore(newCommentDiv, nextSibling); // Insert it before the next sibling of the old div.
-        } else {
-            parent.appendChild(newCommentDiv); // If no next sibling (so, the last child), append the new div.
-        }
+        // Insert the new div.
+        parent.appendChild(newCommentDiv);
         return newCommentDiv;
     }
 
