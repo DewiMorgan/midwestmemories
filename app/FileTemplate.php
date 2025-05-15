@@ -147,11 +147,13 @@ namespace MidwestMemories;
         const commentsContainer = clearCommentDiv(oldCommentDiv);
 
         try {
+            console.log("Awaiting the comments.");
             const comments = await fetchAllComments(imageId);
             console.log("Rendering the comments.");
             renderComments(comments);
             console.log("Displayed comments!");
         } catch (error) {
+            console.log("Error displaying the comments.");
             commentsContainer.textContent = 'Failed to load comments.';
             console.error('Error displaying comments:', error);
         }
@@ -219,7 +221,7 @@ namespace MidwestMemories;
 
     function setupTemplate() {
         console.log("Fetching comments...");
-        fetchAllComments(<?= 6 ?>);
+        displayComments(<?= 6 ?>);
     }
 
     function cleanupTemplate() {
