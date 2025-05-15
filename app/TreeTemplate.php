@@ -117,7 +117,7 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
          * U+1F5C1 🗁 Open Folder
          * U+1F4F7 📷 Camera
          * U+1F4C4 📄 Page Facing Up
-         * U+1F5BB 🖻 Document with Picture
+         * U+1F5BB 🖻 Document with Picture.
          */
         const ICON_EXPANDED = '📂'; // U+1F4C2 Open File Folder
         const ICON_COLLAPSED = '📁'; // U+1F4C1 File Folder
@@ -354,19 +354,37 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
      * @param targetContainer The div we should put the body text into.
      */
     function importRemoteContent(remoteBody, targetContainer) {
-    const content = remoteBody.querySelector('#templateContent');
-    const script = remoteBody.querySelector('#templateScript');
+        // Cleanup from previous template
+        if ('function' === typeof window.cleanupTemplate) {
+            window.cleanupTemplate();
+            window.cleanupTemplate = undefined;
+        }
 
-    if (content) {
-        targetContainer.appendChild(content.cloneNode(true));
+        // Load new content
+        const content = remoteBody.querySelector('#templateContent');
+        const script = remoteBody.querySelector('#templateScript');
+
+        if (content) {
+            const clonedNode = content.cloneNode(true);
+            targetContainer.appendChild(clonedNode);
+        }
+
+        if (script) {
+            const newScript = document.createElement('script');
+            newScript.textContent = script.textContent;
+            targetContainer.appendChild(newScript);
+
+            // Wait for DOM update and script execution.
+            // Use a small timeout to ensure the script has time to define setupTemplate.
+            setTimeout(callSetupTemplate, 0);
+        }
     }
 
-    if (script) {
-        const newScript = document.createElement('script');
-        newScript.textContent = script.textContent;
-        targetContainer.appendChild(newScript);
+    function callSetupTemplate() {
+        if ('function' === typeof window.setupTemplate) {
+            window.setupTemplate();
+        }
     }
-}
 
     /** Ensure our handler loads all child links in the content div. */
     function addLinksToContent(content) {

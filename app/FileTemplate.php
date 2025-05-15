@@ -217,6 +217,10 @@ namespace MidwestMemories;
         fetchAllComments(<?= 6 ?>);
         alert("Files Script got added and executed!"); // DELETEME DEBUG
     }
+
+    function cleanupTemplate() {
+        console.log("Cleaned up files...");
+    }
 </script>
 
 </body>

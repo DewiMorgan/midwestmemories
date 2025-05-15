@@ -172,6 +172,10 @@ namespace MidwestMemories;
     </div><!-- thumb-content -->
 </div><!-- End templateContent div-->
 <script id="templateScript">
+    function cleanupTemplate() {
+        console.log("Cleaned up thumbs...");
+    }
+
     function setupTemplate() {
         console.log("Loaded thumbs...");
         alert("Thumbs Script got added and executed!"); // DELETEME DEBUG
