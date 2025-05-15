@@ -376,13 +376,18 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
 
             // Wait for DOM update and script execution.
             // Use a small timeout to ensure the script has time to define setupTemplate.
-            setTimeout(callSetupTemplate, 0);
+            console.log("Waiting to call setup");
+            setTimeout(callSetupTemplate, 100);
         }
     }
 
     function callSetupTemplate() {
+        console.log("Checking setup exists");
         if ('function' === typeof window.setupTemplate) {
+            console.log("Calling setup");
             window.setupTemplate();
+        } else {
+            console.log("Setup not found");
         }
     }
 
