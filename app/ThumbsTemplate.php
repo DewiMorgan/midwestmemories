@@ -178,7 +178,6 @@ namespace MidwestMemories;
 
     function setupTemplate() {
         console.log("Loaded thumbs...");
-        alert("Thumbs Script got added and executed!"); // DELETEME DEBUG
     }
 </script>
 </body>

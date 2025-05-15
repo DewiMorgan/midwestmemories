@@ -148,6 +148,7 @@ namespace MidwestMemories;
 
         try {
             const comments = await fetchAllComments(imageId);
+            console.log("Rendering the comments.");
             renderComments(comments);
             console.log("Displayed comments!");
         } catch (error) {
@@ -183,12 +184,15 @@ namespace MidwestMemories;
     }
 
     function renderComments(comments, commentsContainer) {
+        console.log("Render comments:");
         for (const comment of comments) {
+            console.log("Single comments:");
             renderSingleComment(comment, commentsContainer);
         }
     }
 
     function renderSingleComment(comment, commentsContainer) {
+        console.log("Single comment rendering.");
         const commentDiv = document.createElement('div');
         commentDiv.className = 'comment';
 
@@ -210,12 +214,12 @@ namespace MidwestMemories;
         commentDiv.appendChild(bodyElem);
 
         commentsContainer.appendChild(commentDiv);
+        console.log("Comment div added to commentsContainer.");
     }
 
     function setupTemplate() {
         console.log("Fetching comments...");
         fetchAllComments(<?= 6 ?>);
-        alert("Files Script got added and executed!"); // DELETEME DEBUG
     }
 
     function cleanupTemplate() {
