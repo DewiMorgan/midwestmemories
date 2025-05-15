@@ -150,7 +150,7 @@ namespace MidwestMemories;
             console.log("Awaiting the comments.");
             const comments = await fetchAllComments(imageId);
             console.log("Rendering the comments.");
-            renderComments(comments);
+            renderComments(comments, commentsContainer);
             console.log("Displayed comments!");
         } catch (error) {
             console.log("Error displaying the comments.");
