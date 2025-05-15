@@ -95,7 +95,7 @@ namespace MidwestMemories;
     </style>
 </head>
 <body>
-<div id="templateContent">
+<div id="template-content">
     <div class="thumb-content">
         <h1 class="center">Folder title goes here</h1>
         <p>This is a description of the folder/album and its contents.</p>
@@ -170,8 +170,8 @@ namespace MidwestMemories;
         ?>
         <div class="spacer">&nbsp;</div>
     </div><!-- thumb-content -->
-</div><!-- End templateContent div-->
-<script id="templateScript">
+</div><!-- End template-content div-->
+<script id="template-script">
     function cleanupTemplate() {
         console.log("Cleaned up thumbs...");
     }

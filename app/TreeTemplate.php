@@ -361,8 +361,8 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
         }
 
         // Load new content
-        const content = remoteBody.querySelector('#templateContent');
-        const script = remoteBody.querySelector('#templateScript');
+        const content = remoteBody.querySelector('#template-content');
+        const script = remoteBody.querySelector('#template-script');
 
         if (content) {
             const clonedNode = content.cloneNode(true);

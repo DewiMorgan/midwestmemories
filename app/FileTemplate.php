@@ -14,7 +14,7 @@ namespace MidwestMemories;
     <title>ToDo: a file title here</title>
 </head>
 <body>
-<div id="templateContent">
+<div id="template-content">
     <?php
     // ToDo: Style this.
     // ToDo: Add edit button.
@@ -113,8 +113,8 @@ namespace MidwestMemories;
 
     ?>
     <div id="comments"></div>
-</div><!-- End templateContent div-->
-<script id="templateScript">
+</div><!-- End template-content div-->
+<script id="template-script">
     async function fetchAllComments(imageId) {
         const allComments = [];
         let currentPage = 0; // Pages start at zero.
@@ -163,7 +163,7 @@ namespace MidwestMemories;
     function clearCommentDiv(oldCommentDiv) {
         console.log("Clearing old comments!");
         // Find the parent element (where the div is located)
-        const parent = document.getElementById('parent-container');
+        const parent = document.getElementById('template-content');
 
         // Remove the old content div
         if (oldCommentDiv) {
