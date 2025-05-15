@@ -148,30 +148,7 @@ namespace MidwestMemories;
 
         try {
             const comments = await fetchAllComments(imageId);
-
-            comments.forEach(comment => {
-                const commentDiv = document.createElement('div');
-                commentDiv.className = 'comment';
-
-                const userElem = document.createElement('strong');
-                userElem.textContent = comment.user;
-
-                const dateElem = document.createElement('span');
-                dateElem["style"].marginLeft = '10px';
-                dateElem.textContent = '(' + comment["date_created"] + ')';
-
-                const bodyElem = document.createElement('pre'); // preserves formatting
-                bodyElem.textContent = comment['body_text'];
-
-                const brElem = document.createElement('br');
-
-                commentDiv.appendChild(userElem);
-                commentDiv.appendChild(dateElem);
-                commentDiv.appendChild(brElem);
-                commentDiv.appendChild(bodyElem);
-
-                commentsContainer.appendChild(commentDiv);
-            });
+            renderComments(comments);
             console.log("Displayed comments!");
         } catch (error) {
             commentsContainer.textContent = 'Failed to load comments.';
@@ -205,9 +182,41 @@ namespace MidwestMemories;
         return newCommentDiv;
     }
 
-    console.log("Fetching comments...");
-    fetchAllComments(<?= 6 ?>);
-    alert("Script got added and executed!"); // DELETEME DEBUG
+    function renderComments(comments, commentsContainer) {
+        for (const comment of comments) {
+            renderSingleComment(comment, commentsContainer);
+        }
+    }
+
+    function renderSingleComment(comment, commentsContainer) {
+        const commentDiv = document.createElement('div');
+        commentDiv.className = 'comment';
+
+        const userElem = document.createElement('strong');
+        userElem.textContent = comment.user;
+
+        const dateElem = document.createElement('span');
+        dateElem["style"].marginLeft = '10px';
+        dateElem.textContent = '(' + comment['date_created'] + ')';
+
+        const bodyElem = document.createElement('pre'); // preserves formatting
+        bodyElem.textContent = comment['body_text'];
+
+        const brElem = document.createElement('br');
+
+        commentDiv.appendChild(userElem);
+        commentDiv.appendChild(dateElem);
+        commentDiv.appendChild(brElem);
+        commentDiv.appendChild(bodyElem);
+
+        commentsContainer.appendChild(commentDiv);
+    }
+
+    function setupTemplate() {
+        console.log("Fetching comments...");
+        fetchAllComments(<?= 6 ?>);
+        alert("Files Script got added and executed!"); // DELETEME DEBUG
+    }
 </script>
 
 </body>

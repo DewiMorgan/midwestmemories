@@ -10,15 +10,14 @@ namespace MidwestMemories;
  * This can be used to generate:
  *   $h_pageTitle as h_string
  *   $h_pageTopContent as h_string
- *   $dirNav as [
- *     'previousDir'=>Url,
+ *   $dirNav as
+ *    ['previousDir'=>Url,
  *     'currentDir'=>Url,
  *     'nextDir'=>Url,
  *     'parentDir'=>Url,
  *     'pageNum'=>Int,
  *     'numPages'=>Int,
- *     'numPerPage'=>Int
- *   ]
+ *     'numPerPage'=>Int]
  *   $listOfThumbs as [description=>h_string, 'thumbUrl'=>Url, 'imageUrl'=>Url]
  */
 ?>
@@ -173,7 +172,10 @@ namespace MidwestMemories;
     </div><!-- thumb-content -->
 </div><!-- End templateContent div-->
 <script id="templateScript">
-    alert("Script got added and executed!"); // DELETEME DEBUG
+    function setupTemplate() {
+        console.log("Loaded thumbs...");
+        alert("Thumbs Script got added and executed!"); // DELETEME DEBUG
+    }
 </script>
 </body>
 </html>
