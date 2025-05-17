@@ -125,9 +125,6 @@ namespace MidwestMemories;
     ?>
     <div id="comments"></div>
 </div><!-- End template-content div-->
-<script id="template-script">
-    </script>
-
 <script>
     async function fetchAllComments() {
         const allComments = [];
@@ -282,6 +279,8 @@ namespace MidwestMemories;
         console.log("Comment div added to commentsContainer.");
         return commentDiv;
     }
+</script>
+<script id="template-script">
 
     function setupTemplate() {
         console.log("Fetching comments...");
@@ -291,6 +290,8 @@ namespace MidwestMemories;
     function cleanupTemplate() {
         console.log("Cleaned up files...");
     }
+</script>
+<script id="xtemplate-script">
 
     function showCommentEditor() {
         const commentControlDiv = clearCommentControlDiv(); // clear controls
