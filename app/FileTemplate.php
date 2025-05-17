@@ -341,7 +341,7 @@ namespace MidwestMemories;
 <script id="template-script">
 
     function getFileId() {
-        return <?= getFileId(); ?>;
+        return <?php echo getFileId(); ?>;
     }
 
 
