@@ -337,12 +337,12 @@ namespace MidwestMemories;
         addCommentControlUI(commentControlDiv);
     }
 
-    function getFileId() {
-        return <?= getFileId() ?>;
-    }
-
 </script>
 <script id="template-script">
+
+    function getFileId() {
+        return <?= getFileId(); ?>;
+    }
 
 
     async function displayComments() {
