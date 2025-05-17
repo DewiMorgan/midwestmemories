@@ -251,7 +251,7 @@ class Index
             return self::getCommentById($insertId);
         } else {
             Log::debug("Failed to add comment by $userName on $fileId", $bodyText);
-            return ['error' => 'Failed to save comment'];
+            return ['error' => 'Failed to save comment 5'];
         }
     }
 
