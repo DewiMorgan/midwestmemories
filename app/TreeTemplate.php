@@ -275,6 +275,81 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
     // Add a listener to handle browser back/forward buttons.
     window.onpopstate = handleNavigation;
 
+
+    /**
+     * Handle link clicking, to load content into the content div
+     * @param {string} url The link to load.
+     * @param saveHistory True to add the followed link to browser history: false for back/forward button handling.
+     * @returns {Promise<void>}
+     */
+    async function openLinkInline(url, saveHistory = true) {
+        console.log("Opening link inline: " + url);
+
+        const content = document.getElementById("content");
+        const newContent = clearContentDiv(content); // Ensure event listeners are removed.
+        clearAddedStyles(); // Remove any styles we loaded from a previous page load.
+
+        let title;
+        try {
+            // Import the title, body and styles from the loaded document.
+            const doc = await fetchRemoteDocument(url);
+            title = doc.querySelector('title')?.innerText;
+            importRemoteStyles(doc.head);
+            importRemoteContent(doc.body, newContent);
+            console.log("Got to writing.");
+        } catch (error) {
+            // Report our failure.
+            console.error(error);
+            title = 'Error loading page';
+            const element = document.createElement('h1');
+            element.textContent = title;
+            newContent.appendChild(element);
+        }
+        document.title = getSiteName() + ' - ' + title;
+
+        // Ensure our handler loads all child links in the content div.
+        addLinksToContent(newContent);
+
+        // Ensure that history will work.
+        if (saveHistory) {
+            const historyUrl = url.replace(/(?:\?|&(?:amp;)?)i=\d+/, ''); // Strip out "inline" instruction.
+            console.log("Updating URL to '" + historyUrl + "'.");
+            window.history.pushState({"html": historyUrl, "pageTitle": title}, '', historyUrl);
+        }
+    }
+
+    /** Get predefined template elements from the remote page to the target container.
+     * @param remoteBody The downloaded web page.
+     * @param targetContainer The div we should put the body text into.
+     */
+    function importRemoteContent(remoteBody, targetContainer) {
+        // Cleanup from previous template
+        if ('function' === typeof window.cleanupTemplate) {
+            window.cleanupTemplate();
+            window.cleanupTemplate = undefined;
+        }
+
+        // Load new content
+        const content = remoteBody.querySelector('#template-content');
+        const script = remoteBody.querySelector('#template-script');
+
+        if (content) {
+            const clonedNode = content.cloneNode(true);
+            targetContainer.appendChild(clonedNode);
+        }
+
+        if (script) {
+            const newScript = document.createElement('script');
+            newScript.textContent = script.textContent;
+            targetContainer.appendChild(newScript);
+
+            // Wait for DOM update and script execution.
+            // Use a small timeout to ensure the script has time to define setupTemplate.
+            console.log("Waiting to call setup");
+            setTimeout(callSetupTemplate, 100);
+        }
+    }
+
     function handleNavigation(e) {
         if (e.state) {
             openLinkInline(e.state.html + "?i=1", false);
@@ -401,81 +476,6 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
             'Messages', 'Metaphor', 'Meteor', 'Mistakes', 'Mondays', 'Mornings', 'Moaning', 'Mystery'
         ];
         return 'Midwest ' + a[~~(Math.random() * a.length)];
-    }
-
-    /**
-     * Handle link clicking, to load content into the content div
-     * @param {string} url The link to load.
-     * @param saveHistory True to add the followed link to browser history: false for back/forward button handling.
-     * @returns {Promise<void>}
-     */
-    async function openLinkInline(url, saveHistory = true) {
-        console.log("Opening link inline: " + url);
-
-        const content = document.getElementById("content");
-        const newContent = clearContentDiv(content); // Ensure event listeners are removed.
-        clearAddedStyles(); // Remove any styles we loaded from a previous page load.
-
-        let title;
-        try {
-            // Import the title, body and styles from the loaded document.
-            const doc = await fetchRemoteDocument(url);
-            title = doc.querySelector('title')?.innerText;
-            importRemoteStyles(doc.head);
-            importRemoteContent(doc.body, newContent);
-            console.log("Got to writing.");
-        } catch (error) {
-            // Report our failure.
-            console.error(error);
-            title = 'Error loading page';
-            const element = document.createElement('h1');
-            element.textContent = title;
-            newContent.appendChild(element);
-        }
-        document.title = getSiteName() + ' - ' + title;
-
-        // Ensure our handler loads all child links in the content div.
-        addLinksToContent(newContent);
-
-        // Ensure that history will work.
-        if (saveHistory) {
-            const historyUrl = url.replace(/(?:\?|&(?:amp;)?)i=\d+/, ''); // Strip out "inline" instruction.
-            console.log("Updating URL to '" + historyUrl + "'.");
-            window.history.pushState({"html": historyUrl, "pageTitle": title}, '', historyUrl);
-        }
-    }
-    }
-
-    /** Get predefined template elements from the remote page to the target container.
-     * @param remoteBody The downloaded web page.
-     * @param targetContainer The div we should put the body text into.
-     */
-    function importRemoteContent(remoteBody, targetContainer) {
-        // Cleanup from previous template
-        if ('function' === typeof window.cleanupTemplate) {
-            window.cleanupTemplate();
-            window.cleanupTemplate = undefined;
-        }
-
-        // Load new content
-        const content = remoteBody.querySelector('#template-content');
-        const script = remoteBody.querySelector('#template-script');
-
-        if (content) {
-            const clonedNode = content.cloneNode(true);
-            targetContainer.appendChild(clonedNode);
-        }
-
-        if (script) {
-            const newScript = document.createElement('script');
-            newScript.textContent = script.textContent;
-            targetContainer.appendChild(newScript);
-
-            // Wait for DOM update and script execution.
-            // Use a small timeout to ensure the script has time to define setupTemplate.
-            console.log("Waiting to call setup");
-            setTimeout(callSetupTemplate, 100);
-        }
     }
 
 </script>
