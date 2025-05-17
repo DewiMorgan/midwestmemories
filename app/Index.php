@@ -161,6 +161,8 @@ class Index
                     $bodyText = $_POST['body_text'] ?? '';
                     if (empty($bodyText)) {
                         Log::warning('Ignoring empty comment text from ' . self::$requestWebPath, $_POST);
+                        $fgcData = json_decode(file_get_contents('php://input'), true);
+                        Log::warning('Trying file_get_contents, got', $fgcData);
                         $data = ['error' => 'Failed to save comment'];
                     } else {
                         $data = self::execPostComment($fileId, $userName, $bodyText);
