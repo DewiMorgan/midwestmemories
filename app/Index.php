@@ -237,13 +237,13 @@ class Index
     {
         // Get the next sequence number for this file
         $sql = 'SELECT MAX(sequence) AS seq FROM midmem_comments WHERE fk_file = ?';
-        $currentSeq = Db::sqlGetItem($sql, 'seq', $fileId);
+        $currentSeq = Db::sqlGetItem($sql, 'seq', 'i', $fileId);
         $nextSeq = is_numeric($currentSeq) ? ((int)$currentSeq + 1) : 1;
 
         // Insert the new comment
         $insertSql = 'INSERT INTO midmem_comments (date_created, user, body_text, sequence, fk_file, hidden)
                   VALUES (NOW(), ?, ?, ?, ?, false)';
-        Log::debug("Db::sqlExec('$insertSql', '$userName', '$bodyText', '$nextSeq', '$fileId')"); // DELETEME DEBUG
+        Log::debug("Db::sqlExec('$insertSql', 'ssii', '$userName', '$bodyText', '$nextSeq', '$fileId')"); // DELETEME DEBUG
         //$result = Db::sqlExec($insertSql, $userName, $bodyText, $nextSeq, $fileId);  // UN-COMMENT-ME DEBUG
 
         if (!empty($result)) {
