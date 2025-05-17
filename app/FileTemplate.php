@@ -302,7 +302,7 @@ namespace MidwestMemories;
         }
     }
 
-    function handleSubmitComment() {
+    async function handleSubmitComment() {
         const textarea = document.getElementById('comment-textarea');
         const errorDiv = document.getElementById('comment-error');
         const commentsDiv = document.getElementById('comments');
@@ -314,7 +314,7 @@ namespace MidwestMemories;
         }
 
         errorDiv.textContent = 'Submitting...';
-        const result = postComment(bodyText);
+        const result = await postComment(bodyText);
         console.log("Result from postComment: ", result);
 
         if ('OK' === result.error) {
