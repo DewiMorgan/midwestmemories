@@ -159,12 +159,12 @@ class Index
                 case 'postComment':
                     $userName = $_SERVER['PHP_AUTH_USER'];
                     $bodyText = json_decode(file_get_contents('php://input'), true);
-                    if (empty($bodyText)) {
+                    if (empty($bodyText) || !is_array($bodyText) || empty($bodyText['body-text'])) {
                         Log::warning('Ignoring empty comment text from ' . self::$requestWebPath, $bodyText);
                         $data = ['error' => 'Failed to save comment'];
                     } else {
                         Log::debug('Valid data found from ' . self::$requestWebPath, $bodyText);
-                        $data = self::execPostComment($fileId, $userName, $bodyText);
+                        $data = self::execPostComment($fileId, $userName, $bodyText['body-text']);
                     }
                     break;
                 default:
