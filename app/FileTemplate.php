@@ -111,17 +111,30 @@ namespace MidwestMemories;
         return $h_fd;
     }
 
+    /**
+     * Get the ID of the displayed file.
+     * @return int
+     */
+    function getFileId(): int
+    {
+        $webPath = Index::$requestUnixPath;
+        $dropboxPath = Path::IMAGE_DIR . $webPath;
+        $sql = 'SELECT `id` FROM `midmem_file_queue` WHERE `full_path` = ?';
+        return intval(Db::sqlGetItem($sql, 'id', 's', $dropboxPath));
+    }
+
     ?>
     <div id="comments"></div>
 </div><!-- End template-content div-->
 <script id="template-script">
-    async function fetchAllComments(imageId) {
+    async function fetchAllComments() {
         const allComments = [];
+        const fileId = getFileId();
         let currentPage = 0; // Pages start at zero.
-        let totalPages = 1; // start assuming only 1 page until we know otherwise.
+        let totalPages = 1; // Start assuming only 1 page until we know otherwise.
 
         do {
-            const response = await fetch(`/v1/comment/${imageId}/${currentPage}`);
+            const response = await fetch(`/v1/comment/${fileId}/${currentPage}`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch page ${currentPage}: ${response.statusText}`);
             }
@@ -141,14 +154,39 @@ namespace MidwestMemories;
         return allComments;
     }
 
+    async function postComment(bodyText) {
+        const fileId = getFileId();
+        const response = await fetch(`/v1/comment/${fileId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({body_text: bodyText})
+        });
 
-    async function displayComments(imageId) {
-        const oldCommentDiv = document.getElementById('comments');
-        const commentsContainer = clearCommentDiv(oldCommentDiv);
+        if (!response.ok) {
+            const message = `HTTP error ${response.status}`;
+            console.error('Failed to post comment:', message);
+            return {response: 'Error', message: message};
+        }
+
+        const result = await response.json();
+
+        if ('OK' !== result.response) {
+            const message = result.message || 'Unknown error from server';
+            console.error('Failed to post comment:', message);
+            return {response: 'Error', message: message};
+        }
+
+        return result;
+    }
+
+    async function displayComments() {
+        const commentsContainer = clearCommentDiv();
 
         try {
             console.log("Awaiting the comments.");
-            const comments = await fetchAllComments(imageId);
+            const comments = await fetchAllComments();
             console.log("Rendering the comments.");
             renderComments(comments, commentsContainer);
             console.log("Displayed comments!");
@@ -160,17 +198,18 @@ namespace MidwestMemories;
     }
 
     /** Safely clear the div using the DOM, so all event handlers are cleanly killed without memory leaks. */
-    function clearCommentDiv(oldCommentDiv) {
+    function clearCommentDiv() {
         console.log("Clearing old comments!");
         // Find the parent element (where the div is located)
+        const oldCommentDiv = document.getElementById('comments');
         const parent = document.getElementById('template-content');
 
-        // Remove the old content div
+        // Remove the old comment div
         if (oldCommentDiv) {
-            oldCommentDiv.remove(); // Remove the div along with its children and event listeners
+            oldCommentDiv.remove(); // Remove the div along with its children and event listeners.
         }
 
-        // Create the new content div, with the same properties as the original.
+        // Create the new comment div, with the same properties as the original.
         const newCommentDiv = document.createElement('div');
         newCommentDiv.id = 'comment';
 
@@ -178,6 +217,34 @@ namespace MidwestMemories;
         parent.appendChild(newCommentDiv);
         return newCommentDiv;
     }
+
+    /** Safely clear the div using the DOM, so all event handlers are cleanly killed without memory leaks. */
+    function clearCommentControlDiv() {
+        console.log("Clearing old comment control!");
+
+        // Remove the old comment control div
+        const oldCommentControlDiv = document.getElementById('comment-controls');
+        if (oldCommentControlDiv) {
+            oldCommentControlDiv.remove(); // Remove the div along with its children and event listeners.
+        }
+
+        // Create the new comment control div.
+        const commentControlDiv = document.createElement('div');
+        commentControlDiv.id = 'comment-controls';
+
+        const commentsDiv = document.getElementById('comments');
+        commentsDiv.appendChild(commentControlDiv);
+
+        return commentControlDiv;
+    }
+
+    function addCommentControlUI(commentControlDiv) {
+        const addButton = document.createElement('button');
+        addButton.textContent = 'Add Comment';
+        addButton.onclick = showCommentEditor;
+        commentControlDiv.appendChild(addButton);
+    }
+
 
     function renderComments(comments, commentsContainer) {
         console.log("Render comments:");
@@ -211,16 +278,93 @@ namespace MidwestMemories;
 
         commentsContainer.appendChild(commentDiv);
         console.log("Comment div added to commentsContainer.");
+        return commentDiv;
     }
 
     function setupTemplate() {
         console.log("Fetching comments...");
-        displayComments(<?= 6 ?>);
+        displayComments();
     }
 
     function cleanupTemplate() {
         console.log("Cleaned up files...");
     }
+
+    function showCommentEditor() {
+        const commentControlDiv = clearCommentControlDiv(); // clear controls
+
+        const textarea = document.createElement('textarea');
+        textarea.rows = 4;
+        textarea.cols = 60;
+        textarea.autofocus = true;
+        textarea.id = 'comment-textarea';
+
+        const submitButton = document.createElement('button');
+        submitButton.textContent = 'Submit';
+
+        const cancelButton = document.createElement('button');
+        cancelButton.textContent = 'Cancel';
+        cancelButton['style'].marginLeft = '10px';
+
+        const errorDiv = document.createElement('div');
+        errorDiv['style'].color = 'red';
+        errorDiv['style'].marginTop = '5px';
+        const brElem = document.createElement('br');
+
+        commentControlDiv.appendChild(textarea);
+        commentControlDiv.appendChild(brElem);
+        commentControlDiv.appendChild(submitButton);
+        commentControlDiv.appendChild(cancelButton);
+        commentControlDiv.appendChild(errorDiv);
+
+        submitButton.onclick = handleSubmitComment;
+        cancelButton.onclick = handleCancelComment;
+
+        // A little time before changing focus.
+        setTimeout(focusTextarea, 0);
+    }
+
+    function focusTextarea() {
+        const textarea = document.getElementById('comment-textarea');
+        if ('function' === typeof textarea.focus) {
+            textarea.focus();
+        }
+    }
+
+    function handleSubmitComment() {
+        const textarea = document.getElementById('comment-textarea');
+        const errorDiv = document.getElementById('comment-error');
+        const commentDiv = document.getElementById('comment');
+
+        const bodyText = textarea['value'].trim();
+        if (!bodyText) {
+            errorDiv.textContent = 'Comment cannot be empty.';
+            return;
+        }
+
+        errorDiv.textContent = 'Submitting...';
+        const result = postComment(bodyText);
+
+        if ('OK' === result.error) {
+            const commentControlDiv = clearCommentControlDiv();
+            addCommentControlUI(commentControlDiv);
+
+            const lastComment = renderSingleComment(bodyText, commentDiv);
+            lastComment.scrollIntoView({behavior: 'smooth', block: 'start'});
+        } else {
+            errorDiv.textContent = result.error;
+        }
+    }
+
+    function handleCancelComment() {
+        const commentControlDiv = clearCommentControlDiv();
+        addCommentControlUI(commentControlDiv);
+    }
+
+    function getFileId() {
+        return <?= getFileId() ?>;
+    }
+
 </script>
 
 </body>

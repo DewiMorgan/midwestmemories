@@ -144,20 +144,32 @@ class Index
     private static function execApiCall(): string
     {
         Log::debug('Starting...', self::$requestWebPath);
-        $firstPart = preg_split('#/#', self::$requestWebPath, -1, PREG_SPLIT_NO_EMPTY);
-        if (is_array($firstPart)) {
-            $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($firstPart[1]);
+        $pathParts = preg_split('#/#', self::$requestWebPath, -1, PREG_SPLIT_NO_EMPTY);
+        if (is_array($pathParts)) {
+            $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($pathParts[1]);
 
-            // Sadly these will likely have to be converted into unnamed params for more than one API endpoint.
-            $imageId = $firstPart[2] ?? null;
-            $requestedPage = intval($firstPart[3] ?? 0);
-            $pageSize = 2;
-            $startItem = $requestedPage * $pageSize;
-
-            $data = match ($endpoint) {
-                'getComment' => self::execGetComments(intval($imageId), 2, $startItem),
-                default => ['error' => "Unknown endpoint {$endpoint}"]
-            };
+            $fileId = $pathParts[2] ?? null;
+            switch ($endpoint) {
+                case 'getComment':
+                    $requestedPage = intval($pathParts[3] ?? 0);
+                    $pageSize = 2; // ToDo: increase this to 100.
+                    $startItem = $requestedPage * $pageSize;
+                    $data = self::execGetComments(intval($fileId), $pageSize, $startItem);
+                    break;
+                case 'postComment':
+                    $userName = $_SERVER['PHP_AUTH_USER'];
+                    $bodyText = $_POST['body_text'] ?? '';
+                    if (empty($bodyText)) {
+                        Log::warning('Ignoring empty comment text', self::$requestWebPath);
+                        $data = ['error' => 'Failed to save comment'];
+                    } else {
+                        $data = self::execPostComment($fileId, $userName, $bodyText);
+                    }
+                    break;
+                default:
+                    $data = ['error' => "Unknown endpoint $endpoint"];
+                    break;
+            }
             try {
                 $encoded = json_encode($data, JSON_THROW_ON_ERROR);
             } catch (JsonException) {
@@ -165,7 +177,7 @@ class Index
                 $encoded = "{'error':'Failed to encode data'}";
             }
         } else {
-            Log::error('Bad API request path', self::$requestWebPath);
+            Log::warning('Bad API request path', self::$requestWebPath);
             $encoded = "{'error':'Bad API request path'}";
         }
         Log::debug('...returning', $encoded);
@@ -202,5 +214,33 @@ class Index
             LIMIT ? OFFSET ?
         ';
         return Db::sqlGetTable($sql, 'sssss', $pageSizeCapped, $fileId, $fileId, $pageSizeCapped, $startItemCapped);
+    }
+
+    /**
+     * Let a user add a comment to an image's page.
+     * @param int $fileId Foreign key into midmem_file_queue.
+     * @param string $userName Username who made the comment.
+     * @param string $bodyText The text they are inserting.
+     * @return string[]
+     */
+    public static function execPostComment(int $fileId, string $userName, string $bodyText): array
+    {
+        // Get the next sequence number for this file
+        $sql = 'SELECT MAX(sequence) AS seq FROM midmem_comments WHERE fk_file = ?';
+        $currentSeq = Db::sqlGetItem($sql, 'seq', $fileId);
+        $nextSeq = is_numeric($currentSeq) ? ((int)$currentSeq + 1) : 1;
+
+        // Insert the new comment
+        $insertSql = 'INSERT INTO midmem_comments (date_created, user, body_text, sequence, fk_file, hidden)
+                  VALUES (NOW(), ?, ?, ?, ?, false)';
+        $result = Db::sqlExec($insertSql, $userName, $bodyText, $nextSeq, $fileId);
+
+        if (!empty($result)) {
+            Log::debug("Added comment by $userName on $fileId", $bodyText);
+            return ['error' => 'OK'];
+        } else {
+            Log::debug("Failed to add comment by $userName on $fileId", $bodyText);
+            return ['error' => 'Failed to save comment'];
+        }
     }
 }

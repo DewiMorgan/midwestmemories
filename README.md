@@ -152,6 +152,9 @@ Current task:
 * Get it usable on a phone.
 * Search template?
 
+* Comments
+    * Optimize adding comments, by show/hide the textarea instead of removing and recreating it all the time.
+
 * ThumbsTemplate
     * https://midwestmemories.dewimorgan.com/?path=%2FDewi%2F2 doesn't fill img names/title from Metadata.
     * In ThumbsTemplate, we need to populate things like $h_pageTitle per instructions in comment at top of that file.

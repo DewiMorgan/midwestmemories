@@ -3,12 +3,15 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
-## 2025/05/15 Wed
+## 2025/05/16 Fri
+
+
+## 2025/05/14 Wed
 
 * FIXED: JS on loaded templates doesn't run!
 * FIXED: Javascript to list comments.
 
-## 2025/05/14 Tue
+## 2025/05/13 Tue
 
 * DONE: Set up the DB for comments.
 * DONE: Write API for listing comments.
@@ -26,7 +29,7 @@ which might not be when they were actually implemented/committed.
 * DONE: show filenames in thumbsTemplate.
 * DONE: Thumb images shouldn't be sized.
 * FIXED: Thumb images aren't in wrapped lines.
-* FIXED: Clicking thumbs doesn't load them in TreeTemplate, I think because they have a double-leading-slash?
+* FIXED: Clicked thumbs don't load in TreeTemplate, maybe due to a double-leading-slash?
 * DONE: Show subfolders as thumbs, too.
 * DONE: Subfolder thumbs should select the folder in the tree.
 * DONE: Subfolder thumbs should expand the folder in the tree, if not expanded.
