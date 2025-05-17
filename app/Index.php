@@ -148,13 +148,13 @@ class Index
         if (is_array($pathParts)) {
             $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($pathParts[1]);
 
-            $fileId = $pathParts[2] ?? null;
+            $fileId = intval($pathParts[2] ?? 0);
             switch ($endpoint) {
                 case 'getComment':
                     $requestedPage = intval($pathParts[3] ?? 0);
                     $pageSize = 2; // ToDo: increase this to 100.
                     $startItem = $requestedPage * $pageSize;
-                    $data = self::execGetComments(intval($fileId), $pageSize, $startItem);
+                    $data = self::execGetComments($fileId, $pageSize, $startItem);
                     break;
                 case 'postComment':
                     $userName = $_SERVER['PHP_AUTH_USER'];
