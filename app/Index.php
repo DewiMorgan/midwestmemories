@@ -159,8 +159,17 @@ class Index
                 case 'postComment':
                     $userName = $_SERVER['PHP_AUTH_USER'];
                     $bodyText = json_decode(file_get_contents('php://input'), true);
-                    if (empty($bodyText) || !is_array($bodyText) || empty($bodyText['body-text'])) {
-                        Log::warning('Ignoring empty comment text from ' . self::$requestWebPath, $bodyText);
+                    if (empty($bodyText)) {
+                        Log::warning('Ignoring empty comment struct from ' . self::$requestWebPath, $bodyText);
+                        $data = ['error' => 'Failed to save comment'];
+                    } elseif (!is_array($bodyText)) {
+                        Log::warning('Ignoring non-array comment text from ' . self::$requestWebPath, $bodyText);
+                        $data = ['error' => 'Failed to save comment'];
+                    } elseif (!array_key_exists('body_text', $bodyText)) {
+                        Log::warning('Ignoring missing body-text key from ' . self::$requestWebPath, $bodyText);
+                        $data = ['error' => 'Failed to save comment'];
+                    } elseif (empty($bodyText['body_text'])) {
+                        Log::warning('Ignoring empty bodytext from ' . self::$requestWebPath, $bodyText);
                         $data = ['error' => 'Failed to save comment'];
                     } else {
                         Log::debug('Valid data found from ' . self::$requestWebPath, $bodyText);
