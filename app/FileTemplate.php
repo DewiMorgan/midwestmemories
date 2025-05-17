@@ -339,7 +339,7 @@ namespace MidwestMemories;
     }
 
     function getFileId() {
-        return 6;
+        return <?= getFileId() ?>;
     }
 
     async function displayComments() {
@@ -358,31 +358,14 @@ namespace MidwestMemories;
         }
     }
 
-</script>
-<script id="template-script">
-
     function setupTemplate() {
         console.log("Fetching comments...");
-        console.log("FileId = <?= getFileId() ?> ...");
-        console.log("FileId = <?= getFileIdDebug() ?> ...");
-        //displayComments();
+        displayComments();
     }
 
     function cleanupTemplate() {
         console.log("Cleaned up files...");
     }
-    setupTemplate();
 </script>
-<?php
-/** DELETEME DEBUG */
-function getFileIdDebug(): string
-{
-    $webPath = Index::$requestWebPath;
-    $dropboxPath = Path::IMAGE_DIR . $webPath;
-    $sql = 'SELECT `id` FROM `midmem_file_queue` WHERE `full_path` = ?';
-    return "dropboxPath='$dropboxPath', sql='$sql'";
-}
-
-?>
 </body>
 </html>

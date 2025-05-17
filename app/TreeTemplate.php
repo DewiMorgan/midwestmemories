@@ -264,15 +264,24 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
 </script>
 
 <script>
+    // Tree view event listeners to handle link-click behavior, and the initial onLoad().
+
+    // Get all the folder elements in the tree view.
+    const links = document.querySelectorAll('.path-link');
+
+    // Add a click event listener to each folder
+    links.forEach(addLinkClickHandler);
+
+    // Add a listener to handle browser back/forward buttons.
+    window.onpopstate = handleNavigation;
+
     function handleNavigation(e) {
         if (e.state) {
             openLinkInline(e.state.html + "?i=1", false);
             document.title = e.state.pageTitle;
         }
     }
-</script>
 
-<script>
     /**
      * Handle link clicking, to load content into the content div
      * @param {string} url The link to load.
@@ -314,9 +323,7 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
             window.history.pushState({"html": historyUrl, "pageTitle": title}, '', historyUrl);
         }
     }
-</script>
 
-<script>
     /** Fetch and parse the HTML document from a URL. */
     async function fetchRemoteDocument(url) {
         const response = await fetch(url);
@@ -324,9 +331,7 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
         const parser = new DOMParser();
         return parser.parseFromString(html, 'text/html');
     }
-</script>
 
-<script>
     /** Remove all <style> and <link rel="stylesheet"> tags from the document's <head> node, except the first one. */
     function clearAddedStyles() {
         const stylesAndLinks = document.head.querySelectorAll('style, link[rel="stylesheet"]');
@@ -334,9 +339,7 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
             stylesAndLinks[i].remove();
         }
     }
-</script>
 
-<script>
     /** Append all <style> and <link rel="stylesheet"> elements from a <head> element into the current document. */
     function importRemoteStyles(remoteHead) {
         const remoteStylesAndLinks = remoteHead.querySelectorAll('style, link[rel="stylesheet"]');
@@ -345,9 +348,7 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
             document.head.appendChild(clonedChild);
         }
     }
-</script>
 
-<script>
     /** Get predefined template elements from the remote page to the target container.
      * @param remoteBody The downloaded web page.
      * @param targetContainer The div we should put the body text into.
@@ -379,9 +380,7 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
             setTimeout(callSetupTemplate, 100);
         }
     }
-</script>
 
-<script>
     function callSetupTemplate() {
         console.log("Checking setup exists");
         if ('function' === typeof window.setupTemplate) {
@@ -391,17 +390,13 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
             console.log("Setup not found");
         }
     }
-</script>
 
-<script>
     /** Ensure our handler loads all child links in the content div. */
     function addLinksToContent(content) {
         const links = content.querySelectorAll('a');
         links.forEach(addLinkClickHandler);
     }
-</script>
 
-<script>
     /** Safely clear the div using the DOM, so all event handlers are cleanly killed without memory leaks. */
     function clearContentDiv(oldContentDiv) {
         // Find the parent element (where the div is located)
@@ -428,9 +423,7 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
         }
         return newContentDiv;
     }
-</script>
 
-<script>
     /**
      * Add an onclick handler to a link.
      * @param {Element} link
@@ -444,9 +437,7 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
             console.log("Not adding onClick to primary link: " + attr);
         }
     }
-</script>
 
-<script>
     function clickLink(e) {
         console.log("Onclick link.");
         // Prevent link from navigating.
@@ -472,15 +463,11 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
         const attr = this.getAttribute("href");
         openLinkInline(attr);
     }
-</script>
 
-<script>
     function removeSelectedClass(listItem) {
         listItem.classList.remove('selected');
     }
-</script>
 
-<script>
     /** Just to troll my wife, get a random name for the site. */
     function getSiteName() {
         const a = [
@@ -489,19 +476,6 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
         ];
         return 'Midwest ' + a[~~(Math.random() * a.length)];
     }
-</script>
-
-<script>
-    // Tree view event listeners to handle link-click behavior, and the initial onLoad().
-
-    // Get all the folder elements in the tree view.
-    const links = document.querySelectorAll('.path-link');
-
-    // Add a click event listener to each folder
-    links.forEach(addLinkClickHandler);
-
-    // Add a listener to handle browser back/forward buttons.
-    window.onpopstate = handleNavigation;
 </script>
 
 </body>
