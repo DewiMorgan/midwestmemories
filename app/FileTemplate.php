@@ -126,6 +126,9 @@ namespace MidwestMemories;
     <div id="comments"></div>
 </div><!-- End template-content div-->
 <script id="template-script">
+    </script>
+
+<script>
     async function fetchAllComments() {
         const allComments = [];
         const fileId = getFileId();
