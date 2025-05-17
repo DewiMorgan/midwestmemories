@@ -170,12 +170,6 @@ namespace MidwestMemories;
 
     /**
      * @param bodyText
-     * @returns {Promise<{Comment}>}
-     */
-
-
-    /**
-     * @param bodyText
      * @returns {Promise<Comment>}
      */
     async function postComment(bodyText) {
@@ -346,11 +340,12 @@ namespace MidwestMemories;
         }
 
         errorDiv.textContent = 'Submitting...';
+        /** @type {Comment} */
         const result = await postComment(bodyText);
         console.log("Result from postComment: ", result);
 
         if ('OK' === result.error) {
-            /** type {Comment} */
+            /** @type {Comment} */
             const comment = {
                 'error': 'OK'
                 'user': result.user,
