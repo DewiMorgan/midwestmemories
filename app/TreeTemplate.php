@@ -264,19 +264,6 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
 </script>
 
 <script>
-    // Tree view event listeners to handle link-click behavior, and the initial onLoad().
-
-    // Get all the folder elements in the tree view.
-    const links = document.querySelectorAll('.path-link');
-
-    // Add a click event listener to each folder
-    links.forEach(addLinkClickHandler);
-
-    // Add a listener to handle browser back/forward buttons.
-    window.onpopstate = handleNavigation;
-</script>
-
-<script>
     function handleNavigation(e) {
         if (e.state) {
             openLinkInline(e.state.html + "?i=1", false);
@@ -502,6 +489,19 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
         ];
         return 'Midwest ' + a[~~(Math.random() * a.length)];
     }
+</script>
+
+<script>
+    // Tree view event listeners to handle link-click behavior, and the initial onLoad().
+
+    // Get all the folder elements in the tree view.
+    const links = document.querySelectorAll('.path-link');
+
+    // Add a click event listener to each folder
+    links.forEach(addLinkClickHandler);
+
+    // Add a listener to handle browser back/forward buttons.
+    window.onpopstate = handleNavigation;
 </script>
 
 </body>
