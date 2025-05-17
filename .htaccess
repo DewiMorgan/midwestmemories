@@ -9,19 +9,10 @@ Require valid-user
     Allow from all
 </Files>
 
-<Files "inlineTest.php">
-    Satisfy Any
-    Order allow,deny
-    Allow from all
-</Files>
-
 RewriteEngine On
 
 # Exclude dropboxwebhook.php from rewriting
 RewriteCond %{REQUEST_URI} ^/dropboxwebhook\.php$ [NC]
-RewriteRule ^ - [L]
-# Exclude dropboxwebhook.php from rewriting
-RewriteCond %{REQUEST_URI} ^/inlineTest\.php$ [NC]
 RewriteRule ^ - [L]
 
 # Redirect index.php?path=/... to clean /... URL

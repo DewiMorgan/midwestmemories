@@ -362,8 +362,8 @@ namespace MidwestMemories;
 
     function setupTemplate() {
         console.log("Fetching comments...");
-        console.log("FileId = " + <?= getFileId() ?>
-            + "...");
+        console.log("FileId = <?= getFileId() ?> ...");
+        console.log("FileId = <?= getFileIdDebug() ?> ...");
         //displayComments();
     }
 
@@ -371,6 +371,16 @@ namespace MidwestMemories;
         console.log("Cleaned up files...");
     }
 </script>
+<?php
+/** DELETEME DEBUG */
+function getFileIdDebug(): string
+{
+    $webPath = Index::$requestUnixPath;
+    $dropboxPath = Path::IMAGE_DIR . $webPath;
+    $sql = 'SELECT `id` FROM `midmem_file_queue` WHERE `full_path` = ?';
+    return "dropboxPath='$dropboxPath', sql='$sql'";
+}
 
+?>
 </body>
 </html>
