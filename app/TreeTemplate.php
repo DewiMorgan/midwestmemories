@@ -444,6 +444,7 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
             window.history.pushState({"html": historyUrl, "pageTitle": title}, '', historyUrl);
         }
     }
+    }
 
     /** Get predefined template elements from the remote page to the target container.
      * @param remoteBody The downloaded web page.
@@ -476,7 +477,7 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
             setTimeout(callSetupTemplate, 100);
         }
     }
-}
+
 </script>
 
 </body>
