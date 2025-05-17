@@ -362,7 +362,8 @@ namespace MidwestMemories;
 
     function setupTemplate() {
         console.log("Fetching comments...");
-        console.log("FileId = <?= getFileId() ?>...");
+        console.log("FileId = " + <?= getFileId() ?>
+            + "...");
         //displayComments();
     }
 
