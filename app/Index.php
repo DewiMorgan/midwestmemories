@@ -164,7 +164,7 @@ class Index
                         $data = ['error' => 'Failed to save comment'];
                     } else {
                         Log::debug('Valid data found from ' . self::$requestWebPath, $bodyText);
-                        $data = self::execPostComment($fileId, $userName, $bodyText['body-text']);
+                        $data = self::execPostComment($fileId, $userName, $bodyText['body_text']);
                     }
                     break;
                 default:
