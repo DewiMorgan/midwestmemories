@@ -284,12 +284,14 @@ namespace MidwestMemories;
 
     function setupTemplate() {
         console.log("Fetching comments...");
-        displayComments();
+        xdisplayComments();
     }
 
     function cleanupTemplate() {
         console.log("Cleaned up files...");
     }
+
+function xdisplayComments() {}
 </script>
 <script id="xtemplate-script">
 
