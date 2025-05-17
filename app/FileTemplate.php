@@ -337,13 +337,9 @@ namespace MidwestMemories;
         addCommentControlUI(commentControlDiv);
     }
 
-</script>
-<script id="template-script">
-
     function getFileId() {
-        return <?php echo getFileId(); ?>;
+        return 6;
     }
-
 
     async function displayComments() {
         const commentsContainer = clearCommentDiv();
@@ -361,9 +357,13 @@ namespace MidwestMemories;
         }
     }
 
+</script>
+<script id="template-script">
+
     function setupTemplate() {
         console.log("Fetching comments...");
-        displayComments();
+        console.log("FileId = <?= getFileId() ?>...");
+        //displayComments();
     }
 
     function cleanupTemplate() {
