@@ -244,8 +244,7 @@ class Index
         $insertSql = 'INSERT INTO midmem_comments (date_created, user, body_text, sequence, fk_file, hidden)
                   VALUES (NOW(), ?, ?, ?, ?, false)';
         Log::debug("Db::sqlExec('$insertSql', 'ssii', '$userName', '$bodyText', '$nextSeq', '$fileId')");
-        // DELETEME DEBUG
-        //$result = Db::sqlExec($insertSql, $userName, $bodyText, $nextSeq, $fileId);  // UN-COMMENT-ME DEBUG
+        $result = Db::sqlExec($insertSql, $userName, $bodyText, $nextSeq, $fileId);
 
         if (!empty($result)) {
             Log::debug("Added comment by $userName on $fileId", $bodyText);
