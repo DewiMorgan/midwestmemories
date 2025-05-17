@@ -246,7 +246,7 @@ class Index
         Log::debug("Db::sqlExec('$insertSql', 'ssii', '$userName', '$bodyText', '$nextSeq', '$fileId')");
         $insertId = Db::sqlExec($insertSql, 'ssii', $userName, $bodyText, $nextSeq, $fileId);
 
-        if (!empty($result)) {
+        if (!empty($insertId)) {
             Log::debug("Added comment by $userName on $fileId", $bodyText);
             return self::getCommentById($insertId);
         } else {
