@@ -173,8 +173,8 @@ namespace MidwestMemories;
 
         const result = await response.json();
 
-        if ('OK' !== result.response) {
-            const message = result.message || 'Unknown error from server';
+        if ('OK' !== result.error) {
+            const message = result.error || 'Unknown error from server';
             console.error('Failed to post comment:', message);
             return {response: 'Error', message: message};
         }
