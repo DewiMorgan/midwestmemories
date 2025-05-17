@@ -282,48 +282,6 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
         }
     }
 
-    /**
-     * Handle link clicking, to load content into the content div
-     * @param {string} url The link to load.
-     * @param saveHistory True to add the followed link to browser history: false for back/forward button handling.
-     * @returns {Promise<void>}
-     */
-    async function openLinkInline(url, saveHistory = true) {
-        console.log("Opening link inline: " + url);
-
-        const content = document.getElementById("content");
-        const newContent = clearContentDiv(content); // Ensure event listeners are removed.
-        clearAddedStyles(); // Remove any styles we loaded from a previous page load.
-
-        let title;
-        try {
-            // Import the title, body and styles from the loaded document.
-            const doc = await fetchRemoteDocument(url);
-            title = doc.querySelector('title')?.innerText;
-            importRemoteStyles(doc.head);
-            importRemoteContent(doc.body, newContent);
-            console.log("Got to writing.");
-        } catch (error) {
-            // Report our failure.
-            console.error(error);
-            title = 'Error loading page';
-            const element = document.createElement('h1');
-            element.textContent = title;
-            newContent.appendChild(element);
-        }
-        document.title = getSiteName() + ' - ' + title;
-
-        // Ensure our handler loads all child links in the content div.
-        addLinksToContent(newContent);
-
-        // Ensure that history will work.
-        if (saveHistory) {
-            const historyUrl = url.replace(/(?:\?|&(?:amp;)?)i=\d+/, ''); // Strip out "inline" instruction.
-            console.log("Updating URL to '" + historyUrl + "'.");
-            window.history.pushState({"html": historyUrl, "pageTitle": title}, '', historyUrl);
-        }
-    }
-
     /** Fetch and parse the HTML document from a URL. */
     async function fetchRemoteDocument(url) {
         const response = await fetch(url);
@@ -475,6 +433,48 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
             'Messages', 'Metaphor', 'Meteor', 'Mistakes', 'Mondays', 'Mornings', 'Moaning', 'Mystery'
         ];
         return 'Midwest ' + a[~~(Math.random() * a.length)];
+    }
+
+    /**
+     * Handle link clicking, to load content into the content div
+     * @param {string} url The link to load.
+     * @param saveHistory True to add the followed link to browser history: false for back/forward button handling.
+     * @returns {Promise<void>}
+     */
+    async function openLinkInline(url, saveHistory = true) {
+        console.log("Opening link inline: " + url);
+
+        const content = document.getElementById("content");
+        const newContent = clearContentDiv(content); // Ensure event listeners are removed.
+        clearAddedStyles(); // Remove any styles we loaded from a previous page load.
+
+        let title;
+        try {
+            // Import the title, body and styles from the loaded document.
+            const doc = await fetchRemoteDocument(url);
+            title = doc.querySelector('title')?.innerText;
+            importRemoteStyles(doc.head);
+            importRemoteContent(doc.body, newContent);
+            console.log("Got to writing.");
+        } catch (error) {
+            // Report our failure.
+            console.error(error);
+            title = 'Error loading page';
+            const element = document.createElement('h1');
+            element.textContent = title;
+            newContent.appendChild(element);
+        }
+        document.title = getSiteName() + ' - ' + title;
+
+        // Ensure our handler loads all child links in the content div.
+        addLinksToContent(newContent);
+
+        // Ensure that history will work.
+        if (saveHistory) {
+            const historyUrl = url.replace(/(?:\?|&(?:amp;)?)i=\d+/, ''); // Strip out "inline" instruction.
+            console.log("Updating URL to '" + historyUrl + "'.");
+            window.history.pushState({"html": historyUrl, "pageTitle": title}, '', historyUrl);
+        }
     }
 </script>
 

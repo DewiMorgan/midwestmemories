@@ -75,9 +75,8 @@ namespace MidwestMemories;
     -->
     <?php
     // DELETEME DEBUG
-    echo '<hr><h3>Debugging stuff below this line</h3>';
-
-    echo '<pre>' . basename(Index::$requestUnixPath) . " file details:\n" . var_export($fileDetails, true) . "</pre>\n";
+    //  echo '<hr><h3>Debugging stuff below this line</h3>';
+// echo '<pre>' . basename(Index::$requestUnixPath) . " file details:\n" . var_export($fileDetails, true) . "</pre>\n";
 
     // END DELETEME DEBUG
 
