@@ -161,16 +161,16 @@ class Index
                     $bodyText = json_decode(file_get_contents('php://input'), true);
                     if (empty($bodyText)) {
                         Log::warning('Ignoring empty comment struct from ' . self::$requestWebPath, $bodyText);
-                        $data = ['error' => 'Failed to save comment'];
+                        $data = ['error' => 'Failed to save comment 1'];
                     } elseif (!is_array($bodyText)) {
                         Log::warning('Ignoring non-array comment text from ' . self::$requestWebPath, $bodyText);
-                        $data = ['error' => 'Failed to save comment'];
+                        $data = ['error' => 'Failed to save comment 2'];
                     } elseif (!array_key_exists('body_text', $bodyText)) {
                         Log::warning('Ignoring missing body_text key from ' . self::$requestWebPath, $bodyText);
-                        $data = ['error' => 'Failed to save comment'];
+                        $data = ['error' => 'Failed to save comment 3'];
                     } elseif (empty($bodyText['body_text'])) {
                         Log::warning('Ignoring empty body_text from ' . self::$requestWebPath, $bodyText);
-                        $data = ['error' => 'Failed to save comment'];
+                        $data = ['error' => 'Failed to save comment 4'];
                     } else {
                         Log::debug('Valid data found from ' . self::$requestWebPath, $bodyText);
                         $data = self::execPostComment($fileId, $userName, $bodyText['body_text']);
