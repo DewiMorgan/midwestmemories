@@ -116,7 +116,7 @@ namespace MidwestMemories;
      */
     function getFileId(): int
     {
-        $webPath = Index::$requestUnixPath;
+        $webPath = Index::$requestWebPath;
         $dropboxPath = Path::IMAGE_DIR . $webPath;
         $sql = 'SELECT `id` FROM `midmem_file_queue` WHERE `full_path` = ?';
         return intval(Db::sqlGetItem($sql, 'id', 's', $dropboxPath));
@@ -269,10 +269,11 @@ namespace MidwestMemories;
 
     function showCommentEditor() {
         const commentControlDiv = clearCommentControlDiv(); // clear controls
-
+        const cols = 60;
+        const rows = 4;
         const textarea = document.createElement('textarea');
-        textarea.rows = 4;
-        textarea.cols = 60;
+        textarea.rows = rows;
+        textarea.cols = cols;
         textarea.autofocus = true;
         textarea.id = 'comment-textarea';
 
@@ -376,7 +377,7 @@ namespace MidwestMemories;
 /** DELETEME DEBUG */
 function getFileIdDebug(): string
 {
-    $webPath = Index::$requestUnixPath;
+    $webPath = Index::$requestWebPath;
     $dropboxPath = Path::IMAGE_DIR . $webPath;
     $sql = 'SELECT `id` FROM `midmem_file_queue` WHERE `full_path` = ?';
     return "dropboxPath='$dropboxPath', sql='$sql'";
