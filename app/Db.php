@@ -55,12 +55,16 @@ class Db
      * Execute a SQL statement.
      * @param string $sql The query to execute.
      * @param int|string ...$items type-string, then variables, like 'sd', 'foo', 1.
-     * @return bool True on success, else false.
+     * @return int|null The inserted ID on success, else null.
      */
-    public static function sqlExec(string $sql, int|string ...$items): bool
+    public static function sqlExec(string $sql, int|string ...$items): ?int
     {
         Log::debug('Exec...', [$sql, $items]);
-        return (bool)self::getQueryResult(self::TYPE_EXEC, $sql, ...$items);
+        $result = self::getQueryResult(self::TYPE_EXEC, $sql, ...$items);
+        if (empty($result)) {
+            return null;
+        }
+        return intval($result[0]);
     }
 
     /**
@@ -166,7 +170,7 @@ class Db
             return [];
         }
         if (self::TYPE_EXEC == $queryType) {
-            return [1];
+            return [$db->insert_id];
         }
         if (!($result = $query->get_result())) {
             Log::warn('get_result failed, db error', $db->error);

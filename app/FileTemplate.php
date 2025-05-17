@@ -76,7 +76,7 @@ namespace MidwestMemories;
     <?php
     // DELETEME DEBUG
     //  echo '<hr><h3>Debugging stuff below this line</h3>';
-// echo '<pre>' . basename(Index::$requestUnixPath) . " file details:\n" . var_export($fileDetails, true) . "</pre>\n";
+    // echo '<pre>' . basename(Index::$requestUnixPath) . " file:\n" . var_export($fileDetails, true) . "</pre>\n";
 
     // END DELETEME DEBUG
 
@@ -127,7 +127,19 @@ namespace MidwestMemories;
 </div><!-- End template-content div-->
 
 <script id="template-script">
+    /**
+     * This comment defines the typedef for the API response that contains a comment.
+     * @typedef {Object} Comment
+     * @property {string} error
+     * @property {string} body_text
+     * @property {string} user
+     * @property {string} date_created
+     */
 
+    /**
+     * Fetch all the comments for this file from the API.
+     * @returns {Promise<*[]>}
+     */
     async function fetchAllComments() {
         const allComments = [];
         const fileId = getFileId();
@@ -140,6 +152,7 @@ namespace MidwestMemories;
                 throw new Error(`Failed to fetch page ${currentPage}: ${response.statusText}`);
             }
 
+            /** @type {Comment[]} */
             const comments = await response.json();
             allComments.push(...comments);
 
@@ -155,6 +168,16 @@ namespace MidwestMemories;
         return allComments;
     }
 
+    /**
+     * @param bodyText
+     * @returns {Promise<{Comment}>}
+     */
+
+
+    /**
+     * @param bodyText
+     * @returns {Promise<Comment>}
+     */
     async function postComment(bodyText) {
         const fileId = getFileId();
         const response = await fetch(`/v1/comment/${fileId}`, {
@@ -166,18 +189,19 @@ namespace MidwestMemories;
         });
 
         if (!response.ok) {
-            const message = `HTTP error ${response.status}`;
-            console.error('Failed to post comment:', message);
-            return {response: 'Error', message: message};
+            const errorMessage = `HTTP error ${response.status}`;
+            console.error('Failed to post comment:', errorMessage);
+            return {error: 'Error', body_text: errorMessage, user: '', date_created: ''};
         }
 
+        /** @type {Comment} */
         const result = await response.json();
         console.log("Awaited response: ", result);
 
         if ('OK' !== result.error) {
-            const message = result.error || 'Unknown error from server';
-            console.error('Failed to post comment:', message);
-            return {response: 'Error', message: message};
+            const errorMessage = result.error || 'Unknown error from server';
+            console.error('Failed to post comment:', errorMessage);
+            return {error: 'Error', body_text: errorMessage, user: '', date_created: ''};
         }
 
         return result;
@@ -231,6 +255,12 @@ namespace MidwestMemories;
         commentControlDiv.appendChild(addButton);
     }
 
+    /**
+     *
+     * @param {Comment} comment
+     * @param commentsContainer
+     * @returns {Element}
+     */
     function renderSingleComment(comment, commentsContainer) {
         console.log("Single comment rendering.");
         const commentDiv = document.createElement('div');
@@ -241,10 +271,10 @@ namespace MidwestMemories;
 
         const dateElem = document.createElement('span');
         dateElem["style"].marginLeft = '10px';
-        dateElem.textContent = '(' + comment['date_created'] + ')';
+        dateElem.textContent = '(' + comment.date_created + ')';
 
         const bodyElem = document.createElement('pre'); // preserves formatting
-        bodyElem.textContent = comment['body_text'];
+        bodyElem.textContent = comment.body_text;
 
         const brElem = document.createElement('br');
 
@@ -272,13 +302,15 @@ namespace MidwestMemories;
         const submitButton = document.createElement('button');
         submitButton.textContent = 'Submit';
 
+        /** @type {HTMLButtonElement} */
         const cancelButton = document.createElement('button');
         cancelButton.textContent = 'Cancel';
-        cancelButton['style'].marginLeft = '10px';
+        cancelButton.style.marginLeft = '10px';
 
+        /** @type {HTMLDivElement} */
         const errorDiv = document.createElement('div');
-        errorDiv['style'].color = 'red';
-        errorDiv['style'].marginTop = '5px';
+        errorDiv.style.color = 'red';
+        errorDiv.style.marginTop = '5px';
         errorDiv.id = 'comment-error';
         const brElem = document.createElement('br');
 
@@ -296,10 +328,10 @@ namespace MidwestMemories;
     }
 
     function focusTextarea() {
+        /** @type {HTMLTextAreaElement} */
         const textarea = document.getElementById('comment-textarea');
-        if ('function' === typeof textarea.focus) {
-            textarea.focus();
-        }
+        textarea.focus();
+        textarea.scrollIntoView({behavior: 'smooth', block: 'start'});
     }
 
     async function handleSubmitComment() {
@@ -318,15 +350,22 @@ namespace MidwestMemories;
         console.log("Result from postComment: ", result);
 
         if ('OK' === result.error) {
+            /** type {Comment} */
+            const comment = {
+                'error': 'OK'
+                'user': result.user,
+                'date_created': result.date_created,
+                'body_text': result.body_text,
+            };
+            renderSingleComment(comment, commentsDiv);
             const commentControlDiv = clearCommentControlDiv();
             addCommentControlUI(commentControlDiv);
-
-            const lastComment = renderSingleComment(bodyText, commentsDiv);
-            lastComment.scrollIntoView({behavior: 'smooth', block: 'start'});
+            commentControlDiv.scrollIntoView({behavior: 'smooth', block: 'start'});
         } else {
             errorDiv.textContent = result.error;
         }
     }
+
     function handleCancelComment() {
         const commentControlDiv = clearCommentControlDiv();
         addCommentControlUI(commentControlDiv);

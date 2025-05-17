@@ -166,10 +166,10 @@ class Index
                         Log::warning('Ignoring non-array comment text from ' . self::$requestWebPath, $bodyText);
                         $data = ['error' => 'Failed to save comment'];
                     } elseif (!array_key_exists('body_text', $bodyText)) {
-                        Log::warning('Ignoring missing body-text key from ' . self::$requestWebPath, $bodyText);
+                        Log::warning('Ignoring missing body_text key from ' . self::$requestWebPath, $bodyText);
                         $data = ['error' => 'Failed to save comment'];
                     } elseif (empty($bodyText['body_text'])) {
-                        Log::warning('Ignoring empty bodytext from ' . self::$requestWebPath, $bodyText);
+                        Log::warning('Ignoring empty body_text from ' . self::$requestWebPath, $bodyText);
                         $data = ['error' => 'Failed to save comment'];
                     } else {
                         Log::debug('Valid data found from ' . self::$requestWebPath, $bodyText);
@@ -244,14 +244,34 @@ class Index
         $insertSql = 'INSERT INTO midmem_comments (date_created, user, body_text, sequence, fk_file, hidden)
                   VALUES (NOW(), ?, ?, ?, ?, false)';
         Log::debug("Db::sqlExec('$insertSql', 'ssii', '$userName', '$bodyText', '$nextSeq', '$fileId')");
-        $result = Db::sqlExec($insertSql, 'ssii', $userName, $bodyText, $nextSeq, $fileId);
+        $insertId = Db::sqlExec($insertSql, 'ssii', $userName, $bodyText, $nextSeq, $fileId);
 
         if (!empty($result)) {
             Log::debug("Added comment by $userName on $fileId", $bodyText);
-            return ['error' => 'OK'];
+            return self::getCommentById($insertId);
         } else {
             Log::debug("Failed to add comment by $userName on $fileId", $bodyText);
             return ['error' => 'Failed to save comment'];
         }
+    }
+
+    /**
+     * @param int $commentId The `id` field of the comment to get.
+     * @return array Comments as a list of [sequence, date_created, user, body_text, num_pages].
+     */
+    private static function getCommentById(int $commentId): array
+    {
+        $sql = "
+            SELECT 
+                'OK' AS `error`,
+                c.`sequence`, 
+                c.`date_created`, 
+                c.`user`, 
+                c.`body_text`
+            FROM `midmem_comments` c
+            WHERE c.id = ?
+            LIMIT 1
+        ";
+        return Db::sqlGetRow($sql, 'i', $commentId);
     }
 }

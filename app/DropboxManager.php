@@ -282,11 +282,12 @@ class DropboxManager
     private function processTextFile($fullPath): bool
     {
         // ToDo: some parsing.
-        return Db::sqlExec(
+        $result = Db::sqlExec(
             "UPDATE `midmem_file_queue` SET `sync_status` = '" . self::SYNC_STATUS_PROCESSED . "' WHERE full_path = ?",
             's',
             $fullPath
         );
+        return is_null($result);
     }
 
     /**
@@ -343,13 +344,14 @@ class DropboxManager
     private function processOtherFile(string $fullPath): bool
     {
         // Nothing to do but mark it complete.
-        return Db::sqlExec(
+        $result = Db::sqlExec(
             "UPDATE `midmem_file_queue` 
                 SET `sync_status` = '" . self::SYNC_STATUS_PROCESSED . "', `error_message`='Unknown type' 
                 WHERE full_path = ?",
             's',
             $fullPath
         );
+        return is_null($result);
     }
 
     /** Load the current cursor from the DB. */
@@ -531,12 +533,13 @@ class DropboxManager
      */
     public function setSyncStatus(string $fullPath, string $status, string $errorMessage = ''): bool
     {
-        return Db::sqlExec(
+        $result = Db::sqlExec(
             'UPDATE `midmem_file_queue` SET `sync_status` = ?, error_message = ? WHERE full_path = ?',
             'sss',
             $status,
             $errorMessage,
             $fullPath
         );
+        return is_null($result);
     }
 }
