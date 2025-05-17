@@ -176,13 +176,13 @@ class Db
         if (self::TYPE_RESULT == $queryType) {
             return $result;
         }
-        $result->free();
         if (!($row = $result->fetch_assoc())) {
             Log::warn('fetch_assoc failed, db error', $db->error);
             Log::warn('fetch_assoc failed, sql error', $query->error);
             $result->free();
             return [];
         }
+        $result->free();
         return $row;
     }
 
