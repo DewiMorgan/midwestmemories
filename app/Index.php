@@ -160,7 +160,7 @@ class Index
                     $userName = $_SERVER['PHP_AUTH_USER'];
                     $bodyText = $_POST['body_text'] ?? '';
                     if (empty($bodyText)) {
-                        Log::warning('Ignoring empty comment text', self::$requestWebPath);
+                        Log::warning('Ignoring empty comment text from ' . self::$requestWebPath, $_POST);
                         $data = ['error' => 'Failed to save comment'];
                     } else {
                         $data = self::execPostComment($fileId, $userName, $bodyText);
