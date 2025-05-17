@@ -81,7 +81,7 @@ class Db
             return null;
         }
         Log::debug("...success: '$row[$field]' is in", $row);
-        return $row[$field];
+        return (string)$row[$field];
     }
 
     /**
