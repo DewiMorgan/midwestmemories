@@ -126,7 +126,7 @@ namespace MidwestMemories;
     <div id="comments"></div>
 </div><!-- End template-content div-->
 
-<script id="template-script">
+<script id="xtemplate-script">
 
     async function fetchAllComments() {
         const allComments = [];
@@ -180,22 +180,6 @@ namespace MidwestMemories;
         }
 
         return result;
-    }
-
-    async function displayComments() {
-        const commentsContainer = clearCommentDiv();
-
-        try {
-            console.log("Awaiting the comments.");
-            const comments = await fetchAllComments();
-            console.log("Rendering the comments.");
-            renderComments(comments, commentsContainer);
-            console.log("Displayed comments!");
-        } catch (error) {
-            console.log("Error displaying the comments.");
-            commentsContainer.textContent = 'Failed to load comments.';
-            console.error('Error displaying comments:', error);
-        }
     }
 
     /** Safely clear the div using the DOM, so all event handlers are cleanly killed without memory leaks. */
@@ -282,14 +266,6 @@ namespace MidwestMemories;
         return commentDiv;
     }
 
-    function setupTemplate() {
-        console.log("Fetching comments...");
-        displayComments();
-    }
-
-    function cleanupTemplate() {
-        console.log("Cleaned up files...");
-    }
 
     function showCommentEditor() {
         const commentControlDiv = clearCommentControlDiv(); // clear controls
@@ -356,6 +332,8 @@ namespace MidwestMemories;
             errorDiv.textContent = result.error;
         }
     }
+</script>
+<script id="template-script">
 
     function handleCancelComment() {
         const commentControlDiv = clearCommentControlDiv();
@@ -366,6 +344,31 @@ namespace MidwestMemories;
         return <?= getFileId() ?>;
     }
 
+
+    async function displayComments() {
+        const commentsContainer = clearCommentDiv();
+
+        try {
+            console.log("Awaiting the comments.");
+            const comments = await fetchAllComments();
+            console.log("Rendering the comments.");
+            renderComments(comments, commentsContainer);
+            console.log("Displayed comments!");
+        } catch (error) {
+            console.log("Error displaying the comments.");
+            commentsContainer.textContent = 'Failed to load comments.';
+            console.error('Error displaying comments:', error);
+        }
+    }
+
+    function setupTemplate() {
+        console.log("Fetching comments...");
+        displayComments();
+    }
+
+    function cleanupTemplate() {
+        console.log("Cleaned up files...");
+    }
 </script>
 
 </body>
