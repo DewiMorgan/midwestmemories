@@ -278,6 +278,7 @@ namespace MidwestMemories;
         const errorDiv = document.createElement('div');
         errorDiv['style'].color = 'red';
         errorDiv['style'].marginTop = '5px';
+        errorDiv.id = 'comment-error';
         const brElem = document.createElement('br');
 
         commentControlDiv.appendChild(textarea);
