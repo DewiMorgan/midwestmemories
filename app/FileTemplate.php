@@ -196,7 +196,7 @@ namespace MidwestMemories;
 
         // Create the new comment div, with the same properties as the original.
         const newCommentDiv = document.createElement('div');
-        newCommentDiv.id = 'comment';
+        newCommentDiv.id = 'comments';
 
         // Insert the new div.
         parent.appendChild(newCommentDiv);
@@ -303,7 +303,7 @@ namespace MidwestMemories;
     function handleSubmitComment() {
         const textarea = document.getElementById('comment-textarea');
         const errorDiv = document.getElementById('comment-error');
-        const commentDiv = document.getElementById('comment');
+        const commentsDiv = document.getElementById('comments');
 
         const bodyText = textarea['value'].trim();
         if (!bodyText) {
@@ -318,7 +318,7 @@ namespace MidwestMemories;
             const commentControlDiv = clearCommentControlDiv();
             addCommentControlUI(commentControlDiv);
 
-            const lastComment = renderSingleComment(bodyText, commentDiv);
+            const lastComment = renderSingleComment(bodyText, commentsDiv);
             lastComment.scrollIntoView({behavior: 'smooth', block: 'start'});
         } else {
             errorDiv.textContent = result.error;
