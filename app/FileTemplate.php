@@ -230,15 +230,6 @@ namespace MidwestMemories;
         commentControlDiv.appendChild(addButton);
     }
 
-
-    function renderComments(comments, commentsContainer) {
-        console.log("Render comments:");
-        for (const comment of comments) {
-            console.log("Single comments:");
-            renderSingleComment(comment, commentsContainer);
-        }
-    }
-
     function renderSingleComment(comment, commentsContainer) {
         console.log("Single comment rendering.");
         const commentDiv = document.createElement('div');
@@ -349,7 +340,13 @@ namespace MidwestMemories;
             console.log("Awaiting the comments.");
             const comments = await fetchAllComments();
             console.log("Rendering the comments.");
-            renderComments(comments, commentsContainer);
+            for (const comment of comments) {
+                console.log("Single comments:");
+                renderSingleComment(comment, commentsContainer);
+            }
+            console.log("Adding add-comment button:");
+            const commentControlDiv = clearCommentControlDiv();
+            addCommentControlUI(commentControlDiv);
             console.log("Displayed comments!");
         } catch (error) {
             console.log("Error displaying the comments.");
