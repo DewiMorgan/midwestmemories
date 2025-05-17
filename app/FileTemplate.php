@@ -126,7 +126,7 @@ namespace MidwestMemories;
     <div id="comments"></div>
 </div><!-- End template-content div-->
 
-<script id="xtemplate-script">
+<script id="template-script">
 
     async function fetchAllComments() {
         const allComments = [];
