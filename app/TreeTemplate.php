@@ -307,38 +307,6 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
         }
     }
 
-    /** Get predefined template elements from the remote page to the target container.
-     * @param remoteBody The downloaded web page.
-     * @param targetContainer The div we should put the body text into.
-     */
-    function importRemoteContent(remoteBody, targetContainer) {
-        // Cleanup from previous template
-        if ('function' === typeof window.cleanupTemplate) {
-            window.cleanupTemplate();
-            window.cleanupTemplate = undefined;
-        }
-
-        // Load new content
-        const content = remoteBody.querySelector('#template-content');
-        const script = remoteBody.querySelector('#template-script');
-
-        if (content) {
-            const clonedNode = content.cloneNode(true);
-            targetContainer.appendChild(clonedNode);
-        }
-
-        if (script) {
-            const newScript = document.createElement('script');
-            newScript.textContent = script.textContent;
-            targetContainer.appendChild(newScript);
-
-            // Wait for DOM update and script execution.
-            // Use a small timeout to ensure the script has time to define setupTemplate.
-            console.log("Waiting to call setup");
-            setTimeout(callSetupTemplate, 100);
-        }
-    }
-
     function callSetupTemplate() {
         console.log("Checking setup exists");
         if ('function' === typeof window.setupTemplate) {
@@ -474,6 +442,38 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
             const historyUrl = url.replace(/(?:\?|&(?:amp;)?)i=\d+/, ''); // Strip out "inline" instruction.
             console.log("Updating URL to '" + historyUrl + "'.");
             window.history.pushState({"html": historyUrl, "pageTitle": title}, '', historyUrl);
+        }
+    }
+
+    /** Get predefined template elements from the remote page to the target container.
+     * @param remoteBody The downloaded web page.
+     * @param targetContainer The div we should put the body text into.
+     */
+    function importRemoteContent(remoteBody, targetContainer) {
+        // Cleanup from previous template
+        if ('function' === typeof window.cleanupTemplate) {
+            window.cleanupTemplate();
+            window.cleanupTemplate = undefined;
+        }
+
+        // Load new content
+        const content = remoteBody.querySelector('#template-content');
+        const script = remoteBody.querySelector('#template-script');
+
+        if (content) {
+            const clonedNode = content.cloneNode(true);
+            targetContainer.appendChild(clonedNode);
+        }
+
+        if (script) {
+            const newScript = document.createElement('script');
+            newScript.textContent = script.textContent;
+            targetContainer.appendChild(newScript);
+
+            // Wait for DOM update and script execution.
+            // Use a small timeout to ensure the script has time to define setupTemplate.
+            console.log("Waiting to call setup");
+            setTimeout(callSetupTemplate, 100);
         }
     }
 </script>
