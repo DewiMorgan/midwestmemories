@@ -347,10 +347,10 @@ namespace MidwestMemories;
         if ('OK' === result.error) {
             /** @type {Comment} */
             const comment = {
-                'error': 'OK'
+                'error': 'OK',
                 'user': result.user,
                 'date_created': result.date_created,
-                'body_text': result.body_text,
+                'body_text': result.body_text
             };
             renderSingleComment(comment, commentsDiv);
             const commentControlDiv = clearCommentControlDiv();
