@@ -158,13 +158,12 @@ class Index
                     break;
                 case 'postComment':
                     $userName = $_SERVER['PHP_AUTH_USER'];
-                    $bodyText = $_POST['body_text'] ?? '';
+                    $bodyText = json_decode(file_get_contents('php://input'), true);
                     if (empty($bodyText)) {
-                        Log::warning('Ignoring empty comment text from ' . self::$requestWebPath, $_POST);
-                        $fgcData = json_decode(file_get_contents('php://input'), true);
-                        Log::warning('Trying file_get_contents, got', $fgcData);
+                        Log::warning('Ignoring empty comment text from ' . self::$requestWebPath, $bodyText);
                         $data = ['error' => 'Failed to save comment'];
                     } else {
+                        Log::debug('Valid data found from ' . self::$requestWebPath, $bodyText);
                         $data = self::execPostComment($fileId, $userName, $bodyText);
                     }
                     break;
@@ -235,11 +234,12 @@ class Index
         // Insert the new comment
         $insertSql = 'INSERT INTO midmem_comments (date_created, user, body_text, sequence, fk_file, hidden)
                   VALUES (NOW(), ?, ?, ?, ?, false)';
-        $result = Db::sqlExec($insertSql, $userName, $bodyText, $nextSeq, $fileId);
+        Log::debug("Db::sqlExec('$insertSql', '$userName', '$bodyText', '$nextSeq', '$fileId')"); // DELETEME DEBUG
+        //$result = Db::sqlExec($insertSql, $userName, $bodyText, $nextSeq, $fileId);  // UN-COMMENT-ME DEBUG
 
         if (!empty($result)) {
             Log::debug("Added comment by $userName on $fileId", $bodyText);
-            return ['error' => 'OK'];
+            return ['error' => 'OKx']; // DELETEME DEBUG
         } else {
             Log::debug("Failed to add comment by $userName on $fileId", $bodyText);
             return ['error' => 'Failed to save comment'];
