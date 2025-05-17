@@ -370,6 +370,7 @@ namespace MidwestMemories;
     function cleanupTemplate() {
         console.log("Cleaned up files...");
     }
+    setupTemplate();
 </script>
 <?php
 /** DELETEME DEBUG */
