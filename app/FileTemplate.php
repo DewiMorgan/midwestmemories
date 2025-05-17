@@ -332,9 +332,6 @@ namespace MidwestMemories;
             errorDiv.textContent = result.error;
         }
     }
-</script>
-<script id="template-script">
-
     function handleCancelComment() {
         const commentControlDiv = clearCommentControlDiv();
         addCommentControlUI(commentControlDiv);
@@ -343,6 +340,9 @@ namespace MidwestMemories;
     function getFileId() {
         return <?= getFileId() ?>;
     }
+
+</script>
+<script id="template-script">
 
 
     async function displayComments() {
