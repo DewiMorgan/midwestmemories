@@ -476,6 +476,7 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
             setTimeout(callSetupTemplate, 100);
         }
     }
+}
 </script>
 
 </body>
