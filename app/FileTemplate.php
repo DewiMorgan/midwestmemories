@@ -172,6 +172,7 @@ namespace MidwestMemories;
         }
 
         const result = await response.json();
+        console.log("Awaited response: ", result);
 
         if ('OK' !== result.error) {
             const message = result.error || 'Unknown error from server';
@@ -314,6 +315,7 @@ namespace MidwestMemories;
 
         errorDiv.textContent = 'Submitting...';
         const result = postComment(bodyText);
+        console.log("Result from postComment: ", result);
 
         if ('OK' === result.error) {
             const commentControlDiv = clearCommentControlDiv();
