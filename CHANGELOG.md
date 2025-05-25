@@ -5,6 +5,8 @@ which might not be when they were actually implemented/committed.
 
 ## 2025/05/16 Fri
 
+* DONE: API to add comments.
+* DONE: Javascript to add comments.
 
 ## 2025/05/14 Wed
 

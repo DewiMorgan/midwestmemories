@@ -117,7 +117,7 @@ namespace MidwestMemories;
     function getFileId(): int
     {
         $webPath = Index::$requestWebPath;
-        $dropboxPath = Path::IMAGE_DIR . $webPath;
+        $dropboxPath = Conf::get(Key::IMAGE_DIR) . $webPath;
         $sql = 'SELECT `id` FROM `midmem_file_queue` WHERE `full_path` = ?';
         return intval(Db::sqlGetItem($sql, 'id', 's', $dropboxPath));
     }

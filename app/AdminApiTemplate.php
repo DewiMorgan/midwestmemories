@@ -1,3 +1,6 @@
+<?php
+declare(strict_types=1);
+?>
 <div id="messages"></div>
 
 <script>
@@ -14,8 +17,6 @@
     function updateMessage(element, appendText) {
         element.textContent += appendText;
     }
-
-    const defaultTimeout = 10000;
 
     // Generic file task handler
     async function handleFileTask(actionName, listEndpoint, fileEndpoint) {

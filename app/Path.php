@@ -9,10 +9,9 @@ namespace MidwestMemories;
  */
 class Path
 {
-    public const IMAGE_DIR = 'midwestmemories';
-
     public const LINK_INLINE = '1';
     public const LINK_RAW = '2';
+    /** @noinspection PhpUnused */
     public const LINK_SEARCH = '3';
     public const LINK_USER = '';
 
@@ -25,9 +24,10 @@ class Path
     public static function validateBaseDir(): void
     {
         /** @noinspection RealpathInStreamContextInspection */
-        $baseDir = realpath(__DIR__ . '/../' . self::IMAGE_DIR . '/');
+        $imageDir = Conf::get(Key::IMAGE_DIR);
+        $baseDir = realpath(__DIR__ . '/../' . $imageDir . '/');
         if (empty($baseDir)) {
-            Log::debug('MM_BASE_DIR empty from "' . __DIR__ . ' + /../ + ' . self::IMAGE_DIR . ' + /".');
+            Log::debug('MM_BASE_DIR empty from "' . __DIR__ . ' + /../ + ' . $imageDir . ' + /".');
             Log::debug('Not safe to continue');
             http_response_code(500); // Internal Server Error.
             die(1);
@@ -62,7 +62,7 @@ class Path
         }
 
         // Folder names may need escaping, but the slashes must remain.
-        $result = Index::MM_BASE_URL . str_replace('%2F', '/', urlencode($result));
+        $result = Conf::get(Key::BASE_URL) . str_replace('%2F', '/', urlencode($result));
         if (self::LINK_USER !== (string)$linkType) {
             $result .= '?i=' . $linkType;
         }

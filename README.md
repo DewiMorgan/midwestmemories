@@ -138,10 +138,12 @@ See also ToDo, above.
 Current task:
 
 * Get it commentable.
-    * API to add comments.
-    * Javascript to add comments.
+    * sanitise comments
+    * allow some rich text: bold and links and such.
     * CSS to make comments usable.
     * Clean up debugging output from files template.
+    * Hide a bunch of unused fields in files template table output.
+* Move it to its own domain.
 * Lower priority
     * API to edit comments.
     * Javascript to edit comments.

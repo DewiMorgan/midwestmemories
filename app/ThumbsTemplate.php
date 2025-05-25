@@ -76,8 +76,8 @@ namespace MidwestMemories;
             padding: 4px; /* White border */
             border: 1px solid #a9a9a9; /* Black border outside the white one. */
             box-shadow: 10px 5px 5px #777777; /* Drop shadow */
-            max-width: <?= DropboxManager::MAX_THUMB_WIDTH ?>px;
-            max-height: <?= DropboxManager::MAX_THUMB_HEIGHT ?>px;
+            max-width: <?= Conf::get(Key::MAX_THUMB_WIDTH) ?>px;
+            max-height: <?= Conf::get(Key::MAX_THUMB_HEIGHT) ?>px;
         }
 
         figure {

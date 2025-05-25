@@ -17,15 +17,6 @@ class DropboxManager
     /** The current position in a read of the file status. Long-lived, persistent, gets updates. */
     public string $cursor;
 
-    /** Max PNG size in bytes before we resample to JPG. */
-    private const MAX_PNG_BYTES = 1024 * 1024;
-
-    /** Max image width in pixels before scaling down for thumbnail. */
-    public const MAX_THUMB_WIDTH = 64;
-
-    /** Max image height in pixels before scaling down for thumbnail. */
-    public const MAX_THUMB_HEIGHT = 64;
-
     /** The item has just been added from the Dropbox list. */
     public const SYNC_STATUS_NEW = 'NEW';
 
@@ -296,7 +287,7 @@ class DropboxManager
      */
     private function processPngFile(string $fullPath): bool
     {
-        if ((filesize($fullPath) > self::MAX_PNG_BYTES)) {
+        if ((filesize($fullPath) > Conf::get(Key::MAX_PNG_BYTES))) {
             // Thumbnail generation would be faster from the new JPG, so we roll this into convertToJpeg.
             $thumbResult = $this->convertToJpeg($fullPath);
         } else {
@@ -395,13 +386,15 @@ class DropboxManager
         $newWidth = $origWidth;
         $newHeight = $origHeight;
         // Scale to max height if needed.
-        if ($origHeight > self::MAX_THUMB_HEIGHT) {
-            $newHeight = self::MAX_THUMB_HEIGHT;
+        $maxHeight = Conf::get(Key::MAX_THUMB_HEIGHT);
+        if ($origHeight > $maxHeight) {
+            $newHeight = $maxHeight;
             $newWidth = floor($origWidth * ($newHeight / $origHeight));
         }
         // Scale further to max width if still too large.
-        if ($newWidth > self::MAX_THUMB_WIDTH) {
-            $newWidth = self::MAX_THUMB_WIDTH;
+        $maxWidth = Conf::get(Key::MAX_THUMB_WIDTH);
+        if ($newWidth > $maxWidth) {
+            $newWidth = $maxWidth;
             $newHeight = floor($origWidth * ($newWidth / $origWidth));
         }
         Log::debug(
