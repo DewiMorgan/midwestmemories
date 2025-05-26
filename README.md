@@ -143,7 +143,6 @@ Current task:
     * CSS to make comments usable.
     * Clean up debugging output from files template.
     * Hide a bunch of unused fields in files template table output.
-* Move it to its own domain.
 * Lower priority
     * API to edit comments.
     * Javascript to edit comments.

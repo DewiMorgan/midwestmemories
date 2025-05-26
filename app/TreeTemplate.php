@@ -142,10 +142,14 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
             // Loop through the items and output a list item for each one.
             $files = '';
             foreach ($items as $item) {
-                // Apply blacklist even to folders. Skip the current and parent directories, and any hidden ones.
-                // Also skip thumbnails, index files, and ICE files.
-                // ToDo: This blocklist and later allowlist is repeated code in thumbsTemplate, etc. Centralize it.
-                if (preg_match('/^(\.|tn_|index\.)|-ICE.jpg$/', $item)) {
+                $itemUnixPath = "$scanUnixDir/$item";
+
+                // Validation.
+                if (is_dir($itemUnixPath)) {
+                    if (!Path::canListDirname($itemUnixPath)) {
+                        continue;
+                    }
+                } elseif (!Path::canListFilename($itemUnixPath)) {
                     continue;
                 }
 
@@ -157,10 +161,6 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
                 if (is_dir($itemUnixPath)) {
                     // Collapse, unless our target path is within this branch.
                     $expandClass = Path::isChildInPath($targetUnixPath, $itemUnixPath) ? 'expanded' : 'collapsed';
-                    Log::debug(
-                        "Folder: expand='$expandClass', select='$selectClass'"
-                        . " : $itemUnixPath from $targetUnixPath"
-                    ); // DELETEME DEBUG
                     $h_expandIcon = ('expanded' === $expandClass) ? ICON_EXPANDED : ICON_COLLAPSED;
                     echo "<li class='folder $expandClass $selectClass'>";
                     echo "<span class='expand-collapse'>$h_expandIcon</span>";
@@ -169,22 +169,11 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
                     // ToDo: If dir is empty, we make an empty UL. Output to a var, and only print if var has data.
                     scanDirectory($itemUnixPath, $targetUnixPath);
                     echo "</ul></li>\n";
-                } elseif (preg_match('/\.(gif|png|jpg|jpeg)$/', $item)) {
-                    // Append whitelisted filetypes to the list of files.
+                } else {
                     $files .= "<li class='file $selectClass'><a href='$u_linkUrl' class='path-link'>$h_item</a></li>\n";
-                    Log::debug("Filing: select='$selectClass' : $itemUnixPath from $targetUnixPath"); // DELETEME DEBUG
                 }
             }
             echo $files;
-
-            // DELETEME DEBUG
-            $webDir = str_replace(Path::$imgBaseUnixPath, '', $scanUnixDir);
-            Metadata::loadFromInis($webDir);
-//            echo "<pre>$dir:\n" . var_export(Metadata::getData(), true) . '</pre>';
-//            Metadata::saveToIni('x', true);
-            // echo 'IniFile:<br><pre>' . Metadata::getIniString('/', Metadata::getData()) . '</pre>';
-            // echo 'ArrayDump:<br><pre>' . var_export(Metadata::getData(), true) . '</pre>';
-            // END DELETEME DEBUG
         }
 
         ?>

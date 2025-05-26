@@ -19,6 +19,50 @@ class Path
     public static string $imgBaseUnixPath;
 
     /**
+     * Test whether file should be listed in tree and folder views.
+     * @param string $filename the filename to check: may include leading path elements.
+     * @return bool true if the file may be listed to users.
+     */
+    public static function canListFilename(string $filename): bool
+    {
+        // Skip any hidden files. Also skip thumbnails, index files, and ICE files.
+        $basename = basename($filename);
+        return (
+            !preg_match('/^(\.|tn_|index\.)|-ICE.jpg$/', $basename)
+            && preg_match('/\.(gif|png|jpg|jpeg)$/', $basename)
+        );
+    }
+
+    /**
+     * Test whether directory should be listed in tree and folder views.
+     * @param string $dirname the filename to check: may include leading path elements.
+     * @return bool true if the file may be listed to users.
+     */
+    public static function canListDirname(string $dirname): bool
+    {
+        // Skip the current and parent directories, and any hidden ones.
+        $basename = basename($dirname);
+        return !preg_match('/^\./', $basename);
+    }
+
+    /**
+     * Test whether file should be gettable if directly requested, even if unlisted.
+     * @param string $filename the filename to check: may include leading path elements.
+     * There's no equivalent for directories: use canListDirname() for that.
+     * @return bool true if the file may be listed to users.
+     */
+    public static function canViewFilename(string $filename): bool
+    {
+        // Skip any hidden files and index files.
+        // Allow thumbnails and ICE files to be viewed if directly requested.
+        $basename = basename($filename);
+        return (
+            !preg_match('/^(\.|index\.)/', $basename)
+            && preg_match('/\.(gif|png|jpg|jpeg)$/', $basename)
+        );
+    }
+
+    /**
      * Handle base dir: being empty could allow arbitrary file access, so check it very early on.
      */
     public static function validateBaseDir(): void
@@ -79,8 +123,6 @@ class Path
      */
     public static function isChildInPath(string $childPath, string $parentPath): bool
     {
-        Log::debug("($childPath, $parentPath)"); // DELETEME DEBUG
-
         // Check they both exist.
         $realChildPath = realpath($childPath);
         if (false === $realChildPath) {
@@ -104,11 +146,8 @@ class Path
 
         // Prevent /pa/ from matching /path/to/file.
         if (strlen($realParentPath) < strlen($realChildPath)) {
-            Log::debug('Expanding short parent.'); // DELETEME DEBUG
             $realParentPath .= '/';
         }
-
-        Log::debug('Result: ' . (str_starts_with($realChildPath, $realParentPath) ? 'y' : 'n')); // DELETEME DEBUG
 
         // Return whether the parent contains the child.
         return str_starts_with($realChildPath, $realParentPath);
@@ -138,10 +177,6 @@ class Path
             $file = basename($webPath);
             $realPath = realpath($fullFolder);
             if (false === $realPath) {
-                // DEBUG DELETEME
-                Log::debug("Validating missing $fullFolder via $folder & $file, folder not found", $webPath);
-                Log::debug('Backtrace', debug_backtrace());
-                // End DEBUG DELETEME
                 Log::debug('Validated folder was not found', $webPath);
                 http_response_code(404); // Not found.
                 die(1);

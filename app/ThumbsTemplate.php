@@ -113,19 +113,16 @@ namespace MidwestMemories;
         foreach ($items as $item) {
             $itemPath = Index::$requestUnixPath . '/' . $item;
             if (is_dir($itemPath)) {
-                if ('.' === $item || ('..' === $item && (Index::$requestUnixPath === Path::$imgBaseUnixPath))) {
-                    Log::debug('Ignoring folder', $itemPath);
-                } else {
+                if (Path::canListDirname($itemPath)) {
                     $dirs[] = $item;
+                } else {
+                    Log::debug('Ignoring unlistable folder', $itemPath);
                 }
             } elseif (is_file($itemPath)) {
-                if (
-                    preg_match('/\/(?:\.|tn_)[^\/]+$/', $itemPath) // In blocklist.
-                    || !preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath) // Not in allowlist.
-                ) {
-                    Log::debug('Ignoring file', $itemPath);
-                } else {
+                if (Path::canListFilename($itemPath)) {
                     $files[] = $item;
+                } else {
+                    Log::debug('Ignoring unlistable file', $itemPath);
                 }
             } else {
                 Log::debug('Ignoring unknown FS object', $itemPath);

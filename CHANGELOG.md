@@ -3,6 +3,10 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/05/25 Sun
+
+* DONE: Move it to its own domain.
+
 ## 2025/05/16 Fri
 
 * DONE: API to add comments.

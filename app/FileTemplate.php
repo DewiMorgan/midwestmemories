@@ -31,14 +31,15 @@ namespace MidwestMemories;
     $h_slide = $h_fd['slideorigin'] . ':' . $h_fd['slidenumber'] . ':' . $h_fd['slidesubsection'];
     $h_altText = $h_fd['displayname'];
     ?>
-    <h1 class="center"><?= $h_fd['displayname'] ?></h1>
-
     <img src="<?= $u_linkUrl ?>" alt="<?= $h_altText ?>" class="file">
-    <p><?= $h_fd['writtennotes'] ?></p>
     <table>
         <tr>
             <td>Slide:</td>
             <td><?= $h_slide ?></td>
+        </tr>
+        <tr>
+            <td>Written notes:</td>
+            <td><?= $h_fd['writtennotes'] ?></td>
         </tr>
         <tr>
             <td>Date:</td>
@@ -60,25 +61,8 @@ namespace MidwestMemories;
             <td>Keywords:</td>
             <td><?= $h_fd['keywords'] ?></td>
         </tr>
-        <tr>
-            <td>Visitor Notes:</td>
-            <td><?= $h_fd['visitornotes'] ?></td>
-        </tr>
     </table>
-
-    <!--
-    <form>
-        <label>
-            <input type="text">
-        </label>
-    </form>
-    -->
     <?php
-    // DELETEME DEBUG
-    //  echo '<hr><h3>Debugging stuff below this line</h3>';
-    // echo '<pre>' . basename(Index::$requestUnixPath) . " file:\n" . var_export($fileDetails, true) . "</pre>\n";
-
-    // END DELETEME DEBUG
 
     /**
      * Convert the raw file details into an HTML-escaped version.

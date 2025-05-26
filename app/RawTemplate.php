@@ -20,19 +20,25 @@ class RawTemplate
         $itemPath = Index::$requestUnixPath;
 
         $mimeType = mime_content_type($itemPath);
-        header("Content-Type: $mimeType");
 
-        // DELETEME DEBUG
+        // Validate.
         if (!is_file($itemPath)) {
             Log::debug("Not a file: $itemPath");
-        } elseif (str_starts_with($itemPath, 'tn_')) {
-            Log::debug("Starts with tn_: $itemPath");
-        } elseif (str_starts_with($itemPath, '.')) {
-            Log::debug("Hidden dot file: $itemPath");
-        } elseif (!preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath)) {
-            Log::debug("Not an image file: $itemPath");
+            static::show404Page();
+        } elseif (!Path::canViewFilename($itemPath)) {
+            Log::debug("Not an viewable file: $itemPath");
+            static::show404Page();
         }
 
+        // Only show the file on success.
+        header("Content-Type: $mimeType");
         readfile($itemPath);
+    }
+
+    private static function show404Page(): void
+    {
+        http_response_code(404);
+        include($_SERVER['DOCUMENT_ROOT'] . '/nonexistent.file'); // Triggers Apache's 404
+        exit;
     }
 }

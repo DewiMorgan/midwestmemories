@@ -53,8 +53,6 @@ class MetadataCleaner
         foreach ($data['/'] as $key => $item) {
             $strippedKey = strtolower(preg_replace('/[^a-z0-9.]/', '', $key));
 
-            Log::debug("Cleaning dir key '$key' as '$strippedKey':"); // DELETEME DEBUG
-
             if (!in_array($strippedKey, self::DIR_KEY_NAMES)) {
                 // Todo: handle the versioned comment history keys.
                 Log::warn("Unrecognized dir-level property $key as $strippedKey");
@@ -133,8 +131,6 @@ class MetadataCleaner
         foreach ($data as $key => $item) {
             $strippedKey = strtolower(preg_replace('/[^a-z0-9.]/', '', $key));
 
-            Log::debug("Cleaning file key '$key' as '$strippedKey':"); // DELETEME DEBUG
-
             if (!in_array($strippedKey, self::FILE_KEY_NAMES)) {
                 // ToDo: handle the versioned comment history keys.
                 Log::warn('Unrecognized file-level property', $key);
@@ -189,7 +185,6 @@ class MetadataCleaner
      */
     private static function cleanBool(mixed $item): ?bool
     {
-        Log::debug('Parsing bool', $item); // DELETEME DEBUG
         if (
             is_array($item) ||
             (is_object($item) && !method_exists($item, '__toString')) ||
@@ -202,7 +197,6 @@ class MetadataCleaner
         } else {
             $result = true;
         }
-        Log::debug("Returning $result"); // DELETEME DEBUG
         return $result;
     }
 
@@ -213,13 +207,11 @@ class MetadataCleaner
      */
     private static function cleanInt(mixed $item): ?int
     {
-        Log::debug('Parsing int', $item); // DELETEME DEBUG
         if (is_numeric($item)) {
             $result = (int)$item; // Casting to int always parses as decimal.
         } else {
             $result = null;
         }
-        Log::debug("Returning $result"); // DELETEME DEBUG
         return $result;
     }
 
@@ -230,7 +222,6 @@ class MetadataCleaner
      */
     private static function cleanCsvLine(mixed $item): array
     {
-        Log::debug('Parsing CSV', $item); // DELETEME DEBUG
         if (!is_string($item)) {
             Log::warn('CSV property was not string', $item);
             return [];
@@ -243,7 +234,6 @@ class MetadataCleaner
         foreach ($parsed as $key => $csvSegment) {
             $parsed[$key] = self::cleanString($csvSegment);
         }
-        Log::debug('Returning ' . implode('#,#', $parsed)); // DELETEME DEBUG
         return $parsed;
     }
 
@@ -254,15 +244,12 @@ class MetadataCleaner
      */
     private static function cleanDate(mixed $item): array
     {
-        Log::debug('Parsing date', $item); // DELETEME DEBUG
         // We could try parsing it as a valid date first, but we know that fails for years on their own.
         $result = strtotime(self::cleanAwfulDate($item));
         if (false === $result) {
-            Log::warn('Unable to parse, returning a null for the timestamp'); // DELETEME DEBUG
             $result = null;
         }
         $cleanedString = self::cleanString($item);
-        Log::debug("Returning $result from $cleanedString"); // DELETEME DEBUG
         return ['timestamp' => $result, 'dateString' => $cleanedString];
     }
 
@@ -387,7 +374,6 @@ class MetadataCleaner
      */
     private static function cleanKeywords(array $keywords): array
     {
-        Log::debug('Returning ' . implode('#,#', $keywords)); // DELETEME DEBUG
         return $keywords;
     }
 
@@ -411,7 +397,6 @@ class MetadataCleaner
      */
     private static function cleanString(mixed $item, int $maxLength = null): string
     {
-        Log::debug('Parsing string', $item); // DELETEME DEBUG
         if (!is_string($item)) {
             Log::warn('String property was not string', $item);
             return '';
@@ -422,7 +407,6 @@ class MetadataCleaner
             $trimmed = substr($trimmed, 0, $maxLength);
         }
 
-        Log::debug("returning $trimmed"); // DELETEME DEBUG
         return $trimmed;
     }
 }
