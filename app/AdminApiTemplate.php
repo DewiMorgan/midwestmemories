@@ -86,7 +86,7 @@ declare(strict_types=1);
         const editCell = row.cells[2];
         passCell.textContent = originalPassword;
         editCell.textContent = '';
-        const editBtn = createButton('🖉', 'edit-btn');
+        const editBtn = createButton('✏️', 'edit-btn');
         editBtn.addEventListener('click', () => startEdit(row));
         editCell.appendChild(editBtn);
     }
@@ -173,6 +173,8 @@ declare(strict_types=1);
         const headerRow = createUserHeaderRow();
         table.appendChild(headerRow);
         table.border = '1';
+
+        console.log(userList);
 
         // Populate rows
         for (let i = 0; i < userList.length; i++) {
