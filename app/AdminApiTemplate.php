@@ -82,8 +82,8 @@ declare(strict_types=1);
 
     // Cancel editing: restore original password and edit button
     function cancelEdit(row, originalPassword) {
-        const passCell = row.cells[1];
-        const editCell = row.cells[2];
+        const passCell = row.cells[2];
+        const editCell = row.cells[3];
         passCell.textContent = originalPassword;
         editCell.textContent = '';
         const editBtn = createButton('✏️', 'edit-btn');
@@ -93,9 +93,9 @@ declare(strict_types=1);
 
     // Start editing a row
     function startEdit(row) {
-        const username = row.cells[0].textContent;
-        const passCell = row.cells[1];
-        const editCell = row.cells[2];
+        const username = row.cells[1].textContent;
+        const passCell = row.cells[2];
+        const editCell = row.cells[3];
         const originalPassword = passCell.textContent;
 
         // Replace password cell content with an input
