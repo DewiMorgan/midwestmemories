@@ -97,10 +97,8 @@ namespace MidwestMemories;
 <body>
 <div id="template-content">
     <div class="thumb-content">
-        <h1 class="center">Folder title goes here</h1>
-        <p>This is a description of the folder/album and its contents.</p>
-        <p>This is a <a href="https://www.google.com">test link to make sure external links work.</a></p>
-        <p>This is a <a href="https://www.google.com?x&i=1">test link to try breaking external links.</a></p>
+        <h1 class="center">ToDo: Folder title goes here</h1>
+        <p>ToDo: description of the folder/album and its contents.</p>
     </div>
 
     <div class="thumb-pad" id="rounded">
