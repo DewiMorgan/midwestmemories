@@ -178,7 +178,8 @@ declare(strict_types=1);
 
         // Populate rows
         for (let i = 0; i < userList.length; i++) {
-            const [username, password] = userList[i];
+            const username = userList[i]['username'];
+            const password = userList[i]['comment'];
             const row = document.createElement('tr');
             const deleteCell = document.createElement('td');
             const userCell = document.createElement('td');
