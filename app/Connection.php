@@ -16,6 +16,7 @@ namespace MidwestMemories;
  */
 class Connection
 {
+    private static Connection $instance;
     public static bool $pageStarted = false;
 
     /**
@@ -40,6 +41,8 @@ class Connection
         public bool $isAdmin = false,
         public bool $isSuperAdmin = false
     ) {
+        static::$instance = $this;
+
         // $request.
         if (!empty($_SERVER['REQUEST_URI'])) {
             $this->request = $_SERVER['REQUEST_URI'];
@@ -82,6 +85,8 @@ class Connection
         if (!empty($_SERVER['REMOTE_USER'])) {
             $this->user .= 'remote:' . $_SERVER['REMOTE_USER'] . ',';
         }
+        $this->isAdmin = $_SESSION['isAdmin'] ?? false;
+        $this->isSuperAdmin = $_SESSION['isSuperAdmin'] ?? false;
         if (!empty($_SERVER['PHP_AUTH_USER'])) {
             $this->user .= 'auth:' . $_SERVER['PHP_AUTH_USER'] . ',';
             if ('myself' === $_SERVER['PHP_AUTH_USER']) {
@@ -97,12 +102,6 @@ class Connection
                 $_SESSION['isAdmin'] = true;
             }
         }
-        if (array_key_exists('isAdmin', $_SESSION) && $_SESSION['isAdmin']) {
-            $this->isAdmin = true;
-        }
-        if (array_key_exists('isSuperAdmin', $_SESSION) && $_SESSION['isSuperAdmin']) {
-            $this->isSuperAdmin = true;
-        }
         if (!empty($_SESSION['name'])) {
             $this->user .= 'sess:' . $_SESSION['name'] . ',';
         }
@@ -112,6 +111,19 @@ class Connection
             $this->user = '?';
         }
     }
+
+    /**
+     * Singleton instance getter.
+     * @return Connection
+     */
+    public static function getInstance(): Connection
+    {
+        if (!isset(self::$instance)) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
 
     /**
      * Extract all possible IP addresses, given many possible proxy headers.

@@ -7,11 +7,10 @@ namespace MidwestMemories;
 use JsonException;
 
 /**
- * The class for the main index.php file.
+ * The class for the main Admin page.
  */
 class Admin
 {
-
     private static string $cursor;
 
     public function __construct()
@@ -50,12 +49,10 @@ class Admin
      */
     private static function initSession(): void
     {
-        global $connection;
+        $connection = Connection::getInstance();
 
         $_SESSION['login'] = 'true';
         $_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
-
-        $connection = new Connection();
 
         // Log this login.
         // ToDo: this is very low level, and should probably be wrapped in a connectionLogger.
@@ -76,9 +73,9 @@ class Admin
      */
     private static function dieIfNotAdmin(): void
     {
-        global $connection;
+        $connection = Connection::getInstance();
 
-        if (!isset($connection) || !$connection->isAdmin) {
+        if (!$connection->isAdmin) {
             die('Access denied');
         }
     }
@@ -98,42 +95,24 @@ class Admin
      */
     private static function getUserInput(): void
     {
-        // Parse all the params we can look for in the request.
+        $dropbox = new DropboxManager();
+
+        // Parse request params
         $cursor = $_REQUEST['cursor'] ?? '';
         $formAction = $_REQUEST['action'] ?? null;
-
-        $fp = new DropboxManager();
-        $list = [];
-
         Log::debug("Starting. Cursor='$cursor', Request", $_REQUEST);
 
-        // Handle API calls. Nothing must be output before these, and they must not output anything.
-        $result = match ($formAction) {
-            'update_dropbox_status' => $fp->readOneCursorUpdate(),
-            'init_root' => $fp->initRootCursor(),
-            'continue_root' => $fp->resumeRootCursor(),
-            'list_files_to_download' => $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_NEW),
-            'list_files_to_process' => $fp->listFilesByStatus(DropboxManager::SYNC_STATUS_DOWNLOADED),
-            'download_one_file' => $fp->downloadOneFile(),
-            'process_one_file' => $fp->processOneFile(),
-            default => '',
-        };
-        if ('' !== $result) {
-            header('Content-Type: application/json');
-            echo json_encode($result, JSON_THROW_ON_ERROR);
-            if (str_starts_with($formAction, 'list_')) {
-                Log::debug('Returning list of ' . count($result) . ' files from $formAction.');
-            } else {
-                Log::debug("From $formAction", $result);
-            }
-            exit(0);
-        }
+        self::getApiResponse($dropbox);
 
         // Handle web page calls. These are after the showHeader, so can print whatever we like.
         static::showHeader();
         switch ($formAction) {
             case 'handle_init_root':
                 static::printAndLog("<h2>Handling init.</h2>\n");
+                include(__DIR__ . '/AdminApiTemplate.php');
+                break;
+            case 'handle_list_users':
+                static::printAndLog("<h2>Handling user list.</h2>\n");
                 include(__DIR__ . '/AdminApiTemplate.php');
                 break;
             case 'handle_queued_files':
@@ -146,14 +125,58 @@ class Admin
         }
 
         echo '<p>Finished reading.</p>';
-        if (empty($fp->cursor)) {
+        if (empty($dropbox->cursor)) {
             echo 'Cursor was not set in the client.<br>';
             static::$cursor = '';
-        } elseif (static::$cursor === $fp->cursor) {
+        } elseif (static::$cursor === $dropbox->cursor) {
             echo 'Cursor unchanged.<br>';
         } else {
-            $cursor = $fp->cursor;
+            $cursor = $dropbox->cursor;
             echo "Cursor reassigned to '$cursor'.<br>";
+        }
+    }
+
+    /**
+     * Handle API calls. Nothing must be output before these, and they must not output anything.
+     * Any list_* endpoints must return a list.
+     * Any actions should return `$error ? "Error: $error" : 'OK';`.
+     * @param DropboxManager $dropbox
+     */
+    public static function getApiResponse(DropboxManager $dropbox): void
+    {
+        $formAction = $_REQUEST['action'] ?? null;
+        $username = $_REQUEST['username'] ?? '';
+        $password = $_REQUEST['password'] ?? '';
+        $users = new UserManager();
+
+        $result = match ($formAction) {
+            'update_dropbox_status' => $dropbox->readOneCursorUpdate(),
+            'init_root' => $dropbox->initRootCursor(),
+            'continue_root' => $dropbox->resumeRootCursor(),
+            'list_files_to_download' => $dropbox->listFilesByStatus(DropboxManager::SYNC_STATUS_NEW),
+            'list_files_to_process' => $dropbox->listFilesByStatus(DropboxManager::SYNC_STATUS_DOWNLOADED),
+            'download_one_file' => $dropbox->downloadOneFile(),
+            'process_one_file' => $dropbox->processOneFile(),
+            'list_users' => $users->getUsers(),
+            'add_user' => $users->addUser($username, $password),
+            'edit_user' => $users->changePassword($username, $password),
+            default => '',
+        };
+
+        if ('' !== $result) {
+            header('Content-Type: application/json');
+            try {
+                echo json_encode($result, JSON_THROW_ON_ERROR);
+            } catch (JsonException $e) {
+                echo '"Error: could not encode result"';
+                Log::error("From $formAction, failed to json encode: " . $e->getMessage(), $result);
+            }
+            if (str_starts_with($formAction, 'list_')) {
+                Log::debug('Returning list of ' . count($result) . ' items from $formAction.');
+            } else {
+                Log::debug("From $formAction", $result);
+            }
+            exit(0);
         }
     }
 
@@ -193,6 +216,14 @@ class Admin
     {
         ?>
         <form method="post">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" required><br><br>
+
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password" required><br><br>
+
+            <button type="submit" name="action" value="add_user">Add this user (click me!)</button>
+
             <button type="submit" name="action" value="handle_queued_files">Handle queued files (click me!)</button>
             <br>
             <button type="submit" name="action" value="handle_init_root">Replace root cursor (dangerous)</button>

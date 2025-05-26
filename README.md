@@ -137,6 +137,15 @@ See also ToDo, above.
 
 Current task:
 
+* DONE: Api to list users.
+* DONE: Api to edit users.
+* DONE: Api to create users.
+* Api to disable users. (just edit with a special/invalid password?)
+* DONE: JS to list users.
+* JS to edit users.
+* JS to create users.
+* JS to disable users.
+
 * Get it commentable.
     * sanitise comments
     * allow some rich text: bold and links and such.

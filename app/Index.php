@@ -51,7 +51,7 @@ class Index
         $_SESSION['login'] = 'true';
         $_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
 
-        $connection = new Connection();
+        $connection = Connection::getInstance();
 
         // Log this login.
         // ToDo: this is very low level, and should probably be wrapped in a connectionLogger.

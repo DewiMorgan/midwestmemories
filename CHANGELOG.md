@@ -6,6 +6,15 @@ which might not be when they were actually implemented/committed.
 ## 2025/05/25 Sun
 
 * DONE: Move it to its own domain.
+* DONE: Move to new domain name.
+* DONE: Api to list users.
+* DONE: Api to edit users.
+* DONE: Api to create users.
+* DONE: JS to list users.
+* DONE: Hardcoded values into a config file.
+* DONE: Centralize the blacklist/whitelist.
+* DONE: Connection class to a singleton instead of a global var
+* DONE: Delete a whole lotta debugging output from the pages and logs.
 
 ## 2025/05/16 Fri
 
