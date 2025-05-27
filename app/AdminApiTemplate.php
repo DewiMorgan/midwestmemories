@@ -116,70 +116,6 @@ declare(strict_types=1);
     }
 
     /**
-     * Appends a final "Add new user" row to the given user table.
-     * @returns {HTMLTableRowElement}
-     */
-    function createUserFooterRow() {
-        /** @type {HTMLTableRowElement} */
-        const row = document.createElement('tr');
-
-        // Column 0: blank
-        /** @type {HTMLTableCellElement} */
-        const emptyCell = document.createElement('td');
-        row.appendChild(emptyCell);
-
-        // Column 1: (Add new user) in italics and hidden input
-        /** @type {HTMLTableCellElement} */
-        const userCell = document.createElement('td');
-        /** @type {HTMLSpanElement} */
-        const label = document.createElement('span');
-        label.textContent = '(Add new user)';
-        /** @type {HTMLInputElement} */
-        const userInput = document.createElement('input');
-        userInput.type = 'text';
-        userInput.className = 'new-username-input';
-        userInput.style.display = 'none';
-        userCell.appendChild(label);
-        userCell.appendChild(userInput);
-        row.appendChild(userCell);
-
-        // Column 2: hidden password input
-        /** @type {HTMLTableCellElement} */
-        const passCell = document.createElement('td');
-        /** @type {HTMLInputElement} */
-        const passInput = document.createElement('input');
-        passInput.type = 'text';
-        passInput.className = 'new-password-input';
-        passInput.style.display = 'none';
-        passCell.appendChild(passInput);
-        row.appendChild(passCell);
-
-        // Column 3: Add, Save, and Cancel buttons
-        /** @type {HTMLTableCellElement} */
-        const controlCell = document.createElement('td');
-
-        const addButton = createButton(iconAddNew, 'edit-button');
-        const toggleEditHandler = toggleEditMode.bind(null, row);
-        addButton.addEventListener('click', toggleEditHandler);
-
-        const saveButton = createButton(iconSave, 'save-button');
-        saveButton.style.display = 'none';
-        const saveNewUserHandler = saveNewUser.bind(null, row);
-        saveButton.addEventListener('click', saveNewUserHandler);
-
-        const cancelButton = createButton(iconCancel, 'cancel-button');
-        cancelButton.style.display = 'none';
-        cancelButton.addEventListener('click', toggleEditHandler);
-
-        controlCell.appendChild(addButton);
-        controlCell.appendChild(saveButton);
-        controlCell.appendChild(cancelButton);
-        row.appendChild(controlCell);
-
-        return row;
-    }
-
-    /**
      * Create one row from a table list.
      * @param {string} username
      * @param {string} password
@@ -199,8 +135,9 @@ declare(strict_types=1);
 
         // Username cell
         /** @type {HTMLTableCellElement} */
-        const userCell = document.createElement('td');
-        userCell.textContent = username;
+        const usernameCell = document.createElement('td');
+        usernameCell.className = 'username-text';
+        usernameCell.textContent = username;
 
         // Password cell
         /** @type {HTMLTableCellElement} */
@@ -243,9 +180,80 @@ declare(strict_types=1);
 
         // Add all cells to the row
         row.appendChild(deleteCell);
-        row.appendChild(userCell);
+        row.appendChild(usernameCell);
         row.appendChild(passwordCell);
         row.appendChild(editCell);
+
+        return row;
+    }
+
+    /**
+     * Appends a final "Add new user" row to the given user table.
+     * @returns {HTMLTableRowElement}
+     */
+    function createUserFooterRow() {
+        /** @type {HTMLTableRowElement} */
+        const row = document.createElement('tr');
+
+        // Column 0: blank
+        /** @type {HTMLTableCellElement} */
+        const emptyCell = document.createElement('td');
+        row.appendChild(emptyCell);
+
+        // Column 1: (Add new user) in italics and hidden input
+        /** @type {HTMLTableCellElement} */
+        const usernameCell = document.createElement('td');
+        /** @type {HTMLSpanElement} */
+        const usernameText = document.createElement('span');
+        usernameText.textContent = '(Add new user)';
+        usernameText.className = 'username-text';
+
+        /** @type {HTMLInputElement} */
+        const usernameInput = document.createElement('input');
+        usernameInput.type = 'text';
+        usernameInput.className = 'username-input';
+        usernameInput.style.display = 'none';
+        usernameCell.appendChild(usernameText);
+        usernameCell.appendChild(usernameInput);
+        row.appendChild(usernameCell);
+
+        // Column 2: hidden password input
+        /** @type {HTMLTableCellElement} */
+        const passwordCell = document.createElement('td');
+        /** @type {HTMLSpanElement} */
+        const passwordText = document.createElement('span');
+        passwordText.className = 'password-text';
+        passwordText.textContent = '';
+        /** @type {HTMLInputElement} */
+        const passwordInput = document.createElement('input');
+        passwordInput.type = 'text';
+        passwordInput.className = 'password-input';
+        passwordInput.style.display = 'none';
+        passwordCell.appendChild(passwordText);
+        passwordCell.appendChild(passwordInput);
+        row.appendChild(passwordCell);
+
+        // Column 3: Add, Save, and Cancel buttons
+        /** @type {HTMLTableCellElement} */
+        const controlCell = document.createElement('td');
+
+        const addButton = createButton(iconAddNew, 'edit-button');
+        const toggleEditHandler = toggleEditMode.bind(null, row);
+        addButton.addEventListener('click', toggleEditHandler);
+
+        const saveButton = createButton(iconSave, 'save-button');
+        saveButton.style.display = 'none';
+        const saveNewUserHandler = saveNewUser.bind(null, row);
+        saveButton.addEventListener('click', saveNewUserHandler);
+
+        const cancelButton = createButton(iconCancel, 'cancel-button');
+        cancelButton.style.display = 'none';
+        cancelButton.addEventListener('click', toggleEditHandler);
+
+        controlCell.appendChild(addButton);
+        controlCell.appendChild(saveButton);
+        controlCell.appendChild(cancelButton);
+        row.appendChild(controlCell);
 
         return row;
     }
@@ -394,7 +402,6 @@ declare(strict_types=1);
         }
     }
 
-
     /**
      * Save a password.
      * @param {HTMLTableRowElement} row
@@ -406,12 +413,11 @@ declare(strict_types=1);
             const passwordInput = row.querySelector('.password-input');
             const password = passwordInput.value;
             if (savePasswordViaApi(username, password)) {
-                toggleEditMode();
+                toggleEditMode(row);
             }
         }
         // Else: do nothing, remain in edit mode
     }
-
 
     /**
      * Handle a click to delete an existing user.
