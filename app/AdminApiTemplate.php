@@ -128,7 +128,7 @@ declare(strict_types=1);
         // Delete button
         /** @type {HTMLTableCellElement} */
         const deleteCell = document.createElement('td');
-        const deleteUserButton = createButton(iconDelete, 'delete-user-button');
+        const deleteUserButton = createButton(iconDelete, 'delete-button');
         const deleteUserHandler = deleteUser.bind(null, row);
         deleteUserButton.addEventListener('click', deleteUserHandler);
         deleteCell.appendChild(deleteUserButton);
@@ -503,10 +503,10 @@ declare(strict_types=1);
             row.querySelector('.username-text').style.display = offWhenEditing;
         }
 
-        row.querySelector('.edit-password-button').style.display = offWhenEditing;
-        row.querySelector('.save-password-button').style.display = onWhenEditing;
-        row.querySelector('.cancel-password-button').style.display = onWhenEditing;
-        const deleteButton = row.querySelector('.delete-user-button');
+        row.querySelector('.edit-button').style.display = offWhenEditing;
+        row.querySelector('.save-button').style.display = onWhenEditing;
+        row.querySelector('.cancel-button').style.display = onWhenEditing;
+        const deleteButton = row.querySelector('.delete-button');
         setButtonEnabled(deleteButton, !enteringEditMode);
     }
 
