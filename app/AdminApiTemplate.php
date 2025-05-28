@@ -5,6 +5,7 @@ declare(strict_types=1);
  * Mostly javascript functions for handling API responses.
  */
 ?>
+<div id="user-list"></div>
 <div id="messages"></div>
 
 <script>
@@ -291,24 +292,6 @@ declare(strict_types=1);
     }
 
     /**
-     * Call whichever task the template has been asked for.
-     */
-    function runRelevantTask() {
-        const params = new URLSearchParams(window.location.search);
-        const action = params.get("action");
-
-        handleListUsers('./admin.php?action=list_users');
-
-        if ("handle_init_root" === action) {
-            runAllInits();
-        } else if ("handle_queued_files" === action) {
-            runAllUpdates();
-        }
-    }
-
-    // ================ HANDLERS - called by listeners.
-
-    /**
      * API wrapper for dropbox polling endpoints. Call the endpoint until all items are processed.
      * @param {string} url
      * @returns {Promise<void>}
@@ -385,9 +368,8 @@ declare(strict_types=1);
      * @param {string} listEndpoint The endpoint to call to get a list of items.
      * @returns {Promise<void>}
      */
-    async function handleListUsers(listEndpoint) {
+    async function listUsers(listEndpoint) {
         const actionName = 'list_users';
-        logMessage(`Getting list of users for ${actionName}...`);
 
         const listResponse = await fetch(listEndpoint);
         if (listResponse.ok) {
@@ -398,9 +380,8 @@ declare(strict_types=1);
             }
             const table = createUserTable(users);
 
-            const messagesDiv = document.getElementById('messages');
-            messagesDiv.appendChild(table);
-            logMessage(`${actionName} complete!`);
+            const userListDiv = document.getElementById('user-list');
+            userListDiv.appendChild(table);
         } else {
             logMessage(`Failed to get list of users for ${actionName}.`);
         }
@@ -553,13 +534,22 @@ declare(strict_types=1);
         setButtonEnabled(deleteButton, !enteringEditMode);
     }
 
+    /**
+     * Call whichever task the template has been asked for.
+     */
+    function runRelevantTasks() {
+        const params = new URLSearchParams(window.location.search);
+        const action = params.get("action");
 
-    /*
-     * List of actions to listen for:
-     * - Delete user.
-     * - Save new password.
-     * - Save new user.
-    */
+        // These always happen.
+        listUsers('./admin.php?action=list_users');
+        runAllUpdates();
 
-    runRelevantTask();
+        // This one only happens if called.
+        if ("handle_init_root" === action) {
+            runAllInits();
+        }
+    }
+
+    runRelevantTasks();
 </script>
