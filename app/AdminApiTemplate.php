@@ -184,6 +184,10 @@ declare(strict_types=1);
         row.appendChild(passwordCell);
         row.appendChild(editCell);
 
+        if ('DISABLED' === password) {
+            disableUsersRowInTable(row);
+        }
+
         return row;
     }
 
@@ -433,7 +437,7 @@ declare(strict_types=1);
             const endpoint = './admin.php?action=change_password';
             const apiResult = await callUserAction(endpoint, username, password);
             if (apiResult) {
-                removeUsersRowFromTable(row);
+                disableUsersRowInTable(row);
             }
         }
         // Else: do nothing.
@@ -506,14 +510,12 @@ declare(strict_types=1);
      * Mark the user as deleted from the table.
      * @param {HTMLTableRowElement} row
      */
-    function removeUsersRowFromTable(row) {
+    function disableUsersRowInTable(row) {
         const usernameText = row.querySelector('.username-text');
         // Strike through the username.
         usernameText.style.textDecoration = 'line-through';
 
         // Disable the edit and delete buttons.
-        const editButton = row.querySelector('.edit-button');
-        setButtonEnabled(editButton, false);
         const deleteButton = row.querySelector('.delete-button');
         setButtonEnabled(deleteButton, false);
     }
