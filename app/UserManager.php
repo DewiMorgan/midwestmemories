@@ -51,7 +51,7 @@ class UserManager
     private function appendToPasswdFile(string $line): bool
     {
         $this->lines[] = $line;
-        return (bool)file_put_contents($this->passwdFile, $line, FILE_APPEND);
+        return (bool)file_put_contents($this->passwdFile, $line . "\n", FILE_APPEND);
     }
 
     /**
