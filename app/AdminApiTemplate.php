@@ -420,6 +420,8 @@ declare(strict_types=1);
             const apiResult = await callUserAction(endpoint, username, password);
             if (apiResult) {
                 toggleEditMode(row);
+                // Unstrike through the username.
+                usernameText.style.textDecoration = 'none';
             }
         }
         // Else: do nothing, remain in edit mode
