@@ -118,7 +118,7 @@ class UserManager
         if ('' === $password) {
             $newEntries = [
                 '# DISABLED',
-                '$username:DISABLED'
+                "$username:DISABLED"
             ];
         } else {
             $newEntries = [
