@@ -3,6 +3,17 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/05/27 Tue
+
+* DONE: Api to disable users. (just edit with a special/invalid password?)
+* DONE: JS to edit users.
+* DONE: JS to create users.
+* DONE: JS to disable users.
+
+## 2025/05/26 Mon
+
+* DONE: Overhaul JS to manipulate users.
+
 ## 2025/05/25 Sun
 
 * DONE: Move it to its own domain.

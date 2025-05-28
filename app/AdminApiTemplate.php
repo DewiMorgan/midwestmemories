@@ -129,7 +129,7 @@ declare(strict_types=1);
         /** @type {HTMLTableCellElement} */
         const deleteCell = document.createElement('td');
         const deleteUserButton = createButton(iconDelete, 'delete-button');
-        const deleteUserHandler = deleteUser.bind(null, row);
+        const deleteUserHandler = disableUser.bind(null, row);
         deleteUserButton.addEventListener('click', deleteUserHandler);
         deleteCell.appendChild(deleteUserButton);
 
@@ -161,13 +161,13 @@ declare(strict_types=1);
         /** @type {HTMLTableCellElement} */
         const editCell = document.createElement('td');
         const editButton = createButton(iconEdit, 'edit-button');
-        const editPasswordHandler = toggleEditMode.bind(null, row);
-        editButton.addEventListener('click', editPasswordHandler);
+        const editHandler = toggleEditMode.bind(null, row);
+        editButton.addEventListener('click', editHandler);
 
         const saveButton = createButton(iconSave, 'save-button');
         saveButton.style.display = 'none';
-        const savePasswordHandler = savePassword.bind(null, row);
-        saveButton.addEventListener('click', savePasswordHandler);
+        const changePasswordHandler = changePassword.bind(null, row);
+        saveButton.addEventListener('click', changePasswordHandler);
 
         const cancelButton = createButton(iconCancel, 'cancel-button');
         cancelButton.style.display = 'none';
@@ -243,7 +243,7 @@ declare(strict_types=1);
 
         const saveButton = createButton(iconSave, 'save-button');
         saveButton.style.display = 'none';
-        const saveNewUserHandler = saveNewUser.bind(null, row);
+        const saveNewUserHandler = addUser.bind(null, row);
         saveButton.addEventListener('click', saveNewUserHandler);
 
         const cancelButton = createButton(iconCancel, 'cancel-button');
@@ -406,13 +406,15 @@ declare(strict_types=1);
      * Save a password.
      * @param {HTMLTableRowElement} row
      */
-    function savePassword(row) {
+    async function changePassword(row) {
         const usernameText = row.querySelector('.username-text');
         const username = usernameText.textContent;
-        if (confirm(`Really replace the password for user, "${username}"?`)) {
+        if (confirm(`Really change the password for user, "${username}"?`)) {
             const passwordInput = row.querySelector('.password-input');
             const password = passwordInput.value;
-            if (savePasswordViaApi(username, password)) {
+            const endpoint = './admin.php?action=change_password';
+            const apiResult = await callUserAction(endpoint, username, password);
+            if (apiResult) {
                 toggleEditMode(row);
             }
         }
@@ -423,11 +425,14 @@ declare(strict_types=1);
      * Handle a click to delete an existing user.
      * @param {HTMLTableRowElement} row
      */
-    function deleteUser(row) {
+    async function disableUser(row) {
         const usernameText = row.querySelector('.username-text');
         const username = usernameText.textContent;
-        if (confirm(`Really delete the existing user, "${username}"?`)) {
-            if (deleteUserViaAPI(username)) {
+        if (confirm(`Really disable the existing user, "${username}"?`)) {
+            const password = '';
+            const endpoint = './admin.php?action=change_password';
+            const apiResult = await callUserAction(endpoint, username, password);
+            if (apiResult) {
                 removeUsersRowFromTable(row);
             }
         }
@@ -438,17 +443,47 @@ declare(strict_types=1);
      * Handle a click to save a new user.
      * @param {HTMLTableRowElement} row
      */
-    function saveNewUser(row) {
+    async function addUser(row) {
         const usernameInput = row.querySelector('.username-input');
         const username = usernameInput.value;
         if (confirm(`Really create the new user, "${username}"?`)) {
             const passwordInput = row.querySelector('.password-input');
             const password = passwordInput.value;
-            if (saveNewUserViaAPI(username, password)) {
+            const endpoint = './admin.php?action=add_user';
+            const apiResult = await callUserAction(endpoint, username, password);
+            if (apiResult) {
                 addUserRowToTable(username, password);
             }
         }
         // Else: do nothing, remain in edit mode
+    }
+
+    /**
+     * Call a user action endpoint with username and password.
+     * @param {string} endpoint The base endpoint URL
+     * @param {string} username
+     * @param {string} password
+     * @returns {Promise<boolean>} True on success, false on failure.
+     */
+    async function callUserAction(endpoint, username, password) {
+        const actionName = endpoint.replace(/^.*action=/, ''); // e.g., "change_password"
+        logMessage(`Calling ${actionName} for user "${username}"...`);
+
+        const url = `${endpoint}&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
+
+        try {
+            const response = await fetch(url);
+            if (response.ok) {
+                logMessage(`${actionName} succeeded for "${username}".`);
+                return true;
+            } else {
+                logMessage(`${actionName} failed for "${username}".`);
+                return false;
+            }
+        } catch (error) {
+            logMessage(`Error calling ${actionName} for "${username}": ${error}`);
+            return false;
+        }
     }
 
     /**

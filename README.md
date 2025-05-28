@@ -137,14 +137,8 @@ See also ToDo, above.
 
 Current task:
 
-* DONE: Api to list users.
-* DONE: Api to edit users.
-* DONE: Api to create users.
-* Api to disable users. (just edit with a special/invalid password?)
-* DONE: JS to list users.
-* JS to edit users.
-* JS to create users.
-* JS to disable users.
+* Handle API errors instead of just checking result.ok (which just checks it was a 200).
+    * Also make API errors not return 200 OK.
 * Maybe in add users, make save button grey out until both username and password are filled? Or just give error on save?
 * Improve admin UI: Always show user list, always show file details, add "Are you sure" to cursor renewal.
 

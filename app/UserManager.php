@@ -115,10 +115,17 @@ class UserManager
             return 'Error: could not find user to update';
         }
 
-        $newEntries = [
-            "# $password",
-            '$username:' . password_hash($password, PASSWORD_BCRYPT)
-        ];
+        if ('' === $password) {
+            $newEntries = [
+                '# DISABLED',
+                '$username:DISABLED'
+            ];
+        } else {
+            $newEntries = [
+                "# $password",
+                '$username:' . password_hash($password, PASSWORD_BCRYPT)
+            ];
+        }
         array_splice($this->lines, $indexToReplace, $numToReplace, $newEntries);
         if ($this->putPasswdFile()) {
             return 'OK';

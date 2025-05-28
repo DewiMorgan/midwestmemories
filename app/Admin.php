@@ -159,7 +159,7 @@ class Admin
             'process_one_file' => $dropbox->processOneFile(),
             'list_users' => $users->getUsers(),
             'add_user' => $users->addUser($username, $password),
-            'edit_user' => $users->changePassword($username, $password),
+            'change_password' => $users->changePassword($username, $password),
             default => '',
         };
 
