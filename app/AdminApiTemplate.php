@@ -297,12 +297,12 @@ declare(strict_types=1);
         const params = new URLSearchParams(window.location.search);
         const action = params.get("action");
 
+        handleListUsers('./admin.php?action=list_users');
+
         if ("handle_init_root" === action) {
             runAllInits();
         } else if ("handle_queued_files" === action) {
             runAllUpdates();
-        } else if ("handle_list_users" === action) {
-            handleListUsers('./admin.php?action=list_users');
         }
     }
 
