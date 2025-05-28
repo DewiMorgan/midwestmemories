@@ -452,6 +452,7 @@ declare(strict_types=1);
             const endpoint = './admin.php?action=add_user';
             const apiResult = await callUserAction(endpoint, username, password);
             if (apiResult) {
+                console.log("apiResult true, adding row");
                 addUserRowToTable(username, password);
             }
         }
@@ -494,6 +495,7 @@ declare(strict_types=1);
     function addUserRowToTable(username, password) {
         const table = document.querySelector('.user-table');
         if (table) {
+            console.log("table found, adding row");
             const newRow = createUserTableRow(username, password);
             const lastRow = table.rows[table.rows.length - 1];
             table.insertBefore(newRow, lastRow);
