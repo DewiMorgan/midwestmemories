@@ -143,9 +143,10 @@ class UserManager
      */
     public function addUser(string $username, string $password): string
     {
+        Log::debug('users', $this->users); // DELETEME DEBUG
         // Check if user already exists
         foreach ($this->users as $user) {
-            if ($username === $user[0]) {
+            if ($username === $user['username']) {
                 return 'Error: user already exists'; // User already exists
             }
         }
