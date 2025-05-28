@@ -109,30 +109,28 @@ class Admin
         switch ($formAction) {
             case 'handle_init_root':
                 static::printAndLog("<h2>Handling init.</h2>\n");
-                include(__DIR__ . '/AdminApiTemplate.php');
                 break;
             case 'handle_list_users':
                 static::printAndLog("<h2>Handling user list.</h2>\n");
-                include(__DIR__ . '/AdminApiTemplate.php');
                 break;
             case 'handle_queued_files':
                 static::printAndLog("<h2>Handling queued files.</h2>\n");
-                include(__DIR__ . '/AdminApiTemplate.php');
                 break;
             default:
                 static::printAndLog("<h2>No command yet given.</h2>\n");
                 break;
         }
+        include(__DIR__ . '/AdminApiTemplate.php');
 
         echo '<p>Finished reading.</p>';
         if (empty($dropbox->cursor)) {
             echo 'Cursor was not set in the client.<br>';
             static::$cursor = '';
-        } elseif (static::$cursor === $dropbox->cursor) {
-            echo 'Cursor unchanged.<br>';
-        } else {
+        } elseif (static::$cursor !== $dropbox->cursor) {
             $cursor = $dropbox->cursor;
             echo "Cursor reassigned to '$cursor'.<br>";
+        } else {
+            echo 'Cursor unchanged.<br>';
         }
     }
 
