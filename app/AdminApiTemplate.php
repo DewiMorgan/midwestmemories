@@ -76,11 +76,11 @@ declare(strict_types=1);
      */
     function createUserTable(userList) {
         const table = document.createElement('table');
-        table.className = 'user-table';
         const thead = createUserHeaderRow();
         table.appendChild(thead);
 
         const tbody = document.createElement('tbody');
+        tbody.className = 'user-table';
         for (let i = 0; i < userList.length; i++) {
             const username = userList[i]['username'];
             const password = userList[i]['comment'];
