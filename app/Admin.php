@@ -172,7 +172,7 @@ class Admin
                 Log::error("From $formAction, failed to json encode: " . $e->getMessage(), $result);
             }
             if (str_starts_with($formAction, 'list_')) {
-                Log::debug('Returning list of ' . count($result) . ' items from $formAction.');
+                Log::debug('Returning list of ' . count($result) . ' items from $formAction.', $result);
             } else {
                 Log::debug("From $formAction", $result);
             }
