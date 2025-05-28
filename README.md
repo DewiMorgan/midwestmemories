@@ -145,6 +145,8 @@ Current task:
 * JS to edit users.
 * JS to create users.
 * JS to disable users.
+* Maybe in add users, make save button grey out until both username and password are filled? Or just give error on save?
+* Improve admin UI: Always show user list, always show file details, add "Are you sure" to cursor renewal.
 
 * Get it commentable.
     * sanitise comments

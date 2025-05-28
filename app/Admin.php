@@ -216,14 +216,6 @@ class Admin
     {
         ?>
         <form method="post">
-            <label for="username">Username:</label><br>
-            <input type="text" id="username" name="username" required><br><br>
-
-            <label for="password">Password:</label><br>
-            <input type="password" id="password" name="password" required><br><br>
-
-            <button type="submit" name="action" value="add_user">Add this user (click me!)</button>
-
             <button type="submit" name="action" value="handle_queued_files">Handle queued files (click me!)</button>
             <br>
             <button type="submit" name="action" value="handle_init_root">Replace root cursor (dangerous)</button>
