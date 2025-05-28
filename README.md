@@ -141,6 +141,7 @@ Current task:
     * Also make API errors not return 200 OK.
 * Maybe in add users, make save button grey out until both username and password are filled? Or just give error on save?
 * Improve admin UI: Always show user list, always show file details, add "Are you sure" to cursor renewal.
+* Correctly handle (and prevent) users that try to set their passwords to the string 'DISABLED'.
 
 * Get it commentable.
     * sanitise comments

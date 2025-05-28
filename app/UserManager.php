@@ -123,7 +123,7 @@ class UserManager
         } else {
             $newEntries = [
                 "# $password",
-                '$username:' . password_hash($password, PASSWORD_BCRYPT)
+                "$username:" . password_hash($password, PASSWORD_BCRYPT)
             ];
         }
         array_splice($this->lines, $indexToReplace, $numToReplace, $newEntries);
