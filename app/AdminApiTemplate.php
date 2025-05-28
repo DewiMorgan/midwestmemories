@@ -419,9 +419,10 @@ declare(strict_types=1);
             const endpoint = './admin.php?action=change_password';
             const apiResult = await callUserAction(endpoint, username, password);
             if (apiResult) {
+                usernameText.style.textDecoration = 'none';
+                usernameText.style.fontStyle = 'normal';
                 toggleEditMode(row);
                 // Unstrike through the username.
-                usernameText.style.textDecoration = 'none';
             }
         }
         // Else: do nothing, remain in edit mode
@@ -516,6 +517,7 @@ declare(strict_types=1);
         const usernameText = row.querySelector('.username-text');
         // Strike through the username.
         usernameText.style.textDecoration = 'line-through';
+        usernameText.style.fontStyle = 'italic';
 
         // Disable the edit and delete buttons.
         const deleteButton = row.querySelector('.delete-button');
