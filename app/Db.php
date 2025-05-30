@@ -21,9 +21,9 @@ class Db extends Singleton
     private mysqli $db;
 
     /**
-     * Private singleton constructor.
+     * Protected singleton constructor.
      */
-    private function __construct()
+    protected function __construct()
     {
         parent::__construct();
         // Create the DB connection using the auth info from the INI file.

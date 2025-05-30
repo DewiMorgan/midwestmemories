@@ -23,9 +23,9 @@ class DropboxManager extends Singleton
     public const KEY_ERROR = 'error';
 
     /**
-     * Private singleton constructor.
+     * Protected singleton constructor.
      */
-    private function __construct()
+    protected function __construct()
     {
         parent::__construct();
         $tokenRefresher = new TokenRefresher();

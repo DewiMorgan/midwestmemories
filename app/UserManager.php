@@ -16,9 +16,9 @@ class UserManager extends Singleton
     private array $lines = [];
 
     /**
-     * Private singleton constructor.
+     * Protected singleton constructor.
      */
-    private function __construct()
+    protected function __construct()
     {
         parent::__construct();
         $this->passwdFile = Conf::get(Key::PASSWORD_FILE);

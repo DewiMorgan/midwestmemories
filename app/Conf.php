@@ -16,7 +16,7 @@ class Conf extends Singleton
     protected array $data;
 
     /**
-     * Private singleton constructor.
+     * Protected singleton constructor.
      */
     protected function __construct()
     {

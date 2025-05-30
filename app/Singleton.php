@@ -23,11 +23,6 @@ abstract class Singleton
     private function __clone() {}
 
     /**
-     * Prevent unserialization.
-     */
-//    private function __wakeup() {}
-
-    /**
      * Get the singleton instance of the subclass.
      * @return static
      */

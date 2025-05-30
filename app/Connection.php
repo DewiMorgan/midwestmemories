@@ -36,9 +36,9 @@ class Connection extends Singleton
     public bool $isSuperAdmin = false;
 
     /**
-     * Private singleton constructor.
+     * Protected singleton constructor.
      */
-    private function __construct()
+    protected function __construct()
     {
         parent::__construct();
 
