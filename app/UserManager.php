@@ -156,8 +156,8 @@ class UserManager extends Singleton
         }
 
         if (
-            static::appendToPasswdFile("# $password")
-            && static::appendToPasswdFile("$username:" . password_hash($password, PASSWORD_BCRYPT))
+            $this->appendToPasswdFile("# $password")
+            && $this->appendToPasswdFile("$username:" . password_hash($password, PASSWORD_BCRYPT))
         ) {
             return 'OK';
         }

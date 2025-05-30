@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use JetBrains\PhpStorm\NoReturn;
+
 RawTemplate::showFile();
 
 /** Template to display the literal binary content of a file, such as an image for an img tag.
@@ -35,7 +37,10 @@ class RawTemplate
         readfile($itemPath);
     }
 
-    private static function show404Page(): void
+    /**
+     * If we can't or don't want to show a file, we can show a 404 page with the correct response code, and exit.
+     */
+    #[NoReturn] private static function show404Page(): void
     {
         http_response_code(404);
         include($_SERVER['DOCUMENT_ROOT'] . '/nonexistent.file'); // Triggers Apache's 404

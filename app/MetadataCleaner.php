@@ -180,7 +180,7 @@ class MetadataCleaner
      *   Null if it converts to empty string.
      *   False if string representation contains "0", "n" or "f" (eg, "no", "n/a", "false").
      *   True otherwise.
-     * @param mixed $item The item to try parsing as a boolean.
+     * @param mixed $item The item to try parsing as a Boolean value.
      * @return bool|null The valid boolean, or null if it could not be parsed.
      */
     private static function cleanBool(mixed $item): ?bool
@@ -255,8 +255,8 @@ class MetadataCleaner
 
     /**
      * If a date is in a very human format, like "Late 60s or early 70s. It may be april?", or "Cinco de Mayo '60!"
-     * ...it'll do it's best and guess April 1st 1960.
-     * It's guaranteed to return SOME valid date string, even if it's not the right one.
+     * ...it will do its best and guess April 1st 1960.
+     * It is guaranteed to return SOME valid date string, even if it is not the right one.
      * @param string $string
      * @return string
      */
@@ -271,7 +271,7 @@ class MetadataCleaner
             return $matches[0];
         }
 
-        // Find string months, but try to avoid false positives from eg "Maybe Mark can Separate out the Junk."
+        // Find string months, trying to avoid false positives from things like "Maybe Mark can Separate out the Junk."
         preg_match_all(
             '/\b(Jan|Feb|Mar(?!k)|Apr|May(?!\s*be)|Jun(?!k)|Jul|Aug|Sep(?![ae])|Oct|Nov|Dec(?![cr]))/i',
             $string,
@@ -316,7 +316,7 @@ class MetadataCleaner
         }
         // Grab the day, if any, or default to 1st.
         $foundDay = self::applyFirstValue('', '01', $foundMaybeDays, $foundMaybeYears);
-        // If we haven't yet grabbed our year, then do so. If there are none, our default year is 1066.
+        // If we haven't yet grabbed our year, then do so. Default year is 1066.
         $foundYear = self::applyFirstValue($foundYear, '1066', $foundMaybeYears);
         // If we've got a 2-digit year, assume it was in the 1900s.
         if (strlen($foundYear) === 2) {
@@ -351,7 +351,6 @@ class MetadataCleaner
         return $found;
     }
 
-
     /**
      * Helper to remove the first matching element from an array.
      * @param mixed $value The value to remove.
@@ -365,7 +364,7 @@ class MetadataCleaner
     }
 
     /**
-     * Clean a list of keywords.
+     * Clean a list of keyword strings.
      * @param array $keywords The keywords to clean.
      * @return array
      * @ToDo: Currently a no-op. Maybe:
@@ -390,7 +389,7 @@ class MetadataCleaner
     }
 
     /**
-     * Given a string, make sure it's trimmed, and truncate it to the max length, if any.
+     * Given a string, make sure it is trimmed, and truncate it to the max length, if any.
      * @param mixed $item The item to clean as a string.
      * @param ?int $maxLength optional max length to truncate to.
      * @return string The cleaned string, which may be empty.

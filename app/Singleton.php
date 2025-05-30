@@ -19,11 +19,13 @@ abstract class Singleton
 
     /**
      * Prevent cloning.
+     * @noinspection PhpUnusedPrivateMethodInspection
      */
     private function __clone() {}
 
     /**
      * Prevent unserialization.
+     * @noinspection PhpUnusedPrivateMethodInspection
      */
     private function __wakeup() {}
 

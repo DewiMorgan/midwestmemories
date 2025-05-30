@@ -95,7 +95,7 @@ class Metadata
      * However, folders are inserted in the '/' element, so "path/to/folder/" matches:
      *   ['path'=>['to'=>['folder'=>['/'=>[the array that gets returned]]]]]
      * @param string $webFilePath The absolute web file to get the information for. NOT relative!
-     * @param bool $loadIfNotFound True (default) if we can try loading file if the folder is not yet loaded.
+     * @param bool $loadIfNotFound True (default) if we can try loading the file if the folder is not yet loaded.
      * @return array Subarray from the metadata in self::$folderTree.
      * ToDo: this does not yet handle inherited data.
      *       Data from all parent folders isn't loaded at all.

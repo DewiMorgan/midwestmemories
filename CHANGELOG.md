@@ -9,7 +9,7 @@ which might not be when they were actually implemented/committed.
 * DONE: Sectionize admin page UI.
 * DONE: Clean up admin page logic.
 * DONE: Rm obsolete cursor code from admin page.
-* DONE: Singletonize Conf.
+* DONE: Convert Conf to singleton.
 * DONE: Add Singleton class, inherited by Conf, DropboxManager, UserManager, Connection & Db.
 
 ## 2025/05/27 Tue
@@ -33,7 +33,7 @@ which might not be when they were actually implemented/committed.
 * DONE: JS to list users.
 * DONE: Hardcoded values into a config file.
 * DONE: Centralize the blacklist/whitelist.
-* DONE: Connection class to a singleton instead of a global var
+* DONE: Connection class to a singleton instead of a global var.
 * DONE: Delete a whole lotta debugging output from the pages and logs.
 
 ## 2025/05/16 Fri

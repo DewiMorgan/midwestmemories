@@ -139,7 +139,7 @@ Current task:
 
 * I broke file downloads from dropbox.
 
-* Handle API errors instead of just checking result.ok (which just checks it was a 200).
+* Handle API errors instead of just checking `result.ok` (which just checks it was a 200).
     * Also make API errors not return 200 OK.
 * Maybe in add users, make save button grey out until both username and password are filled? Or just give error on save?
 * Improve admin UI: add "Are you sure" to cursor renewal.

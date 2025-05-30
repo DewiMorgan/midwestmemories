@@ -9,13 +9,13 @@ use JsonException;
 
 /**
  * Webhook Callback for changes in DropBox. Only have 10 seconds to respond, so make it fast!
- * https://www.dropbox.com/developers/reference/webhooks
+ * https://www.dropbox.com/developers/reference/webhooks has more info.
  */
 class DropboxWebhook
 {
     #[NoReturn] public function __construct()
     {
-        // If it's a validation, validate and exit.
+        // If it is a validation, validate and exit.
         self::validate();
 
         if (array_key_exists('X-Dropbox-Signature', apache_request_headers())) {
