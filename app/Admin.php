@@ -11,21 +11,20 @@ use JsonException;
  */
 class Admin
 {
-    private static string $cursor;
-
     public function __construct()
     {
+        // Auth and session management. Must not output anything.
         static::handleLogouts();
         static::initSession();
         static::dieIfNotAdmin();
 
-        try {
-            static::getUserInput();
-        } catch (JsonException) {
-            die('["Error: Could not encode list"]');
+        // Handle as JSON API call if one is requested: default to web page request.
+        $formAction = $_REQUEST['action'] ?? null;
+        if ($formAction) {
+            self::getApiResponse($formAction);
+        } else {
+            static::showAdminTemplate();
         }
-        static::showHeader();
-        static::showContent();
     }
 
     /**
@@ -81,83 +80,34 @@ class Admin
     }
 
     /**
-     * Wrapper for debugging info. Likely to call a logging system in the future.
-     * @param string $str The string to log.
-     */
-    private static function printAndLog(string $str): void
-    {
-        Log::debug($str);
-        echo($str);
-    }
-
-    /** Parse the input from the admin form.
-     * @throws JsonException
-     */
-    private static function getUserInput(): void
-    {
-        $dropbox = new DropboxManager();
-
-        // Parse request params
-        $cursor = $_REQUEST['cursor'] ?? '';
-        $formAction = $_REQUEST['action'] ?? null;
-        Log::debug("Starting. Cursor='$cursor', Request", $_REQUEST);
-
-        self::getApiResponse($dropbox);
-
-        // Handle web page calls. These are after the showHeader, so can print whatever we like.
-        static::showHeader();
-        switch ($formAction) {
-            case 'handle_init_root':
-                static::printAndLog("<h2>Handling init.</h2>\n");
-                break;
-            case 'handle_list_users':
-                static::printAndLog("<h2>Handling user list.</h2>\n");
-                break;
-            case 'handle_queued_files':
-                static::printAndLog("<h2>Handling queued files.</h2>\n");
-                break;
-            default:
-                static::printAndLog("<h2>No command yet given.</h2>\n");
-                break;
-        }
-        include(__DIR__ . '/AdminApiTemplate.php');
-
-        echo '<p>Finished reading.</p>';
-        if (empty($dropbox->cursor)) {
-            echo 'Cursor was not set in the client.<br>';
-            static::$cursor = '';
-        } elseif (static::$cursor !== $dropbox->cursor) {
-            $cursor = $dropbox->cursor;
-            echo "Cursor reassigned to '$cursor'.<br>";
-        } else {
-            echo 'Cursor unchanged.<br>';
-        }
-    }
-
-    /**
      * Handle API calls. Nothing must be output before these, and they must not output anything.
      * Any list_* endpoints must return a list.
      * Any actions should return `$error ? "Error: $error" : 'OK';`.
-     * @param DropboxManager $dropbox
+     * @param string $formAction
      */
-    public static function getApiResponse(DropboxManager $dropbox): void
+    public static function getApiResponse(string $formAction): void
     {
-        $formAction = $_REQUEST['action'] ?? null;
-        $username = $_REQUEST['username'] ?? '';
-        $password = $_REQUEST['password'] ?? '';
-        $users = new UserManager();
-
         $result = match ($formAction) {
-            'update_dropbox_status' => $dropbox->readOneCursorUpdate(),
-            'init_root' => $dropbox->initRootCursor(),
-            'continue_root' => $dropbox->resumeRootCursor(),
-            'list_files_to_download' => $dropbox->listFilesByStatus(DropboxManager::SYNC_STATUS_NEW),
-            'list_files_to_process' => $dropbox->listFilesByStatus(DropboxManager::SYNC_STATUS_DOWNLOADED),
-            'download_one_file' => $dropbox->downloadOneFile(),
-            'process_one_file' => $dropbox->processOneFile(),
-            'list_users' => $users->getUsers(),
-            'add_user' => $users->addUser($username, $password),
-            'change_password' => $users->changePassword($username, $password),
+            'update_dropbox_status' => DropboxManager::getInstance()->readOneCursorUpdate(),
+            'init_root' => DropboxManager::getInstance()->initRootCursor(),
+            'continue_root' => DropboxManager::getInstance()->resumeRootCursor(),
+            'list_files_to_download' => DropboxManager::getInstance()->listFilesByStatus(
+                DropboxManager::SYNC_STATUS_NEW
+            ),
+            'list_files_to_process' => DropboxManager::getInstance()->listFilesByStatus(
+                DropboxManager::SYNC_STATUS_DOWNLOADED
+            ),
+            'download_one_file' => DropboxManager::getInstance()->downloadOneFile(),
+            'process_one_file' => DropboxManager::getInstance()->processOneFile(),
+            'list_users' => UserManager::getInstance()->getUsers(),
+            'add_user' => UserManager::getInstance()->addUser(
+                $_REQUEST['username'] ?? '',
+                $_REQUEST['password'] ?? ''
+            ),
+            'change_password' => UserManager::getInstance()->changePassword(
+                $_REQUEST['username'] ?? '',
+                $_REQUEST['password'] ?? ''
+            ),
             default => '',
         };
 
@@ -182,12 +132,8 @@ class Admin
      * Show the HTML page.
      * ToDo: make this a template.
      */
-    private static function showHeader(): void
+    private static function showAdminTemplate(): void
     {
-        if (Connection::$pageStarted) {
-            return;
-        }
-        Connection::$pageStarted = true;
         ?>
         <!DOCTYPE html>
         <html lang="en">
@@ -203,22 +149,19 @@ class Admin
         </head>
         <body>
         <h1>Midwest Memories - admin</h1>
-        <?php
-    }
-
-    /**
-     * Show the admin page itself.
-     * ToDo: make this a template.
-     */
-    private static function showContent(): void
-    {
-        ?>
+        <h2>Users</h2>
+        <div id="user-list"></div>
+        <h2>Dropbox Files</h2>
+        <div id="messages"></div>
+        <h2>Admin Actions</h2>
         <form method="post">
-            <button type="submit" name="action" value="handle_queued_files">Handle queued files (click me!)</button>
-            <br>
             <button type="submit" name="action" value="handle_init_root">Replace root cursor (dangerous)</button>
         </form>
         <br>
+        <?php
+        // ToDo: turn this into a script tag. Not yet, though, as including it avoids problems with script caching.
+        include(__DIR__ . '/AdminApiTemplate.php');
+        ?>
         </body>
         </html>
         <?php

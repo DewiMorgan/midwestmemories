@@ -9,7 +9,7 @@ use Spatie\Dropbox\Client;
 /**
  * Manage a dropbox connection, and the operations on dropbox files.
  */
-class DropboxManager
+class DropboxManager extends Singleton
 {
     /** Dropbox Client object. */
     private Client $client;
@@ -34,8 +34,12 @@ class DropboxManager
     public const KEY_MORE_FILES = 'moreFilesToGo';
     public const KEY_ERROR = 'error';
 
-    public function __construct()
+    /**
+     * Private singleton constructor.
+     */
+    private function __construct()
     {
+        parent::__construct();
         $tokenRefresher = new TokenRefresher();
         $token = $tokenRefresher->getToken();
 

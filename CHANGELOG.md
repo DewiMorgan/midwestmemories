@@ -3,6 +3,15 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/05/29 Thu
+
+* DONE: Improve admin UI: Always show user list, always show file details.
+* DONE: Sectionize admin page UI.
+* DONE: Clean up admin page logic.
+* DONE: Rm obsolete cursor code from admin page.
+* DONE: Singletonize Conf.
+* DONE: Add Singleton class, inherited by Conf, DropboxManager, UserManager, Connection & Db.
+
 ## 2025/05/27 Tue
 
 * DONE: Api to disable users. (just edit with a special/invalid password?)

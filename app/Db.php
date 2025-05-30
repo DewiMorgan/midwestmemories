@@ -12,7 +12,7 @@ use mysqli_result;
  * Database connection singleton class.
  * @noinspection PhpClassNamingConventionInspection
  */
-class Db
+class Db extends Singleton
 {
     private const TYPE_EXEC = 0; // `TYPE_EXEC` returns [1] on success.
     private const TYPE_RESULT = 1; // `TYPE_RESULT` returns a result that must be freed.
@@ -20,22 +20,12 @@ class Db
 
     private mysqli $db;
 
-    private static ?Db $instance = null;
-
     /**
-     * Singleton factory.
-     * @return Db
+     * Private singleton constructor.
      */
-    private static function getInstance(): Db
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new Db();
-        }
-        return self::$instance;
-    }
-
     private function __construct()
     {
+        parent::__construct();
         // Create the DB connection using the auth info from the INI file.
         try {
             $this->db = new mysqli(

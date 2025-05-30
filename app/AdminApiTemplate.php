@@ -1,14 +1,8 @@
-<?php
-declare(strict_types=1);
-
-/*
- * Mostly javascript functions for handling API responses.
- */
-?>
-<div id="user-list"></div>
-<div id="messages"></div>
-
 <script>
+    /*
+     * Javascript functions for handling API responses.
+     */
+
     const iconAddNew = '➕';
     const iconCancel = '❌';
     const iconDelete = '🗑️';

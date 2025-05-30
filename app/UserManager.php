@@ -6,7 +6,7 @@ namespace MidwestMemories;
 /**
  * Manager for user accounts.
  */
-class UserManager
+class UserManager extends Singleton
 {
     private string $passwdFile;
 
@@ -15,8 +15,12 @@ class UserManager
     /** @var string[] $lines */
     private array $lines = [];
 
-    public function __construct()
+    /**
+     * Private singleton constructor.
+     */
+    private function __construct()
     {
+        parent::__construct();
         $this->passwdFile = Conf::get(Key::PASSWORD_FILE);
         $this->readPasswdFile();
         $this->readUsers();

@@ -14,34 +14,33 @@ namespace MidwestMemories;
  *  Ability to register accounts (with authorization).
  *  Ability to change passwords.
  */
-class Connection
+class Connection extends Singleton
 {
-    private static Connection $instance;
-    public static bool $pageStarted = false;
+    /** @var string $request URL requested, via $_SERVER['REQUEST_URI'] */
+    public string $request = '';
+    /** @var string $date Current date. */
+    public string $date = '';
+    /** @var string $ip Requesting IP. */
+    public string $ip = '';
+    /** @var string $ipList List of possible originating IPs. */
+    public string $ipList = '';
+    /** @var string $agent User-agent information. */
+    public string $agent = '';
+    /** @var string $user Best guess at the current user. */
+    public string $user = '';
+    /** @var bool $isBot True if user looks like a known bot. */
+    public bool $isBot = false;
+    /** @var bool $isAdmin True if the user is recognized as a registered admin. */
+    public bool $isAdmin = false;
+    /** @var bool $isSuperAdmin True if the user is recognized as me. */
+    public bool $isSuperAdmin = false;
 
     /**
-     * @param string $request -- URL requested, via $_SERVER['REQUEST_URI']
-     * @param string $date -- Current date.
-     * @param string $ip -- Requesting IP.
-     * @param string $ipList -- List of possible originating IPs.
-     * @param string $agent -- User-agent information.
-     * @param string $user -- Best guess at the current user.
-     * @param bool $isBot -- True if user looks like a known bot.
-     * @param bool $isAdmin -- True if the user is recognized as a registered admin.
-     * @param bool $isSuperAdmin -- True if the user is recognized as me.
+     * Private singleton constructor.
      */
-    public function __construct(
-        public string $request = '',
-        public string $date = '',
-        public string $ip = '',
-        public string $ipList = '',
-        public string $agent = '',
-        public string $user = '',
-        public bool $isBot = false,
-        public bool $isAdmin = false,
-        public bool $isSuperAdmin = false
-    ) {
-        static::$instance = $this;
+    private function __construct()
+    {
+        parent::__construct();
 
         // $request.
         if (!empty($_SERVER['REQUEST_URI'])) {
@@ -111,19 +110,6 @@ class Connection
             $this->user = '?';
         }
     }
-
-    /**
-     * Singleton instance getter.
-     * @return Connection
-     */
-    public static function getInstance(): Connection
-    {
-        if (!isset(self::$instance)) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-
 
     /**
      * Extract all possible IP addresses, given many possible proxy headers.
