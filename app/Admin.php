@@ -91,14 +91,14 @@ class Admin
             'update_dropbox_status' => DropboxManager::getInstance()->readOneCursorUpdate(),
             'init_root' => DropboxManager::getInstance()->initRootCursor(),
             'continue_root' => DropboxManager::getInstance()->resumeRootCursor(),
-            'list_files_to_download' => DropboxManager::getInstance()->listFilesByStatus(
-                DropboxManager::SYNC_STATUS_NEW
+            'list_files_to_download' => FileProcessor::getInstance()->listFilesByStatus(
+                SyncStatus::NEW
             ),
-            'list_files_to_process' => DropboxManager::getInstance()->listFilesByStatus(
-                DropboxManager::SYNC_STATUS_DOWNLOADED
+            'list_files_to_process' => FileProcessor::getInstance()->listFilesByStatus(
+                SyncStatus::DOWNLOADED
             ),
-            'download_one_file' => DropboxManager::getInstance()->downloadOneFile(),
-            'process_one_file' => DropboxManager::getInstance()->processOneFile(),
+            'download_one_file' => FileProcessor::getInstance()->downloadOneFile(),
+            'process_one_file' => FileProcessor::getInstance()->processOneFile(),
             'list_users' => UserManager::getInstance()->getUsers(),
             'add_user' => UserManager::getInstance()->addUser(
                 $_REQUEST['username'] ?? '',

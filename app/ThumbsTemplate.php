@@ -134,7 +134,7 @@ namespace MidwestMemories;
 
             // Skip files without a matching thumbnail file: they have not been fully processed.
             if (is_file($itemPath)) {
-                $thumbUnixPath = DropboxManager::getThumbName($itemPath);
+                $thumbUnixPath = FileProcessor::getThumbName($itemPath);
                 if (!is_file($thumbUnixPath)) {
                     Log::debug("No thumb found for image: '$thumbUnixPath' from '$itemPath'");
                     continue;
