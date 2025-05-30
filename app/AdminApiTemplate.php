@@ -34,21 +34,6 @@
     }
 
     /**
-     * Create a styled HTML button component.
-     * @param {string} labelText
-     * @param {string} className
-     * @returns {HTMLButtonElement}
-     */
-    function createButton(labelText, className) {
-        /** @type {HTMLButtonElement} */
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.textContent = labelText;
-        button.className = className;
-        return button;
-    }
-
-    /**
      * Enable or disable a button element.
      * @param {HTMLButtonElement|null} buttonElement
      * @param {boolean} isEnabled
@@ -110,6 +95,67 @@
         return thead;
     }
 
+    // ==============
+
+    function createTd(content) {
+        const cell = document.createElement('td');
+        if (content) {
+            cell.appendChild(content);
+        }
+        return cell;
+    }
+
+    function createTextSpan(className, text) {
+        const span = document.createElement('span');
+        span.className = className;
+        span.textContent = text;
+        return span;
+    }
+
+    function createInput(className, value = '') {
+        /** @type {HTMLInputElement} */
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = className;
+        input.value = value;
+        input.style.display = 'none';
+        return input;
+    }
+
+    function createActionButtons(row) {
+        const actionCell = document.createElement('td');
+        const editButton = createButton(iconEdit, 'edit-button', toggleEditMode, row);
+        const saveButton = createButton(iconSave, 'save-button', changePassword, row, true);
+        const cancelButton = createButton(iconCancel, 'cancel-button', toggleEditMode, row, true);
+        actionCell.append(editButton, saveButton, cancelButton);
+        return actionCell;
+    }
+
+    /**
+     * Create a styled HTML button component.
+     * @param {string} labelText Text or icon to display.
+     * @param {string} className
+     * @param {(event: MouseEvent) => void} [handler] Onclick callback.
+     * @param {HTMLTableRowElement} [row]
+     * @param {boolean} [hidden=false]
+     * @returns {HTMLButtonElement}
+     */
+    function createButton(labelText, className, handler = null, row = null, hidden = false) {
+        /** @type {HTMLButtonElement} */
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = labelText;
+        button.className = className;
+        if (handler) {
+            const boundHandler = row ? handler.bind(null, row) : handler;
+            button.addEventListener('click', boundHandler);
+        }
+        if (hidden) {
+            button.style.display = 'none';
+        }
+        return button;
+    }
+
     /**
      * Create one row from a table list.
      * @param {string} username
@@ -120,64 +166,20 @@
         /** @type {HTMLTableRowElement} */
         const row = document.createElement('tr');
 
-        // Delete button
-        /** @type {HTMLTableCellElement} */
-        const deleteCell = document.createElement('td');
-        const deleteUserButton = createButton(iconDelete, 'delete-button');
-        const deleteUserHandler = disableUser.bind(null, row);
-        deleteUserButton.addEventListener('click', deleteUserHandler);
-        deleteCell.appendChild(deleteUserButton);
+        const deleteBtn = createButton(iconDelete, 'delete-button', disableUser, row);
+        const deleteCell = createTd(deleteBtn);
 
-        // Username cell
-        /** @type {HTMLTableCellElement} */
-        const usernameCell = document.createElement('td');
-        usernameCell.className = 'username-text';
-        usernameCell.textContent = username;
+        const usernameSpan = createTextSpan('username-text', username);
+        const usernameCell = createTd(usernameSpan);
 
-        // Password cell
-        /** @type {HTMLTableCellElement} */
-        const passwordCell = document.createElement('td');
-        /** @type {HTMLSpanElement} */
-        const passwordText = document.createElement('span');
-        passwordText.className = 'password-text';
-        passwordText.textContent = password;
+        const passwordSpan = createTextSpan('password-text', password);
+        const passwordInput = createInput('password-input', password);
+        const passwordCell = createTd();
+        passwordCell.append(passwordSpan, passwordInput);
 
-        /** @type {HTMLInputElement} */
-        const passwordInput = document.createElement('input');
-        passwordInput.className = 'password-input';
-        passwordInput.type = 'text';
-        passwordInput.value = password;
-        passwordInput.style.display = 'none';
+        const editCell = createActionButtons(row);
 
-        passwordCell.appendChild(passwordText);
-        passwordCell.appendChild(passwordInput);
-
-        // Edit cell
-        /** @type {HTMLTableCellElement} */
-        const editCell = document.createElement('td');
-        const editButton = createButton(iconEdit, 'edit-button');
-        const editHandler = toggleEditMode.bind(null, row);
-        editButton.addEventListener('click', editHandler);
-
-        const saveButton = createButton(iconSave, 'save-button');
-        saveButton.style.display = 'none';
-        const changePasswordHandler = changePassword.bind(null, row);
-        saveButton.addEventListener('click', changePasswordHandler);
-
-        const cancelButton = createButton(iconCancel, 'cancel-button');
-        cancelButton.style.display = 'none';
-        const cancelPasswordHandler = toggleEditMode.bind(null, row);
-        cancelButton.addEventListener('click', cancelPasswordHandler);
-
-        editCell.appendChild(editButton);
-        editCell.appendChild(saveButton);
-        editCell.appendChild(cancelButton);
-
-        // Add all cells to the row
-        row.appendChild(deleteCell);
-        row.appendChild(usernameCell);
-        row.appendChild(passwordCell);
-        row.appendChild(editCell);
+        row.append(deleteCell, usernameCell, passwordCell, editCell);
 
         if ('DISABLED' === password) {
             disableUsersRowInTable(row);
@@ -186,73 +188,23 @@
         return row;
     }
 
-    /**
-     * Appends a final "Add new user" row to the given user table.
-     * @returns {HTMLTableRowElement}
-     */
     function createUserFooterRow() {
-        /** @type {HTMLTableRowElement} */
         const row = document.createElement('tr');
+        const blankCell = createTd();
 
-        // Column 0: blank
-        /** @type {HTMLTableCellElement} */
-        const emptyCell = document.createElement('td');
-        row.appendChild(emptyCell);
+        const usernameText = createTextSpan('username-text', '(Add new user)');
+        const usernameInput = createInput('username-input');
+        const usernameCell = createTd();
+        usernameCell.append(usernameText, usernameInput);
 
-        // Column 1: (Add new user) in italics and hidden input
-        /** @type {HTMLTableCellElement} */
-        const usernameCell = document.createElement('td');
-        /** @type {HTMLSpanElement} */
-        const usernameText = document.createElement('span');
-        usernameText.textContent = '(Add new user)';
-        usernameText.className = 'username-text';
+        const passwordSpan = createTextSpan('password-text', '');
+        const passwordInput = createInput('password-input');
+        const passwordCell = createTd();
+        passwordCell.append(passwordSpan, passwordInput);
 
-        /** @type {HTMLInputElement} */
-        const usernameInput = document.createElement('input');
-        usernameInput.type = 'text';
-        usernameInput.className = 'username-input';
-        usernameInput.style.display = 'none';
-        usernameCell.appendChild(usernameText);
-        usernameCell.appendChild(usernameInput);
-        row.appendChild(usernameCell);
+        const controlCell = createActionButtons(row);
 
-        // Column 2: hidden password input
-        /** @type {HTMLTableCellElement} */
-        const passwordCell = document.createElement('td');
-        /** @type {HTMLSpanElement} */
-        const passwordText = document.createElement('span');
-        passwordText.className = 'password-text';
-        passwordText.textContent = '';
-        /** @type {HTMLInputElement} */
-        const passwordInput = document.createElement('input');
-        passwordInput.type = 'text';
-        passwordInput.className = 'password-input';
-        passwordInput.style.display = 'none';
-        passwordCell.appendChild(passwordText);
-        passwordCell.appendChild(passwordInput);
-        row.appendChild(passwordCell);
-
-        // Column 3: Add, Save, and Cancel buttons
-        /** @type {HTMLTableCellElement} */
-        const controlCell = document.createElement('td');
-
-        const addButton = createButton(iconAddNew, 'edit-button');
-        const toggleEditHandler = toggleEditMode.bind(null, row);
-        addButton.addEventListener('click', toggleEditHandler);
-
-        const saveButton = createButton(iconSave, 'save-button');
-        saveButton.style.display = 'none';
-        const saveNewUserHandler = addUser.bind(null, row);
-        saveButton.addEventListener('click', saveNewUserHandler);
-
-        const cancelButton = createButton(iconCancel, 'cancel-button');
-        cancelButton.style.display = 'none';
-        cancelButton.addEventListener('click', toggleEditHandler);
-
-        controlCell.appendChild(addButton);
-        controlCell.appendChild(saveButton);
-        controlCell.appendChild(cancelButton);
-        row.appendChild(controlCell);
+        row.append(blankCell, usernameCell, passwordCell, controlCell);
 
         return row;
     }
@@ -442,8 +394,8 @@
     }
 
     /**
-     * Call a user action endpoint with username and password.
-     * @param {string} endpoint The base endpoint URL
+     * Call a user action endpoint with the username and password.
+     * @param {string} endpoint The base endpoint URL.
      * @param {string} username
      * @param {string} password
      * @returns {Promise<boolean>} True on success, false on failure.
