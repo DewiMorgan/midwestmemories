@@ -87,8 +87,8 @@ class Admin
      */
     public static function getApiResponse(string $formAction): void
     {
+        Log::debug("Action", $formAction);
         $result = match ($formAction) {
-            'update_dropbox_status' => DropboxManager::getInstance()->readCursorUpdate(),
             'init_root' => DropboxManager::getInstance()->initRootCursor(),
             'continue_root' => DropboxManager::getInstance()->readCursorUpdate(),
             'list_files_to_download' => FileProcessor::getInstance()->listFilesByStatus(
@@ -155,7 +155,7 @@ class Admin
         <div id="messages"></div>
         <h2>Admin Actions</h2>
         <form method="post">
-            <button type="submit" name="action" value="handle_init_root">Check Dropbox for missed files (slow)</button>
+            <button type="submit" name="user-action" value="handle_init_root">Re-get missed files (slow)</button>
         </form>
         <br>
         <?php

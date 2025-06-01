@@ -217,7 +217,7 @@
         // Get the initial cursor.
         await handleDropboxPolling('./admin.php?action=init_root');
         // Get the remainder of the cursor.
-        await handleDropboxPolling('./admin.php?action=continue_root');
+        await runAllUpdates();
     }
 
     /**
@@ -226,7 +226,7 @@
      */
     async function runAllUpdates() {
         // Get and queue updates from Dropbox.
-        await handleDropboxPolling('./admin.php?action=update_dropbox_status');
+        await handleDropboxPolling('./admin.php?action=continue_root');
         // Download queued downloads.
         await handleFileTask(
             'Downloading', './admin.php?action=list_files_to_download', './admin.php?action=download_one_file'
@@ -485,14 +485,14 @@
      */
     function runRelevantTasks() {
         const params = new URLSearchParams(window.location.search);
-        const action = params.get("action");
+        const userAction = params.get("user-action");
 
         // These always happen.
         listUsers('./admin.php?action=list_users');
         runAllUpdates();
 
         // This one only happens if called.
-        if ("handle_init_root" === action) {
+        if ("handle_init_root" === userAction) {
             runAllInits();
         }
     }
