@@ -23,6 +23,7 @@ namespace MidwestMemories;
 
     $u_linkUrl = Path::unixPathToUrl(Index::$requestUnixPath, Path::LINK_RAW);
     $fileDetails = Metadata::getFileDataByUnixPath(Index::$requestUnixPath);
+    Log::debug('File data found', $fileDetails);
 
     // Escape the details array.
     $h_fd = cleanFileDetails($fileDetails);

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MidwestMemories;
 
 /**
- * Class vor validation and cleaning of Metadata.
+ * Class for validation and cleaning of Metadata.
  */
 class MetadataCleaner
 {
