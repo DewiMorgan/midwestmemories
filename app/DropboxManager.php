@@ -42,7 +42,7 @@ class DropboxManager extends Singleton
      */
     public function handleFileList(array $list, string $error): array
     {
-        $numValidFiles = 0;
+        $numAddedFiles = 0;
         $hasMoreFiles = false;
         if (!empty($list)) {
             // This is a kludge for an apparent Dropbox bug. When given a path, `has_more` is always true, and it
@@ -57,12 +57,12 @@ class DropboxManager extends Singleton
             }
 
             // Otherwise, process the list.
-            $numValidFiles = $this->saveFileQueue($list['entries']);
+            $numAddedFiles = $this->saveFileQueue($list['entries']);
             Log::debug('List', $list);
         }
 
         $result = [
-            static::KEY_VALID_FILES => $numValidFiles,
+            static::KEY_VALID_FILES => $numAddedFiles,
             static::KEY_TOTAL_FILES => count($list['entries'] ?? []),
             static::KEY_MORE_FILES => $hasMoreFiles,
             static::KEY_ERROR => $error
@@ -174,6 +174,8 @@ class DropboxManager extends Singleton
             );
             if (empty($result)) {
                 Log::error('Error writing Dropbox entry to MySQL', $entry);
+            } else {
+                $numberOfFiles = $result['rows'];
             }
         }
         return $numberOfFiles;

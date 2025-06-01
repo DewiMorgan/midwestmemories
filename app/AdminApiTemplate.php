@@ -261,9 +261,9 @@
                 }
 
                 if (true === data.moreFilesToGo) {
-                    logMessage(`= ${data.numValidFiles} valid of ${data.numTotalFiles} total, more to come...`);
+                    logMessage(`= ${data.numValidFiles} new from ${data.numTotalFiles} total, more to come...`);
                 } else {
-                    logMessage(`= ${data.numValidFiles} valid of ${data.numTotalFiles} total, finished!`);
+                    logMessage(`= ${data.numValidFiles} new from ${data.numTotalFiles} total, finished!`);
                     return;
                 }
             }
