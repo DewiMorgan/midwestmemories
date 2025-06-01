@@ -156,6 +156,7 @@ class Admin
         <h2>Admin Actions</h2>
         <form method="post">
             <button type="submit" name="user-action" value="handle_init_root">Re-get missed files (slow)</button>
+            <br><a href="admin.php?user-action=handle_init_root">Re-get missed files (slow)</a>
         </form>
         <br>
         <?php
