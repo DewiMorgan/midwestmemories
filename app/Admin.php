@@ -146,18 +146,32 @@ class Admin
             <link rel="manifest" href="/site.webmanifest">
             <title>Admin: Midwest Memories</title>
             <meta charset="UTF-8">
+            <style>
+                #messages {
+                    max-height: calc(1.2em * 50); /* Adjust line height if needed */
+                    overflow-y: auto;
+                    font-family: monospace; /* Optional for consistent line height */
+                    white-space: pre-wrap;
+                }
+            </style>
         </head>
         <body>
         <h1>Midwest Memories - admin</h1>
         <h2>Users</h2>
         <div id="user-list"></div>
+        <hr>
+
         <h2>Dropbox Files</h2>
         <div id="messages"></div>
+        <br>
+        <input type="checkbox" id="autoscroll" name="autoscroll" checked>
+        <label for="autoscroll">Auto scroll</label><br>
+        <hr>
+
         <h2>Admin Actions</h2>
-        <form method="post">
-            <button type="submit" name="user-action" value="handle_init_root">Re-get missed files (slow)</button>
-            <br><a href="admin.php?user-action=handle_init_root">Re-get missed files (slow)</a>
-        </form>
+        <ul>
+            <li><a href="/admin.php?user-action=handle_init_root">Re-get missed files (slow, rarely needed)</a></li>
+        </ul>
         <br>
         <?php
         // ToDo: turn this into a script tag. Not yet, though, as including it avoids problems with script caching.

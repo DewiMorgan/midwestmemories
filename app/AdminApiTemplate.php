@@ -21,6 +21,13 @@
         const p = document.createElement('p');
         p.textContent = message;
         messagesDiv.appendChild(p);
+
+        /** @type {HTMLInputElement} */
+        const autoscroll = document.getElementById('autoscroll');
+        if (autoscroll.checked) {
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
         return p;
     }
 
@@ -94,8 +101,6 @@
         thead.appendChild(headerRow);
         return thead;
     }
-
-    // ==============
 
     function createTd(content) {
         const cell = document.createElement('td');
@@ -256,9 +261,9 @@
                 }
 
                 if (true === data.moreFilesToGo) {
-                    logMessage(`${data.numValidFiles} of ${data.numTotalFiles}, more to come...`);
+                    logMessage(`${data.numValidFiles} valid of ${data.numTotalFiles} total, more to come...`);
                 } else {
-                    logMessage(`${data.numValidFiles} of ${data.numTotalFiles}, finished!`);
+                    logMessage(`${data.numValidFiles} valid of ${data.numTotalFiles} total, finished!`);
                     return;
                 }
             }

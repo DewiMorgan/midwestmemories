@@ -8,6 +8,7 @@ use Spatie\Dropbox\Client;
 
 /**
  * Manage a dropbox connection, and the operations on dropbox files.
+ * @see https://www.dropbox.com/developers/documentation/http/documentation#files-list_folder
  */
 class DropboxManager extends Singleton
 {
