@@ -88,6 +88,8 @@ class Connection extends Singleton
         $this->isSuperAdmin = $_SESSION['isSuperAdmin'] ?? false;
         if (!empty($_SERVER['PHP_AUTH_USER'])) {
             $this->user .= 'auth:' . $_SERVER['PHP_AUTH_USER'] . ',';
+            $_SESSION['isAdmin'] = false;
+            $_SESSION['isSuperAdmin'] = false;
             if ('myself' === $_SERVER['PHP_AUTH_USER']) {
                 $this->isAdmin = true;
                 $this->isSuperAdmin = true;
@@ -99,7 +101,6 @@ class Connection extends Singleton
                 $this->isAdmin = true;
                 // This means isAdmin can't be revoked 'til the session's killed.
                 $_SESSION['isAdmin'] = true;
-                $_SESSION['isSuperAdmin'] = false;
             }
         }
         if (!empty($_SESSION['name'])) {
