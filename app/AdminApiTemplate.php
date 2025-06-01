@@ -342,10 +342,13 @@
             const endpoint = './admin.php?action=change_password';
             const apiResult = await callUserAction(endpoint, username, password);
             if (apiResult) {
+                // Unstrike through the username.
                 usernameText.style.textDecoration = 'none';
                 usernameText.style.fontStyle = 'normal';
+                // Set the password to the new one.
+                const passwordText = row.querySelector('.password-text');
+                passwordInput.value = passwordText.textContent;
                 toggleEditMode(row);
-                // Unstrike through the username.
             }
         }
         // Else: do nothing, remain in edit mode
