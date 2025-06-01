@@ -65,7 +65,8 @@ class DropboxManager extends Singleton
      */
     public function initRootCursor(): array
     {
-        $list = $this->client->listFolder('', true);
+        $path = rtrim(Conf::get(Key::DROPBOX_PATH_PREFIX), '/');
+        $list = $this->client->listFolder($path, true);
         if (array_key_exists('cursor', $list)) {
             $saveResult = $this->setNewCursor($list['cursor']);
             if (empty($saveResult)) {
