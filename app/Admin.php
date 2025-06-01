@@ -167,7 +167,7 @@ class Admin
         <div id="user-list"></div>
         <hr>
 
-        <h2>Dropbox Files</h2>
+        <h2>Background Task Output</h2>
         <div id="messages"></div>
         <br>
         <input type="checkbox" id="autoscroll" name="autoscroll" checked>
