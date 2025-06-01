@@ -169,13 +169,14 @@ class UserManager extends Singleton
      */
     public function getUsers(): array
     {
-        $connection = Connection::getInstance();
-
-        if ($connection->isSuperAdmin) {
+        if (Connection::getInstance()->isSuperAdmin) {
             return $this->users;
         } else {
             return array_map(function ($item) {
-                return [$item[0], ''];
+                return [
+                    'username' => $item['username'],
+                    'comment' => ('DISABLED' === $item['comment']) ? 'DISABLED' : ''
+                ];
             }, $this->users);
         }
     }
