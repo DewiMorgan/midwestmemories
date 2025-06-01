@@ -116,7 +116,7 @@ This also makes thumbnails, publicly publishes the files, etc.
 * /index.php::global & app/Index.php::__construct() - as above, but for the subpage.
 * app/Index.php::showPage() - `i` param set by JS means internal request: include FileTemplate, ThumbsTemplate, etc.
 
-Templates have headers... unsure how it works when JS includes them inline. Styles seem respected?
+Templates have one script and stylesheet in their header, both parsed into the parent when they are read inline.
 
 ## ToDo:
 
@@ -138,6 +138,14 @@ See also ToDo, above.
 Current task:
 
 * I broke file downloads from dropbox.
+
+      Undefined array key "/" in 
+        /data0/ulixamvtuwwyaykg/public_html/midwestmemoriesfamily/app/MetadataCleaner.php on line 53
+      foreach() argument must be of type array|object, null given in 
+        /data0/ulixamvtuwwyaykg/public_html/midwestmemoriesfamily/app/MetadataCleaner.php on line 53
+
+* Editing a user's password no longer shows it as edited until you reload.
+* adding a new user no longer works.
 
 * Handle API errors instead of just checking `result.ok` (which just checks it was a 200).
     * Also make API errors not return 200 OK.

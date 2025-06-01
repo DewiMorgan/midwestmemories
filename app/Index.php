@@ -53,8 +53,8 @@ class Index
 
         $connection = Connection::getInstance();
 
-        // Log this login.
-        // ToDo: this is very low level, and should probably be wrapped in a connectionLogger.
+        // Log this login. No error handling if we fail.
+        // ToDo: this is very low level, and duplicated code. Should probably be wrapped in a connectionLogger.
         Db::sqlExec(
             'INSERT INTO midmem_visitors (`request`, `main_ip`, `all_ips_string`, `user`, `agent`)'
             . ' VALUES (?, ?, ?, ?, ?)',
@@ -241,14 +241,14 @@ class Index
         $insertSql = 'INSERT INTO midmem_comments (date_created, user, body_text, sequence, fk_file, hidden)
                   VALUES (NOW(), ?, ?, ?, ?, false)';
         Log::debug("Db::sqlExec('$insertSql', 'ssii', '$userName', '$bodyText', '$nextSeq', '$fileId')");
-        $insertId = Db::sqlExec($insertSql, 'ssii', $userName, $bodyText, $nextSeq, $fileId);
+        $insertResult = Db::sqlExec($insertSql, 'ssii', $userName, $bodyText, $nextSeq, $fileId);
 
-        if (!empty($insertId)) {
-            Log::debug("Added comment by $userName on $fileId", $bodyText);
-            return self::getCommentById($insertId);
-        } else {
+        if (empty($insertResult) || (0 === $insertResult['rows'] ?? 0) || (0 === $insertResult['id'] ?? 0)) {
             Log::debug("Failed to add comment by $userName on $fileId", $bodyText);
             return ['error' => 'Failed to save comment 5'];
+        } else {
+            Log::debug("Added comment by $userName on $fileId", $bodyText);
+            return self::getCommentById($insertResult['id']);
         }
     }
 

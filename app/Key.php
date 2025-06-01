@@ -16,6 +16,7 @@ enum Key: string
     case DROPBOX_KEY = 'dropbox_key';
     case DROPBOX_REFRESH_TOKEN = 'dropbox_refresh_token';
     case DROPBOX_SECRET = 'dropbox_secret';
+    case DROPBOX_PATH_PREFIX = 'dropbox_path_prefix';
     case DROPBOX_USER_ID = 'dropbox_user_id';
     case IMAGE_DIR = 'image_dir';
     case LOG_FILE = 'log_file';

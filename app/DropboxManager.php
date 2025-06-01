@@ -35,21 +35,20 @@ class DropboxManager extends Singleton
     }
 
     /**
-     * Initialize the cursor, and get the start of the list of all files for this website. Might be LONG.
-     * @return array List of file details.
+     * @param array $list
+     * @param string $error
+     * @return array
      */
-    public function initRootCursor(): array
+    public function handleFileList(array $list, string $error): array
     {
-        $list = $this->client->listFolder('', true);
-        if (array_key_exists('cursor', $list)) {
-            $this->setNewCursor($list['cursor']);
-            $error = 'OK';
-        } else {
-            $error = 'Error: Root cursor not set';
+        $numValidFiles = 0;
+        if (!empty($list)) {
+            $numValidFiles = $this->saveFileQueue($list['entries']);
+            Log::debug('List', $list);
         }
         $result = [
-            static::KEY_TOTAL_FILES => count($list['entries'] ?? 0),
-            static::KEY_VALID_FILES => count($list['entries'] ?? 0),
+            static::KEY_VALID_FILES => $numValidFiles,
+            static::KEY_TOTAL_FILES => count($list['entries'] ?? []),
             static::KEY_MORE_FILES => $list['has_more'] ?? false,
             static::KEY_ERROR => $error
         ];
@@ -58,13 +57,37 @@ class DropboxManager extends Singleton
     }
 
     /**
+     * Initialize the cursor, and get the start of the list of all files for this website. Might be LONG.
+     * ToDo: change listFolder to use Conf::get[Key::DROPBOX_PATH_PREFIX] instead of ''.
+     *       No trailing slash!
+     * @return array List of file details.
+     */
+    public function initRootCursor(): array
+    {
+        $list = $this->client->listFolder('', true);
+        if (array_key_exists('cursor', $list)) {
+            $saveResult = $this->setNewCursor($list['cursor']);
+            if (empty($saveResult)) {
+                $error = 'Error: Root cursor not saved to MySQL';
+                Log::error('Root cursor not saved to MySQL', $saveResult);
+            } else {
+                $error = 'OK';
+            }
+        } else {
+            $error = 'Error: Root cursor not set in returned file details';
+            Log::warn('Root cursor not set in returned file details', $list);
+        }
+        return $this->handleFileList($list, $error);
+    }
+
+    /**
      * Get the list of updated files for the given cursor, up to a timeout.
      * @return array Details of what was done.
      */
-    public function resumeRootCursor(): array
+    public function readCursorUpdate(): array
     {
+        // Ensure we have a cursor.
         $this->loadCursor();
-        $list = [];
         if ($this->cursor) {
             $list = $this->client->listFolderContinue($this->cursor);
             if (array_key_exists('cursor', $list)) {
@@ -72,58 +95,22 @@ class DropboxManager extends Singleton
             }
             $error = 'OK';
         } else {
+            $list = [];
             $error = 'Error: Root cursor not initially set';
         }
-        $result = [
-            static::KEY_TOTAL_FILES => count($list['entries'] ?? 0),
-            static::KEY_VALID_FILES => count($list['entries'] ?? 0),
-            static::KEY_MORE_FILES => $list['has_more'] ?? false,
-            static::KEY_ERROR => $error
-        ];
-        Log::debug('Result:', $result);
-        return $result;
+        return $this->handleFileList($list, $error);
     }
 
     /**
-     * Read a chunk of the list of updated files for the given DropBox cursor, and queue it in the MySQL.
-     * @return array of count read from DropBox & written to MySQL, more can be read, and any errors.
-     */
-    public function readOneCursorUpdate(): array
-    {
-        $this->loadCursor();
-        if ($this->cursor) {
-            $list = $this->client->listFolderContinue($this->cursor);
-            $this->setNewCursor($list['cursor']);
-            $numValidFiles = $this->saveFileQueue($list['entries']);
-            Log::debug('List', $list);
-            $result = [
-                static::KEY_VALID_FILES => $numValidFiles,
-                static::KEY_TOTAL_FILES => count($list['entries']),
-                static::KEY_MORE_FILES => $list['has_more'] ?? false,
-                static::KEY_ERROR => 'OK'
-            ];
-        } else {
-            $result = [
-                static::KEY_VALID_FILES => 0,
-                static::KEY_TOTAL_FILES => 0,
-                static::KEY_MORE_FILES => false,
-                static::KEY_ERROR => 'Error: Root cursor not set'
-            ];
-        }
-
-        Log::debug('Result:', $result);
-        return $result;
-    }
-
-    /**
-     * Persistently set the cursor to a new value.
+     * Persistently set the cursor to a new value, if it has changed.
      * @param string $cursor The cursor string.
+     * @return array ['id'=>N, 'rows'=>1] if changed, else ['id'=>N, 'rows'=>0] or [] depending on why it failed.
      */
-    private function setNewCursor(string $cursor): void
+    private function setNewCursor(string $cursor): array
     {
         if (!empty($cursor) && $this->cursor !== $cursor) {
             $this->cursor = $cursor;
-            Db::sqlExec(
+            return Db::sqlExec(
                 'INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`) 
                 VALUES (?, ?) 
                 ON DUPLICATE KEY UPDATE `cursor_id` = ?',
@@ -133,10 +120,12 @@ class DropboxManager extends Singleton
                 $cursor
             );
         }
+        return [];
     }
 
     /**
      * Save files to the queue, to process later.
+     * ToDo: Could check for .tag='deleted' later in the list, as it might be re-deleted; but handle deletion first.
      * @param array $list Array of entries, each an array with keys '.tag', 'name', 'path_lower', 'path_display', etc.
      * .tag is file, folder, delete, or more.
      * @return int How many files were added to the list.
@@ -144,23 +133,32 @@ class DropboxManager extends Singleton
     private function saveFileQueue(array $list): int
     {
         $numberOfFiles = 0;
+        $pathPrefix = Conf::get(Key::DROPBOX_PATH_PREFIX);
         foreach ($list as $entry) {
-            // Skip anything we don't care about.
-            if ('file' !== $entry['.tag'] || !str_starts_with($entry['path_lower'], '/midwestmemories/')) {
+            // Skip anything we definitely don't care about.
+            if ('file' !== $entry['.tag'] || !str_starts_with($entry['path_lower'], $pathPrefix)) {
                 continue;
             }
             $numberOfFiles++;
-            // Could check other .tag='file' fields, like 'is_downloadable', though that should always be true, I think.
-            // Could check 'content_hash' to see if it is unchanged, though if it is in our list, it should be changed.
-            // Could check for .tag='deleted' later in the list, as it might be re-deleted; but handle deletion first.
-            Db::sqlExec(
-                "INSERT INTO `midmem_file_queue` (`file_name`, `full_path`, `sync_status`, `error_message`)
-                    VALUES (?, ?, ?, '')",
-                'sss',
+            // The ON DUPLICATE KEY behavior only overwrites with updated values if the hash was changed.
+            $result = Db::sqlExec(
+                "INSERT INTO `midmem_file_queue` 
+                    (`file_name`, `full_path`, `sync_status`, `file_hash`, `error_message`)
+                 VALUES (?, ?, ?, ?, '')
+                 ON DUPLICATE KEY UPDATE 
+                    file_name = IF(VALUES(file_hash) != file_hash, VALUES(file_name), file_name),
+                    sync_status = IF(VALUES(file_hash) != file_hash, VALUES(sync_status), sync_status),
+                    file_hash = IF(VALUES(file_hash) != file_hash, VALUES(file_hash), file_hash),
+                    error_message = IF(VALUES(file_hash) != file_hash, '', error_message)",
+                'ssss',
                 $entry['name'],
                 ltrim($entry['path_display'], '\\/'),
-                SyncStatus::NEW->value
+                SyncStatus::NEW->value,
+                $entry['content_hash']
             );
+            if (empty($result)) {
+                Log::error('Error writing Dropbox entry to MySQL', $entry);
+            }
         }
         return $numberOfFiles;
     }

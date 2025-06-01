@@ -28,8 +28,10 @@ namespace MidwestMemories;
     $h_fd = cleanFileDetails($fileDetails);
 
     // Special cases.
-    $h_slide = $h_fd['slideorigin'] . ':' . $h_fd['slidenumber'] . ':' . $h_fd['slidesubsection'];
-    $h_altText = $h_fd['displayname'];
+    $h_slide = ($h_fd['slideorigin'] ?? '')
+        . ':' . ($h_fd['slidenumber'] ?? '')
+        . ':' . ($h_fd['slidesubsection'] ?? '');
+    $h_altText = $h_fd['displayname'] ?? '';
     ?>
     <img src="<?= $u_linkUrl ?>" alt="<?= $h_altText ?>" class="file">
     <table>
@@ -39,27 +41,27 @@ namespace MidwestMemories;
         </tr>
         <tr>
             <td>Written notes:</td>
-            <td><?= $h_fd['writtennotes'] ?></td>
+            <td><?= $h_fd['writtennotes'] ?? '' ?></td>
         </tr>
         <tr>
             <td>Date:</td>
-            <td><?= $h_fd['date'] ?></td>
+            <td><?= $h_fd['date'] ?? '' ?></td>
         </tr>
         <tr>
             <td>Location:</td>
-            <td><?= $h_fd['location'] ?></td>
+            <td><?= $h_fd['location'] ?? '' ?></td>
         </tr>
         <tr>
             <td>Photographer:</td>
-            <td><?= $h_fd['photographer'] ?></td>
+            <td><?= $h_fd['photographer'] ?? '' ?></td>
         </tr>
         <tr>
             <td>People:</td>
-            <td><?= $h_fd['people'] ?></td>
+            <td><?= $h_fd['people'] ?? '' ?></td>
         </tr>
         <tr>
             <td>Keywords:</td>
-            <td><?= $h_fd['keywords'] ?></td>
+            <td><?= $h_fd['keywords'] ?? '' ?></td>
         </tr>
     </table>
     <?php

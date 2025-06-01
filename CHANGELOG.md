@@ -3,6 +3,15 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+Change Dropbox cursor management to make sense: either "read latest changes" or "read full file list". 
+Make setNewCursor and sqlExec return id & rows changed. 
+Make SaveFileQueue handle dup keys
+Make SaveFileQueue use the file's hash to see if a record needs updating.
+Add more syscall return validation.
+Fix FileTemplate missing array indexes.
+Move dropbox_path_prefix to ini file.
+Add file_hash to db schema.
+
 ## 2025/05/29 Thu
 
 * DONE: Improve admin UI: Always show user list, always show file details.

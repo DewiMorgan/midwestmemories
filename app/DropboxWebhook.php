@@ -81,6 +81,7 @@ class DropboxWebhook
                 && count($decoded['delta']['users']) > 0
             ) {
                 foreach ($decoded['delta']['users'] as $userId) {
+                    // No error handling if we fail.
                     Db::sqlExec(
                         "
                         INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`, `webhook_timestamp`)
@@ -92,7 +93,8 @@ class DropboxWebhook
                 }
             }
         } else {
-            // On failure, we set the webhook timestamp to now(). I don't know why.
+            // On failure, I set the webhook timestamp to now(). I no longer remember why.
+            // ToDo: figure out why.
             Db::sqlExec('UPDATE `midmem_dropbox_users` SET `webhook_timestamp` = NOW() WHERE 1');
         }
     }

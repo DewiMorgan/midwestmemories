@@ -45,16 +45,12 @@ class Db extends Singleton
      * Execute a SQL statement.
      * @param string $sql The query to execute.
      * @param int|string ...$items type-string, then variables, like 'sd', 'foo', 1.
-     * @return int|null The inserted ID on success, else null.
+     * @return array|null An array like ['id' => N, 'rows' => M] on success, else empty array [].
      */
-    public static function sqlExec(string $sql, int|string ...$items): ?int
+    public static function sqlExec(string $sql, int|string ...$items): ?array
     {
         Log::debug('Exec...', [$sql, $items]);
-        $result = self::getQueryResult(self::TYPE_EXEC, $sql, ...$items);
-        if (empty($result)) {
-            return null;
-        }
-        return intval($result[0]);
+        return self::getQueryResult(self::TYPE_EXEC, $sql, ...$items);
     }
 
     /**
@@ -160,7 +156,7 @@ class Db extends Singleton
             return [];
         }
         if (self::TYPE_EXEC == $queryType) {
-            return [$db->insert_id];
+            return ['id', $db->insert_id, 'rows' => $db->affected_rows];
         }
         if (!($result = $query->get_result())) {
             Log::warn('get_result failed, db error', $db->error);

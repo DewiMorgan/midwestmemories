@@ -6,8 +6,10 @@ create table `midmem_file_queue`
         COMMENT 'Dropbox path_display with leading slashes removed',
     sync_status   ENUM ('NEW', 'ERROR', 'DOWNLOADED', 'PROCESSED') NOT NULL DEFAULT 'NEW'
         COMMENT 'How the sync of this queued file has progressed.',
-    error_message TEXT                                             NOT NULL
+    error_message TEXT                                             NOT NULL DEFAULT ''
         COMMENT 'Description of any error encountered',
+    file_hash     TEXT                                             NOT NULL DEFAULT ''
+        COMMENT 'Hash of file, to tell if it has changed.',
     UNIQUE INDEX (full_path)
 ) ENGINE = InnoDB
   COLLATE = utf8mb4_unicode_ci,

@@ -53,8 +53,8 @@ class Admin
         $_SESSION['login'] = 'true';
         $_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
 
-        // Log this login.
-        // ToDo: this is very low level, and should probably be wrapped in a connectionLogger.
+        // Log this login. No error handling if we fail.
+        // ToDo: this is very low level, and duplicated code. Should probably be wrapped in a connectionLogger.
         Db::sqlExec(
             'INSERT INTO midmem_visitors (`request`, `main_ip`, `all_ips_string`, `user`, `agent`)'
             . ' VALUES (?, ?, ?, ?, ?)',
@@ -88,9 +88,9 @@ class Admin
     public static function getApiResponse(string $formAction): void
     {
         $result = match ($formAction) {
-            'update_dropbox_status' => DropboxManager::getInstance()->readOneCursorUpdate(),
+            'update_dropbox_status' => DropboxManager::getInstance()->readCursorUpdate(),
             'init_root' => DropboxManager::getInstance()->initRootCursor(),
-            'continue_root' => DropboxManager::getInstance()->resumeRootCursor(),
+            'continue_root' => DropboxManager::getInstance()->readCursorUpdate(),
             'list_files_to_download' => FileProcessor::getInstance()->listFilesByStatus(
                 SyncStatus::NEW
             ),

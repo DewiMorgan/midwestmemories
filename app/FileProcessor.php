@@ -56,7 +56,7 @@ class FileProcessor extends Singleton
             SyncStatus::PROCESSED->value,
             $fullPath
         );
-        return is_null($result);
+        return !empty($result);
     }
 
     /**
@@ -123,7 +123,7 @@ class FileProcessor extends Singleton
             SyncStatus::PROCESSED->value,
             $fullPath
         );
-        return is_null($result);
+        return !empty($result);
     }
 
     // Privates
@@ -251,7 +251,7 @@ class FileProcessor extends Singleton
             $errorMessage,
             $fullPath
         );
-        return is_null($result);
+        return !empty($result);
     }
 
 
