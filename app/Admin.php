@@ -134,8 +134,8 @@ class Admin
      */
     private static function showAdminTemplate(): void
     {
+        echo "<!DOCTYPE html>\n"; // As an echo to prevent any leading whitespace.
         ?>
-        <!DOCTYPE html>
         <html lang="en">
         <head>
             <link rel="shortcut icon" href="/favicon.ico">
