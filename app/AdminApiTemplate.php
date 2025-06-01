@@ -311,21 +311,25 @@
      * @returns {Promise<void>}
      */
     async function listUsers(listEndpoint) {
-        const actionName = 'list_users';
+        logMessage(`Getting list of users.`);
 
         const listResponse = await fetch(listEndpoint);
         if (listResponse.ok) {
             const users = await listResponse.json();
             const numUsers = users.length;
             if (0 === numUsers) {
-                logMessage(`= Got zero users for ${actionName}.`);
+                logMessage(`= Got zero users! There should probably be more.`);
+            } else {
+                logMessage(`= Got ${numUsers} users!`);
             }
+            console.log('Users:', users);
+
             const table = createUserTable(users);
 
             const userListDiv = document.getElementById('user-list');
             userListDiv.appendChild(table);
         } else {
-            logMessage(`= Failed to get list of users for ${actionName}.`);
+            logMessage(`= Failed to get list of users.`);
         }
     }
 
