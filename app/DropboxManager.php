@@ -43,14 +43,28 @@ class DropboxManager extends Singleton
     public function handleFileList(array $list, string $error): array
     {
         $numValidFiles = 0;
+        $hasMoreFiles = false;
         if (!empty($list)) {
+            // This is a kludge for an apparent Dropbox bug. When given a path, `has_more` is always true, and it
+            // will always return the path if asked.
+            $hasMoreFiles = $list['has_more'] ?? false;
+            if (1 === count($list)) {
+                $badPath = rtrim(Conf::get(Key::DROPBOX_PATH_PREFIX), '/');
+                $actualPath = $list['entries'][0]['path_display'] ?? $badPath;
+                if ($actualPath === $badPath) {
+                    $hasMoreFiles = false;
+                }
+            }
+
+            // Otherwise, process the list.
             $numValidFiles = $this->saveFileQueue($list['entries']);
             Log::debug('List', $list);
         }
+
         $result = [
             static::KEY_VALID_FILES => $numValidFiles,
             static::KEY_TOTAL_FILES => count($list['entries'] ?? []),
-            static::KEY_MORE_FILES => $list['has_more'] ?? false,
+            static::KEY_MORE_FILES => $hasMoreFiles,
             static::KEY_ERROR => $error
         ];
         Log::debug('Result:', $result);
@@ -83,7 +97,7 @@ class DropboxManager extends Singleton
     }
 
     /**
-     * Get the list of updated files for the given cursor, up to a timeout.
+     * Get a page of updated files for the given cursor.
      * @return array Details of what was done.
      */
     public function readCursorUpdate(): array
