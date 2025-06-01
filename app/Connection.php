@@ -99,6 +99,7 @@ class Connection extends Singleton
                 $this->isAdmin = true;
                 // This means isAdmin can't be revoked 'til the session's killed.
                 $_SESSION['isAdmin'] = true;
+                $_SESSION['isSuperAdmin'] = false;
             }
         }
         if (!empty($_SESSION['name'])) {
