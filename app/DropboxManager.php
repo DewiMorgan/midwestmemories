@@ -108,7 +108,7 @@ class DropboxManager extends Singleton
      */
     private function setNewCursor(string $cursor): array
     {
-        if (!empty($cursor) && $this->cursor !== $cursor) {
+        if (!empty($cursor) && (!isset($this->cursor) || $this->cursor !== $cursor)) {
             $this->cursor = $cursor;
             return Db::sqlExec(
                 'INSERT INTO `midmem_dropbox_users` (`user_id`, `cursor_id`) 
