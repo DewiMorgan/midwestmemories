@@ -252,7 +252,7 @@
 
                 // Enforce syntax.
                 data.moreFilesToGo ??= false;
-                data.numValidFiles ??= 0;
+                data.numAddedFiles ??= 0;
                 data.numTotalFiles ??= 0;
 
                 if ("OK" !== data.error) {
@@ -261,9 +261,9 @@
                 }
 
                 if (true === data.moreFilesToGo) {
-                    logMessage(`= ${data.numValidFiles} new from ${data.numTotalFiles} total, more to come...`);
+                    logMessage(`= ${data.numAddedFiles} new from ${data.numTotalFiles} total, more to come...`);
                 } else {
-                    logMessage(`= ${data.numValidFiles} new from ${data.numTotalFiles} total, finished!`);
+                    logMessage(`= ${data.numAddedFiles} new from ${data.numTotalFiles} total, finished!`);
                     return;
                 }
             }

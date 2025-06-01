@@ -18,7 +18,7 @@ class DropboxManager extends Singleton
     /** The current position in a read of the file status. Long-lived, persistent, gets updates. */
     public string $cursor;
 
-    public const KEY_VALID_FILES = 'numValidFiles';
+    public const KEY_ADDED_FILES = 'numAddedFiles';
     public const KEY_TOTAL_FILES = 'numTotalFiles';
     public const KEY_MORE_FILES = 'moreFilesToGo';
     public const KEY_ERROR = 'error';
@@ -48,7 +48,7 @@ class DropboxManager extends Singleton
             // This is a kludge for an apparent Dropbox bug. When given a path, `has_more` is always true, and it
             // will always return the path if asked.
             $hasMoreFiles = $list['has_more'] ?? false;
-            if (1 === count($list)) {
+            if (1 === count($list['entries'])) {
                 $badPath = rtrim(Conf::get(Key::DROPBOX_PATH_PREFIX), '/');
                 $actualPath = $list['entries'][0]['path_display'] ?? $badPath;
                 if ($actualPath === $badPath) {
@@ -62,7 +62,7 @@ class DropboxManager extends Singleton
         }
 
         $result = [
-            static::KEY_VALID_FILES => $numAddedFiles,
+            static::KEY_ADDED_FILES => $numAddedFiles,
             static::KEY_TOTAL_FILES => count($list['entries'] ?? []),
             static::KEY_MORE_FILES => $hasMoreFiles,
             static::KEY_ERROR => $error
