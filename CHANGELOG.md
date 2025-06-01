@@ -5,6 +5,7 @@ which might not be when they were actually implemented/committed.
 
 ## 2025/06/01 Sun
 
+* DONE: Make messages window limited in height, with optional autoscroll.
 * DONE: Change Dropbox cursor management to make sense: either "read latest" or "read full list".
 * DONE: Make setNewCursor and sqlExec return ID & rows changed.
 * DONE: Make SaveFileQueue handle dup keys

@@ -148,7 +148,7 @@ class Admin
             <meta charset="UTF-8">
             <style>
                 #messages {
-                    max-height: calc(1.2em * 50); /* Adjust line height if needed */
+                    max-height: calc(1.2em * 5); /* Adjust line height if needed */
                     overflow-y: auto;
                     font-family: monospace; /* Optional for consistent line height */
                     white-space: pre-wrap;
