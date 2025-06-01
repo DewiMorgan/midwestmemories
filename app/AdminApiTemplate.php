@@ -347,7 +347,7 @@
                 usernameText.style.fontStyle = 'normal';
                 // Set the password to the new one.
                 const passwordText = row.querySelector('.password-text');
-                passwordInput.value = passwordText.textContent;
+                passwordText.textContent = passwordInput.value;
                 toggleEditMode(row);
             }
         }
