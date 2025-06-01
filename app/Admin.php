@@ -162,7 +162,10 @@ class Admin
             </style>
         </head>
         <body>
-        <h1>Midwest Memories - admin (<?= $_SESSION['name'] ?>)</h1>
+        <h1>Midwest Memories -
+            <?= Connection::getInstance()->isSuperAdmin ? 'SuperAdmin' : 'Admin'; ?>
+            (<?= $_SESSION['name'] ?>)
+        </h1>
         <h2>Users</h2>
         <div id="user-list"></div>
         <hr>
