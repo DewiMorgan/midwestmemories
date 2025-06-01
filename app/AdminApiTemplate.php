@@ -261,9 +261,9 @@
                 }
 
                 if (true === data.moreFilesToGo) {
-                    logMessage(`= ${data.numAddedFiles} new from ${data.numTotalFiles} total, more to come...`);
+                    logMessage(`= Got ${data.numAddedFiles} new files of ${data.numTotalFiles} total, more to come...`);
                 } else {
-                    logMessage(`= ${data.numAddedFiles} new from ${data.numTotalFiles} total, finished!`);
+                    logMessage(`= Got ${data.numAddedFiles} new files of ${data.numTotalFiles} total, finished!`);
                     return;
                 }
             }
@@ -311,7 +311,7 @@
      * @returns {Promise<void>}
      */
     async function listUsers(listEndpoint) {
-        logMessage(`Getting list of users.`);
+        logMessage(`Getting list of users...`);
 
         const listResponse = await fetch(listEndpoint);
         if (listResponse.ok) {
