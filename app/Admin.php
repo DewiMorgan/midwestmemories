@@ -162,7 +162,7 @@ class Admin
             </style>
         </head>
         <body>
-        <h1>Midwest Memories - admin</h1>
+        <h1>Midwest Memories - admin (<?= Connection::getInstance()->user ?>)</h1>
         <h2>Users</h2>
         <div id="user-list"></div>
         <hr>
