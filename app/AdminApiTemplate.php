@@ -210,23 +210,12 @@
     }
 
     /**
-     * Run prepare and then process for initialization.
-     * @returns {Promise<void>}
-     */
-    async function runAllInits() {
-        // Get the initial cursor.
-        await handleDropboxPolling('./admin.php?action=init_root');
-        // Get the remainder of the cursor.
-        await runAllUpdates();
-    }
-
-    /**
      * Run all steps of listing, downloading, and postprocessing files.
      * @returns {Promise<void>}
      */
     async function runAllUpdates() {
         // Get and queue updates from Dropbox.
-        await handleDropboxPolling('./admin.php?action=continue_root');
+        await handleDropboxPolling('./admin.php?action=continue_root', 'get the next page of files');
         // Download queued downloads.
         await handleFileTask(
             'Downloading', './admin.php?action=list_files_to_download', './admin.php?action=download_one_file'
@@ -240,9 +229,11 @@
     /**
      * API wrapper for dropbox polling endpoints. Call the endpoint until all items are processed.
      * @param {string} url
+     * @param {string} actionName
      * @returns {Promise<void>}
      */
-    async function handleDropboxPolling(url) {
+    async function handleDropboxPolling(url, actionName) {
+        logMessage(`Asking Dropbox to ${actionName}...`);
         try {
             while (true) {
                 const response = await fetch(url);
@@ -485,16 +476,18 @@
      */
     function runRelevantTasks() {
         const params = new URLSearchParams(window.location.search);
-        const userAction = params.get("user-action");
 
-        // These always happen.
+        // Populate the user list.
         listUsers('./admin.php?action=list_users');
-        runAllUpdates();
 
-        // This one only happens if called.
-        if ("handle_init_root" === userAction) {
-            runAllInits();
+        // Only if requested by the user.
+        if ("handle_init_root" === params.get("user-action")) {
+            // Get the initial page of files, resetting the cursor.
+            handleDropboxPolling('./admin.php?action=init_root', 'get the very first page of files');
         }
+
+        // Get all remaining pages.
+        runAllUpdates();
     }
 
     runRelevantTasks();
