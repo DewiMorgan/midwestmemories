@@ -120,7 +120,7 @@ class Admin
                 Log::error("From $formAction, failed to json encode: " . $e->getMessage(), $result);
             }
             if (str_starts_with($formAction, 'list_')) {
-                Log::debug('Returning list of ' . count($result) . ' items from $formAction.', $result);
+                Log::debug('Returning list of ' . count($result) . " items from $formAction.", $result);
             } else {
                 Log::debug("From $formAction", $result);
             }
@@ -155,7 +155,7 @@ class Admin
         <div id="messages"></div>
         <h2>Admin Actions</h2>
         <form method="post">
-            <button type="submit" name="action" value="handle_init_root">Replace root cursor (dangerous)</button>
+            <button type="submit" name="action" value="handle_init_root">Check Dropbox for missed files (slow)</button>
         </form>
         <br>
         <?php

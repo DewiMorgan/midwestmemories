@@ -139,11 +139,6 @@ Current task:
 
 * I broke file downloads from dropbox.
 
-      Undefined array key "/" in 
-        /data0/ulixamvtuwwyaykg/public_html/midwestmemoriesfamily/app/MetadataCleaner.php on line 53
-      foreach() argument must be of type array|object, null given in 
-        /data0/ulixamvtuwwyaykg/public_html/midwestmemoriesfamily/app/MetadataCleaner.php on line 53
-
 * Editing a user's password no longer shows it as edited until you reload.
 * adding a new user no longer works.
 

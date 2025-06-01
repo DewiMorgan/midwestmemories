@@ -156,13 +156,13 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
                 $h_item = htmlspecialchars($item);
                 $itemUnixPath = "$scanUnixDir/$item";
                 $u_linkUrl = Path::unixPathToUrl($itemUnixPath, Path::LINK_INLINE);
-                $selectClass = ($itemUnixPath === $targetUnixPath) ? 'selected' : '';
+                $h_selectClass = ($itemUnixPath === $targetUnixPath) ? 'selected' : '';
                 // If the item is a directory, output a list item with a nested ul element.
                 if (is_dir($itemUnixPath)) {
                     // Collapse, unless our target path is within this branch.
-                    $expandClass = Path::isChildInPath($targetUnixPath, $itemUnixPath) ? 'expanded' : 'collapsed';
-                    $h_expandIcon = ('expanded' === $expandClass) ? ICON_EXPANDED : ICON_COLLAPSED;
-                    echo "<li class='folder $expandClass $selectClass'>";
+                    $h_expandClass = Path::isChildInPath($targetUnixPath, $itemUnixPath) ? 'expanded' : 'collapsed';
+                    $h_expandIcon = ('expanded' === $h_expandClass) ? ICON_EXPANDED : ICON_COLLAPSED;
+                    echo "<li class='folder $h_expandClass $h_selectClass'>";
                     echo "<span class='expand-collapse'>$h_expandIcon</span>";
                     echo " <a href='$u_linkUrl' class='path-link'>$h_item</a>";
                     echo "<ul>\n";
@@ -170,7 +170,9 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
                     scanDirectory($itemUnixPath, $targetUnixPath);
                     echo "</ul></li>\n";
                 } else {
-                    $files .= "<li class='file $selectClass'><a href='$u_linkUrl' class='path-link'>$h_item</a></li>\n";
+                    $files .= "<li class='file $h_selectClass'>"
+                        . "<a href='$u_linkUrl' class='path-link'>$h_item</a>"
+                        . "</li>\n";
                 }
             }
             echo $files;
