@@ -261,14 +261,14 @@
                 }
 
                 if (true === data.moreFilesToGo) {
-                    logMessage(`${data.numValidFiles} valid of ${data.numTotalFiles} total, more to come...`);
+                    logMessage(`= ${data.numValidFiles} valid of ${data.numTotalFiles} total, more to come...`);
                 } else {
-                    logMessage(`${data.numValidFiles} valid of ${data.numTotalFiles} total, finished!`);
+                    logMessage(`= ${data.numValidFiles} valid of ${data.numTotalFiles} total, finished!`);
                     return;
                 }
             }
         } catch (err) {
-            logMessage(`Request failed: ${err.message}`);
+            logMessage(`= Request failed: ${err.message}`);
         }
     }
 
@@ -287,7 +287,7 @@
             const files = await listResponse.json();
             const numFiles = files.length;
             if (0 === numFiles) {
-                logMessage(`Got zero files for ${actionName}.`);
+                logMessage(`= Got zero files for ${actionName}.`);
             }
             // for (const filename of files) {
             for (const [index, filename] of files.entries()) {
@@ -299,9 +299,9 @@
                     updateMessage(messageElement, ' Failed');
                 }
             }
-            logMessage(`${actionName} complete!`);
+            logMessage(`= ${actionName} complete!`);
         } else {
-            logMessage(`Failed to get list of files for ${actionName}.`);
+            logMessage(`= Failed to get list of files for ${actionName}.`);
         }
     }
 
@@ -318,14 +318,14 @@
             const users = await listResponse.json();
             const numUsers = users.length;
             if (0 === numUsers) {
-                logMessage(`Got zero users for ${actionName}.`);
+                logMessage(`= Got zero users for ${actionName}.`);
             }
             const table = createUserTable(users);
 
             const userListDiv = document.getElementById('user-list');
             userListDiv.appendChild(table);
         } else {
-            logMessage(`Failed to get list of users for ${actionName}.`);
+            logMessage(`= Failed to get list of users for ${actionName}.`);
         }
     }
 
