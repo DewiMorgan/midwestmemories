@@ -1,5 +1,8 @@
 MySqlAuth.ini
 DropboxAuth.ini
+index-template.ini
+ApiResponse.txt
+mm.log
 error_log
 callback.out
 inst-mwm.log
