@@ -127,10 +127,15 @@
         return input;
     }
 
-    function createActionButtons(row) {
+    function createActionButtons(row, isCreating) {
+        let saveButton;
+        if (isCreating) {
+            saveButton = createButton(iconSave, 'save-button', changePassword, row, true);
+        } else {
+            saveButton = createButton(iconSave, 'save-button', addUser, row, true);
+        }
         const actionCell = document.createElement('td');
         const editButton = createButton(iconEdit, 'edit-button', toggleEditMode, row);
-        const saveButton = createButton(iconSave, 'save-button', changePassword, row, true);
         const cancelButton = createButton(iconCancel, 'cancel-button', toggleEditMode, row, true);
         actionCell.append(editButton, saveButton, cancelButton);
         return actionCell;
@@ -182,7 +187,7 @@
         const passwordCell = createTd();
         passwordCell.append(passwordSpan, passwordInput);
 
-        const editCell = createActionButtons(row);
+        const editCell = createActionButtons(row, true);
 
         row.append(deleteCell, usernameCell, passwordCell, editCell);
 
@@ -207,7 +212,7 @@
         const passwordCell = createTd();
         passwordCell.append(passwordSpan, passwordInput);
 
-        const controlCell = createActionButtons(row);
+        const controlCell = createActionButtons(row, false);
 
         row.append(blankCell, usernameCell, passwordCell, controlCell);
 

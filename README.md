@@ -138,9 +138,17 @@ See also ToDo, above.
 Current task:
 
 * I broke file downloads from dropbox.
+* DONE: Editing a user's password no longer shows it as edited until you reload.
+* Adding a new user no longer works.
 
-* Editing a user's password no longer shows it as edited until you reload.
-* adding a new user no longer works.
+* Add new user - wrong confirm prompt. Doesn't add user.
+
+I think the above are all fixed. Next:
+
+* convert API to be a separate file.
+* convert user management to session-and-DB based.
+* Get folder-level details showing.
+* Faster page loads (smaller initial images?)
 
 * Handle API errors instead of just checking `result.ok` (which just checks it was a 200).
     * Also make API errors not return 200 OK.
