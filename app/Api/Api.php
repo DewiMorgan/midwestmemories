@@ -74,6 +74,8 @@ class Api
         } catch (ValueError) {
             Log::warn("No match for $this->method $this->path");
             Log::debug('Request', $_REQUEST);
+            Log::debug('URI', $_SERVER['REQUEST_URI']);
+
             $this->jsonResponse(404, ['error' => 'Endpoint not found']);
         }
     }
