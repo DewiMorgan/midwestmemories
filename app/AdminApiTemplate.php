@@ -223,23 +223,26 @@
         await handleFileTask('Postprocessing', '/api/v1.0/process');
     }
 
+
     /**
      * API wrapper to call an endpoint and return the data object, or an exception on error.
-     * @param {string} url
-     * @param {string} httpMethod
-     * @param payload
-     * @returns {Promise<any[]>}
+     * @template T
+     * @param {string} url - The API endpoint to fetch.
+     * @param {string} [method='GET'] - The HTTP method.
+     * @param {Object|null} [payload=null] - Optional payload for POST/PUT/PATCH.
+     * @param {'string'|'object'|'array'} expectedType - Expected type for the `data` payload.
+     * @returns {Promise<T>} - The validated data response.
+     * @throws {Error} - If the response status or data type is incorrect.
      */
-    async function fetchApiData(url, httpMethod = 'GET', payload = null) {
+    async function fetchApiData(url, method = 'GET', expectedType = 'array', payload = null) {
         const options = {
-            method: httpMethod,
+            method,
             headers: {
                 'Accept': 'application/json',
             }
         };
 
-        // Attach JSON body if payload is given and method allows it.
-        if (null !== payload && ['POST', 'PUT', 'PATCH'].includes(httpMethod.toUpperCase())) {
+        if (null !== payload && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
             options.headers['Content-Type'] = 'application/json';
             options.body = JSON.stringify(payload);
         }
@@ -256,16 +259,18 @@
             throw new Error("Response JSON does not contain a 'data' property.");
         }
 
-        if (!Array.isArray(jsonResponse.data)) {
-            console.log(`The 'data' property is not an array from ${httpMethod} ${url}.`, jsonResponse.data);
-            throw new Error(`The 'data' property is not an array from ${httpMethod} ${url}.`);
+        const data = jsonResponse.data;
+
+        const actualType = Array.isArray(data) ? 'array' : typeof data;
+        if (actualType !== expectedType) {
+            throw new Error(`Expected 'data' to be ${expectedType}, but got ${actualType}.`);
         }
 
         if (jsonResponse.hasOwnProperty('error') && "OK" !== jsonResponse.error) {
             throw new Error(jsonResponse.error);
         }
 
-        return jsonResponse.data;
+        return data;
     }
 
     /**
@@ -278,7 +283,11 @@
         logMessage(`Asking Dropbox to ${readableDescription}...`);
         try {
             while (true) {
-                const data = await fetchApiData(url);
+                /**
+                 * @typedef {{numAddedFiles:int, numTotalFiles:int, hasMoreFiles:bool, error:string}} FileActionStatus
+                 * @type {Promise<FileActionStatus>}
+                 */
+                const data = await fetchApiData(url, 'GET', 'object');
 
                 // Enforce syntax.
                 data.moreFilesToGo ??= false;
@@ -306,14 +315,14 @@
     async function handleFileTask(actionName, endpoint) {
         logMessage(`Getting list of files for ${actionName}...`);
         try {
-            const files = await fetchApiData(endpoint);
+            const files = await fetchApiData(endpoint, 'GET', 'array');
             const numFiles = files.length;
             if (0 === numFiles) {
                 logMessage(`= Got zero files for ${actionName}.`);
             }
             for (const [index, filename] of files.entries()) {
                 logMessage(`= ${index + 1}/${numFiles} ${actionName} ${filename}...`);
-                await fetchApiData(endpoint, 'POST');
+                await fetchApiData(endpoint, 'POST', 'object');
             }
             logMessage(`= ${actionName} complete!`);
         } catch (err) {
@@ -329,7 +338,7 @@
     async function listUsers(listEndpoint) {
         logMessage(`Getting list of users...`);
         try {
-            const users = await fetchApiData(listEndpoint);
+            const users = await fetchApiData(listEndpoint, 'GET', 'array');
             const numUsers = users.length;
 
             if (0 === numUsers) {
@@ -423,7 +432,7 @@
         logMessage(`Calling ${actionName} for user "${username}"...`);
 
         try {
-            await fetchApiData(endpoint, httpMethod, {username, password});
+            await fetchApiData(endpoint, httpMethod, 'array', {username, password});
             logMessage(`= ${actionName} succeeded for "${username}".`);
             return true;
         } catch (error) {
@@ -505,7 +514,7 @@
             // Get the initial page of files, resetting the cursor.
             logMessage('Reinitializing Dropbox list...');
             try {
-                fetchApiData('/api/v1.0/cursor', 'POST');
+                fetchApiData('/api/v1.0/cursor', 'POST', 'object');
                 logMessage(`= Reinitializing Dropbox list succeeded.`);
             } catch (err) {
                 logMessage(`= Reinitializing Dropbox list failed: ${err.message}`);
