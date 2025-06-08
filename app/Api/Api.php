@@ -34,6 +34,36 @@ class Api
     }
 
     /**
+     * Called to handle an API call. Having as a public method may be unnecessary - could be called from constructor.
+     * @return void
+     */
+    public function handleApiCall(): void
+    {
+        try {
+            $endpointDef = $this->getEndpointDefinition();
+
+            $this->authorize($endpointDef);
+            $this->rateLimit($endpointDef);
+
+//            $input = $this->getJsonInput();
+//            $routeParams = $match['params'];
+//            $params = array_merge($routeParams, $input);
+            $params = $this->getJsonParams();
+            $this->validateRequiredParams($endpointDef, $params);
+
+            $callback = $endpointDef['callback'];
+
+            Log::info("Calling $callback for $this->method $this->path");
+            $result = call_user_func($callback, $params);
+
+            $this->jsonResponse($result['status'] ?? 200, ['data' => $result['data'] ?? null]);
+        } catch (Exception $e) {
+            Log::error("API Exception: {$e->getMessage()}");
+            $this->jsonResponse(500, ['error' => 'Server error: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
      * Get the properties of this endpoint.
      * @return array
      */
@@ -43,6 +73,7 @@ class Api
             return EndpointRegistry::get($this->method, $this->path);
         } catch (ValueError) {
             Log::warn("No match for $this->method $this->path");
+            Log::debug('Request', $_REQUEST);
             $this->jsonResponse(404, ['error' => 'Endpoint not found']);
         }
     }
@@ -84,36 +115,6 @@ class Api
                 Log::warn("Rate limit exceeded for key: $key");
                 $this->jsonResponse(429, ['error' => 'Rate limit exceeded']);
             }
-        }
-    }
-
-    /**
-     * Called to handle an API call. Having as a public method may be unnecessary - could be called from constructor.
-     * @return void
-     */
-    public function handleApiCall(): void
-    {
-        try {
-            $endpointDef = $this->getEndpointDefinition();
-
-            $this->authorize($endpointDef);
-            $this->rateLimit($endpointDef);
-
-//            $input = $this->getJsonInput();
-//            $routeParams = $match['params'];
-//            $params = array_merge($routeParams, $input);
-            $params = $this->getJsonParams();
-            $this->validateRequiredParams($endpointDef, $params);
-
-            $callback = $endpointDef['callback'];
-
-            Log::info("Calling $callback for $this->method $this->path");
-            $result = call_user_func($callback, $params);
-
-            $this->jsonResponse($result['status'] ?? 200, ['data' => $result['data'] ?? null]);
-        } catch (Exception $e) {
-            Log::error("API Exception: {$e->getMessage()}");
-            $this->jsonResponse(500, ['error' => 'Server error: ' . $e->getMessage()]);
         }
     }
 
