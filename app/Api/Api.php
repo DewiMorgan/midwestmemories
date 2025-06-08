@@ -62,9 +62,10 @@ class Api
             $params = $this->getJsonParams();
             $this->validateRequiredParams($endpointDef, $params);
 
+            /** @var Callable $callback */
             $callback = $endpointDef['callback'];
 
-            Log::info("Calling $callback for $this->method $this->path");
+            Log::info("Calling callback for $this->method $this->path", $callback);
             $result = call_user_func($callback, $params);
 
             $this->jsonResponse($result['status'] ?? 200, ['data' => $result['data'] ?? null]);
