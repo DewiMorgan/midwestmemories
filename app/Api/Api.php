@@ -76,6 +76,7 @@ class Api
             Log::debug('Request', $_REQUEST);
             Log::debug('Get', $_GET);
             Log::debug('URI', $_SERVER['REQUEST_URI']);
+            Log::debug('Server', $_SERVER);
 
             $this->jsonResponse(404, ['error' => 'Endpoint not found']);
         }
