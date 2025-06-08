@@ -495,7 +495,7 @@
         const params = new URLSearchParams(window.location.search);
 
         // Populate the user list.
-        listUsers('/api/v1.0/users');
+        listUsers('/api/v1.0/user');
 
         // Only if requested by the user.
         if ("handle_init_root" === params.get("user-action")) {
