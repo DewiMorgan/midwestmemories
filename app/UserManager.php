@@ -180,12 +180,13 @@ class UserManager extends Singleton
             return $instance->users;
         } else {
             Log::debug('Branch 2', $instance->users);
-            return array_map(function ($item) {
+            $data = array_map(function ($item) {
                 return [
                     'username' => $item['username'],
                     'comment' => ('DISABLED' === $item['comment']) ? 'DISABLED' : ''
                 ];
             }, $instance->users);
+            return ['data' => $data];
         }
     }
 }

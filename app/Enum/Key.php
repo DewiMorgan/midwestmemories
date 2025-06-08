@@ -10,7 +10,7 @@ namespace MidwestMemories\Enum;
  */
 enum Key: string
 {
-    // A bunch of static keys.
+    // A bunch of static keys for the Conf class.
     case BASE_URL = 'base_url';
     case DEFAULT_TIMEOUT = 'default_timeout';
     case DROPBOX_KEY = 'dropbox_key';
