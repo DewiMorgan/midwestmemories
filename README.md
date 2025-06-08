@@ -138,6 +138,7 @@ See also ToDo, above.
 Current task:
 
 * Convert API to be a separate file.
+    * Need to change the UI to use the new system.
 * Change endpoints to be loaded as a class or config file or something.
 * Move source out of web root (edit autoloader?).
 * Convert user management to session-and-DB based.
