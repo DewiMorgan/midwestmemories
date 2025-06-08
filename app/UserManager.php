@@ -173,10 +173,13 @@ class UserManager extends Singleton
      */
     public static function getUsers(): array
     {
+        Log::debug('Getting users');
         $instance = self::getInstance();
         if (Connection::getInstance()->isSuperAdmin) {
+            Log::debug('Branch 1', $instance->users);
             return $instance->users;
         } else {
+            Log::debug('Branch 2', $instance->users);
             return array_map(function ($item) {
                 return [
                     'username' => $item['username'],

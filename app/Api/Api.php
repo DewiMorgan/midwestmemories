@@ -65,7 +65,7 @@ class Api
             /** @var Callable $callback */
             $callback = $endpointDef['callback'];
 
-            Log::info("Calling callback for $this->method $this->path", $callback);
+            Log::info("Calling callback for $this->method $this->path");
             $result = call_user_func($callback, $params);
 
             $this->jsonResponse($result['status'] ?? 200, ['data' => $result['data'] ?? null]);
