@@ -67,6 +67,7 @@ class Api
 
             Log::info("Calling callback for $this->method $this->path");
             $result = call_user_func($callback, $params);
+            Log::debug('Result', $result);
 
             $this->jsonResponse($result['status'] ?? 200, ['data' => $result['data'] ?? null]);
         } catch (Exception $e) {
