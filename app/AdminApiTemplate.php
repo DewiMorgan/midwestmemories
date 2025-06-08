@@ -321,7 +321,16 @@
         const listResponse = await fetch(listEndpoint);
         if (listResponse.ok) {
             const users = await listResponse.json();
-            const numUsers = users.length;
+
+            if (!users.hasOwnProperty('data')) {
+                logMessage("Response JSON does not contain a 'data' property.");
+                return;
+            } else if (!Array.isArray(users.data)) {
+                logMessage("'data' property is not an array.");
+                return;
+            }
+            const numUsers = users.data.length;
+
             if (0 === numUsers) {
                 logMessage(`= Got zero users! There should probably be more.`);
             } else {
@@ -334,7 +343,7 @@
             const userListDiv = document.getElementById('user-list');
             userListDiv.appendChild(table);
         } else {
-            logMessage(`= Failed to get list of users.`);
+            logMessage(`= Failed to get list of users: status ${listResponse.status}`);
         }
     }
 
