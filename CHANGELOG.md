@@ -3,9 +3,15 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/06/07 Sat
+
+* DONE: I broke file downloads from dropbox.
+* DONE: Editing a user's password no longer shows it as edited until you reload.
+* DONE: Adding a new user no longer works - wrong confirm prompt. Doesn't add user.
+
 ## 2025/06/01 Sun
 
-* DONE: Show current username on admin page.
+* DONE: Show a current username on admin page.
 * DONE: Make messages window limited in height, with optional autoscroll.
 * DONE: Change Dropbox cursor management to make sense: either "read latest" or "read full list".
 * DONE: Make setNewCursor and sqlExec return ID & rows changed.

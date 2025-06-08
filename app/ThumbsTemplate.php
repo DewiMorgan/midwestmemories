@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use MidwestMemories\Enum\Key;
+
 /** Template to display thumbnails in a table, with titles, and a description at the top.
  * Requirements:
  *   Index::$realPath as string -> unique key identifies dir (or later, search result!)

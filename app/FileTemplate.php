@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use MidwestMemories\Enum\Key;
+
 /**
  * Template to display a single file and its details.
  */
@@ -105,7 +107,7 @@ namespace MidwestMemories;
     {
         $webPath = Index::$requestWebPath;
         $dropboxPath = Conf::get(Key::IMAGE_DIR) . $webPath;
-        $sql = 'SELECT `id` FROM `midmem_file_queue` WHERE `full_path` = ?';
+        $sql = 'SELECT `id` FROM `' . Db::TABLE_FILE_QUEUE . '` WHERE `full_path` = ?';
         return intval(Db::sqlGetItem($sql, 'id', 's', $dropboxPath));
     }
 

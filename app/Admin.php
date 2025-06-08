@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MidwestMemories;
 
 use JsonException;
+use MidwestMemories\Enum\SyncStatus;
 
 /**
  * The class for the main Admin page.
@@ -56,13 +57,13 @@ class Admin
         // Log this login. No error handling if we fail.
         // ToDo: this is very low level, and duplicated code. Should probably be wrapped in a connectionLogger.
         Db::sqlExec(
-            'INSERT INTO midmem_visitors (`request`, `main_ip`, `all_ips_string`, `user`, `agent`)'
+            'INSERT INTO `' . Db::TABLE_VISITORS . '` (`request`, `main_ip`, `all_ips_string`, `user`, `agent`)'
             . ' VALUES (?, ?, ?, ?, ?)',
             'sssss',
             $connection->request,
             $connection->ip,
             $connection->ipList,
-            $connection->user,
+            $connection->usernameGuesses,
             $connection->agent
         );
     }
@@ -87,7 +88,7 @@ class Admin
      */
     public static function getApiResponse(string $formAction): void
     {
-        Log::debug("Action", $formAction);
+        Log::debug('Action', $formAction);
         $result = match ($formAction) {
             'init_root' => DropboxManager::getInstance()->initRootCursor(),
             'continue_root' => DropboxManager::getInstance()->readCursorUpdate(),

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use MidwestMemories\Enum\Key;
+
 /**
  * Manager for user accounts.
  */

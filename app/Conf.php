@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use MidwestMemories\Enum\Key;
+
 /**
  * Config manager.
  */

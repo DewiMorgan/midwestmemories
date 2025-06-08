@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use MidwestMemories\Enum\Key;
+use MidwestMemories\Enum\SyncStatus;
+
 /**
  * File processing class for DropboxManager.
  */
@@ -48,7 +51,7 @@ class FileProcessor extends Singleton
         // ToDo: some parsing.
         $result = Db::sqlExec(
             '
-                UPDATE `midmem_file_queue` 
+                UPDATE `' . Db::TABLE_FILE_QUEUE . '` 
                 SET `sync_status` = ?
                 WHERE full_path = ?
             ',
@@ -114,8 +117,8 @@ class FileProcessor extends Singleton
     {
         // Nothing to do but mark it complete.
         $result = Db::sqlExec(
-            "
-                UPDATE `midmem_file_queue` 
+            '
+                UPDATE `' . Db::TABLE_FILE_QUEUE . "` 
                 SET `sync_status` = ?, `error_message`='Unknown type' 
                 WHERE full_path = ?
             ",
@@ -245,7 +248,7 @@ class FileProcessor extends Singleton
     public function setSyncStatus(string $fullPath, SyncStatus $status, string $errorMessage = ''): bool
     {
         $result = Db::sqlExec(
-            'UPDATE `midmem_file_queue` SET `sync_status` = ?, error_message = ? WHERE full_path = ?',
+            'UPDATE `' . Db::TABLE_FILE_QUEUE . '` SET `sync_status` = ?, error_message = ? WHERE full_path = ?',
             'sss',
             $status->value,
             $errorMessage,
@@ -265,7 +268,7 @@ class FileProcessor extends Singleton
             'full_path',
             '
                 SELECT `full_path` 
-                FROM `midmem_file_queue`
+                FROM `' . Db::TABLE_FILE_QUEUE . '`
                 WHERE `sync_status` = ?
                 ORDER BY `id`
             ',
@@ -283,7 +286,7 @@ class FileProcessor extends Singleton
         return Db::sqlGetItem(
             '
                 SELECT `full_path`
-                FROM `midmem_file_queue`
+                FROM `' . Db::TABLE_FILE_QUEUE . '`
                 WHERE `sync_status` = ?
                 ORDER BY `id`
                 LIMIT 1

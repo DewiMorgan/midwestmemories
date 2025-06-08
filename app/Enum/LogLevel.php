@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MidwestMemories;
+namespace MidwestMemories\Enum;
 
 /**
  * Possible logging levels for the Log class.

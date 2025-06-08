@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use MidwestMemories\Enum\Key;
+use MidwestMemories\Enum\LogLevel;
+
 /**
  * Static logger.
  * @noinspection PhpClassNamingConventionInspection

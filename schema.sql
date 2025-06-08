@@ -134,3 +134,15 @@ CREATE TABLE `midmem_comments`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci
     COMMENT 'Comments left by visitors';
+
+CREATE TABLE rate_limits
+(
+    user_id       INT          NOT NULL,
+    rate_key      VARCHAR(255) NOT NULL,
+    request_count INT          NOT NULL DEFAULT 1,
+    window_start  DATETIME     NOT NULL,
+    PRIMARY KEY (user_id, rate_key)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+    COMMENT 'Rate limiting API calls';

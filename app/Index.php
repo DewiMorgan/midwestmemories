@@ -56,13 +56,13 @@ class Index
         // Log this login. No error handling if we fail.
         // ToDo: this is very low level, and duplicated code. Should probably be wrapped in a connectionLogger.
         Db::sqlExec(
-            'INSERT INTO midmem_visitors (`request`, `main_ip`, `all_ips_string`, `user`, `agent`)'
+            'INSERT INTO `' . Db::TABLE_VISITORS . '` (`request`, `main_ip`, `all_ips_string`, `user`, `agent`)'
             . ' VALUES (?, ?, ?, ?, ?)',
             'sssss',
             $connection->request,
             $connection->ip,
             $connection->ipList,
-            $connection->user,
+            $connection->usernameGuesses,
             $connection->agent
         );
     }
@@ -204,7 +204,7 @@ class Index
         $sql = '
             WITH comment_count AS (
                 SELECT LEAST(CEIL(COUNT(*)/?), 1000) AS `num_pages`
-                FROM `midmem_comments`
+                FROM `' . Db::TABLE_COMMENTS . '`
                 WHERE `fk_file` = ? AND NOT `hidden`
             )
             SELECT 
@@ -213,7 +213,7 @@ class Index
                 c.`user`, 
                 c.`body_text`,
                 cc.`num_pages`
-            FROM `midmem_comments` c
+            FROM `' . Db::TABLE_COMMENTS . '` c
             CROSS JOIN comment_count cc
             WHERE c.`fk_file` = ?
             AND NOT c.`hidden`
@@ -233,13 +233,16 @@ class Index
     public static function execPostComment(int $fileId, string $userName, string $bodyText): array
     {
         // Get the next sequence number for this file
-        $sql = 'SELECT MAX(sequence) AS seq FROM midmem_comments WHERE fk_file = ?';
+        $sql = 'SELECT MAX(`sequence`) AS `seq` FROM `' . Db::TABLE_COMMENTS . '` WHERE `fk_file` = ?';
         $currentSeq = Db::sqlGetItem($sql, 'seq', 'i', $fileId);
         $nextSeq = is_numeric($currentSeq) ? ((int)$currentSeq + 1) : 1;
 
         // Insert the new comment
-        $insertSql = 'INSERT INTO midmem_comments (date_created, user, body_text, sequence, fk_file, hidden)
-                  VALUES (NOW(), ?, ?, ?, ?, false)';
+        $insertSql = '
+        INSERT INTO `' . Db::TABLE_COMMENTS . '`
+            (`date_created`, `user`, `body_text`, `sequence`, `fk_file`, `hidden`)
+        VALUES (NOW(), ?, ?, ?, ?, false)
+        ';
         Log::debug("Db::sqlExec('$insertSql', 'ssii', '$userName', '$bodyText', '$nextSeq', '$fileId')");
         $insertResult = Db::sqlExec($insertSql, 'ssii', $userName, $bodyText, $nextSeq, $fileId);
 
@@ -265,10 +268,10 @@ class Index
                 c.`date_created`, 
                 c.`user`, 
                 c.`body_text`
-            FROM `midmem_comments` c
+            FROM `" . Db::TABLE_COMMENTS . '` c
             WHERE c.id = ?
             LIMIT 1
-        ";
+        ';
         return Db::sqlGetRow($sql, 'i', $commentId);
     }
 }

@@ -26,10 +26,16 @@ class Connection extends Singleton
     public string $ipList = '';
     /** @var string $agent User-agent information. */
     public string $agent = '';
-    /** @var string $user Best guess at the current user. */
-    public string $user = '';
+    /** @var string $usernameGuesses String containing best guesses at the current user's name. */
+    public string $usernameGuesses = '';
+    /** @var string $username The displayname of the current user, if authenticated. */
+    public string $username = '';
+    /** @var int $userId The ID of the current user, if authenticated. */
+    public int $userId = 0;
     /** @var bool $isBot True if user looks like a known bot. */
     public bool $isBot = false;
+    /** @var bool $isUser True if the user is recognized as an authenticated user (including admins!). */
+    public bool $isUser = false;
     /** @var bool $isAdmin True if the user is recognized as a registered admin. */
     public bool $isAdmin = false;
     /** @var bool $isSuperAdmin True if the user is recognized as me. */
@@ -74,20 +80,23 @@ class Connection extends Singleton
 
         // $user, $isAdmin and $isBot
         if (str_contains($this->agent, 'facebookexternalhit')) {
-            $this->user .= 'bot:facebook,';
+            $this->usernameGuesses .= 'bot:facebook,';
             $this->isBot = true;
         }
         if (str_contains($this->agent, 'Discordbot')) {
-            $this->user .= 'bot:discord,';
+            $this->usernameGuesses .= 'bot:discord,';
             $this->isBot = true;
         }
         if (!empty($_SERVER['REMOTE_USER'])) {
-            $this->user .= 'remote:' . $_SERVER['REMOTE_USER'] . ',';
+            $this->usernameGuesses .= 'remote:' . $_SERVER['REMOTE_USER'] . ',';
         }
         $this->isAdmin = $_SESSION['isAdmin'] ?? false;
         $this->isSuperAdmin = $_SESSION['isSuperAdmin'] ?? false;
         if (!empty($_SERVER['PHP_AUTH_USER'])) {
-            $this->user .= 'auth:' . $_SERVER['PHP_AUTH_USER'] . ',';
+            $this->usernameGuesses .= 'auth:' . $_SERVER['PHP_AUTH_USER'] . ',';
+            $this->isUser = true;
+            $this->username = $_SERVER['PHP_AUTH_USER'];
+            $this->userId = 1; // ToDo: something better, once we're using DB users.
             $_SESSION['isAdmin'] = false;
             $_SESSION['isSuperAdmin'] = false;
             if ('myself' === $_SERVER['PHP_AUTH_USER']) {
@@ -104,12 +113,12 @@ class Connection extends Singleton
             }
         }
         if (!empty($_SESSION['name'])) {
-            $this->user .= 'sess:' . $_SESSION['name'] . ',';
+            $this->usernameGuesses .= 'sess:' . $_SESSION['name'] . ',';
         }
-        $this->user = preg_replace('/\s*/', '', $this->user); // strip all whitespace.
-        $this->user = preg_replace('/,$/', '', $this->user); // trim trailing comma.
-        if (empty($this->user)) {
-            $this->user = '?';
+        $this->usernameGuesses = preg_replace('/\s*/', '', $this->usernameGuesses); // strip all whitespace.
+        $this->usernameGuesses = preg_replace('/,$/', '', $this->usernameGuesses); // trim trailing comma.
+        if (empty($this->usernameGuesses)) {
+            $this->usernameGuesses = '?';
         }
     }
 
@@ -201,7 +210,7 @@ class Connection extends Singleton
             'ip' => $this->ip,
             'ipList' => $this->ipList,
             'agent' => $this->agent,
-            'user' => $this->user,
+            'user' => $this->usernameGuesses,
             'isBot' => $this->isBot,
             'isAdmin' => $this->isAdmin,
             'isSuperAdmin' => $this->isSuperAdmin,
