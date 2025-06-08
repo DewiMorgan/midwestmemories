@@ -226,20 +226,20 @@
     /**
      * API wrapper to call an endpoint and return the data object, or an exception on error.
      * @param {string} url
-     * @param {string} method
+     * @param {string} httpMethod
      * @param payload
      * @returns {Promise<any[]>}
      */
-    async function fetchApiData(url, method = 'GET', payload = null) {
+    async function fetchApiData(url, httpMethod = 'GET', payload = null) {
         const options = {
-            method: method,
+            method: httpMethod,
             headers: {
                 'Accept': 'application/json',
             }
         };
 
         // Attach JSON body if payload is given and method allows it.
-        if (null !== payload && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
+        if (null !== payload && ['POST', 'PUT', 'PATCH'].includes(httpMethod.toUpperCase())) {
             options.headers['Content-Type'] = 'application/json';
             options.body = JSON.stringify(payload);
         }
@@ -257,7 +257,7 @@
         }
 
         if (!Array.isArray(jsonResponse.data)) {
-            throw new Error("The 'data' property is not an array.");
+            throw new Error(`The 'data' property is not an array from ${httpMethod} ${url}.`);
         }
 
         if (jsonResponse.hasOwnProperty('error') && "OK" !== jsonResponse.error) {

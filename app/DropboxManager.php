@@ -69,7 +69,7 @@ class DropboxManager extends Singleton
             static::KEY_MORE_FILES => $hasMoreFiles,
             static::KEY_ERROR => $error
         ];
-        Log::debug('Result:', $result);
+        Log::debug('Result', $result);
         return $result;
     }
 
