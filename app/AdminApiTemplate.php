@@ -257,6 +257,7 @@
         }
 
         if (!Array.isArray(jsonResponse.data)) {
+            console.log(`The 'data' property is not an array from ${httpMethod} ${url}.`, jsonResponse.data);
             throw new Error(`The 'data' property is not an array from ${httpMethod} ${url}.`);
         }
 
@@ -343,7 +344,7 @@
             const userListDiv = document.getElementById('user-list');
             userListDiv.appendChild(table);
         } catch (err) {
-            logMessage(`= Listing new files failed: ${err.message}`);
+            logMessage(`= Listing users failed: ${err.message}`);
         }
     }
 

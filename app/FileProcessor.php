@@ -267,8 +267,7 @@ class FileProcessor extends Singleton
     public static function listNewFiles(): array
     {
         $instance = self::getInstance();
-        $data = $instance->listFilesByStatus(SyncStatus::NEW);
-        return ['data' => $data];
+        return $instance->listFilesByStatus(SyncStatus::NEW);
     }
 
     /**
@@ -278,8 +277,7 @@ class FileProcessor extends Singleton
     public static function listDownloadedFiles(): array
     {
         $instance = self::getInstance();
-        $data = $instance->listFilesByStatus(SyncStatus::DOWNLOADED);
-        return ['data' => $data];
+        return $instance->listFilesByStatus(SyncStatus::DOWNLOADED);
     }
 
     /**
