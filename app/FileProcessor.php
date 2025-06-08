@@ -16,9 +16,9 @@ class FileProcessor extends Singleton
     /**
      * Process the first downloaded file from the file queue table.
      * Add thumbnails, resample images, and parse txt files, then set status to PROCESSED.
-     * @return string "OK" or "Error: ...", depending on the result.
+     * @return array ['status'=>200 or 500, 'data'=>"OK" or "Error: ..."], depending on the result.
      */
-    public static function processOneFile(): string
+    public static function processOneFile(): array
     {
         $instance = self::getInstance();
         $entry = $instance->listFirstFileByStatus(SyncStatus::DOWNLOADED);
@@ -27,7 +27,7 @@ class FileProcessor extends Singleton
         if (!file_exists($fullPath)) {
             $error = 'file_exists failed';
             $instance->setSyncStatus($fullPath, SyncStatus::ERROR, $error);
-            return "Error: $error";
+            return ['status' => 500, 'data' => "Error: $error"];
         }
 
         // Get the mime type.
@@ -40,7 +40,9 @@ class FileProcessor extends Singleton
             'image/jpeg' => $instance->processJpegFile($fullPath),
             default => $instance->processOtherFile($fullPath),
         };
-        return $error ? "Error: $error" : 'OK';
+        $data = $error ? "Error: $error" : 'OK';
+        $status = $error ? 500 : 200;
+        return ['status' => $status, 'data' => $data];
     }
 
     /**
@@ -258,25 +260,26 @@ class FileProcessor extends Singleton
         return !empty($result);
     }
 
-
     /**
      * Static callback wrapper.
-     * @return array
+     * @return array ['data' => List of file paths.]
      */
     public static function listNewFiles(): array
     {
         $instance = self::getInstance();
-        return $instance->listFilesByStatus(SyncStatus::NEW);
+        $data = $instance->listFilesByStatus(SyncStatus::NEW);
+        return ['data' => $data];
     }
 
     /**
      * Static callback wrapper.
-     * @return array
+     * @return array ['data' => List of file paths.]
      */
     public static function listDownloadedFiles(): array
     {
         $instance = self::getInstance();
-        return $instance->listFilesByStatus(SyncStatus::DOWNLOADED);
+        $data = $instance->listFilesByStatus(SyncStatus::DOWNLOADED);
+        return ['data' => $data];
     }
 
     /**
@@ -285,7 +288,7 @@ class FileProcessor extends Singleton
      */
     public function listFilesByStatus(SyncStatus $status): array
     {
-        return Db::sqlGetList(
+        $data = Db::sqlGetList(
             'full_path',
             '
                 SELECT `full_path` 
@@ -296,6 +299,7 @@ class FileProcessor extends Singleton
             's',
             $status->value
         );
+        return ['data' => $data];
     }
 
     /**
@@ -320,9 +324,9 @@ class FileProcessor extends Singleton
 
     /**
      * Download the first file from the file queue table.
-     * @return string "OK" or "Error: ...", depending on the result.
+     * @return array [ "OK" or "Error: ...", depending on the result.
      */
-    public static function downloadOneFile(): string
+    public static function downloadOneFile(): array
     {
         $dropbox = DropboxManager::getInstance();
         $instance = self::getInstance();
@@ -335,21 +339,25 @@ class FileProcessor extends Singleton
         if (!is_dir($dir) && !mkdir($dir, 0700, true) && !is_dir($dir)) {
             $error = "mkdir($dir,0700,true) failed";
             $instance->setSyncStatus($fullPath, SyncStatus::ERROR, $error);
-            return "Error: $error";
+            Log::error($error, $fullPath);
+            return ['status' => 500, 'data' => "Error: $error"];
         }
         // Download the file from Dropbox. If it already exists, it might've been edited, so we get it anyway.
         $url = $dropbox->getTemporaryLink($untrimmedPath); // Requires NON-trimmed full path!
         $result = $dropbox->downloadFromUrl($url, $fullPath);
         // Update the DB to DOWNLOADED or ERROR.
         if ($result) {
-            $status = SyncStatus::DOWNLOADED;
+            $syncStatus = SyncStatus::DOWNLOADED;
             $error = '';
+            $httpStatus = 200;
         } else {
-            $status = SyncStatus::ERROR;
+            $syncStatus = SyncStatus::ERROR;
             $error = 'False result from downloadFromUrl.';
+            $httpStatus = 500;
         }
-        $instance->setSyncStatus($fullPath, $status, $error);
-        return $error ? "Error: $error" : 'OK';
+        $instance->setSyncStatus($fullPath, $syncStatus, $error);
+        $data = $error ? "Error: $error" : 'OK';
+        return ['status' => $httpStatus, 'data' => $data];
     }
 
     /**

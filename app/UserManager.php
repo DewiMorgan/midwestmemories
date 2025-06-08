@@ -97,9 +97,9 @@ class UserManager extends Singleton
      *
      * @param string $username
      * @param string $password
-     * @return string 'OK' or 'Error: {reason}'.
+     * @return array ['status'=>Http status, 'data'=>'OK' or 'Error: {reason}'].
      */
-    public static function changePassword(string $username, string $password): string
+    public static function changePassword(string $username, string $password): array
     {
         $instance = self::getInstance();
         $numToReplace = 1;
@@ -119,7 +119,7 @@ class UserManager extends Singleton
         }
         // Fail if not found.
         if (is_null($indexToReplace)) {
-            return 'Error: could not find user to update';
+            return ['status' => 500, 'data' => 'Error: could not find user to update'];
         }
 
         if ('' === $password) {
@@ -135,9 +135,9 @@ class UserManager extends Singleton
         }
         array_splice($instance->lines, $indexToReplace, $numToReplace, $newEntries);
         if ($instance->putPasswdFile()) {
-            return 'OK';
+            return ['data' => 'OK'];
         }
-        return 'Error: could not save new password';
+        return ['status' => 500, 'data' => 'Error: could not save new password'];
     }
 
     /**
@@ -146,16 +146,16 @@ class UserManager extends Singleton
      *
      * @param string $username
      * @param string $password
-     * @return string 'OK' or 'Error: {reason}'.
+     * @return array ['status' => Http Status, 'data' => 'OK' or 'Error: {reason}'].
      */
-    public static function addUser(string $username, string $password): string
+    public static function addUser(string $username, string $password): array
     {
         $instance = self::getInstance();
         Log::debug('users', $instance->users); // DELETEME DEBUG
         // Check if user already exists
         foreach ($instance->users as $user) {
             if ($username === $user['username']) {
-                return 'Error: user already exists'; // User already exists
+                return ['status' => 500, 'data' => 'Error: user already exists']; // User already exists
             }
         }
 
@@ -163,9 +163,9 @@ class UserManager extends Singleton
             $instance->appendToPasswdFile("# $password")
             && $instance->appendToPasswdFile("$username:" . password_hash($password, PASSWORD_BCRYPT))
         ) {
-            return 'OK';
+            return ['status' => 200, 'data' => 'OK'];
         }
-        return 'Error: could not save user';
+        return ['status' => 500, 'data' => 'Error: could not save user']; // User already exists
     }
 
     /**

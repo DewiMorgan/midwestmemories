@@ -34,8 +34,10 @@ class EndpointRegistry
 
         // Endpoint definitions keyed by ApiEndpoint enum.
         // Each value includes auth level, parameters, and the callback.
+        // The callback returns an array ['status'=>HTTP status, 'data'=>payload].
+        // Status defaults to 200, payload to empty.
         return match ($key) {
-            // Admin-only endpoints
+            // Admin-only endpoints.
             EndpointKey::POST_CURSOR => [
                 'auth' => 'admin',
                 'params' => [],

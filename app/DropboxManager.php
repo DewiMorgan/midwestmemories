@@ -77,7 +77,7 @@ class DropboxManager extends Singleton
      * Initialize the cursor, and get the start of the list of all files for this website. Might be LONG.
      * ToDo: change listFolder to use Conf::get[Key::DROPBOX_PATH_PREFIX] instead of ''.
      *       No trailing slash!
-     * @return array List of file details.
+     * @return array ['data' => [List of file details]].
      */
     public static function initRootCursor(): array
     {
@@ -96,12 +96,13 @@ class DropboxManager extends Singleton
             $error = 'Error: Root cursor not set in returned file details';
             Log::warn('Root cursor not set in returned file details', $list);
         }
-        return $instance->handleFileList($list, $error);
+        $data = $instance->handleFileList($list, $error);
+        return ['data' => $data];
     }
 
     /**
      * Get a page of updated files for the given cursor.
-     * @return array Details of what was done.
+     * @return array ['data' => [Details of what was done]].
      */
     public static function readCursorUpdate(): array
     {
@@ -118,7 +119,8 @@ class DropboxManager extends Singleton
             $list = [];
             $error = 'Error: Root cursor not initially set';
         }
-        return $instance->handleFileList($list, $error);
+        $data = $instance->handleFileList($list, $error);
+        return ['data' => $data];
     }
 
     /**
