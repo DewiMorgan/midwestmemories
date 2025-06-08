@@ -55,8 +55,8 @@ class EndpointRegistry
             ],
             EndpointKey::POST_DOWNLOAD => [
                 'auth' => 'admin',
-                'params' => ['file_id' => ParamTypes::INT],
-                'callback' => FileProcessor::downloadOneFile(...),
+                'params' => [],
+                'callback' => FileProcessor::downloadNextFile(...),
             ],
             EndpointKey::GET_PROCESS => [
                 'auth' => 'admin',
@@ -65,8 +65,8 @@ class EndpointRegistry
             ],
             EndpointKey::POST_PROCESS => [
                 'auth' => 'admin',
-                'params' => ['file_id' => ParamTypes::INT],
-                'callback' => FileProcessor::processOneFile(...),
+                'params' => [],
+                'callback' => FileProcessor::processNextFile(...),
             ],
             EndpointKey::GET_USER => [
                 'auth' => 'admin',
@@ -82,6 +82,11 @@ class EndpointRegistry
                 'auth' => 'admin',
                 'params' => ['username' => ParamTypes::STRING, 'password' => ParamTypes::STRING],
                 'callback' => UserManager::changePassword(...),
+            ],
+            EndpointKey::DELETE_USER => [
+                'auth' => 'admin',
+                'params' => ['username' => ParamTypes::STRING],
+                'callback' => UserManager::delete(...),
             ],
 
             // User-accessible comment endpoints with rate limiting

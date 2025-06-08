@@ -32,15 +32,6 @@
     }
 
     /**
-     * Helper to append to the last message.
-     * @param {HTMLParagraphElement} element
-     * @param {string} appendText
-     */
-    function updateMessage(element, appendText) {
-        element.textContent += appendText;
-    }
-
-    /**
      * Enable or disable a button element.
      * @param {HTMLButtonElement|null} buttonElement
      * @param {boolean} isEnabled
@@ -225,45 +216,73 @@
      */
     async function runAllUpdates() {
         // Get and queue updates from Dropbox.
-        await handleDropboxPolling('./admin.php?action=continue_root', 'get the next page of files');
+        await handleDropboxPolling('/api/v1.0/cursor', 'GET', 'get the next page of files');
         // Download queued downloads.
-        await handleFileTask(
-            'Downloading', './admin.php?action=list_files_to_download', './admin.php?action=download_one_file'
-        );
+        await handleFileTask('Downloading', '/api/v1.0/download');
         // Generate queued thumbnails.
-        await handleFileTask(
-            'Postprocessing', './admin.php?action=list_files_to_process', './admin.php?action=process_one_file'
-        );
+        await handleFileTask('Postprocessing', '/api/v1.0/process');
     }
 
     /**
-     * API wrapper for dropbox polling endpoints. Call the endpoint until all items are processed.
+     * API wrapper to call an endpoint and return the data object, or an exception on error.
      * @param {string} url
-     * @param {string} actionName
+     * @param {string} method
+     * @param payload
+     * @returns {Promise<any[]>}
+     */
+    async function fetchApiData(url, method = 'GET', payload = null) {
+        const options = {
+            method: method,
+            headers: {
+                'Accept': 'application/json',
+            }
+        };
+
+        // Attach JSON body if payload is given and method allows it.
+        if (null !== payload && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
+            options.headers['Content-Type'] = 'application/json';
+            options.body = JSON.stringify(payload);
+        }
+
+        const response = await fetch(url, options);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error: ${response.status}`);
+        }
+
+        const jsonResponse = await response.json();
+
+        if (!jsonResponse.hasOwnProperty('data')) {
+            throw new Error("Response JSON does not contain a 'data' property.");
+        }
+
+        if (!Array.isArray(jsonResponse.data)) {
+            throw new Error("The 'data' property is not an array.");
+        }
+
+        if (jsonResponse.hasOwnProperty('error') && "OK" !== jsonResponse.error) {
+            throw new Error(jsonResponse.error);
+        }
+
+        return jsonResponse.data;
+    }
+
+    /**
+     * API wrapper for dropbox polling endpoint. Call the endpoint until all items are processed.
+     * @param {string} url
+     * @param {string} readableDescription
      * @returns {Promise<void>}
      */
-    async function handleDropboxPolling(url, actionName) {
-        logMessage(`Asking Dropbox to ${actionName}...`);
+    async function handleDropboxPolling(url, readableDescription) {
+        logMessage(`Asking Dropbox to ${readableDescription}...`);
         try {
             while (true) {
-                const response = await fetch(url);
-                const data = await response.json();
-
-                // Ensure HTTP-level success (status code 2xx).
-                if (!response.ok) {
-                    logMessage(`HTTP error: ${response.status}`);
-                    return;
-                }
+                const data = await fetchApiData(url);
 
                 // Enforce syntax.
                 data.moreFilesToGo ??= false;
                 data.numAddedFiles ??= 0;
                 data.numTotalFiles ??= 0;
-
-                if ("OK" !== data.error) {
-                    logMessage(data.error);
-                    return;
-                }
 
                 if (true === data.moreFilesToGo) {
                     logMessage(`= Got ${data.numAddedFiles} new files of ${data.numTotalFiles} total, more to come...`);
@@ -273,40 +292,31 @@
                 }
             }
         } catch (err) {
-            logMessage(`= Request failed: ${err.message}`);
+            logMessage(`= Listing new files failed: ${err.message}`);
         }
     }
 
     /**
-     * Generic file task handler. Get a list, then iterate over it to process each item.
+     * Generic file task handler. GET a list from an API endpoint, then POST to the same endpoint to process each item.
      * @param {string} actionName Just for logging, what API action we're performing.
-     * @param {string} listEndpoint The endpoint to call to get a list of items.
-     * @param {string} fileEndpoint The endpoint to call to process each item from the list.
+     * @param {string} endpoint The endpoint to `GET` for a list, and POST for each item.
      * @returns {Promise<void>}
      */
-    async function handleFileTask(actionName, listEndpoint, fileEndpoint) {
+    async function handleFileTask(actionName, endpoint) {
         logMessage(`Getting list of files for ${actionName}...`);
-
-        const listResponse = await fetch(listEndpoint);
-        if (listResponse.ok) {
-            const files = await listResponse.json();
+        try {
+            const files = await fetchApiData(endpoint);
             const numFiles = files.length;
             if (0 === numFiles) {
                 logMessage(`= Got zero files for ${actionName}.`);
             }
-            // for (const filename of files) {
             for (const [index, filename] of files.entries()) {
-                const messageElement = logMessage(`${index + 1}/${numFiles} ${actionName} ${filename}...`);
-                const fileResponse = await fetch(fileEndpoint);
-                if (fileResponse.ok) {
-                    updateMessage(messageElement, ' OK');
-                } else {
-                    updateMessage(messageElement, ' Failed');
-                }
+                logMessage(`= ${index + 1}/${numFiles} ${actionName} ${filename}...`);
+                await fetchApiData(endpoint, 'POST');
             }
             logMessage(`= ${actionName} complete!`);
-        } else {
-            logMessage(`= Failed to get list of files for ${actionName}.`);
+        } catch (err) {
+            logMessage(`= ${actionName} failed: ${err.message}`);
         }
     }
 
@@ -317,19 +327,8 @@
      */
     async function listUsers(listEndpoint) {
         logMessage(`Getting list of users...`);
-
-        const listResponse = await fetch(listEndpoint);
-        if (listResponse.ok) {
-            const jsonResponse = await listResponse.json();
-
-            if (!jsonResponse.hasOwnProperty('data')) {
-                logMessage("= Response JSON does not contain a 'data' property.");
-                return;
-            } else if (!Array.isArray(jsonResponse.data)) {
-                logMessage("= 'data' property is not an array.");
-                return;
-            }
-            const users = jsonResponse.data;
+        try {
+            const users = await fetchApiData(listEndpoint);
             const numUsers = users.length;
 
             if (0 === numUsers) {
@@ -343,8 +342,8 @@
 
             const userListDiv = document.getElementById('user-list');
             userListDiv.appendChild(table);
-        } else {
-            logMessage(`= Failed to get list of users: status ${listResponse.status}`);
+        } catch (err) {
+            logMessage(`= Listing new files failed: ${err.message}`);
         }
     }
 
@@ -358,8 +357,8 @@
         if (confirm(`Really change the password for user, "${username}"?`)) {
             const passwordInput = row.querySelector('.password-input');
             const password = passwordInput.value;
-            const endpoint = './admin.php?action=change_password';
-            const apiResult = await callUserAction(endpoint, username, password);
+            const endpoint = '/api/v1.0/user';
+            const apiResult = await callUserAction('Change password', endpoint, 'PUT', username, password);
             if (apiResult) {
                 // Unstrike through the username.
                 usernameText.style.textDecoration = 'none';
@@ -381,9 +380,8 @@
         const usernameText = row.querySelector('.username-text');
         const username = usernameText.textContent;
         if (confirm(`Really disable the existing user, "${username}"?`)) {
-            const password = '';
-            const endpoint = './admin.php?action=change_password';
-            const apiResult = await callUserAction(endpoint, username, password);
+            const endpoint = '/api/v1.0/user';
+            const apiResult = await callUserAction('Disable user', endpoint, 'DELETE', username);
             if (apiResult) {
                 disableUsersRowInTable(row);
             }
@@ -401,8 +399,8 @@
         if (confirm(`Really create the new user, "${username}"?`)) {
             const passwordInput = row.querySelector('.password-input');
             const password = passwordInput.value;
-            const endpoint = './admin.php?action=add_user';
-            const apiResult = await callUserAction(endpoint, username, password);
+            const endpoint = '/api/v1.0/user';
+            const apiResult = await callUserAction('Create user', endpoint, 'POST', username, password);
             if (apiResult) {
                 console.log("apiResult true, adding row");
                 addUserRowToTable(username, password);
@@ -413,28 +411,22 @@
 
     /**
      * Call a user action endpoint with the username and password.
+     * @param {string} actionName
      * @param {string} endpoint The base endpoint URL.
+     * @param {string} httpMethod
      * @param {string} username
      * @param {string} password
      * @returns {Promise<boolean>} True on success, false on failure.
      */
-    async function callUserAction(endpoint, username, password) {
-        const actionName = endpoint.replace(/^.*action=/, ''); // e.g., "change_password"
+    async function callUserAction(actionName, endpoint, httpMethod, username, password = '') {
         logMessage(`Calling ${actionName} for user "${username}"...`);
 
-        const url = `${endpoint}&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
-
         try {
-            const response = await fetch(url);
-            if (response.ok) {
-                logMessage(`${actionName} succeeded for "${username}".`);
-                return true;
-            } else {
-                logMessage(`${actionName} failed for "${username}".`);
-                return false;
-            }
+            await fetchApiData(endpoint, httpMethod, {username, password});
+            logMessage(`= ${actionName} succeeded for "${username}".`);
+            return true;
         } catch (error) {
-            logMessage(`Error calling ${actionName} for "${username}": ${error}`);
+            logMessage(`= ${actionName} failed for "${username}": ${error}`);
             return false;
         }
     }
@@ -510,7 +502,13 @@
         // Only if requested by the user.
         if ("handle_init_root" === params.get("user-action")) {
             // Get the initial page of files, resetting the cursor.
-            handleDropboxPolling('./admin.php?action=init_root', 'get the very first page of files');
+            logMessage('Reinitializing Dropbox list...');
+            try {
+                fetchApiData('/api/v1.0/cursor', 'POST');
+                logMessage(`= Reinitializing Dropbox list succeeded.`);
+            } catch (err) {
+                logMessage(`= Reinitializing Dropbox list failed: ${err.message}`);
+            }
         }
 
         // Get all remaining pages.

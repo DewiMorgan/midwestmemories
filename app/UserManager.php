@@ -141,6 +141,16 @@ class UserManager extends Singleton
     }
 
     /**
+     * Delete/disable a user.
+     * @param string $username Who to delete
+     * @return array ['status'=>Http status, 'data'=>'OK' or 'Error: {reason}'].
+     */
+    public static function delete(string $username): array
+    {
+        return self::changePassword($username, '');
+    }
+
+    /**
      * Adds a new user to the `.htpasswd` file.
      * Returns false if the user already exists, or an error occurs.
      *

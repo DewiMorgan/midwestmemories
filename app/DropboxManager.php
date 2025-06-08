@@ -75,8 +75,6 @@ class DropboxManager extends Singleton
 
     /**
      * Initialize the cursor, and get the start of the list of all files for this website. Might be LONG.
-     * ToDo: change listFolder to use Conf::get[Key::DROPBOX_PATH_PREFIX] instead of ''.
-     *       No trailing slash!
      * @return array ['data' => [List of file details]].
      */
     public static function initRootCursor(): array

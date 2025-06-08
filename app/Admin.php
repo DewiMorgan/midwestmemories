@@ -94,8 +94,8 @@ class Admin
             'continue_root' => DropboxManager::readCursorUpdate(),
             'list_files_to_download' => FileProcessor::listNewFiles(),
             'list_files_to_process' => FileProcessor::listDownloadedFiles(),
-            'download_one_file' => FileProcessor::downloadOneFile(),
-            'process_one_file' => FileProcessor::processOneFile(),
+            'download_one_file' => FileProcessor::downloadNextFile(),
+            'process_one_file' => FileProcessor::processNextFile(),
             'list_users' => UserManager::getUsers(),
             'add_user' => UserManager::addUser(
                 $_REQUEST['username'] ?? '',

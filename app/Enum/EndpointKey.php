@@ -10,6 +10,7 @@ namespace MidwestMemories\Enum;
 enum EndpointKey: string
 {
     case DELETE_COMMENT = 'DELETE#comment';
+    case DELETE_USER = 'DELETE#user';
     case GET_COMMENT = 'GET#comment';
     case GET_CURSOR = 'GET#cursor';
     case GET_DOWNLOAD = 'GET#download';

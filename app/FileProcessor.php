@@ -18,7 +18,7 @@ class FileProcessor extends Singleton
      * Add thumbnails, resample images, and parse txt files, then set status to PROCESSED.
      * @return array ['status'=>200 or 500, 'data'=>"OK" or "Error: ..."], depending on the result.
      */
-    public static function processOneFile(): array
+    public static function processNextFile(): array
     {
         $instance = self::getInstance();
         $entry = $instance->listFirstFileByStatus(SyncStatus::DOWNLOADED);
@@ -326,7 +326,7 @@ class FileProcessor extends Singleton
      * Download the first file from the file queue table.
      * @return array [ "OK" or "Error: ...", depending on the result.
      */
-    public static function downloadOneFile(): array
+    public static function downloadNextFile(): array
     {
         $dropbox = DropboxManager::getInstance();
         $instance = self::getInstance();
