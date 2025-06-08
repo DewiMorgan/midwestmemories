@@ -320,16 +320,17 @@
 
         const listResponse = await fetch(listEndpoint);
         if (listResponse.ok) {
-            const users = await listResponse.json();
+            const jsonResponse = await listResponse.json();
 
-            if (!users.hasOwnProperty('data')) {
-                logMessage("Response JSON does not contain a 'data' property.");
+            if (!jsonResponse.hasOwnProperty('data')) {
+                logMessage("= Response JSON does not contain a 'data' property.");
                 return;
-            } else if (!Array.isArray(users.data)) {
-                logMessage("'data' property is not an array.");
+            } else if (!Array.isArray(jsonResponse.data)) {
+                logMessage("= 'data' property is not an array.");
                 return;
             }
-            const numUsers = users.data.length;
+            const users = jsonResponse.data;
+            const numUsers = users.length;
 
             if (0 === numUsers) {
                 logMessage(`= Got zero users! There should probably be more.`);
