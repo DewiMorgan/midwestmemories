@@ -23,6 +23,7 @@ class Api
 {
     private string $method;
     private string $path;
+    private mixed $apiVersion;
 
     public function __construct()
     {
@@ -30,7 +31,17 @@ class Api
         $this->method = $_SERVER['REQUEST_METHOD'];
         $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $baseUri = dirname($_SERVER['SCRIPT_NAME']);
-        $this->path = '/' . trim(str_replace($baseUri, '', $requestUri), '/');
+        // $this->path = '/' . trim(str_replace($baseUri, '', $requestUri), '/');
+        $this->apiVersion = $_GET['apiVersion'];
+        if ('v1.0' !== $this->apiVersion) {
+            Log::error('Unsupported API version', $this->apiVersion);
+            $this->jsonResponse(400, ['error' => "Unsupported API version: $this->apiVersion"]);
+        }
+        $this->path = $_GET['path'];
+        if (!preg_match('/^\w+$/', $this->path)) {
+            Log::error('Path not found', $this->path);
+            $this->jsonResponse(404, ['error' => "Path not found: $this->path"]);
+        }
     }
 
     /**
