@@ -10,8 +10,6 @@ use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use MidwestMemories\Connection;
 use MidwestMemories\Db;
-use MidwestMemories\Enum\EndpointPath;
-use MidwestMemories\Enum\HttpMethod;
 use MidwestMemories\Enum\ParamTypes;
 use MidwestMemories\Log;
 use ValueError;
@@ -25,7 +23,6 @@ class Api
 {
     private string $method;
     private string $path;
-    private array $endpoints;
 
     public function __construct()
     {
@@ -34,9 +31,6 @@ class Api
         $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $baseUri = dirname($_SERVER['SCRIPT_NAME']);
         $this->path = '/' . trim(str_replace($baseUri, '', $requestUri), '/');
-
-        // Load defined endpoint routes.
-        $this->endpoints = require(__DIR__ . '/endpoints.php');
     }
 
     /**
@@ -47,8 +41,8 @@ class Api
     {
         try {
             return EndpointRegistry::get($this->method, $this->path);
-        } catch (ValueError $e) {
-            Log::warn("No match for {$this->method} {$this->path}");
+        } catch (ValueError) {
+            Log::warn("No match for $this->method $this->path");
             $this->jsonResponse(404, ['error' => 'Endpoint not found']);
         }
     }
@@ -63,13 +57,13 @@ class Api
         $auth = $endpointDef['auth'] ?? null;
 
         if ($auth === 'admin' && !Connection::getInstance()->isAdmin) {
-            Log::warn("Forbidden: admin required for {$this->method} {$this->path}");
+            Log::warn("Forbidden: admin required for $this->method $this->path");
             $this->jsonResponse(403, ['error' => 'Admin access required']);
         }
 
         // Anyone using the API should be at least an authenticated user.
         if ($auth === 'user' && !Connection::getInstance()->isUser) {
-            Log::warn("Forbidden: login required for {$this->method} {$this->path}");
+            Log::warn("Forbidden: login required for $this->method $this->path");
             $this->jsonResponse(403, ['error' => 'User access required']);
         }
     }
@@ -185,7 +179,7 @@ class Api
 
             if (!$valid) {
                 $actual = gettype($value);
-                $invalid[] = "$name (expected {$expectedType->value}, got $actual)";
+                $invalid[] = "$name (expected $expectedType->value, got $actual)";
             }
         }
 
@@ -198,31 +192,6 @@ class Api
             Log::warn('Invalid parameter types: ' . implode(', ', $invalid));
             $this->jsonResponse(400, ['error' => 'Invalid parameter types: ' . implode(', ', $invalid)]);
         }
-    }
-
-    /**
-     * @param string $path
-     * @param string $method
-     * @return array|null
-     */
-    private function matchEndpoint(string $path, string $method): ?array
-    {
-        foreach ($this->endpoints as $route => $methods) {
-            $pattern = preg_replace('#\{([^}]+)}#', '(?P<$1>[^/]+)', $route);
-            $pattern = '#^' . trim($pattern, '/') . '$#';
-
-            if (preg_match($pattern, trim($path, '/'), $matches)) {
-                if (!isset($methods[$method])) {
-                    Log::warn("Method $method not allowed for $route");
-                    $this->jsonResponse(405, ['error' => 'Method not allowed']);
-                }
-
-                $params = array_filter($matches, fn($k) => !is_int($k), ARRAY_FILTER_USE_KEY);
-                return ['endpoint' => $methods[$method], 'params' => $params];
-            }
-        }
-
-        return null;
     }
 
     /**
