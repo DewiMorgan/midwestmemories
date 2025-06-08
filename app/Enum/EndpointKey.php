@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 namespace MidwestMemories\Enum;
+require_once('HttpMethod.php');
+require_once('EndpointPath.php');
 
 /**
  * Enum representing all API endpoints in the system.
