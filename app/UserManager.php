@@ -63,7 +63,7 @@ class UserManager extends Singleton
     /**
      * Reads `.htpasswd` file and populates our array of usernames/passwords.
      */
-    public function readUsers(): void
+    private function readUsers(): void
     {
         $users = [];
         $knownPassword = '?';
@@ -99,12 +99,13 @@ class UserManager extends Singleton
      * @param string $password
      * @return string 'OK' or 'Error: {reason}'.
      */
-    public function changePassword(string $username, string $password): string
+    public static function changePassword(string $username, string $password): string
     {
+        $instance = self::getInstance();
         $numToReplace = 1;
         $prevLine = '';
         $indexToReplace = null;
-        foreach ($this->lines as $i => $line) {
+        foreach ($instance->lines as $i => $line) {
             if (str_starts_with(trim($line), "$username:")) {
                 $indexToReplace = $i;
                 // Check if the previous line is a comment.
@@ -132,8 +133,8 @@ class UserManager extends Singleton
                 "$username:" . password_hash($password, PASSWORD_BCRYPT)
             ];
         }
-        array_splice($this->lines, $indexToReplace, $numToReplace, $newEntries);
-        if ($this->putPasswdFile()) {
+        array_splice($instance->lines, $indexToReplace, $numToReplace, $newEntries);
+        if ($instance->putPasswdFile()) {
             return 'OK';
         }
         return 'Error: could not save new password';
@@ -147,19 +148,20 @@ class UserManager extends Singleton
      * @param string $password
      * @return string 'OK' or 'Error: {reason}'.
      */
-    public function addUser(string $username, string $password): string
+    public static function addUser(string $username, string $password): string
     {
-        Log::debug('users', $this->users); // DELETEME DEBUG
+        $instance = self::getInstance();
+        Log::debug('users', $instance->users); // DELETEME DEBUG
         // Check if user already exists
-        foreach ($this->users as $user) {
+        foreach ($instance->users as $user) {
             if ($username === $user['username']) {
                 return 'Error: user already exists'; // User already exists
             }
         }
 
         if (
-            $this->appendToPasswdFile("# $password")
-            && $this->appendToPasswdFile("$username:" . password_hash($password, PASSWORD_BCRYPT))
+            $instance->appendToPasswdFile("# $password")
+            && $instance->appendToPasswdFile("$username:" . password_hash($password, PASSWORD_BCRYPT))
         ) {
             return 'OK';
         }
@@ -169,17 +171,18 @@ class UserManager extends Singleton
     /**
      * @return array[]
      */
-    public function getUsers(): array
+    public static function getUsers(): array
     {
+        $instance = self::getInstance();
         if (Connection::getInstance()->isSuperAdmin) {
-            return $this->users;
+            return $instance->users;
         } else {
             return array_map(function ($item) {
                 return [
                     'username' => $item['username'],
                     'comment' => ('DISABLED' === $item['comment']) ? 'DISABLED' : ''
                 ];
-            }, $this->users);
+            }, $instance->users);
         }
     }
 }

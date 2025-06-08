@@ -79,12 +79,13 @@ class DropboxManager extends Singleton
      *       No trailing slash!
      * @return array List of file details.
      */
-    public function initRootCursor(): array
+    public static function initRootCursor(): array
     {
+        $instance = self::getInstance();
         $path = rtrim(Conf::get(Key::DROPBOX_PATH_PREFIX), '/');
-        $list = $this->client->listFolder($path, true);
+        $list = $instance->client->listFolder($path, true);
         if (array_key_exists('cursor', $list)) {
-            $saveResult = $this->setNewCursor($list['cursor']);
+            $saveResult = $instance->setNewCursor($list['cursor']);
             if (empty($saveResult)) {
                 $error = 'Error: Root cursor not saved to MySQL';
                 Log::error('Root cursor not saved to MySQL', $saveResult);
@@ -95,28 +96,29 @@ class DropboxManager extends Singleton
             $error = 'Error: Root cursor not set in returned file details';
             Log::warn('Root cursor not set in returned file details', $list);
         }
-        return $this->handleFileList($list, $error);
+        return $instance->handleFileList($list, $error);
     }
 
     /**
      * Get a page of updated files for the given cursor.
      * @return array Details of what was done.
      */
-    public function readCursorUpdate(): array
+    public static function readCursorUpdate(): array
     {
+        $instance = self::getInstance();
         // Ensure we have a cursor.
-        $this->loadCursor();
-        if ($this->cursor) {
-            $list = $this->client->listFolderContinue($this->cursor);
+        $instance->loadCursor();
+        if ($instance->cursor) {
+            $list = $instance->client->listFolderContinue($instance->cursor);
             if (array_key_exists('cursor', $list)) {
-                $this->setNewCursor($list['cursor']);
+                $instance->setNewCursor($list['cursor']);
             }
             $error = 'OK';
         } else {
             $list = [];
             $error = 'Error: Root cursor not initially set';
         }
-        return $this->handleFileList($list, $error);
+        return $instance->handleFileList($list, $error);
     }
 
     /**

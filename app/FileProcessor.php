@@ -18,14 +18,15 @@ class FileProcessor extends Singleton
      * Add thumbnails, resample images, and parse txt files, then set status to PROCESSED.
      * @return string "OK" or "Error: ...", depending on the result.
      */
-    public function processOneFile(): string
+    public static function processOneFile(): string
     {
-        $entry = $this->listFirstFileByStatus(SyncStatus::DOWNLOADED);
+        $instance = self::getInstance();
+        $entry = $instance->listFirstFileByStatus(SyncStatus::DOWNLOADED);
         Log::debug('Processing', $entry);
         $fullPath = ltrim($entry, '/\\');
         if (!file_exists($fullPath)) {
             $error = 'file_exists failed';
-            $this->setSyncStatus($fullPath, SyncStatus::ERROR, $error);
+            $instance->setSyncStatus($fullPath, SyncStatus::ERROR, $error);
             return "Error: $error";
         }
 
@@ -33,11 +34,11 @@ class FileProcessor extends Singleton
         $mimeType = mime_content_type($fullPath);
         echo "Processing as $mimeType: $fullPath<br>\n";
         $error = match ($mimeType) {
-            'text/plain' => $this->processTextFile($fullPath),
-            'image/gif' => $this->processGifFile($fullPath),
-            'image/png' => $this->processPngFile($fullPath),
-            'image/jpeg' => $this->processJpegFile($fullPath),
-            default => $this->processOtherFile($fullPath),
+            'text/plain' => $instance->processTextFile($fullPath),
+            'image/gif' => $instance->processGifFile($fullPath),
+            'image/png' => $instance->processPngFile($fullPath),
+            'image/jpeg' => $instance->processJpegFile($fullPath),
+            default => $instance->processOtherFile($fullPath),
         };
         return $error ? "Error: $error" : 'OK';
     }
@@ -259,6 +260,26 @@ class FileProcessor extends Singleton
 
 
     /**
+     * Static callback wrapper.
+     * @return array
+     */
+    public static function listNewFiles(): array
+    {
+        $instance = self::getInstance();
+        return $instance->listFilesByStatus(SyncStatus::NEW);
+    }
+
+    /**
+     * Static callback wrapper.
+     * @return array
+     */
+    public static function listDownloadedFiles(): array
+    {
+        $instance = self::getInstance();
+        return $instance->listFilesByStatus(SyncStatus::DOWNLOADED);
+    }
+
+    /**
      * Get the list of files in a certain `sync_status`.
      * @return string[] List of file paths.
      */
@@ -281,7 +302,7 @@ class FileProcessor extends Singleton
      * Get the first of a list of files in a certain `sync_status`.
      * @return string List of file paths.
      */
-    public function listFirstFileByStatus(SyncStatus $status): string
+    private function listFirstFileByStatus(SyncStatus $status): string
     {
         return Db::sqlGetItem(
             '
@@ -301,10 +322,11 @@ class FileProcessor extends Singleton
      * Download the first file from the file queue table.
      * @return string "OK" or "Error: ...", depending on the result.
      */
-    public function downloadOneFile(): string
+    public static function downloadOneFile(): string
     {
         $dropbox = DropboxManager::getInstance();
-        $untrimmedPath = $this->listFirstFileByStatus(SyncStatus::NEW);
+        $instance = self::getInstance();
+        $untrimmedPath = $instance->listFirstFileByStatus(SyncStatus::NEW);
 
         $fullPath = ltrim($untrimmedPath, '/\\');
         // If the dir doesn't exist, then create it.
@@ -312,7 +334,7 @@ class FileProcessor extends Singleton
         // Repeat is_dir() check twice to ensure it either exists, or got created.
         if (!is_dir($dir) && !mkdir($dir, 0700, true) && !is_dir($dir)) {
             $error = "mkdir($dir,0700,true) failed";
-            $this->setSyncStatus($fullPath, SyncStatus::ERROR, $error);
+            $instance->setSyncStatus($fullPath, SyncStatus::ERROR, $error);
             return "Error: $error";
         }
         // Download the file from Dropbox. If it already exists, it might've been edited, so we get it anyway.
@@ -326,7 +348,7 @@ class FileProcessor extends Singleton
             $status = SyncStatus::ERROR;
             $error = 'False result from downloadFromUrl.';
         }
-        $this->setSyncStatus($fullPath, $status, $error);
+        $instance->setSyncStatus($fullPath, $status, $error);
         return $error ? "Error: $error" : 'OK';
     }
 

@@ -90,22 +90,18 @@ class Admin
     {
         Log::debug('Action', $formAction);
         $result = match ($formAction) {
-            'init_root' => DropboxManager::getInstance()->initRootCursor(),
-            'continue_root' => DropboxManager::getInstance()->readCursorUpdate(),
-            'list_files_to_download' => FileProcessor::getInstance()->listFilesByStatus(
-                SyncStatus::NEW
-            ),
-            'list_files_to_process' => FileProcessor::getInstance()->listFilesByStatus(
-                SyncStatus::DOWNLOADED
-            ),
-            'download_one_file' => FileProcessor::getInstance()->downloadOneFile(),
-            'process_one_file' => FileProcessor::getInstance()->processOneFile(),
-            'list_users' => UserManager::getInstance()->getUsers(),
-            'add_user' => UserManager::getInstance()->addUser(
+            'init_root' => DropboxManager::initRootCursor(),
+            'continue_root' => DropboxManager::readCursorUpdate(),
+            'list_files_to_download' => FileProcessor::listNewFiles(),
+            'list_files_to_process' => FileProcessor::listDownloadedFiles(),
+            'download_one_file' => FileProcessor::downloadOneFile(),
+            'process_one_file' => FileProcessor::processOneFile(),
+            'list_users' => UserManager::getUsers(),
+            'add_user' => UserManager::addUser(
                 $_REQUEST['username'] ?? '',
                 $_REQUEST['password'] ?? ''
             ),
-            'change_password' => UserManager::getInstance()->changePassword(
+            'change_password' => UserManager::changePassword(
                 $_REQUEST['username'] ?? '',
                 $_REQUEST['password'] ?? ''
             ),

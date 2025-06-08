@@ -49,7 +49,7 @@ class EndpointRegistry
             EndpointKey::GET_DOWNLOAD => [
                 'auth' => 'admin',
                 'params' => [],
-                'callback' => FileProcessor::listFilesByStatus(...), // Assumes it gets NEW status inside
+                'callback' => FileProcessor::listNewFiles(...),
             ],
             EndpointKey::POST_DOWNLOAD => [
                 'auth' => 'admin',
@@ -59,7 +59,7 @@ class EndpointRegistry
             EndpointKey::GET_PROCESS => [
                 'auth' => 'admin',
                 'params' => [],
-                'callback' => FileProcessor::listFilesByStatus(...), // Assumes it gets DOWNLOADED status inside
+                'callback' => FileProcessor::listDownloadedFiles(...),
             ],
             EndpointKey::POST_PROCESS => [
                 'auth' => 'admin',
