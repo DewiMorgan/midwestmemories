@@ -423,27 +423,27 @@
 
     /**
      * Call a user action endpoint with the username and password.
-     * @param {string} actionName
+     * @param {string} readableAction What we're doing, for human-readable logging/display.
      * @param {string} endpoint The base endpoint URL.
-     * @param {string} httpMethod
-     * @param {string} username
-     * @param {string} password
+     * @param {string} httpMethod GET, POST, DELETE, etc.
+     * @param {string} username Optional username.
+     * @param {string} password Optional password.
      * @returns {Promise<boolean>} True on success, false on failure.
      */
-    async function callUserAction(actionName, endpoint, httpMethod, username = '', password = '') {
+    async function callUserAction(readableAction, endpoint, httpMethod, username = '', password = '') {
         let user = username;
         if ('' === user) {
             const parts = endpoint.split('/');
             user = parts[parts.length - 1];
         }
-        logMessage(`Calling ${actionName} for user "${user}"...`);
+        logMessage(`Calling ${readableAction} for user "${user}"...`);
 
         try {
             await fetchApiData(endpoint, httpMethod, 'array', {user, password});
-            logMessage(`= ${actionName} succeeded for "${user}".`);
+            logMessage(`= ${readableAction} succeeded for "${user}".`);
             return true;
         } catch (error) {
-            logMessage(`= ${actionName} failed for "${user}": ${error}`);
+            logMessage(`= ${readableAction} failed for "${user}": ${error}`);
             return false;
         }
     }
