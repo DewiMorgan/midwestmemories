@@ -441,7 +441,7 @@
 
         const expectType = 'DELETE' === httpMethod ? 'string' : 'array';
         try {
-            await fetchApiData(endpoint, httpMethod, expectType, {user, password});
+            await fetchApiData(endpoint, httpMethod, expectType, {username:user, password});
             logMessage(`= ${readableAction} succeeded for "${user}".`);
             return true;
         } catch (error) {
