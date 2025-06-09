@@ -265,6 +265,7 @@
 
         const actualType = Array.isArray(data) ? 'array' : typeof data;
         if (actualType !== expectedType) {
+            console.log(`Received ${actualType}, expected ${expectedType}`, data);
             throw new Error(`Expected 'data' to be ${expectedType}, but got ${actualType}.`);
         }
 
@@ -438,8 +439,9 @@
         }
         logMessage(`Calling ${readableAction} for user "${user}"...`);
 
+        const expectType = 'DELETE' === httpMethod ? 'string' : 'array';
         try {
-            await fetchApiData(endpoint, httpMethod, 'array', {user, password});
+            await fetchApiData(endpoint, httpMethod, expectType, {user, password});
             logMessage(`= ${readableAction} succeeded for "${user}".`);
             return true;
         } catch (error) {
