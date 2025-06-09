@@ -439,7 +439,7 @@
         }
         logMessage(`Calling ${readableAction} for user "${user}"...`);
 
-        const expectType = 'DELETE' === httpMethod ? 'string' : 'array';
+        const expectType = ('DELETE' === httpMethod || 'PUT' === httpMethod) ? 'string' : 'array';
         try {
             await fetchApiData(endpoint, httpMethod, expectType, {username: user, password});
             logMessage(`= ${readableAction} succeeded for "${user}".`);
