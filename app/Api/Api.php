@@ -24,6 +24,10 @@ class Api
     private string $method;
     private string $path;
     private mixed $apiVersion;
+    /**
+     * @var string
+     */
+    private string $pathParams;
 
     public function __construct()
     {
@@ -38,6 +42,9 @@ class Api
             $this->jsonResponse(400, ['error' => "Unsupported API version: $this->apiVersion"]);
         }
         $this->path = $_GET['path'];
+        $parts = preg_split('#/+#', $this->path, 2, PREG_SPLIT_NO_EMPTY);
+        $this->path = $parts[0] ?? '';
+        $this->pathParams = $parts[1] ?? '';
         if (!preg_match('/^\w+$/', $this->path)) {
             Log::error('Path not found', $this->path);
             $this->jsonResponse(404, ['error' => "Path not found: $this->path"]);
@@ -146,15 +153,9 @@ class Api
      */
     private function getPathParams(array $endpoint): array
     {
-        Log::debug("Reading path params for $this->path:", $endpoint); // DELETEME DEBUG
-        $base = '/api/v1.0/';
-        $remainingPath = substr($this->path, strlen($base));
-
-        // Example: 'user/fred/abc/unnamed' -> ['user', 'fred', 'abc', 'unnamed'].
-        $params = array_values(array_filter(explode('/', $remainingPath)));
-
-        // Remove action segment, e.g., 'user'.
-        array_shift($params);
+        Log::debug("Reading path params for $this->path as $this->pathParams:", $endpoint); // DELETEME DEBUG
+        // Example: 'fred/abc/unnamed' -> ['user', 'fred', 'abc', 'unnamed'].
+        $params = array_values(array_filter(explode('/', $this->pathParams)));
 
         // Append optionally named entries. So from $endpoint['params'] = ['username', 'password']
         // [0=>'fred', 1=>'abc', 2=>'unnamed'] => [0=>'fred', 1=>'abc', 2=>'banana', 'user'=>'fred', 'pass'=>'abc']
