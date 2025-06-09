@@ -95,12 +95,14 @@ class UserManager extends Singleton
     /**
      * Updates or inserts a user's password in the `.htpasswd` file.
      *
-     * @param string $username
-     * @param string $password
-     * @return array ['status'=>Http status, 'data'=>'OK' or 'Error: {reason}'].
+     * @param array $params ['username' => {string}, 'password' => {string}]
+     * @return array ['status' => {int Http Status}, 'data' => 'OK' or 'Error: {string reason}'].
      */
-    public static function changePassword(string $username, string $password): array
+    public static function changePassword(array $params): array
     {
+        $username = $params['username'] ?? '';
+        $password = $params['password'] ?? '';
+
         $instance = self::getInstance();
         $numToReplace = 1;
         $prevLine = '';
@@ -142,24 +144,26 @@ class UserManager extends Singleton
 
     /**
      * Delete/disable a user.
-     * @param string $username Who to delete
-     * @return array ['status'=>Http status, 'data'=>'OK' or 'Error: {reason}'].
+     * @param array $params ['username' => {string}]
+     * @return array ['status' => {int Http Status}, 'data' => 'OK' or 'Error: {string reason}'].
      */
-    public static function delete(string $username): array
+    public static function delete(array $params): array
     {
-        return self::changePassword($username, '');
+        $params['password'] = '';
+        return self::changePassword($params);
     }
 
     /**
      * Adds a new user to the `.htpasswd` file.
      * Returns false if the user already exists, or an error occurs.
-     *
-     * @param string $username
-     * @param string $password
-     * @return array ['status' => Http Status, 'data' => 'OK' or 'Error: {reason}'].
+     * @param array $params ['username' => {string}, 'password' => {string}]
+     * @return array ['status' => {int Http Status}, 'data' => 'OK' or 'Error: {string reason}'].
      */
-    public static function addUser(string $username, string $password): array
+    public static function addUser(array $params): array
     {
+        $username = $params['username'] ?? '';
+        $password = $params['password'] ?? '';
+
         $instance = self::getInstance();
         Log::debug('users', $instance->users); // DELETEME DEBUG
         // Check if user already exists
