@@ -392,8 +392,8 @@
         const usernameText = row.querySelector('.username-text');
         const username = usernameText.textContent;
         if (confirm(`Really disable the existing user, "${username}"?`)) {
-            const endpoint = '/api/v1.0/user';
-            const apiResult = await callUserAction('Disable user', endpoint, 'DELETE', username);
+            const endpoint = `/api/v1.0/user/${username}`;
+            const apiResult = await callUserAction('Disable user', endpoint, 'DELETE');
             if (apiResult) {
                 disableUsersRowInTable(row);
             }
@@ -430,15 +430,20 @@
      * @param {string} password
      * @returns {Promise<boolean>} True on success, false on failure.
      */
-    async function callUserAction(actionName, endpoint, httpMethod, username, password = '') {
-        logMessage(`Calling ${actionName} for user "${username}"...`);
+    async function callUserAction(actionName, endpoint, httpMethod, username = '', password = '') {
+        let user = username;
+        if ('' === user) {
+            const parts = endpoint.split('/');
+            user = parts[parts.length - 1];
+        }
+        logMessage(`Calling ${actionName} for user "${user}"...`);
 
         try {
-            await fetchApiData(endpoint, httpMethod, 'array', {username, password});
-            logMessage(`= ${actionName} succeeded for "${username}".`);
+            await fetchApiData(endpoint, httpMethod, 'array', {user, password});
+            logMessage(`= ${actionName} succeeded for "${user}".`);
             return true;
         } catch (error) {
-            logMessage(`= ${actionName} failed for "${username}": ${error}`);
+            logMessage(`= ${actionName} failed for "${user}": ${error}`);
             return false;
         }
     }
