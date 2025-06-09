@@ -139,6 +139,8 @@ Current task:
 
 * Convert API to be a separate file.
     * Need to change the UI to use the new system.
+    * User endpoints return a string, should maybe return an object like the file endpoints?
+    * Make the JS also handle endpoints using the lookup table?
 * Change endpoints to be loaded as a class or config file or something.
 * Move source out of web root (edit autoloader?).
 * Convert user management to session-and-DB based.

@@ -216,7 +216,7 @@
      */
     async function runAllUpdates() {
         // Get and queue updates from Dropbox.
-        await handleDropboxPolling('/api/v1.0/cursor', 'GET', 'get the next page of files');
+        await handleDropboxPolling();
         // Download queued downloads.
         await handleFileTask('Downloading', '/api/v1.0/download');
         // Generate queued thumbnails.
@@ -278,19 +278,17 @@
 
     /**
      * API wrapper for dropbox polling endpoint. Call the endpoint until all items are processed.
-     * @param {string} url
-     * @param {string} readableDescription
      * @returns {Promise<void>}
      */
-    async function handleDropboxPolling(url, readableDescription) {
-        logMessage(`Asking Dropbox to ${readableDescription}...`);
+    async function handleDropboxPolling() {
+        logMessage(`Asking Dropbox to get the next page of files...`);
         try {
             while (true) {
                 /**
                  * @typedef {{numAddedFiles:int, numTotalFiles:int, hasMoreFiles:bool, error:string}} FileActionStatus
                  * @type {Promise<FileActionStatus>}
                  */
-                const data = await fetchApiData(url, 'GET', 'object');
+                const data = await fetchApiData('/api/v1.0/cursor', 'GET', 'object');
 
                 // Enforce syntax.
                 data.moreFilesToGo ??= false;
@@ -439,9 +437,8 @@
         }
         logMessage(`Calling ${readableAction} for user "${user}"...`);
 
-        const expectType = ('GET' === httpMethod) ? 'array' : 'string';
         try {
-            await fetchApiData(endpoint, httpMethod, expectType, {username: user, password});
+            await fetchApiData(endpoint, httpMethod, 'string', {username: user, password});
             logMessage(`= ${readableAction} succeeded for "${user}".`);
             return true;
         } catch (error) {

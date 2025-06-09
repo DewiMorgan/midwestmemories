@@ -42,51 +42,61 @@ class EndpointRegistry
                 'auth' => 'admin',
                 'params' => [],
                 'callback' => DropboxManager::initRootCursor(...),
+                'responseType' => 'object', // Returns an associative array with status, etc.
             ],
             EndpointKey::GET_CURSOR => [
                 'auth' => 'admin',
                 'params' => [],
                 'callback' => DropboxManager::readCursorUpdate(...),
+                'responseType' => 'object', // Returns an associative array with status, etc.
             ],
             EndpointKey::GET_DOWNLOAD => [
                 'auth' => 'admin',
                 'params' => [],
                 'callback' => FileProcessor::listNewFiles(...),
+                'responseType' => 'array', // Returns a list of items.
             ],
             EndpointKey::POST_DOWNLOAD => [
                 'auth' => 'admin',
                 'params' => [],
                 'callback' => FileProcessor::downloadNextFile(...),
+                'responseType' => 'object', // Returns an associative array with status, etc.
             ],
             EndpointKey::GET_PROCESS => [
                 'auth' => 'admin',
                 'params' => [],
                 'callback' => FileProcessor::listDownloadedFiles(...),
+                'responseType' => 'array', // Returns a list of items.
             ],
             EndpointKey::POST_PROCESS => [
                 'auth' => 'admin',
                 'params' => [],
                 'callback' => FileProcessor::processNextFile(...),
+                'responseType' => 'object', // Returns an associative array with status, etc.
             ],
             EndpointKey::GET_USER => [
                 'auth' => 'admin',
                 'params' => [],
                 'callback' => UserManager::getUsers(...),
+                'responseType' => 'array', // Returns a list of items.
             ],
             EndpointKey::POST_USER => [
                 'auth' => 'admin',
                 'params' => ['username' => ParamTypes::STRING, 'password' => ParamTypes::STRING],
                 'callback' => UserManager::addUser(...),
+                'responseType' => 'string', // Returns a string 'OK' or 'Error: ...'.
             ],
             EndpointKey::PUT_USER => [
                 'auth' => 'admin',
                 'params' => ['username' => ParamTypes::STRING, 'password' => ParamTypes::STRING],
                 'callback' => UserManager::changePassword(...),
+                'responseType' => 'string', // Returns a string 'OK' or 'Error: ...'.
             ],
             EndpointKey::DELETE_USER => [
                 'auth' => 'admin',
                 'params' => ['username' => ParamTypes::STRING],
                 'callback' => UserManager::delete(...),
+                'responseType' => 'string', // Returns a string 'OK' or 'Error: ...'.
             ],
 
             // User-accessible comment endpoints with rate limiting
