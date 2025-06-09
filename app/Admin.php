@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
-use JsonException;
-use MidwestMemories\Enum\SyncStatus;
-
 /**
  * The class for the main Admin page.
  */
