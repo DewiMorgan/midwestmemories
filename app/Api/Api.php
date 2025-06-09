@@ -56,10 +56,12 @@ class Api
             $this->authorize($endpointDef);
             $this->rateLimit($endpointDef);
 
-//            $input = $this->getJsonInput();
-//            $routeParams = $match['params'];
-//            $params = array_merge($routeParams, $input);
-            $params = $this->getJsonParams();
+            // Get our parameters from every possible source. Later sources overwrite earlier ones.
+            $params = array_merge(
+                $this->getPathParams($endpointDef),
+                $_GET,
+                $this->getJsonParams()
+            );
             $this->validateRequiredParams($endpointDef, $params);
 
             /** @var Callable $callback */
@@ -136,6 +138,39 @@ class Api
     }
 
     /**
+     * Extracts path parameters after the base route and assigns names if defined in the endpoint.
+     * @param array $endpoint The endpoint metadata with optional 'params' list.
+     * @return array A merged array of indexed and named path parameters.
+     */
+    private function getPathParams(array $endpoint): array
+    {
+        $base = '/api/v1.0/';
+        $remainingPath = substr($this->path, strlen($base));
+
+        // Example: 'user/fred/abc/unnamed' -> ['user', 'fred', 'abc', 'unnamed'].
+        $params = array_values(array_filter(explode('/', $remainingPath)));
+
+        // Remove action segment, e.g., 'user'.
+        array_shift($params);
+
+        // Append optionally named entries. So from $endpoint['params'] = ['username', 'password']
+        // [0=>'fred', 1=>'abc', 2=>'unnamed'] => [0=>'fred', 1=>'abc', 2=>'banana', 'user'=>'fred', 'pass'=>'abc']
+        if (array_key_exists('params', $endpoint)) {
+            $paramNames = array_keys($endpoint['params']);
+            for ($i = 0; $i < count($params); $i++) {
+                // Append named key if it exists in the endpoint 'params'.
+                $name = $paramNames[$i] ?? null;
+                if ($name) {
+                    $params[$name] = $params[$i];
+                }
+            }
+        }
+
+        return $params;
+    }
+
+    /**
+     * Get JSON params from the body text
      * @return array
      */
     private function getJsonParams(): array
