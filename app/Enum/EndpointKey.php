@@ -20,7 +20,7 @@ enum EndpointKey: string
     case POST_CURSOR = 'POST#cursor';
     case POST_DOWNLOAD = 'POST#download';
     case POST_PROCESS = 'POST#process';
-    case POST_USER = 'PUT#user';
+    case POST_USER = 'POST#user';
     case PUT_COMMENT = 'PUT#comment';
-    case PUT_USER = 'POST#user';
+    case PUT_USER = 'PUT#user';
 }
