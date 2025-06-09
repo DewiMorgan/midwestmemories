@@ -57,11 +57,13 @@ class Api
             $this->rateLimit($endpointDef);
 
             // Get our parameters from every possible source. Later sources overwrite earlier ones.
+            Log::debug('Getting GET params', $_GET);// DELETEME DEBUG
             $params = array_merge(
                 $this->getPathParams($endpointDef),
                 $_GET,
                 $this->getJsonParams()
             );
+            Log::debug('Merged params', $params);// DELETEME DEBUG
             $this->validateRequiredParams($endpointDef, $params);
 
             /** @var Callable $callback */
@@ -144,6 +146,7 @@ class Api
      */
     private function getPathParams(array $endpoint): array
     {
+        Log::debug("Reading path params for $this->path:", $endpoint); // DELETEME DEBUG
         $base = '/api/v1.0/';
         $remainingPath = substr($this->path, strlen($base));
 
@@ -165,6 +168,7 @@ class Api
                 }
             }
         }
+        Log::debug('= Read', $params); // DELETEME DEBUG
 
         return $params;
     }
@@ -175,14 +179,16 @@ class Api
      */
     private function getJsonParams(): array
     {
+        Log::debug("Reading JSON params for $this->path:"); // DELETEME DEBUG
         if (!in_array($this->method, ['POST', 'PUT', 'PATCH'])) {
+            Log::debug('= Empty: not POST/PUT/PATCH.'); // DELETEME DEBUG
             return [];
         }
 
         $raw = file_get_contents('php://input');
-        Log::debug('raw params', $raw);// DELETEME DEBUG
+        Log::debug('= Raw params', $raw);// DELETEME DEBUG
         $decoded = json_decode($raw, true);
-        Log::debug('decoded params', $decoded);// DELETEME DEBUG
+        Log::debug('= Decoded params', $decoded);// DELETEME DEBUG
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             Log::warn('Invalid JSON input: ' . json_last_error_msg());
@@ -193,7 +199,7 @@ class Api
             Log::warn('Expected JSON object, got something else.');
             $this->jsonResponse(400, ['error' => 'Expected JSON object.']);
         }
-
+        Log::debug('= Read', $decoded); // DELETEME DEBUG
         return $decoded;
     }
 
