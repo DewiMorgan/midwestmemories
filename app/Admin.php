@@ -18,14 +18,7 @@ class Admin
         static::handleLogouts();
         static::initSession();
         static::dieIfNotAdmin();
-
-        // Handle as JSON API call if one is requested: default to web page request.
-        $formAction = $_REQUEST['action'] ?? null;
-        if ($formAction) {
-            self::getApiResponse($formAction);
-        } else {
-            static::showAdminTemplate();
-        }
+        static::showAdminTemplate();
     }
 
     /**
@@ -77,51 +70,6 @@ class Admin
 
         if (!$connection->isAdmin) {
             die('Access denied');
-        }
-    }
-
-    /**
-     * Handle API calls. Nothing must be output before these, and they must not output anything.
-     * Any list_* endpoints must return a list.
-     * Any actions should return `$error ? "Error: $error" : 'OK';`.
-     * @param string $formAction
-     */
-    public static function getApiResponse(string $formAction): void
-    {
-        Log::debug('Action', $formAction);
-        $result = match ($formAction) {
-            'init_root' => DropboxManager::initRootCursor(),
-            'continue_root' => DropboxManager::readCursorUpdate(),
-            'list_files_to_download' => FileProcessor::listNewFiles(),
-            'list_files_to_process' => FileProcessor::listDownloadedFiles(),
-            'download_one_file' => FileProcessor::downloadNextFile(),
-            'process_one_file' => FileProcessor::processNextFile(),
-            'list_users' => UserManager::getUsers(),
-            'add_user' => UserManager::addUser(
-                $_REQUEST['username'] ?? '',
-                $_REQUEST['password'] ?? ''
-            ),
-            'change_password' => UserManager::changePassword(
-                $_REQUEST['username'] ?? '',
-                $_REQUEST['password'] ?? ''
-            ),
-            default => '',
-        };
-
-        if ('' !== $result) {
-            header('Content-Type: application/json');
-            try {
-                echo json_encode($result, JSON_THROW_ON_ERROR);
-            } catch (JsonException $e) {
-                echo '"Error: could not encode result"';
-                Log::error("From $formAction, failed to json encode: " . $e->getMessage(), $result);
-            }
-            if (str_starts_with($formAction, 'list_')) {
-                Log::debug('Returning list of ' . count($result) . " items from $formAction.", $result);
-            } else {
-                Log::debug("From $formAction", $result);
-            }
-            exit(0);
         }
     }
 
