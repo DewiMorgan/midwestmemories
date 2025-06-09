@@ -145,7 +145,9 @@ class Api
         }
 
         $raw = file_get_contents('php://input');
+        Log::debug('raw params', $raw);// DELETEME DEBUG
         $decoded = json_decode($raw, true);
+        Log::debug('decoded params', $decoded);// DELETEME DEBUG
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             Log::warn('Invalid JSON input: ' . json_last_error_msg());
