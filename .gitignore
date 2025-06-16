@@ -7,3 +7,4 @@ error_log
 callback.out
 inst-mwm.log
 .idea
+/.phpunit.result.cache
