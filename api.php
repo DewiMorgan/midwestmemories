@@ -15,7 +15,7 @@ date_default_timezone_set('US/Central');
 session_start();
 header('Content-Type: application/json');
 
-require_once(__DIR__ . '/app/autoload.php');
+require_once(__DIR__ . '/src/autoload.php');
 
 $api = new Api();
 $api->handleApiCall();

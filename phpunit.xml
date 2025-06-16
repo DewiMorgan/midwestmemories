@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="test/bootstrap.php"
+         colors="true"
+         stopOnFailure="false"
+         failOnRisky="true"
+         failOnWarning="true"
+         failOnIncomplete="true"
+         failOnSkipped="true"
+         executionOrder="depends,defects"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerErrors="true"
+         displayDetailsOnTestsThatTriggerNotices="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         displayDetailsOnPhpunitDeprecations="true"
+>
+
+    <!-- Maximize PHP error reporting -->
+    <php>
+        <ini name="display_errors" value="1"/>
+        <ini name="display_startup_errors" value="1"/>
+        <ini name="error_reporting" value="E_ALL|E_STRICT|E_DEPRECATED|E_NOTICE|E_WARNING"/>
+        <ini name="log_errors" value="0"/>
+    </php>
+
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>test</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

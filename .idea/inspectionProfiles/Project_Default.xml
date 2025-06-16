@@ -121,7 +121,7 @@
       <option name="migratedIntoUserSpace" value="true" />
     </inspection_tool>
     <inspection_tool class="FunctionNamingConventionJS" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="m_regex" value="[a-z][A-Za-z]*" />
+      <option name="m_regex" value="#?[a-z][A-Za-z]*" />
       <option name="m_minLength" value="4" />
       <option name="m_maxLength" value="32" />
     </inspection_tool>
@@ -143,7 +143,6 @@
     <inspection_tool class="JSConstructorReturnsPrimitive" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="JSDeclarationsAtScopeStart" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="JSEqualityComparisonWithCoercion.TS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="JSHint" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="JSNonStrictModeUsed" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="JSUnfilteredForInLoop" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="JSXSyntaxUsed" enabled="true" level="ERROR" enabled_by_default="true" />

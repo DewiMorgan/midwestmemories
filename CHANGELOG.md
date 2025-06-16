@@ -195,14 +195,14 @@ which might not be when they were actually implemented/committed.
 * FIXED: Update browser history when navigating.
 * FIXED: Db::mkRefArray(): There's apparently a `...` operator that makes this kludge redundant: see man page.
 * FIXED: The ThumbTemplate doesn't fill out - maybe no suitable files with thumbs?
-* FIXED: Fifth argument ($port) must be of type ?int, string given in `.../public_html/midwestmemories/app/Db.php:41`.
+* FIXED: Fifth argument ($port) must be of type ?int, string given in `.../public_html/midwestmemories/src/Db.php:41`.
 * FIXED: index.php double-loads the tree template.
 * FIXED: Content div has it as a class but not an ID.
 * FIXED: OpenLinkInline doesn't seem to do so. I had the wrong classnames.
 * FIXED: Create a config file for non-secret info.
 * FIXED: Read auth info through the config class.
 * FIXED: Unify pre-existing logging (as in Db class) to use Log class.
-* FIXED: Refactor dropbox webhook to a class, and move the class into the app/ folder.
+* FIXED: Refactor dropbox webhook to a class, and move the class into the src/ folder.
 * FIXED: Create a simple static logger class. Log::error($str), etc.
 * FIXED: Create a simple static config class. `Conf::get(Conf::LOG_LEVEL)`, etc.
 * FIXED: DropboxManager has some very poor naming. `dbm.iterations` and `dbm.extracted` need renaming.

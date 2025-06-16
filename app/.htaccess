@@ -1,2 +1,0 @@
-# This prevents anyone directly accessing the source code.
-deny from all

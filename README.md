@@ -107,14 +107,14 @@ This also makes thumbnails, publicly publishes the files, etc.
 ## Templating flow
 
 * /index.php::global - All user page processing starts here. Sets up autoloading, new Index(), and exits.
-* app/Index.php::__construct() - Handles session and path.
-* app/Index.php::showPage() - `i` param unset means user request: include TreeTemplate.
-* app/TreeTemplate.php::global - display left-bar, set an onLoad JS to load body page.
-* app/TreeTemplate.php::scanDirectory() - display left-bar, set an onLoad JS to load body page, add drag-bar listeners.
-* app/TreeTemplate.php:JS:handleDragBar*() - handle drag-bar resizing.
-* app/TreeTemplate.php:JS:openLinkInline() - handle onLoad and onClick, to load target into "content" div & fix history.
-* /index.php::global & app/Index.php::__construct() - as above, but for the subpage.
-* app/Index.php::showPage() - `i` param set by JS means internal request: include FileTemplate, ThumbsTemplate, etc.
+* src/Index.php::__construct() - Handles session and path.
+* src/Index.php::showPage() - `i` param unset means user request: include TreeTemplate.
+* src/TreeTemplate.php::global - display left-bar, set an onLoad JS to load body page.
+* src/TreeTemplate.php::scanDirectory() - display left-bar, set an onLoad JS to load body page, add drag-bar listeners.
+* src/TreeTemplate.php:JS:handleDragBar*() - handle drag-bar resizing.
+* src/TreeTemplate.php:JS:openLinkInline() - handle onLoad and onClick, to load target into "content" div & fix history.
+* /index.php::global & src/Index.php::__construct() - as above, but for the subpage.
+* src/Index.php::showPage() - `i` param set by JS means internal request: include FileTemplate, ThumbsTemplate, etc.
 
 Templates have one script and stylesheet in their header, both parsed into the parent when they are read inline.
 
@@ -137,15 +137,20 @@ See also ToDo, above.
 
 Current task:
 
+* JS is probably broken. Modify AdminApiTemplate to include all JS.
+    * Future: a compile step for JS.
 * Convert API to be a separate file.
     * Need to change the UI to use the new system.
     * User endpoints return a string, should maybe return an object like the file endpoints?
     * Make the JS also handle endpoints using the lookup table?
+    * Create CommentManager class.
+    * Convert Comments to use new API.
 * Change endpoints to be loaded as a class or config file or something.
 * Move source out of web root (edit autoloader?).
 * Convert user management to session-and-DB based.
 * Get folder-level details showing.
 * Faster page loads (smaller initial images?)
+* Create a "live" site, and a "test" site.
 
 * Handle API errors instead of just checking `result.ok` (which just checks it was a 200).
     * Also make API errors not return 200 OK.
