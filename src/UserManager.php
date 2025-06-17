@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace MidwestMemories;
 
 use MidwestMemories\Enum\Key;
+use MidwestMemories\Enum\UserAccess;
 
 /**
  * Manager for user accounts.
@@ -119,6 +120,7 @@ class UserManager extends Singleton
             }
             $prevLine = $line;
         }
+
         // Fail if not found.
         if (is_null($indexToReplace)) {
             return ['status' => 500, 'data' => 'Error: could not find user to update'];
@@ -137,9 +139,42 @@ class UserManager extends Singleton
         }
         array_splice($instance->lines, $indexToReplace, $numToReplace, $newEntries);
         if ($instance->putPasswdFile()) {
-            return ['data' => 'OK'];
+            return ['status' => 200, 'data' => 'OK'];
         }
         return ['status' => 500, 'data' => 'Error: could not save new password'];
+    }
+
+    /**
+     * Delete/disable a user.
+     * @param array $params ['username' => {string}]
+     * @return array ['status' => {int Http Status}, 'data' => 'OK' or 'Error: {string reason}'].
+     */
+    public static function deleteNew(array $params): array
+    {
+        $username = trim($params['username'] ?? '');
+
+        if ($username === '') {
+            return ['status' => 400, 'data' => 'Error: Missing username'];
+        }
+
+        // Check if user exists
+        $user = Db::sqlGetRow('SELECT id FROM midmem_users WHERE username = ?', 's', $username);
+        if (!$user) {
+            return ['status' => 404, 'data' => 'Error: User not found'];
+        }
+
+        // Soft delete: set is_disabled = 1
+        $ok = Db::sqlExec(
+            'UPDATE midmem_users SET is_disabled = 1 WHERE username = ?',
+            's',
+            $username
+        );
+
+        if (!$ok) {
+            return ['status' => 500, 'data' => 'Error: Failed to disable user'];
+        }
+
+        return ['status' => 200, 'data' => 'OK'];
     }
 
     /**
@@ -154,8 +189,49 @@ class UserManager extends Singleton
     }
 
     /**
+     * Adds a new user to the users table.
+     * Sets status 500 if the user already exists, or an error occurs.
+     * @param array $params ['username' => {string}, 'password' => {string}]
+     * @return array ['status' => {int Http Status}, 'data' => 'OK' or 'Error: {string reason}'].
+     */
+    public static function addUserNew(array $params): array
+    {
+        $username = trim($params['username'] ?? '');
+        $password = $params['password'] ?? '';
+
+        if ($username === '' || $password === '') {
+            return ['status' => 400, 'data' => 'Error: Missing username or password'];
+        }
+
+        // Check for existing user
+        $existing = Db::sqlGetRow('SELECT id FROM midmem_users WHERE username = ?', 's', $username);
+        if ($existing) {
+            return ['status' => 500, 'data' => 'Error: User already exists: ' . var_export($existing, true)];
+        }
+
+        // Hash password
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+
+        // Insert user with default access level
+        $ok = Db::sqlExec(
+            'INSERT INTO midmem_users (username, password_hash, access_level) VALUES (?, ?, ?)',
+            'ssi',
+            $username,
+            $hash,
+            UserAccess::USER->value
+        );
+
+        if (!$ok) {
+            return ['status' => 500, 'data' => 'Error: Could not add user'];
+        }
+
+        return ['status' => 200, 'data' => 'OK'];
+    }
+
+
+    /**
      * Adds a new user to the `.htpasswd` file.
-     * Returns false if the user already exists, or an error occurs.
+     * Sets status 500 if the user already exists, or an error occurs.
      * @param array $params ['username' => {string}, 'password' => {string}]
      * @return array ['status' => {int Http Status}, 'data' => 'OK' or 'Error: {string reason}'].
      */
@@ -163,6 +239,13 @@ class UserManager extends Singleton
     {
         $username = $params['username'] ?? '';
         $password = $params['password'] ?? '';
+
+        if ('' === $username) {
+            return ['status' => 400, 'data' => 'Error: empty username'];
+        }
+        if ('' === $password) {
+            return ['status' => 400, 'data' => 'Error: empty password'];
+        }
 
         $instance = self::getInstance();
         Log::debug('users', $instance->users); // DELETEME DEBUG
@@ -177,13 +260,14 @@ class UserManager extends Singleton
             $instance->appendToPasswdFile("# $password")
             && $instance->appendToPasswdFile("$username:" . password_hash($password, PASSWORD_BCRYPT))
         ) {
+            $instance->users[] = ['username' => $username, 'password' => $password];
             return ['status' => 200, 'data' => 'OK'];
         }
         return ['status' => 500, 'data' => 'Error: could not save user']; // User already exists
     }
 
     /**
-     * @return array[]
+     * @return array ['status' => 200, 'data' => [['username'=>"...", 'comment'=>"..." ]...]];
      */
     public static function getUsers(): array
     {
@@ -200,7 +284,7 @@ class UserManager extends Singleton
                     'comment' => ('DISABLED' === $item['comment']) ? 'DISABLED' : ''
                 ];
             }, $instance->users);
-            return ['data' => $data];
+            return ['status' => 200, 'data' => $data];
         }
     }
 }

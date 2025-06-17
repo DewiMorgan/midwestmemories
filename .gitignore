@@ -8,3 +8,4 @@ callback.out
 inst-mwm.log
 .idea
 /.phpunit.result.cache
+/.htpasswd

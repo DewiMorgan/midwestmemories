@@ -10,9 +10,6 @@ use MidwestMemories\Enum\UserAccess;
  *    ShowLoginForm()
  *    HandleUserChangePassword()
  *    HandleUserResetPassword()
- *    HandleAdminCreateUser()
- *    HandleAdminDisableUser()
- *    HandleAdminChangeUserPassword()
  */
 
 /**
