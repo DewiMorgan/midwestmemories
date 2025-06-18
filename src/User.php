@@ -96,4 +96,137 @@ class User extends Singleton
         // $_SESSION = [];
         // session_destroy();
     }
+
+    /**
+     * Adds a new user to the users table.
+     * Sets status 500 if the user already exists, or an error occurs.
+     * @param array $params ['username' => {string}, 'password' => {string}]
+     * @return array ['status' => {int Http Status}, 'data' => 'OK' or 'Error: {string reason}'].
+     */
+    public static function addUser(array $params): array
+    {
+        $username = trim($params['username'] ?? '');
+        $password = $params['password'] ?? '';
+
+        if ($username === '' || $password === '') {
+            return ['status' => 400, 'data' => 'Error: Missing username or password'];
+        }
+
+        // Check for existing user
+        $existing = Db::sqlGetRow('SELECT id FROM midmem_users WHERE username = ?', 's', $username);
+        if ($existing) {
+            return ['status' => 500, 'data' => 'Error: User already exists: ' . var_export($existing, true)];
+        }
+
+        // Hash password
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+
+        // Insert user with default access level
+        $ok = Db::sqlExec(
+            'INSERT INTO midmem_users (username, password_hash, access_level) VALUES (?, ?, ?)',
+            'ssi',
+            $username,
+            $hash,
+            UserAccess::USER->value
+        );
+
+        if (!$ok) {
+            return ['status' => 500, 'data' => 'Error: Could not add user'];
+        }
+
+        return ['status' => 200, 'data' => 'OK'];
+    }
+
+    /**
+     * Updates or inserts a user's password in the `.htpasswd` file.
+     *
+     * @param array $params ['username' => {string}, 'password' => {string}]
+     * @return array ['status' => {int Http Status}, 'data' => 'OK' or 'Error: {string reason}'].
+     */
+    public static function changePassword(array $params): array
+    {
+        $username = trim($params['username'] ?? '');
+        $password = $params['password'] ?? '';
+
+        if ($username === '' || $password === '') {
+            return ['status' => 400, 'data' => 'Error: Missing username or password'];
+        }
+
+        // Confirm user exists
+        $user = Db::sqlGetRow('SELECT `id` FROM `midmem_users` WHERE `username` = ?', 's', $username);
+        if (!$user) {
+            return ['status' => 404, 'data' => 'Error: User not found'];
+        }
+
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+
+        $ok = Db::sqlExec(
+            'UPDATE `midmem_users` SET `password_hash` = ? WHERE `username` = ?',
+            'ss',
+            $hash,
+            $username
+        );
+
+        if (!$ok) {
+            return ['status' => 500, 'data' => 'Error: Failed to update password'];
+        }
+
+        return ['status' => 200, 'data' => 'OK'];
+    }
+
+    /**
+     * Delete/disable a user.
+     * @param array $params ['username' => {string}]
+     * @return array ['status' => {int Http Status}, 'data' => 'OK' or 'Error: {string reason}'].
+     */
+    public static function delete(array $params): array
+    {
+        $username = trim($params['username'] ?? '');
+
+        if ($username === '') {
+            return ['status' => 400, 'data' => 'Error: Missing username'];
+        }
+
+        // Check if user exists
+        $user = Db::sqlGetRow('SELECT id FROM midmem_users WHERE username = ?', 's', $username);
+        if (!$user) {
+            return ['status' => 404, 'data' => 'Error: User not found'];
+        }
+
+        // Soft delete: set is_disabled = 1
+        $ok = Db::sqlExec(
+            'UPDATE midmem_users SET is_disabled = 1 WHERE username = ?',
+            's',
+            $username
+        );
+
+        if (!$ok) {
+            return ['status' => 500, 'data' => 'Error: Failed to disable user'];
+        }
+
+        return ['status' => 200, 'data' => 'OK'];
+    }
+
+    /**
+     * Get all users, including disabled ones.
+     * @return array `['status' => 200, 'data' => [['username'=>"...", 'comment'=>"..." ]...]]`
+     * On failure, `['status' => 500, 'data' => 'Error: ...']` or similar.
+     */
+    public static function getUsers(): array
+    {
+        $rows = Db::sqlGetTable(
+            "SELECT
+                username,
+                IF(is_disabled = 1, 'DISABLED', '') AS comment
+            FROM midmem_users
+            ORDER BY username"
+        );
+
+        if (!$rows) {
+            return ['status' => 500, 'data' => 'Error: Failed to fetch users'];
+        }
+
+        return ['status' => 200, 'data' => $rows];
+    }
+
 }

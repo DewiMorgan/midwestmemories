@@ -29,5 +29,4 @@ enum Key: string
     case MYSQL_PASS = 'mysql_pass';
     case MYSQL_PORT = 'mysql_port';
     case MYSQL_USER = 'mysql_user';
-    case PASSWORD_FILE = 'password_file';
 }

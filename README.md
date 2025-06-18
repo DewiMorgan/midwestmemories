@@ -137,6 +137,8 @@ See also ToDo, above.
 
 Current task:
 
+* Convert user logins to new mechanism.
+* Add unit tests for everything.
 * JS is probably broken. Modify AdminApiTemplate to include all JS.
     * Future: a compile step for JS.
 * Convert API to be a separate file.

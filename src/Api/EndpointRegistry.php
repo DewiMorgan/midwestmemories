@@ -9,7 +9,7 @@ use MidwestMemories\Enum\EndpointPath;
 use MidwestMemories\Enum\HttpMethod;
 use MidwestMemories\Enum\ParamTypes;
 use MidwestMemories\FileProcessor;
-use MidwestMemories\UserManager;
+use MidwestMemories\User;
 use ValueError;
 
 /**
@@ -77,25 +77,25 @@ class EndpointRegistry
             EndpointKey::GET_USER => [
                 'auth' => 'admin',
                 'params' => [],
-                'callback' => UserManager::getUsers(...),
+                'callback' => User::getUsers(...),
                 'responseType' => 'array', // Returns a list of items.
             ],
             EndpointKey::POST_USER => [
                 'auth' => 'admin',
                 'params' => ['username' => ParamTypes::STRING, 'password' => ParamTypes::STRING],
-                'callback' => UserManager::addUser(...),
+                'callback' => User::addUser(...),
                 'responseType' => 'string', // Returns a string 'OK' or 'Error: ...'.
             ],
             EndpointKey::PUT_USER => [
                 'auth' => 'admin',
                 'params' => ['username' => ParamTypes::STRING, 'password' => ParamTypes::STRING],
-                'callback' => UserManager::changePassword(...),
+                'callback' => User::changePassword(...),
                 'responseType' => 'string', // Returns a string 'OK' or 'Error: ...'.
             ],
             EndpointKey::DELETE_USER => [
                 'auth' => 'admin',
                 'params' => ['username' => ParamTypes::STRING],
-                'callback' => UserManager::delete(...),
+                'callback' => User::delete(...),
                 'responseType' => 'string', // Returns a string 'OK' or 'Error: ...'.
             ],
 

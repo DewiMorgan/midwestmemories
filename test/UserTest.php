@@ -10,7 +10,6 @@ declare(strict_types=1);
 use MidwestMemories\Db;
 use MidwestMemories\Enum\UserAccess;
 use MidwestMemories\User;
-use MidwestMemories\UserManager;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -259,7 +258,8 @@ final class UserTest extends TestCase
         $this->useRealDb();
         $params = ['username' => 'new_user', 'password' => 'securePassword'];
 
-        $result = UserManager::addUserNew($params);
+        $result = User::addUser($params);
+
         self::assertIsArray($result);
         self::assertSame(200, $result['status']);
         self::assertSame('OK', $result['data']);
@@ -270,7 +270,7 @@ final class UserTest extends TestCase
         $this->useRealDb();
         $params = ['password' => 'securePassword'];
 
-        $result = UserManager::addUserNew($params);
+        $result = User::addUser($params);
 
         self::assertIsArray($result);
         self::assertSame(400, $result['status']);
@@ -282,7 +282,7 @@ final class UserTest extends TestCase
         $this->useRealDb();
         $params = ['username' => 'new_user'];
 
-        $result = UserManager::addUserNew($params);
+        $result = User::addUser($params);
 
         self::assertIsArray($result);
         self::assertSame(400, $result['status']);
@@ -295,10 +295,10 @@ final class UserTest extends TestCase
         $params = ['username' => 'existing_user', 'password' => 'whatever'];
 
         // First add should succeed
-        UserManager::addUserNew($params);
+        User::addUser($params);
 
         // Second add should fail
-        $result = UserManager::addUserNew($params);
+        $result = User::addUser($params);
 
         self::assertIsArray($result);
         self::assertSame(500, $result['status']);
@@ -311,7 +311,7 @@ final class UserTest extends TestCase
         $username = 'new_user';
         $password = 'secret';
 
-        $result = UserManager::addUserNew(['username' => $username, 'password' => $password]);
+        $result = User::addUser(['username' => $username, 'password' => $password]);
 
         static::assertIsArray($result);
         static::assertSame(200, $result['status']);
@@ -325,12 +325,13 @@ final class UserTest extends TestCase
 
     public function testDeleteUserSuccess(): void
     {
+        $this->useRealDb();
         $username = 'temp_user';
 
         // Precondition: user must exist to delete successfully
-        UserManager::addUser(['username' => $username, 'password' => 'irrelevant']);
+        User::addUser(['username' => $username, 'password' => 'irrelevant']);
 
-        $result = UserManager::delete(['username' => $username]);
+        $result = User::delete(['username' => $username]);
 
         static::assertIsArray($result);
         static::assertSame(200, $result['status']);
@@ -339,19 +340,19 @@ final class UserTest extends TestCase
 
     public function testDeleteUserMissingUsername(): void
     {
-        $result = UserManager::delete([]); // No username key
+        $result = User::delete([]); // No username key
 
         static::assertIsArray($result);
-        static::assertSame(500, $result['status']);
+        static::assertSame(400, $result['status']);
         static::assertStringStartsWith('Error:', $result['data']);
     }
 
     public function testDeleteNonexistentUser(): void
     {
-        $result = UserManager::delete(['username' => 'ghost_user']);
+        $result = User::delete(['username' => 'ghost_user']);
 
         static::assertIsArray($result);
-        static::assertSame(500, $result['status']);
+        static::assertSame(404, $result['status']);
         static::assertStringStartsWith('Error:', $result['data']);
     }
 
@@ -371,7 +372,7 @@ final class UserTest extends TestCase
         );
 
         // Act
-        $result = UserManager::deleteNew(['username' => $username]);
+        $result = User::delete(['username' => $username]);
 
         // Assert
         static::assertSame(200, $result['status']);
@@ -384,14 +385,15 @@ final class UserTest extends TestCase
 
     public function testChangePasswordSuccess(): void
     {
+        $this->useRealDb();
         $username = 'charlie';
         $originalPassword = 'oldPass';
         $newPassword = 'newSecurePass';
 
         // Ensure user exists
-        UserManager::addUser(['username' => $username, 'password' => $originalPassword]);
+        User::addUser(['username' => $username, 'password' => $originalPassword]);
 
-        $result = UserManager::changePassword(['username' => $username, 'password' => $newPassword]);
+        $result = User::changePassword(['username' => $username, 'password' => $newPassword]);
 
         static::assertIsArray($result);
         static::assertSame(200, $result['status']);
@@ -400,38 +402,82 @@ final class UserTest extends TestCase
 
     public function testChangePasswordForNonexistentUser(): void
     {
-        $result = UserManager::changePassword(['username' => 'nonexistent', 'password' => 'whatever']);
+        $result = User::changePassword(['username' => 'nonexistent', 'password' => 'whatever']);
         static::assertIsArray($result);
-        static::assertSame(500, $result['status']);
+        static::assertSame(404, $result['status']);
         static::assertStringStartsWith('Error:', $result['data']);
     }
 
     public function testChangePasswordMissingUsername(): void
     {
-        $result = UserManager::changePassword(['password' => 'whatever']);
+        $result = User::changePassword(['password' => 'whatever']);
 
         static::assertIsArray($result);
-        static::assertSame(500, $result['status']);
+        static::assertSame(400, $result['status']);
         static::assertStringStartsWith('Error:', $result['data']);
     }
 
     public function testChangePasswordMissingPassword(): void
     {
-        $result = UserManager::changePassword(['username' => 'alice']);
+        $result = User::changePassword(['username' => 'alice']);
 
         static::assertIsArray($result);
-        static::assertSame(500, $result['status']);
+        static::assertSame(400, $result['status']);
+        static::assertStringStartsWith('Error:', $result['data']);
+    }
+
+    public function testChangePasswordUpdatesPasswordHash(): void
+    {
+        $this->useRealDb();
+        $username = 'change_pass';
+        $oldHash = password_hash('old_pass', PASSWORD_DEFAULT);
+        $newPassword = 'new_pass';
+
+        Db::sqlExec(
+            'INSERT INTO midmem_users (username, password_hash, access_level) VALUES (?, ?, ?)',
+            'ssi',
+            $username,
+            $oldHash,
+            UserAccess::USER->value
+        );
+
+        $result = User::changePassword([
+            'username' => $username,
+            'password' => $newPassword
+        ]);
+
+        static::assertSame(200, $result['status']);
+        static::assertSame('OK', $result['data']);
+
+        $newHash = Db::sqlGetItem(
+            'password_hash',
+            'SELECT password_hash FROM midmem_users WHERE username = ?',
+            's',
+            $username
+        );
+        static::assertTrue(password_verify($newPassword, $newHash));
+    }
+
+    public function testChangePasswordFailsForUnknownUser(): void
+    {
+        $result = User::changePassword([
+            'username' => 'nonexistent',
+            'password' => 'irrelevant'
+        ]);
+
+        static::assertSame(404, $result['status']);
         static::assertStringStartsWith('Error:', $result['data']);
     }
 
     public function testGetUsersIncludesAddedUser(): void
     {
+        $this->useRealDb();
         $username = 'dave';
         $password = 'hunter2';
 
-        UserManager::addUser(['username' => $username, 'password' => $password]);
+        User::addUser(['username' => $username, 'password' => $password]);
 
-        $result = UserManager::getUsers();
+        $result = User::getUsers();
 
         static::assertIsArray($result);
         static::assertSame(200, $result['status']);
@@ -443,12 +489,13 @@ final class UserTest extends TestCase
 
     public function testGetUsersIncludesCommentField(): void
     {
+        $this->useRealDb();
         $username = 'ellen';
         $password = 'abc123';
 
-        UserManager::addUser(['username' => $username, 'password' => $password]);
+        User::addUser(['username' => $username, 'password' => $password]);
 
-        $result = UserManager::getUsers();
+        $result = User::getUsers();
 
         static::assertIsArray($result);
         static::assertSame(200, $result['status']);
@@ -459,4 +506,39 @@ final class UserTest extends TestCase
         static::assertNotNull($user, 'User was not found in list');
         static::assertArrayHasKey('comment', $user);
     }
+
+    public function testGetUsersReturnsAllUsers(): void
+    {
+        $this->useRealDb();
+        Db::sqlExec(
+            'INSERT INTO `midmem_users` (`username`, `password_hash`, `access_level`, `is_disabled`)
+                VALUES (?, ?, ?, ?)',
+            'ssis',
+            'alice',
+            'hash',
+            UserAccess::USER->value,
+            0
+        );
+
+        Db::sqlExec(
+            'INSERT INTO `midmem_users` (`username`, `password_hash`, `access_level`, `is_disabled`)
+                VALUES (?, ?, ?, ?)',
+            'ssis',
+            'bob',
+            'hash',
+            UserAccess::ADMIN->value,
+            1 // disabled, should appear as such.
+        );
+
+        $result = User::getUsers();
+
+        static::assertSame(200, $result['status']);
+        $users = $result['data'];
+        static::assertCount(2, $users);
+        static::assertSame('alice', $users[0]['username']);
+        static::assertSame('', $users[0]['comment']);
+        static::assertSame('bob', $users[1]['username']);
+        static::assertSame('DISABLED', $users[1]['comment']);
+    }
+
 }
