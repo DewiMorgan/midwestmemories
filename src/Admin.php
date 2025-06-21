@@ -80,66 +80,22 @@ class Admin
     }
 
     /**
-     * Show the HTML page.
-     * ToDo: make this a template.
+     * Show the admin dashboard template.
      */
     private static function showAdminTemplate(): void
     {
-        echo "<!DOCTYPE html>\n"; // As an echo to prevent any leading whitespace.
-        ?>
-        <html lang="en">
-        <head>
-            <link rel="shortcut icon" href="/favicon.ico">
-            <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-            <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-            <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-            <link rel="icon" href="/favicon.ico">
-            <link rel="manifest" href="/site.webmanifest">
-            <title>Admin: Midwest Memories</title>
-            <meta charset="UTF-8">
-            <style>
-                #messages {
-                    max-height: calc(1em * 25); /* Adjust line height if needed */
-                    line-height: 1.2; /* Tighter line spacing */
-                    overflow-y: auto;
-                    font-family: monospace; /* Optional for consistent line height */
-                    white-space: pre-wrap;
-                }
-
-                #messages p {
-                    margin: 0; /* Remove default vertical spacing */
-                    padding: 0; /* Optional: remove padding if applied */
-                }
-            </style>
-        </head>
-        <body>
-        <h1>Midwest Memories -
-            <?php
-            $user = User::getInstance();
-            echo $user->isSuperAdmin ? 'SuperAdmin' : 'Admin';
-            echo ' (' . htmlspecialchars($user->username) . ')';
-            ?>
-        </h1>
-        <h2>Users</h2>
-        <div id="user-list"></div>
-        <hr>
-
-        <h2>Background Task Output</h2>
-        <div id="messages"></div>
-        <br>
-        <input type="checkbox" id="autoscroll" name="autoscroll" checked>
-        <label for="autoscroll">Auto scroll</label><br>
-        <hr>
-
-        <h2>Admin Actions</h2>
-        <button onclick="initializeCursor()">Initialize Cursor</button>
-        <br>
-        <?php
-        // ToDo: turn this into a script tag. Not yet, though, as including it avoids problems with script caching.
-        include(__DIR__ . '/AdminApiTemplate.php');
-        ?>
-        </body>
-        </html>
-        <?php
+        $user = User::getInstance();
+        
+        $templateVars = [
+            'pageTitle' => 'Admin: Midwest Memories',
+            'userRole' => $user->isSuperAdmin ? 'SuperAdmin' : 'Admin',
+            'username' => $user->username
+        ];
+        
+        // Extract variables for the template
+        extract($templateVars);
+        
+        // Include the template file
+        require __DIR__ . '/templates/admin-dashboard.php';
     }
 }
