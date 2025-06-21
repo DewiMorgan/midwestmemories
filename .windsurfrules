@@ -1,0 +1,62 @@
+# Coding Guidelines.
+
+- Backend: PHP version 8.1.
+- Front End: JavaScript, HTML, CSS.
+- Use TDD: write a failing test before creating new code.
+- File format: UTF-8, unix-style line endings (`\n`).
+
+## General code style (PHP and JS)
+
+- Use named private class methods, instead of inline anonymous functions.
+- No inline functions or closures.
+- Prefer named constants or enums over hardcoded strings or integers.
+- Strict typing and comparisons.
+
+## Object-Oriented Design
+
+- One class per file.
+- Avoid constructor injection for dependencies, as this causes dependency coupling.
+- Prefer singleton patterns over static methods or constructor injection, as this reduces dependency coupling.
+- Prefer immutability where feasible.
+
+## PHP code style
+
+- PSR-12 style, PSR-4 autoloading and namespacing.
+- Short array syntax: `[]` not `array()`.
+- All classes need `strict_types=1`.
+- All classes and functions/methods need a PHPDoc block.
+- Never suppress errors with `@`.
+- Don't add composer packages.
+
+## Useful, existing PHP classes
+
+- Inherit from the Singleton class for `getInstance()`, and for the `setInstance()` and `resetInstance()` test methods.
+- Use the static class mysqli wrapper for methods `Db::sqlExec()`, `Db::sqlGetValue()`, `Db::sqlGetRow()`,
+  `Db::sqlGetList()`, `Db::sqlGetTable()`.
+- Db:: methods take a string query, and an array of params: the first is the mysqli-style list of types for the others.
+- Store config values in /MidwestMemories.ini.
+- Read config values using the static class Conf::get(Key $key), storing keys in the Key enum.
+
+## JS code style.
+
+- Prefer OOP classes rather than functions.
+- Create classes like `window.Api = class {...}`
+- Start files with `/* jshint esversion: 6 */`
+- Prefer named methods or arrow functions assigned to class properties over nested anonymous callbacks.
+- Trivially short inline closures might be OK if there's no other way.
+
+## API Design
+
+- Use REST-ful conventions: noun-based URLs, appropriate HTTP verbs.
+- Always validate input data. Return proper HTTP status codes.
+- Return JSON in all API responses unless otherwise specified.
+- Successful JSON response format: `{'status' => 200, 'data' => 'OK'}` or `{'status' => 200, 'data' => {object data}}`.
+- Error JSON response format: `{'status' => {Http error code}, 'data' => 'Error: {string reason}'}`.
+
+## Testing
+
+- Unit tests: PHPUnit 10.5.46.
+- Use `static::assertSame` instead of `$this-assertSame` in unit tests.
+- Every new public method must have at least one unit test.
+- Use test doubles (mocks/stubs) only when isolating unit dependencies.
+- Place all test classes under `test/` with the same namespace and structure as `src/`.

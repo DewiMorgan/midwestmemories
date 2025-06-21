@@ -188,7 +188,7 @@ class DropboxManager extends Singleton
     /** Load the current cursor from the DB. */
     private function loadCursor(): void
     {
-        $this->cursor = Db::sqlGetItem(
+        $this->cursor = Db::sqlGetValue(
             'cursor_id',
             'SELECT `cursor_id` FROM `' . Db::TABLE_DROPBOX_USERS . '` LIMIT 1'
         );

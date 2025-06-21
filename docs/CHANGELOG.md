@@ -3,6 +3,22 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/06/20 Sat
+
+* Items moved over from README's "How it should work (Phase 1)" section:
+    * Initially, params. Later, mod-rewrite.
+    * path: path to folder. (later, search=search terms)
+    * In folders: index.txt file (or HTML?) contains default values.
+    * Display breadcrumb, album notes, and all images as thumbs in a fluid table. Likely need to generate thumbnails.
+    * Clicking individual images shows image details and the image.
+* Items moved over from README's "Planned Features" section:
+    * DONE: Get namespaces and autoloading working per PSR.
+    * DONE: Get testing working (again check PSR).
+    * DONE: Hierarchical nav with breadcrumbs.
+    * DONE: Copy from file structure.
+    * DONE: Mirror to/from dropbox.
+    * Access restrict.
+
 ## 2025/06/07 Sat
 
 * DONE: I broke file downloads from dropbox.
@@ -208,3 +224,5 @@ which might not be when they were actually implemented/committed.
 * FIXED: DropboxManager has some very poor naming. `dbm.iterations` and `dbm.extracted` need renaming.
 * FIXED: The main page doesn't load.
 * FIXED: Remove logging from autoloader.
+
+See also [CHANGELOG.md](CHANGELOG.md)

@@ -1,0 +1,96 @@
+# This "/" section describes the folder itself.
+[/]
+# Comments begin with a semicolon ';' or a hash '#'.
+# Key names are case-insensitive, and all punctuation is ignored: so "written notes", "WRITTEN_NOTES" and
+# "writtenNotes" are all treated as the same thing. But the only punctuation allowed is hyphens, dots and underscores.
+# No quotes, etc.
+
+# 'Display name' is whatever should appear under the thumbnail of this folder in the tree view and thumbnail view.
+# Defaults to the folder name.
+display name = "Dewi's second folder of images"
+# Lines don't HAVE to be quoted, but it helps: like, the above loses the apostrophe if it's unquoted.
+# The equals sign can have any amount of whitespace on either side: it's ignored unless quoted, and even then it's
+# stripped off the beginning and end, so this is treated as having NO leading spaces, not three, or lots.
+# Source: Where we got this album from.
+source = "   Facebook "
+# written notes: Whatever written notes were saved with this album.
+written notes = "This is my second folder of images, it has cool pictures that I saved off Facebook."
+# Dates ideally in the format "yyyy/mm/dd hh:mm:ss".  I'll try to be smart about parsing human-entered dates, but still.
+start date = 2019
+# If you leave a value empty or omit the value entirely, it'll be marked as unknown. This will show as "2019 to 20??"
+# To have it show a single date or time as the date for an album, put the same time for both start and end.
+end date = ""
+# Comma separated list of names that might have taken this pic.
+# Quotes within quoted strings must be escaped by backslashes.
+photographer = "Dewi \"Mr Awesome\" Morgan"
+# Quoted values can go over multiple lines.
+# Location: Where it was. As much of an address or geolocation as can be identified.
+# Future: replace with a geolocation map pin?
+location = "Dewi's house,
+Dewi's Street,
+Dewi's World"
+# People: a Comma-separated list of people names that are in ALL images.
+# If a value ends in "?", then it's marked as unsure.
+people = "Dewi Morgan?"
+# Comma-separated list of subjects we want people to be able to search by. Unlikely to be necessary.
+keywords = "Fine Art, Self Portrait"
+visitor notes =
+
+# Each image is listed with square braces around the filename.
+[test1.gif]
+display name = "The best pic, gif version"
+# Most fields can be edited and overridden by humans. We only show the latest version, but store an edit history.
+# ToDo: If someone edits a field that already has a value, ask if they want to update that value for other images
+#   in the folder, with thumbs and checkboxes to select/unselect.
+# Exact date, or a range of dates that it might be in, eg "2023/01/03 10:12:14 - 2023/02/01 12:34:56"
+date = "2023"
+# If you delete (or comment out) values, they'll inherit from the album.
+# If the album doesn't have that field, it inherits from the parent folder, but is marked as "unsure".
+# If there's nothing to inherit, it's marked as "unknown".
+#photographer=
+# This is explicitly setting it to "unknown". The string "unknown" would also work.
+location = "?"
+# An empty string is NOT the same as blank.
+# So this is explicitly overriding the album's default and saying there's nobody in this pic.
+people = ""
+# Comma-separated list of subjects we want people to be able to search by. Unlikely to be necessary.
+keywords = "Cross, Test"
+# Any written notes that were saved with this image. These are not editable by visitors.
+written notes = This is my favorite image. I am the best artist.
+visitor notes = "Oh no you are not - A.
+Haha you guys are funny - Mom."
+# For each of the above fields, we'll also store an automatic edit history of what it used to be, and who changed it.
+# You don't need to manually edit these, as they'll be set automatically when you upload, but you can if you want.
+# The latest value doesn't have a version number, but it matches to the latest version number's ".N.by" line.
+visitor notes.1.by = CarrieRoth@Web 2023/03/02 17:23
+visitor notes.0 = "Oh no you are not - A."
+visitor notes.0.by = Auora@DropBox 2023/03/01 12:34
+
+[test2.png]
+display name = "png version"
+date = "2023"
+location = "?"
+people = ""
+keywords = "Cross, Test"
+written notes = "I love this pic so much I made a png of it"
+
+[test3.jpg]
+date = "2023"
+location = "?"
+people = ""
+keywords = "Cross, Test"
+written notes = "I love this pic so much I made a jpg of it"
+
+[test4.txt]
+# I guess we COULD have other files that we let them view, like .txt files, etc. No good reason to at the moment,
+# so I haven't done it, and this file won't show up, but if we want to, we could make this happen.
+date = "2023"
+location = "?"
+people = ""
+keywords = "Cross, Test"
+written notes = "I love this pic so much I made a txt of it"
+
+[index.txt]
+# Files only show up if your index.txt file has an entry for them, for safety reasons.
+# Even if we decide to allow it to show text files, I think I'll special-case "index.txt" files to not display
+# even if we do something dumb like this, and have an [index.txt] section.

@@ -234,7 +234,7 @@ class Index
     {
         // Get the next sequence number for this file
         $sql = 'SELECT MAX(`sequence`) AS `seq` FROM `' . Db::TABLE_COMMENTS . '` WHERE `fk_file` = ?';
-        $currentSeq = Db::sqlGetItem('seq', $sql, 'i', $fileId);
+        $currentSeq = Db::sqlGetValue('seq', $sql, 'i', $fileId);
         $nextSeq = is_numeric($currentSeq) ? ((int)$currentSeq + 1) : 1;
 
         // Insert the new comment

@@ -306,7 +306,7 @@ class FileProcessor extends Singleton
      */
     private function listFirstFileByStatus(SyncStatus $status): string
     {
-        return Db::sqlGetItem(
+        return Db::sqlGetValue(
             'full_path',
             '
                 SELECT `full_path`

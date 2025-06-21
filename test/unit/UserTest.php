@@ -349,6 +349,7 @@ final class UserTest extends TestCase
 
     public function testDeleteNonexistentUser(): void
     {
+        $this->useRealDb();
         $result = User::delete(['username' => 'ghost_user']);
 
         static::assertIsArray($result);
@@ -402,6 +403,7 @@ final class UserTest extends TestCase
 
     public function testChangePasswordForNonexistentUser(): void
     {
+        $this->useRealDb();
         $result = User::changePassword(['username' => 'nonexistent', 'password' => 'whatever']);
         static::assertIsArray($result);
         static::assertSame(404, $result['status']);
@@ -449,7 +451,7 @@ final class UserTest extends TestCase
         static::assertSame(200, $result['status']);
         static::assertSame('OK', $result['data']);
 
-        $newHash = Db::sqlGetItem(
+        $newHash = Db::sqlGetValue(
             'password_hash',
             'SELECT password_hash FROM midmem_users WHERE username = ?',
             's',
@@ -460,6 +462,7 @@ final class UserTest extends TestCase
 
     public function testChangePasswordFailsForUnknownUser(): void
     {
+        $this->useRealDb();
         $result = User::changePassword([
             'username' => 'nonexistent',
             'password' => 'irrelevant'

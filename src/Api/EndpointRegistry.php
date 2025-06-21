@@ -98,6 +98,12 @@ class EndpointRegistry
                 'callback' => User::delete(...),
                 'responseType' => 'string', // Returns a string 'OK' or 'Error: ...'.
             ],
+            EndpointKey::POST_LOGIN => [
+                'auth' => 'none',
+                'params' => ['username' => ParamTypes::STRING, 'password' => ParamTypes::STRING],
+                'callback' => User::handleUserLogin(...),
+                'responseType' => 'string', // Returns a string 'OK' or 'Error: ...'.
+            ],
 
             // User-accessible comment endpoints with rate limiting
 //            EndpointKey::GET_COMMENT => [

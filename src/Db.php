@@ -77,9 +77,9 @@ class Db extends Singleton
      * @param int|string ...$items A string describing the types of all following values, then the values.
      * @return null|string The retrieved value, or null on error.
      */
-    public static function sqlGetItem(string $fieldName, string $sql, int|string ...$items): ?string
+    public static function sqlGetValue(string $fieldName, string $sql, int|string ...$items): ?string
     {
-        return self::getInstance()->runSqlGetItem($fieldName, $sql, ...$items);
+        return self::getInstance()->runSqlGetValue($fieldName, $sql, ...$items);
     }
 
     /**
@@ -89,7 +89,7 @@ class Db extends Singleton
      * @param int|string ...$items A string describing the types of all following values, then the values.
      * @return null|string The retrieved value, or null on error.
      */
-    public function runSqlGetItem(string $fieldName, string $sql, int|string ...$items): ?string
+    public function runSqlGetValue(string $fieldName, string $sql, int|string ...$items): ?string
     {
         Log::debug('Start...', [$sql, $items]);
         if (!($row = $this->getQueryResult(self::TYPE_ROW, $sql, ...$items))) {

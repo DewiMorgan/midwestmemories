@@ -108,7 +108,7 @@ use MidwestMemories\Enum\Key;
         $webPath = Index::$requestWebPath;
         $dropboxPath = Conf::get(Key::IMAGE_DIR) . $webPath;
         $sql = 'SELECT `id` FROM `' . Db::TABLE_FILE_QUEUE . '` WHERE `full_path` = ?';
-        return intval(Db::sqlGetItem('id', $sql, 's', $dropboxPath));
+        return intval(Db::sqlGetValue('id', $sql, 's', $dropboxPath));
     }
 
     ?>
