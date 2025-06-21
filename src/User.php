@@ -98,6 +98,22 @@ class User extends Singleton
     }
 
     /**
+     * Get a string representation of the user object, primarily for debugging.
+     * @return string Serialized user data.
+     */
+    public function __toString(): string
+    {
+        return var_export([
+            'userId' => $this->userId,
+            'username' => $this->username,
+            'isLoggedIn' => $this->isLoggedIn,
+            'isUser' => $this->isUser,
+            'isAdmin' => $this->isAdmin,
+            'isSuperAdmin' => $this->isSuperAdmin
+        ], true);
+    }
+
+    /**
      * Adds a new user to the users table.
      * Sets status 500 if the user already exists, or an error occurs.
      * @param array $params ['username' => {string}, 'password' => {string}]

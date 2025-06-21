@@ -28,18 +28,8 @@ class Connection extends Singleton
     public string $agent = '';
     /** @var string $usernameGuesses String containing best guesses at the current user's name. */
     public string $usernameGuesses = '';
-    /** @var string $username The displayname of the current user, if authenticated. */
-    public string $username = '';
-    /** @var int $userId The ID of the current user, if authenticated. */
-    public int $userId = 0;
     /** @var bool $isBot True if user looks like a known bot. */
     public bool $isBot = false;
-    /** @var bool $isUser True if the user is recognized as an authenticated user (including admins!). */
-    public bool $isUser = false;
-    /** @var bool $isAdmin True if the user is recognized as a registered admin. */
-    public bool $isAdmin = false;
-    /** @var bool $isSuperAdmin True if the user is recognized as me. */
-    public bool $isSuperAdmin = false;
 
     /**
      * Protected singleton constructor.
@@ -78,7 +68,7 @@ class Connection extends Singleton
             $this->agent = '?';
         }
 
-        // $user, $isAdmin and $isBot
+        // Bot detection
         if (str_contains($this->agent, 'facebookexternalhit')) {
             $this->usernameGuesses .= 'bot:facebook,';
             $this->isBot = true;
@@ -87,33 +77,19 @@ class Connection extends Singleton
             $this->usernameGuesses .= 'bot:discord,';
             $this->isBot = true;
         }
+
+        // Get user instance from the session.
+        $user = User::getInstance();
+
+        // Handle username guesses from various sources.
         if (!empty($_SERVER['REMOTE_USER'])) {
             $this->usernameGuesses .= 'remote:' . $_SERVER['REMOTE_USER'] . ',';
         }
-        $this->isAdmin = $_SESSION['isAdmin'] ?? false;
-        $this->isSuperAdmin = $_SESSION['isSuperAdmin'] ?? false;
         if (!empty($_SERVER['PHP_AUTH_USER'])) {
             $this->usernameGuesses .= 'auth:' . $_SERVER['PHP_AUTH_USER'] . ',';
-            $this->isUser = true;
-            $this->username = $_SERVER['PHP_AUTH_USER'];
-            $this->userId = 1; // ToDo: something better, once we're using DB users.
-            $_SESSION['isAdmin'] = false;
-            $_SESSION['isSuperAdmin'] = false;
-            if ('myself' === $_SERVER['PHP_AUTH_USER']) {
-                $this->isAdmin = true;
-                $this->isSuperAdmin = true;
-                // This means these permissions can't be revoked 'til the session's killed.
-                $_SESSION['isAdmin'] = true;
-                $_SESSION['isSuperAdmin'] = true;
-            }
-            if ('auora' === $_SERVER['PHP_AUTH_USER']) {
-                $this->isAdmin = true;
-                // This means isAdmin can't be revoked 'til the session's killed.
-                $_SESSION['isAdmin'] = true;
-            }
         }
-        if (!empty($_SESSION['name'])) {
-            $this->usernameGuesses .= 'sess:' . $_SESSION['name'] . ',';
+        if (!empty($user->username) && $user->isLoggedIn) {
+            $this->usernameGuesses .= 'user:' . $user->username . ',';
         }
         $this->usernameGuesses = preg_replace('/\s*/', '', $this->usernameGuesses); // strip all whitespace.
         $this->usernameGuesses = preg_replace('/,$/', '', $this->usernameGuesses); // trim trailing comma.
@@ -198,22 +174,24 @@ class Connection extends Singleton
         );
     }
 
-    /** Get a string describing the object. Mostly for debugging, not used by real code.
+    /**
+     * Get a string describing the object. Mostly for debugging, not used by real code.
      * @return string Serialized object data.
      * @noinspection PhpUnused
      */
     public function __toString(): string
     {
+        $user = User::getInstance();
+
         return var_export([
             'request' => $this->request,
             'date' => $this->date,
             'ip' => $this->ip,
             'ipList' => $this->ipList,
             'agent' => $this->agent,
-            'user' => $this->usernameGuesses,
+            'usernameGuesses' => $this->usernameGuesses,
             'isBot' => $this->isBot,
-            'isAdmin' => $this->isAdmin,
-            'isSuperAdmin' => $this->isSuperAdmin,
+            'user' => (string)$user
         ], true);
     }
 

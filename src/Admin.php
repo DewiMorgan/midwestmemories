@@ -12,26 +12,9 @@ class Admin
     public function __construct()
     {
         // Auth and session management. Must not output anything.
-        static::handleLogouts();
         static::initSession();
         static::dieIfNotAdmin();
         static::showAdminTemplate();
-    }
-
-    /**
-     * Handle logout requests.
-     */
-    private static function handleLogouts(): void
-    {
-        // Handle logouts.
-        if (array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' === $_SESSION['login']) {
-            header('HTTP/1.1 401 Unauthorized');
-            $_SESSION['login'] = 'false';
-            echo "<!DOCTYPE html>\n";
-            echo '<html lang="en"><head><title>Logout</title></head><body><h1>Logged out</h1><p><a href="'
-                . $_SERVER['PHP_SELF'] . '">Click here to log back in.</a></p></body></html>' . "\n";
-            exit(0);
-        }
     }
 
     /**
