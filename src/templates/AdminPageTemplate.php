@@ -123,7 +123,7 @@ declare(strict_types=1);
 <br>
 <?php
 // Include the admin API template
-include(__DIR__ . '/../AdminApiTemplate.php');
+include(__DIR__ . '/AdminApiTemplate.php');
 ?>
 </body>
 </html>

@@ -42,9 +42,10 @@ Subfolders:
 * /docs/schema.sql - SQL schema for the database.
 * /midwestmemories - Default thumbnails. Once deployed, all images will also be stored within here.
 * /src - All code (additional subfolders should be created to organize).
-* /src/Api - API endpoint code.
+* /src/Api - PHP API endpoint code.
 * /src/Enum - PHP Enum classes.
 * /src/JS - JS code.
+* /src/templates - PHP templates
 * /test - All tests. Javascript has no tests yet.
 * /test/unit - PHPUnit tests.
 * /test/e2e - End-to-end tests.
