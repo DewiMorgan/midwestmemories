@@ -92,7 +92,7 @@ class User extends Singleton
     {
         $this->populateUser([]);
         unset($_SESSION['userId']);
-        // We can also completely clobber the session, but that will break CSRF, etc, too.
+        // We can also completely clobber the session, but that will break things like CSRF, too.
         // $_SESSION = [];
         // session_destroy();
     }

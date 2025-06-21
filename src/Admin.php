@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use JetBrains\PhpStorm\NoReturn;
+use MidwestMemories\User;
+
 /**
  * The class for the main Admin page.
  */
@@ -23,12 +26,14 @@ class Admin
     private static function initSession(): void
     {
         $connection = Connection::getInstance();
+        $user = User::getInstance();
 
-        $_SESSION['login'] = 'true';
-        $_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
+        // Handle login form submission
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['username']) && !empty($_POST['password'])) {
+            $user->handleUserLogin();
+        }
 
-        // Log this login. No error handling if we fail.
-        // ToDo: this is very low level, and duplicated code. Should probably be wrapped in a connectionLogger.
+        // Log this access. No error handling if we fail.
         Db::sqlExec(
             'INSERT INTO `' . Db::TABLE_VISITORS . '` (`request`, `main_ip`, `all_ips_string`, `user`, `agent`)'
             . ' VALUES (?, ?, ?, ?, ?)',
@@ -36,7 +41,7 @@ class Admin
             $connection->request,
             $connection->ip,
             $connection->ipList,
-            $connection->usernameGuesses,
+            $user->isLoggedIn ? $user->username : 'guest',
             $connection->agent
         );
     }
@@ -46,11 +51,32 @@ class Admin
      */
     private static function dieIfNotAdmin(): void
     {
-        $connection = Connection::getInstance();
+        $user = User::getInstance();
 
-        if (!$connection->isAdmin) {
-            die('Access denied');
+        if (!$user->isAdmin && !$user->isSuperAdmin) {
+            if (!$user->isLoggedIn) {
+                self::showLoginForm();
+            } else {
+                http_response_code(403);
+                die('Access denied: Insufficient privileges');
+            }
         }
+    }
+
+    /**
+     * Display the login form template.
+     * @param string|null $error Optional error message to display
+     */
+    #[NoReturn] private static function showLoginForm(?string $error = null): void
+    {
+        // Set error message if login was attempted and failed
+        if (isset($_POST['username']) && $error === null) {
+            $error = 'Invalid username or password';
+        }
+
+        // Include the template file
+        require __DIR__ . '/templates/login-form.php';
+        exit();
     }
 
     /**
@@ -88,8 +114,11 @@ class Admin
         </head>
         <body>
         <h1>Midwest Memories -
-            <?= Connection::getInstance()->isSuperAdmin ? 'SuperAdmin' : 'Admin'; ?>
-            (<?= $_SESSION['name'] ?>)
+            <?php
+            $user = User::getInstance();
+            echo $user->isSuperAdmin ? 'SuperAdmin' : 'Admin';
+            echo ' (' . htmlspecialchars($user->username) . ')';
+            ?>
         </h1>
         <h2>Users</h2>
         <div id="user-list"></div>
