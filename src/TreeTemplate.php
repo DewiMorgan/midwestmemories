@@ -8,7 +8,7 @@ namespace MidwestMemories;
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title><?php Index::getSiteName(); ?> - Folder Tree</title>
+    <title><?php IndexGateway::getSiteName(); ?> - Folder Tree</title>
     <!--suppress CssUnusedSymbol -->
     <style>
         img.file {
@@ -125,7 +125,7 @@ $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
         // This is the treeview component.
         echo '<ul>';
         echo "<li class='folder'><a href='/?i=1' class='path-link'>Home</a></li>";
-        scanDirectory($root, Index::$requestUnixPath);
+        scanDirectory($root, IndexGateway::$requestUnixPath);
         echo '</ul>';
 
         /**

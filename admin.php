@@ -14,5 +14,5 @@ session_start();
 
 require_once(__DIR__ . '/src/autoload.php');
 
-new Admin();
+new AdminGateway();
 exit(0);

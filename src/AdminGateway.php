@@ -9,14 +9,35 @@ use JetBrains\PhpStorm\NoReturn;
 /**
  * The class for the main Admin page.
  */
-class Admin
+class AdminGateway
 {
     public function __construct()
     {
+        // Handle logout if requested
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logout') {
+            $this->handleLogout();
+        }
+
         // Auth and session management. Must not output anything.
         static::initSession();
         static::dieIfNotAdmin();
         static::showAdminTemplate();
+    }
+
+    /**
+     * Handle user logout.
+     */
+    #[NoReturn] private function handleLogout(): void
+    {
+        $user = User::getInstance();
+        $user->handleUserLogout();
+
+        // Clear session data
+        $_SESSION = [];
+
+        // Redirect to admin page to show login form
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit;
     }
 
     /**
@@ -64,17 +85,11 @@ class Admin
 
     /**
      * Display the login form template.
-     * @param string|null $error Optional error message to display
      */
-    #[NoReturn] private static function showLoginForm(?string $error = null): void
+    #[NoReturn] private static function showLoginForm(): void
     {
-        // Set error message if login was attempted and failed
-        if (isset($_POST['username']) && $error === null) {
-            $error = 'Invalid username or password';
-        }
-
         // Include the template file
-        require __DIR__ . '/templates/login-form.php';
+        require __DIR__ . '/templates/AdminLoginTemplate.php';
         exit();
     }
 
@@ -95,6 +110,6 @@ class Admin
         extract($templateVars);
 
         // Include the template file
-        require __DIR__ . '/templates/admin-dashboard.php';
+        require __DIR__ . '/templates/AdminPageTemplate.php';
     }
 }

@@ -106,12 +106,12 @@ use MidwestMemories\Enum\Key;
     <div class="thumb-pad" id="rounded">
         <div class="spacer">&nbsp;</div>
         <?php
-        $items = scandir(Index::$requestUnixPath);
+        $items = scandir(IndexGateway::$requestUnixPath);
 
         $dirs = [];
         $files = [];
         foreach ($items as $item) {
-            $itemPath = Index::$requestUnixPath . '/' . $item;
+            $itemPath = IndexGateway::$requestUnixPath . '/' . $item;
             if (is_dir($itemPath)) {
                 if (Path::canListDirname($itemPath)) {
                     $dirs[] = $item;
@@ -132,7 +132,7 @@ use MidwestMemories\Enum\Key;
         // Output
         $fileNum = 0;
         foreach (array_merge($dirs, $files) as $item) {
-            $itemPath = Index::$requestUnixPath . '/' . $item;
+            $itemPath = IndexGateway::$requestUnixPath . '/' . $item;
 
             // Skip files without a matching thumbnail file: they have not been fully processed.
             if (is_file($itemPath)) {

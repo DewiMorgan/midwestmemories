@@ -100,7 +100,8 @@ declare(strict_types=1);
     <h1>Midwest Memories - <?= htmlspecialchars($userRole) ?></h1>
     <div class="user-info">
         Logged in as: <?= htmlspecialchars($username) ?>
-        <form action="/logout" method="post" style="display: inline;">
+        <form method="post" style="display: inline;">
+            <input type="hidden" name="action" value="logout">
             <button type="submit" style="margin-left: 10px;">Logout</button>
         </form>
     </div>

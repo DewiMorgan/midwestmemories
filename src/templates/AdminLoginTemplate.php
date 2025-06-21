@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 /**
  * Template for the admin login form.
- *
- * @var string|null $error Error message to display if login failed
+ * Shows an error message if a login was attempted and failed.
  */
 ?>
 <!DOCTYPE html>
@@ -73,8 +72,8 @@ declare(strict_types=1);
 <body>
     <div class="login-form">
         <h2>Admin Login</h2>
-        <?php if (!empty($error)): ?>
-            <div class="error"><?= htmlspecialchars($error) ?></div>
+        <?php if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['username'])): ?>
+            <div class="error">Invalid username or password</div>
         <?php endif; ?>
         <form method="post" action="">
             <div class="form-group">

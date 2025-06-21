@@ -9,7 +9,7 @@ use JsonException;
 /**
  * The class for the main index.php file.
  */
-class Index
+class IndexGateway
 {
     // Full user-requested path relative to hdd /. If set, exists in Path::$imageBasePath. No trailing slash on folders.
     public static string $requestUnixPath;

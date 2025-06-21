@@ -19,7 +19,7 @@ class RawTemplate
      */
     public static function showFile(): void
     {
-        $itemPath = Index::$requestUnixPath;
+        $itemPath = IndexGateway::$requestUnixPath;
 
         $mimeType = mime_content_type($itemPath);
 

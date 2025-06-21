@@ -70,7 +70,7 @@ class Metadata
 
         if (false === $iniFileData) {
             Log::error('loadFolderIni failed to parse ini file', $webPath);
-            Index::showError('Failed to parse ini file for this folder.');
+            IndexGateway::showError('Failed to parse ini file for this folder.');
             die(1);
         }
 

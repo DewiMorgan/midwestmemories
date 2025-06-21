@@ -10,4 +10,4 @@ session_start();
 
 require_once(__DIR__ . '/src/autoload.php');
 
-new Index();
+new IndexGateway();

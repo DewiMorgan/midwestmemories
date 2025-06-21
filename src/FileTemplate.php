@@ -23,8 +23,8 @@ use MidwestMemories\Enum\Key;
     // ToDo: Add form input fields.
     // ToDo: Add next/prev buttons.
 
-    $u_linkUrl = Path::unixPathToUrl(Index::$requestUnixPath, Path::LINK_RAW);
-    $fileDetails = Metadata::getFileDataByUnixPath(Index::$requestUnixPath);
+    $u_linkUrl = Path::unixPathToUrl(IndexGateway::$requestUnixPath, Path::LINK_RAW);
+    $fileDetails = Metadata::getFileDataByUnixPath(IndexGateway::$requestUnixPath);
     Log::debug('File data found', $fileDetails);
 
     // Escape the details array.
@@ -105,7 +105,7 @@ use MidwestMemories\Enum\Key;
      */
     function getFileId(): int
     {
-        $webPath = Index::$requestWebPath;
+        $webPath = IndexGateway::$requestWebPath;
         $dropboxPath = Conf::get(Key::IMAGE_DIR) . $webPath;
         $sql = 'SELECT `id` FROM `' . Db::TABLE_FILE_QUEUE . '` WHERE `full_path` = ?';
         return intval(Db::sqlGetValue('id', $sql, 's', $dropboxPath));
