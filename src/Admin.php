@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MidwestMemories;
 
 use JetBrains\PhpStorm\NoReturn;
-use MidwestMemories\User;
 
 /**
  * The class for the main Admin page.
@@ -85,16 +84,16 @@ class Admin
     private static function showAdminTemplate(): void
     {
         $user = User::getInstance();
-        
+
         $templateVars = [
             'pageTitle' => 'Admin: Midwest Memories',
             'userRole' => $user->isSuperAdmin ? 'SuperAdmin' : 'Admin',
             'username' => $user->username
         ];
-        
+
         // Extract variables for the template
         extract($templateVars);
-        
+
         // Include the template file
         require __DIR__ . '/templates/admin-dashboard.php';
     }

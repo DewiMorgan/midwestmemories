@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Template for the admin login form.
- * Variables available in this template:
- * - string $error (optional): Error message to display if login failed
+ *
+ * @var string|null $error Error message to display if login failed
  */
 ?>
 <!DOCTYPE html>
