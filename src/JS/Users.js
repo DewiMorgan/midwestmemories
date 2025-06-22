@@ -6,21 +6,21 @@ window.Users = class {
      * @returns {Promise<void>}
      */
     static async listUsers() {
-        logMessage(`Getting list of users...`);
+        Log.message(`Getting list of users...`);
         try {
             const users = await Api.fetchApiData('/api/v1.0/user', 'GET', 'array');
             const numUsers = users.length;
 
             if (0 === numUsers) {
-                logMessage(`= Got zero users! There should probably be more.`);
+                Log.message(`= Got zero users! There should probably be more.`);
             } else {
-                logMessage(`= Got ${numUsers} users!`);
+                Log.message(`= Got ${numUsers} users!`);
             }
             console.log('Users:', users);
 
             UserTable.populateUserTable(users);
         } catch (err) {
-            logMessage(`= Listing users failed: ${err.message}`);
+            Log.message(`= Listing users failed: ${err.message}`);
         }
     }
 
@@ -101,14 +101,14 @@ window.Users = class {
             const parts = endpoint.split('/');
             user = parts[parts.length - 1];
         }
-        logMessage(`Calling ${readableAction} for user "${user}"...`);
+        Log.message(`Calling ${readableAction} for user "${user}"...`);
 
         try {
             await Api.fetchApiData(endpoint, httpMethod, 'string', {username: user, password});
-            logMessage(`= ${readableAction} succeeded for "${user}".`);
+            Log.message(`= ${readableAction} succeeded for "${user}".`);
             return true;
         } catch (error) {
-            logMessage(`= ${readableAction} failed for "${user}": ${error}`);
+            Log.message(`= ${readableAction} failed for "${user}": ${error}`);
             return false;
         }
     }

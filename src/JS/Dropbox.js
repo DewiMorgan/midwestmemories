@@ -5,7 +5,7 @@ window.Dropbox = class {
      * @returns {Promise<void>}
      */
     static async handleDropboxPolling() {
-        logMessage(`Asking Dropbox to get the next page of files...`);
+        Log.message(`Asking Dropbox to get the next page of files...`);
         try {
             while (true) {
                 /**
@@ -20,14 +20,14 @@ window.Dropbox = class {
                 data.numTotalFiles ??= 0;
 
                 if (true === data.moreFilesToGo) {
-                    logMessage(`= Got ${data.numAddedFiles} new files of ${data.numTotalFiles} total, more to come...`);
+                    Log.message(`= Got ${data.numAddedFiles} new files of ${data.numTotalFiles} total, more coming...`);
                 } else {
-                    logMessage(`= Got ${data.numAddedFiles} new files of ${data.numTotalFiles} total, finished!`);
+                    Log.message(`= Got ${data.numAddedFiles} new files of ${data.numTotalFiles} total, finished!`);
                     return;
                 }
             }
         } catch (err) {
-            logMessage(`= Listing new files failed: ${err.message}`);
+            Log.message(`= Listing new files failed: ${err.message}`);
         }
     }
 
@@ -38,32 +38,32 @@ window.Dropbox = class {
      * @returns {Promise<void>}
      */
     static async handleFileTask(actionName, endpoint) {
-        logMessage(`Getting list of files for ${actionName}...`);
+        Log.message(`Getting list of files for ${actionName}...`);
         try {
             const files = await Api.fetchApiData(endpoint, 'GET', 'array');
             const numFiles = files.length;
             if (0 === numFiles) {
-                logMessage(`= Got zero files for ${actionName}.`);
+                Log.message(`= Got zero files for ${actionName}.`);
             }
             for (const [index, filename] of files.entries()) {
-                logMessage(`= ${index + 1}/${numFiles} ${actionName} ${filename}...`);
+                Log.message(`= ${index + 1}/${numFiles} ${actionName} ${filename}...`);
                 await Api.fetchApiData(endpoint, 'POST', 'object');
             }
-            logMessage(`= ${actionName} complete!`);
+            Log.message(`= ${actionName} complete!`);
         } catch (err) {
-            logMessage(`= ${actionName} failed: ${err.message}`);
+            Log.message(`= ${actionName} failed: ${err.message}`);
         }
     }
 
     initializeCursor() {
         // Get the initial page of files, resetting the cursor.
-        logMessage('Reinitializing Dropbox list...');
+        Log.message('Reinitializing Dropbox list...');
         try {
             // noinspection VoidExpressionJS
             void Api.fetchApiData('/api/v1.0/cursor', 'POST', 'object');
-            logMessage(`= Reinitializing Dropbox list succeeded.`);
+            Log.message(`= Reinitializing Dropbox list succeeded.`);
         } catch (err) {
-            logMessage(`= Reinitializing Dropbox list failed: ${err.message}`);
+            Log.message(`= Reinitializing Dropbox list failed: ${err.message}`);
         }
 
         // Get all remaining pages and process them.
