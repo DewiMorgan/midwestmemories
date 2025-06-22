@@ -8,6 +8,10 @@ declare(strict_types=1);
  * @var string $userRole The role of the current user (Admin/SuperAdmin)
  * @var string $username The current user's username
  */
+
+use MidwestMemories\Conf;
+use MidwestMemories\Enum\Key;
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -94,6 +98,7 @@ declare(strict_types=1);
             color: #6c757d;
         }
     </style>
+    <script src="/<?php echo Conf::get(Key::IMAGE_DIR); ?>/admin.js?i=2"></script>
 </head>
 <body>
 <div class="header">
@@ -121,8 +126,5 @@ declare(strict_types=1);
 <h2>Admin Actions</h2>
 <button onclick="initializeCursor()">Initialize Cursor</button>
 <br>
-<script>
-
-</script>
 </body>
 </html>

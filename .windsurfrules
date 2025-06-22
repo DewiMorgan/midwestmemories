@@ -5,19 +5,20 @@
 - Use TDD: write a failing test before creating new code.
 - File format: UTF-8, unix-style line endings (`\n`).
 
-## General code style (PHP and JS)
-
-- Use named private class methods, instead of inline anonymous functions.
-- No inline functions or closures.
-- Prefer named constants or enums over hardcoded strings or integers.
-- Strict typing and comparisons.
-
 ## Object-Oriented Design
 
 - One class per file.
 - Avoid constructor injection for dependencies, as this causes dependency coupling.
 - Prefer singleton patterns over static methods or constructor injection, as this reduces dependency coupling.
 - Prefer immutability where feasible.
+
+## General code style (PHP and JS)
+
+- Use named private class methods, instead of inline anonymous functions.
+- No inline functions or closures.
+- Prefer named constants or enums over hardcoded strings or integers.
+- Strict typing and comparisons.
+- Comments end in a period.
 
 ## PHP code style
 
