@@ -121,9 +121,24 @@ declare(strict_types=1);
 <h2>Admin Actions</h2>
 <button onclick="initializeCursor()">Initialize Cursor</button>
 <br>
-<?php
-// Include the admin API template
-include(__DIR__ . '/AdminApiTemplate.php');
-?>
+<script>
+    /**
+     * Call whichever task the template has been asked for.
+     */
+    function runRelevantTasks() {
+        // noinspection VoidExpressionJS
+        void new UserTable();
+        const userListDiv = document.getElementById('user-list');
+        userListDiv.appendChild(UserTable.table);
+
+        // Populate the user list.
+        Users.listUsers();
+
+        // Do any pending Dropbox activities.
+        Dropbox.runAllUpdates();
+    }
+
+    runRelevantTasks();
+</script>
 </body>
 </html>

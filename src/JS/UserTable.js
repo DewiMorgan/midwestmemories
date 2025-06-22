@@ -1,5 +1,11 @@
 /* jshint esversion: 6 */
 window.UserTable = class {
+    static iconAddNew = '➕';
+    static iconCancel = '❌';
+    static iconDelete = '🗑️';
+    static iconEdit = '✏️';
+    static iconSave = '💾';
+
     /** @type {HTMLTableElement} */
     static table;
 
@@ -123,7 +129,7 @@ window.UserTable = class {
         /** @type {HTMLTableRowElement} */
         const row = document.createElement('tr');
 
-        const deleteBtn = HtmlUtils.createButton(iconDelete, 'delete-button', Users.disableUser, row);
+        const deleteBtn = HtmlUtils.createButton(UserTable.iconDelete, 'delete-button', Users.disableUser, row);
         const deleteCell = HtmlUtils.createTd(deleteBtn);
 
         const usernameSpan = HtmlUtils.createTextSpan('username-text', username);
@@ -169,13 +175,19 @@ window.UserTable = class {
     #createActionButtons(row, isCreating) {
         let saveButton;
         if (isCreating) {
-            saveButton = HtmlUtils.createButton(iconSave, 'save-button', Users.changePassword, row, true);
+            saveButton = HtmlUtils.createButton(UserTable.iconSave, 'save-button', Users.changePassword, row, true);
         } else {
-            saveButton = HtmlUtils.createButton(iconSave, 'save-button', Users.addUser, row, true);
+            saveButton = HtmlUtils.createButton(UserTable.iconSave, 'save-button', Users.addUser, row, true);
         }
         const actionCell = document.createElement('td');
-        const editButton = HtmlUtils.createButton(iconEdit, 'edit-button', UserTable.toggleEditMode, row);
-        const cancelButton = HtmlUtils.createButton(iconCancel, 'cancel-button', UserTable.toggleEditMode, row, true);
+        const editButton = HtmlUtils.createButton(UserTable.iconEdit, 'edit-button', UserTable.toggleEditMode, row);
+        const cancelButton = HtmlUtils.createButton(
+            UserTable.iconCancel,
+            'cancel-button',
+            UserTable.toggleEditMode,
+            row,
+            true
+        );
         actionCell.append(editButton, saveButton, cancelButton);
         return actionCell;
     }

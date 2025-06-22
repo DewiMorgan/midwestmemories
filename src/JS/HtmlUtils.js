@@ -1,5 +1,7 @@
 /* jshint esversion: 6 */
 window.HtmlUtils = class {
+    static disabledOpacity = '0.5';
+
     /**
      * Enable or disable a button element.
      * @param {HTMLButtonElement|null} buttonElement
@@ -11,7 +13,7 @@ window.HtmlUtils = class {
                 /** @type {{ disabled: boolean }} */ (buttonElement).disabled = !isEnabled;
             }
 
-            buttonElement.style.opacity = isEnabled ? '' : disabledOpacity;
+            buttonElement.style.opacity = isEnabled ? '' : this.disabledOpacity;
             buttonElement.style.cursor = isEnabled ? '' : 'default';
         }
     }
