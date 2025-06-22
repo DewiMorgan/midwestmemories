@@ -199,7 +199,7 @@ final class UserTest extends TestCase
         $_POST['password'] = 'correct-password';
 
         $user = User::getInstance();
-        $user->handleUserLogin();
+        User::handleUserLogin();
 
         self::assertTrue($user->isLoggedIn);
         self::assertEquals(1, $user->userId);
@@ -214,7 +214,7 @@ final class UserTest extends TestCase
         $_POST['password'] = 'wrong-password';
 
         $user = User::getInstance();
-        $user->handleUserLogin();
+        User::handleUserLogin();
 
         self::assertFalse($user->isLoggedIn);
         self::assertArrayNotHasKey('userId', $_SESSION);
@@ -227,7 +227,7 @@ final class UserTest extends TestCase
         $_POST['password'] = 'anything';
 
         $user = User::getInstance();
-        $user->handleUserLogin();
+        User::handleUserLogin();
 
         self::assertFalse($user->isLoggedIn);
         self::assertArrayNotHasKey('userId', $_SESSION);
@@ -240,13 +240,13 @@ final class UserTest extends TestCase
         $_POST['username'] = 'alice';
         $_POST['password'] = 'correct-password';
         $user = User::getInstance();
-        $user->handleUserLogin();
+        User::handleUserLogin();
 
         self::assertTrue($user->isLoggedIn);
         self::assertArrayHasKey('userId', $_SESSION);
 
         // Now log out
-        $user->handleUserLogout();
+        User::handleUserLogout();
 
         self::assertFalse($user->isLoggedIn);
         self::assertArrayNotHasKey('userId', $_SESSION);

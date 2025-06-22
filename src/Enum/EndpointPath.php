@@ -14,4 +14,5 @@ enum EndpointPath: string
     case PROCESS = 'process';
     case USER = 'user';
     case COMMENT = 'comment';
+    case LOGIN = 'login';
 }

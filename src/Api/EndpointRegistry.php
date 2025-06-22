@@ -28,9 +28,18 @@ class EndpointRegistry
      */
     public static function get(string $method, string $path): ?array
     {
-        $method = HttpMethod::from($method);
-        $path = EndpointPath::from(trim($path, '/'));
-        $key = EndpointKey::from(strtoupper($method->value) . '#' . $path->value);
+        try {
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "== $method\n", FILE_APPEND); // DELETEME DEBUG
+            $method = HttpMethod::from($method);
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "== $method->value $path\n", FILE_APPEND); // DELETEME DEBUG
+            $path = EndpointPath::from(trim($path, '/'));
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "== $method->value $path->value\n", FILE_APPEND); // DELETEME DEBUG
+            $key = EndpointKey::from(strtoupper($method->value) . '#' . $path->value);
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "== $method->value $path->value $key->value\n", FILE_APPEND); // DELETEME DEBUG
+        } catch (ValueError $e) {
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
+            return null;
+        }
 
         // Endpoint definitions keyed by ApiEndpoint enum.
         // Each value includes auth level, parameters, and the callback.
@@ -102,7 +111,7 @@ class EndpointRegistry
                 'auth' => 'none',
                 'params' => ['username' => ParamTypes::STRING, 'password' => ParamTypes::STRING],
                 'callback' => User::handleUserLogin(...),
-                'responseType' => 'string', // Returns a string 'OK' or 'Error: ...'.
+                'responseType' => 'object', // Returns a string 'OK' or 'Error: ...'.
             ],
 
             // User-accessible comment endpoints with rate limiting

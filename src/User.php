@@ -31,7 +31,7 @@ class User extends Singleton
     {
         // Check if userId present in session and valid
         if (!isset($_SESSION['userId']) || !is_int($_SESSION['userId']) || $_SESSION['userId'] <= 0) {
-            $this->handleUserLogout();
+            self::handleUserLogout();
             return; // no valid userId, so remain logged out
         }
 
@@ -44,15 +44,17 @@ class User extends Singleton
     }
 
     /**
+     * API callback.
      * Attempt to authenticate the user using POST data.
+     * @return array
      */
-    public function handleUserLogin(): void
+    public static function handleUserLogin(): array
     {
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
         // Validate input.
         if (empty($_POST['username']) || empty($_POST['password'])) {
             // Missing credentials.
-            $this->handleUserLogout();
-            return;
+            return self::handleUserLogout();
         }
 
         $username = trim($_POST['username']);
@@ -62,9 +64,13 @@ class User extends Singleton
         $user = Db::sqlGetRow($sql, 's', $username);
 
         if ($user && password_verify($password, $user['password_hash'] ?? '')) {
-            $this->populateUser($user);
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
+            $instance = self::getInstance();
+            $instance->populateUser($user);
+            return ['status' => 200, 'data' => 'OK'];
         } else {
-            $this->handleUserLogout();
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
+            return self::handleUserLogout();
         }
     }
 
@@ -80,7 +86,7 @@ class User extends Singleton
         $this->isAdmin = $accessLevel >= UserAccess::ADMIN->value;
         $this->isSuperAdmin = $accessLevel >= UserAccess::SUPER_ADMIN->value;
         // Users with no access level can't log in.
-        $this->isLoggedIn = $this->userId > 0 && $this->isUser;
+        $this->isLoggedIn = ($this->userId > 0) && $this->isUser;
         // Set session user (or zero it, if login failed).
         $_SESSION['userId'] = $this->userId;
     }
@@ -88,13 +94,15 @@ class User extends Singleton
     /**
      * Handle a request from the user to log them out.
      */
-    public function handleUserLogout(): void
+    public static function handleUserLogout(): array
     {
-        $this->populateUser([]);
+        $instance = self::getInstance();
+        $instance->populateUser([]);
         unset($_SESSION['userId']);
         // We can also completely clobber the session, but that will break things like CSRF, too.
         // $_SESSION = [];
         // session_destroy();
+        return ['status' => 403, 'data' => 'Error: access denied'];
     }
 
     /**

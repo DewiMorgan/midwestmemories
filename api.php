@@ -10,7 +10,7 @@ use MidwestMemories\Api\Api;
  * All JSON APIs go through this endpoint.
  */
 
-date_default_timezone_set('US/Central');
+date_default_timezone_set('America/Chicago');
 
 session_start();
 header('Content-Type: application/json');

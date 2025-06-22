@@ -9,7 +9,7 @@ class ApiTestHelper
     private static string $host = '127.0.0.1';
     private static int $port = 8081;
     private static string $docRoot = __DIR__ . '/..';
-    private static string $entryFile = 'test-server.php';
+    private static string $entryFile = 'test/test-server.php';
     private static mixed $process = null;
     private static string $cookieJar;
 
@@ -25,7 +25,7 @@ class ApiTestHelper
         self::$cookieJar = tempnam(sys_get_temp_dir(), 'cookie');
 
         $cmd = sprintf(
-            'php -S %s:%d -t %s %s > /dev/null 2>&1 & echo $!',
+            'php -S %s:%d -t %s %s > /var/log/php_api_server.log 2>&1 & echo $!',
             self::$host,
             self::$port,
             escapeshellarg(self::$docRoot),
@@ -101,6 +101,6 @@ class ApiTestHelper
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        return ['status' => $httpCode, 'body' => $body];
+        return ['status' => $httpCode, 'data' => $body];
     }
 }

@@ -29,8 +29,7 @@ class AdminGateway
      */
     #[NoReturn] private function handleLogout(): void
     {
-        $user = User::getInstance();
-        $user->handleUserLogout();
+        User::handleUserLogout();
 
         // Clear session data
         $_SESSION = [];
@@ -46,14 +45,14 @@ class AdminGateway
     private static function initSession(): void
     {
         $connection = Connection::getInstance();
-        $user = User::getInstance();
 
         // Handle login form submission
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['username']) && !empty($_POST['password'])) {
-            $user->handleUserLogin();
+            User::handleUserLogin();
         }
 
         // Log this access. No error handling if we fail.
+        $user = User::getInstance();
         Db::sqlExec(
             'INSERT INTO `' . Db::TABLE_VISITORS . '` (`request`, `main_ip`, `all_ips_string`, `user`, `agent`)'
             . ' VALUES (?, ?, ?, ?, ?)',

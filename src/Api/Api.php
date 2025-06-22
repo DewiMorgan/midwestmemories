@@ -12,6 +12,7 @@ use MidwestMemories\Connection;
 use MidwestMemories\Db;
 use MidwestMemories\Enum\ParamTypes;
 use MidwestMemories\Log;
+use MidwestMemories\User;
 use ValueError;
 
 /**
@@ -36,12 +37,13 @@ class Api
         $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $baseUri = dirname($_SERVER['SCRIPT_NAME']);
         // $this->path = '/' . trim(str_replace($baseUri, '', $requestUri), '/');
-        $this->apiVersion = $_GET['apiversion'];
+        // API version gets put into the GET params by .htaccess mod_rewrite.
+        $this->apiVersion = $_GET['apiversion'] ?? 'v0.0';
         if ('v1.0' !== $this->apiVersion) {
             Log::error('Unsupported API version', $this->apiVersion);
             $this->jsonResponse(400, ['error' => "Unsupported API version: $this->apiVersion"]);
         }
-        $this->path = $_GET['path'];
+        $this->path = $_GET['path'] ?? '';
         $parts = preg_split('#/+#', $this->path, 2, PREG_SPLIT_NO_EMPTY);
         $this->path = $parts[0] ?? '';
         $this->pathParams = $parts[1] ?? '';
@@ -57,11 +59,16 @@ class Api
      */
     public function handleApiCall(): void
     {
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
         try {
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             $endpointDef = $this->getEndpointDefinition();
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . var_export($endpointDef, true) . "\n", FILE_APPEND); // DELETEME DEBUG
 
             $this->authorize($endpointDef);
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             $this->rateLimit($endpointDef);
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
 
             // Get our parameters from every possible source. Later sources overwrite earlier ones.
             Log::debug('Getting GET params', $_GET);// DELETEME DEBUG
@@ -70,8 +77,10 @@ class Api
                 $_GET,
                 $this->getJsonParams()
             );
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             Log::debug('Merged params', $params);// DELETEME DEBUG
             $this->validateRequiredParams($endpointDef, $params);
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
 
             /** @var Callable $callback */
             $callback = $endpointDef['callback'];
@@ -80,8 +89,10 @@ class Api
             $result = call_user_func($callback, $params);
             Log::debug('Result', $result);
 
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             $this->jsonResponse($result['status'] ?? 200, ['data' => $result['data'] ?? null]);
         } catch (Exception $e) {
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             Log::error("API Exception: {$e->getMessage()}");
             $this->jsonResponse(500, ['error' => 'Server error: ' . $e->getMessage()]);
         }
@@ -94,8 +105,10 @@ class Api
     private function getEndpointDefinition(): array
     {
         try {
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             return EndpointRegistry::get($this->method, $this->path);
         } catch (ValueError) {
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             Log::warn("No match for $this->method $this->path");
             Log::debug('Request', $_REQUEST);
             Log::debug('Get', $_GET);
@@ -115,13 +128,16 @@ class Api
     {
         $auth = $endpointDef['auth'] ?? null;
 
-        if ($auth === 'admin' && !Connection::getInstance()->isAdmin) {
+        $user = User::getInstance();
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . var_export($user, true) . "\n", FILE_APPEND); // DELETEME DEBUG
+        if ($auth === 'admin' && !$user->isAdmin) {
             Log::warn("Forbidden: admin required for $this->method $this->path");
             $this->jsonResponse(403, ['error' => 'Admin access required']);
         }
 
         // Anyone using the API should be at least an authenticated user.
-        if ($auth === 'user' && !Connection::getInstance()->isUser) {
+        if ($auth === 'user' && !$user->isUser) {
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . var_export($user, true) . "\n", FILE_APPEND); // DELETEME DEBUG
             Log::warn("Forbidden: login required for $this->method $this->path");
             $this->jsonResponse(403, ['error' => 'User access required']);
         }
@@ -180,27 +196,39 @@ class Api
      */
     private function getJsonParams(): array
     {
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
         Log::debug("Reading JSON params for $this->path:"); // DELETEME DEBUG
         if (!in_array($this->method, ['POST', 'PUT', 'PATCH'])) {
             Log::debug('= Empty: not POST/PUT/PATCH.'); // DELETEME DEBUG
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             return [];
         }
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
 
         $raw = file_get_contents('php://input');
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . var_export($raw, true) . "\n", FILE_APPEND); // DELETEME DEBUG
         Log::debug('= Raw params', $raw);// DELETEME DEBUG
         $decoded = json_decode($raw, true);
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . var_export($decoded, true) . "\n", FILE_APPEND); // DELETEME DEBUG
         Log::debug('= Decoded params', $decoded);// DELETEME DEBUG
 
+        // If it isn't JSON, try to parse it as a query string.
         if (json_last_error() !== JSON_ERROR_NONE) {
-            Log::warn('Invalid JSON input: ' . json_last_error_msg());
-            $this->jsonResponse(400, ['error' => 'Invalid JSON: ' . json_last_error_msg()]);
+            parse_str($raw, $decoded);
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . var_export($decoded, true) . "\n", FILE_APPEND); // DELETEME DEBUG
+//            Log::warn('Invalid JSON input: ' . json_last_error_msg());
+//file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
+//file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . 'Invalid JSON input: ' . json_last_error_msg() . "\n", FILE_APPEND); // DELETEME DEBUG
+//            $this->jsonResponse(400, ['error' => 'Invalid JSON: ' . json_last_error_msg()]);
         }
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
 
         if (!is_array($decoded)) {
             Log::warn('Expected JSON object, got something else.');
             $this->jsonResponse(400, ['error' => 'Expected JSON object.']);
         }
         Log::debug('= Read', $decoded); // DELETEME DEBUG
+file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . var_export($decoded, true) . "\n", FILE_APPEND); // DELETEME DEBUG
         return $decoded;
     }
 
@@ -274,7 +302,8 @@ class Api
      */
     private function rateLimitKey(): string
     {
-        return Connection::getInstance()->username . ":$this->path";
+        $user = User::getInstance();
+        return $user->username . ":$this->path";
     }
 
     /**
@@ -282,7 +311,7 @@ class Api
      */
     private function checkRateLimit(string $key, int $limit, int $window): bool
     {
-        $userId = Connection::getInstance()->userId;
+        $userId = User::getInstance()->userId;
         $now = new DateTime('now');
         $windowInterval = new DateInterval("PT{$window}S"); // e.g., PT60S = 60 seconds
 

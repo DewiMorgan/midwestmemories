@@ -2,6 +2,9 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
+* Rate-limit by IP as well as by username?
+* loginAs() does not seem to be working for one unit test.
+
 * Add unit tests for everything.
     * Get API tests working.
     * Generate Web page tests.

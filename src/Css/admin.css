@@ -1,0 +1,142 @@
+/* Admin Panel Styles */
+
+/* Base styles */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+h1, h2, h3 {
+    color: #2c3e50;
+}
+
+/* Login form specific */
+.login-form {
+    max-width: 400px;
+    margin: 50px auto 0;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Buttons */
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Messages and errors */
+#messages {
+    max-height: calc(1em * 25);
+    line-height: 1.2;
+    overflow-y: auto;
+    font-family: monospace;
+    white-space: pre-wrap;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+#messages p {
+    margin: 0;
+    padding: 2px 0;
+}
+
+.error {
+    color: #d32f2f;
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #ffebee;
+    border: 1px solid #ef9a9a;
+    border-radius: 4px;
+}
+
+/* Layout */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.user-info {
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+#user-list {
+    margin: 15px 0;
+    padding: 10px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    min-height: 100px;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: #dee2e6;
+    margin: 20px 0;
+}
+
+/* Login page specific */
+body.login-page {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.login-page .header {
+    justify-content: center;
+    border: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.login-page h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-page button {
+    width: 100%;
+    padding: 12px 20px;
+}
