@@ -1,6 +1,5 @@
 <?php
 /** @noinspection PhpUnnecessaryStaticReferenceInspection */
-/** @noinspection PhpMethodNamingConventionInspection */
 /** @noinspection PhpEnforceDocCommentInspection */
 /** @noinspection DuplicatedCode */
 // Above because tests have different code standards.

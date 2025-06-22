@@ -1,0 +1,19 @@
+/**
+ * Call the various API tasks that we run automatically when displaying the admin page.
+ * First, list all users in a table to let them be edited.
+ * Then, process any pending Dropbox updates.
+ */
+function runAdminTasks() {
+    // noinspection VoidExpressionJS
+    void new UserTable();
+    const userListDiv = document.getElementById('user-list');
+    userListDiv.appendChild(UserTable.table);
+
+    // Populate the user list.
+    Users.listUsers();
+
+    // Do any pending Dropbox activities.
+    Dropbox.runAllUpdates();
+}
+
+runAdminTasks();
