@@ -9,6 +9,7 @@ use MidwestMemories\Enum\EndpointPath;
 use MidwestMemories\Enum\HttpMethod;
 use MidwestMemories\Enum\ParamTypes;
 use MidwestMemories\FileProcessor;
+use MidwestMemories\Log;
 use MidwestMemories\User;
 use ValueError;
 
@@ -29,15 +30,11 @@ class EndpointRegistry
     public static function get(string $method, string $path): ?array
     {
         try {
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "== $method\n", FILE_APPEND); // DELETEME DEBUG
             $method = HttpMethod::from($method);
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "== $method->value $path\n", FILE_APPEND); // DELETEME DEBUG
             $path = EndpointPath::from(trim($path, '/'));
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "== $method->value $path->value\n", FILE_APPEND); // DELETEME DEBUG
             $key = EndpointKey::from(strtoupper($method->value) . '#' . $path->value);
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "== $method->value $path->value $key->value\n", FILE_APPEND); // DELETEME DEBUG
-        } catch (ValueError $e) {
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
+        } catch (ValueError) {
+            Log::warn("Couldn't match enums for $method $path");
             return null;
         }
 

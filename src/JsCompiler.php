@@ -56,7 +56,7 @@ class JsCompiler
         foreach ($inputFiles as $file) {
             $filePath = $jsDir . ltrim($file, '/');
             if (!file_exists($filePath)) {
-                error_log('JsCompiler: File not found: ' . $filePath);
+                Log::error('JsCompiler: File not found: ' . $filePath);
                 return false;
             }
         }
@@ -66,7 +66,7 @@ class JsCompiler
             $filePath = $jsDir . ltrim($file, '/');
             $content = file_get_contents($filePath);
             if ($content === false) {
-                error_log('JsCompiler: Could not read file: ' . $filePath);
+                Log::error('JsCompiler: Could not read file: ' . $filePath);
                 return false;
             }
 
@@ -78,7 +78,7 @@ class JsCompiler
         // If the output directory doesn't exist, fail.
         $outputDir = dirname($outputFile);
         if (!is_dir($outputDir)) {
-            error_log('JsCompiler: Directory not found: ' . $outputDir);
+            Log::error('JsCompiler: Directory not found: ' . $outputDir);
             return false;
         }
 

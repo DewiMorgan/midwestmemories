@@ -8,7 +8,6 @@ use DateInterval;
 use DateTime;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
-use MidwestMemories\Connection;
 use MidwestMemories\Db;
 use MidwestMemories\Enum\ParamTypes;
 use MidwestMemories\Log;
@@ -34,9 +33,6 @@ class Api
     {
         // Get method and request path.
         $this->method = $_SERVER['REQUEST_METHOD'];
-        $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $baseUri = dirname($_SERVER['SCRIPT_NAME']);
-        // $this->path = '/' . trim(str_replace($baseUri, '', $requestUri), '/');
         // API version gets put into the GET params by .htaccess mod_rewrite.
         $this->apiVersion = $_GET['apiversion'] ?? 'v0.0';
         if ('v1.0' !== $this->apiVersion) {
@@ -59,16 +55,10 @@ class Api
      */
     public function handleApiCall(): void
     {
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
         try {
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             $endpointDef = $this->getEndpointDefinition();
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . var_export($endpointDef, true) . "\n", FILE_APPEND); // DELETEME DEBUG
-
             $this->authorize($endpointDef);
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             $this->rateLimit($endpointDef);
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
 
             // Get our parameters from every possible source. Later sources overwrite earlier ones.
             Log::debug('Getting GET params', $_GET);// DELETEME DEBUG
@@ -77,10 +67,8 @@ file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "
                 $_GET,
                 $this->getJsonParams()
             );
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             Log::debug('Merged params', $params);// DELETEME DEBUG
             $this->validateRequiredParams($endpointDef, $params);
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
 
             /** @var Callable $callback */
             $callback = $endpointDef['callback'];
@@ -89,10 +77,8 @@ file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "
             $result = call_user_func($callback, $params);
             Log::debug('Result', $result);
 
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             $this->jsonResponse($result['status'] ?? 200, ['data' => $result['data'] ?? null]);
         } catch (Exception $e) {
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             Log::error("API Exception: {$e->getMessage()}");
             $this->jsonResponse(500, ['error' => 'Server error: ' . $e->getMessage()]);
         }
@@ -105,10 +91,8 @@ file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "
     private function getEndpointDefinition(): array
     {
         try {
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             return EndpointRegistry::get($this->method, $this->path);
         } catch (ValueError) {
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             Log::warn("No match for $this->method $this->path");
             Log::debug('Request', $_REQUEST);
             Log::debug('Get', $_GET);
@@ -129,7 +113,6 @@ file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "
         $auth = $endpointDef['auth'] ?? null;
 
         $user = User::getInstance();
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . var_export($user, true) . "\n", FILE_APPEND); // DELETEME DEBUG
         if ($auth === 'admin' && !$user->isAdmin) {
             Log::warn("Forbidden: admin required for $this->method $this->path");
             $this->jsonResponse(403, ['error' => 'Admin access required']);
@@ -137,7 +120,6 @@ file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . v
 
         // Anyone using the API should be at least an authenticated user.
         if ($auth === 'user' && !$user->isUser) {
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . var_export($user, true) . "\n", FILE_APPEND); // DELETEME DEBUG
             Log::warn("Forbidden: login required for $this->method $this->path");
             $this->jsonResponse(403, ['error' => 'User access required']);
         }
@@ -196,39 +178,27 @@ file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . v
      */
     private function getJsonParams(): array
     {
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
         Log::debug("Reading JSON params for $this->path:"); // DELETEME DEBUG
         if (!in_array($this->method, ['POST', 'PUT', 'PATCH'])) {
             Log::debug('= Empty: not POST/PUT/PATCH.'); // DELETEME DEBUG
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             return [];
         }
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
 
         $raw = file_get_contents('php://input');
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . var_export($raw, true) . "\n", FILE_APPEND); // DELETEME DEBUG
         Log::debug('= Raw params', $raw);// DELETEME DEBUG
         $decoded = json_decode($raw, true);
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . var_export($decoded, true) . "\n", FILE_APPEND); // DELETEME DEBUG
         Log::debug('= Decoded params', $decoded);// DELETEME DEBUG
 
         // If it isn't JSON, try to parse it as a query string.
         if (json_last_error() !== JSON_ERROR_NONE) {
             parse_str($raw, $decoded);
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . var_export($decoded, true) . "\n", FILE_APPEND); // DELETEME DEBUG
-//            Log::warn('Invalid JSON input: ' . json_last_error_msg());
-//file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
-//file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . 'Invalid JSON input: ' . json_last_error_msg() . "\n", FILE_APPEND); // DELETEME DEBUG
-//            $this->jsonResponse(400, ['error' => 'Invalid JSON: ' . json_last_error_msg()]);
         }
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
 
         if (!is_array($decoded)) {
-            Log::warn('Expected JSON object, got something else.');
+            Log::warn('Expected JSON or encoded object, got something else.');
             $this->jsonResponse(400, ['error' => 'Expected JSON object.']);
         }
         Log::debug('= Read', $decoded); // DELETEME DEBUG
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . var_export($decoded, true) . "\n", FILE_APPEND); // DELETEME DEBUG
         return $decoded;
     }
 
@@ -273,14 +243,18 @@ file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . v
             }
         }
 
+        $message = '';
         if ($missing) {
-            Log::warn('Missing parameters: ' . implode(', ', $missing));
-            $this->jsonResponse(400, ['error' => 'Missing parameters: ' . implode(', ', $missing)]);
+            $message = 'Missing parameters: ' . implode(', ', $missing) . '. ';
+            Log::warn($message);
         }
 
         if ($invalid) {
-            Log::warn('Invalid parameter types: ' . implode(', ', $invalid));
-            $this->jsonResponse(400, ['error' => 'Invalid parameter types: ' . implode(', ', $invalid)]);
+            $message .= 'Invalid parameter types: ' . implode(', ', $invalid) . '. ';
+        }
+
+        if ($message) {
+            $this->jsonResponse(400, ['error' => $message]);
         }
     }
 

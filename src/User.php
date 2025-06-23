@@ -24,14 +24,22 @@ class User extends Singleton
     public bool $isAdmin = false;
     public bool $isSuperAdmin = false;
 
+    protected function __construct()
+    {
+        $this->loadFromSession();
+        parent::__construct();
+    }
+
     /**
      * Get the userid from the session, then load the user info from that.
+     * Warning: called from constructor, so calling any static methods that call getInstance() will be an infinite loop.
      */
     public function loadFromSession(): void
     {
         // Check if userId present in session and valid
         if (!isset($_SESSION['userId']) || !is_int($_SESSION['userId']) || $_SESSION['userId'] <= 0) {
-            self::handleUserLogout();
+            $this->populateUser([]);
+            unset($_SESSION['userId']);
             return; // no valid userId, so remain logged out
         }
 
@@ -50,7 +58,6 @@ class User extends Singleton
      */
     public static function handleUserLogin(): array
     {
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
         // Validate input.
         if (empty($_POST['username']) || empty($_POST['password'])) {
             // Missing credentials.
@@ -62,14 +69,11 @@ file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "
         // Try to authenticate.
         $sql = 'SELECT * FROM `midmem_users` WHERE `username` = ?';
         $user = Db::sqlGetRow($sql, 's', $username);
-
         if ($user && password_verify($password, $user['password_hash'] ?? '')) {
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             $instance = self::getInstance();
             $instance->populateUser($user);
             return ['status' => 200, 'data' => 'OK'];
         } else {
-file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "\n", FILE_APPEND); // DELETEME DEBUG
             return self::handleUserLogout();
         }
     }
@@ -173,13 +177,13 @@ file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "
         $password = $params['password'] ?? '';
 
         if ($username === '' || $password === '') {
-            return ['status' => 400, 'data' => 'Error: Missing username or password'];
+            return ['status' => 400, 'data' => 'Error: Missing username or new password for changing password'];
         }
 
         // Confirm user exists
         $user = Db::sqlGetRow('SELECT `id` FROM `midmem_users` WHERE `username` = ?', 's', $username);
         if (!$user) {
-            return ['status' => 404, 'data' => 'Error: User not found'];
+            return ['status' => 404, 'data' => 'Error: User not found for change password'];
         }
 
         $hash = password_hash($password, PASSWORD_DEFAULT);
@@ -208,13 +212,13 @@ file_put_contents('/tmp/deleteme', date('Y-m-d H:i:s') . __FILE__ . __LINE__ . "
         $username = trim($params['username'] ?? '');
 
         if ($username === '') {
-            return ['status' => 400, 'data' => 'Error: Missing username'];
+            return ['status' => 400, 'data' => 'Error: Missing username for deletion'];
         }
 
         // Check if user exists
         $user = Db::sqlGetRow('SELECT id FROM midmem_users WHERE username = ?', 's', $username);
         if (!$user) {
-            return ['status' => 404, 'data' => 'Error: User not found'];
+            return ['status' => 404, 'data' => 'Error: User not found for deletion'];
         }
 
         // Soft delete: set is_disabled = 1

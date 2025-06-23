@@ -1,5 +1,6 @@
 <?php
 /** @noinspection PhpUnnecessaryStaticReferenceInspection */
+/** @noinspection PhpMethodNamingConventionInspection */
 /** @noinspection PhpEnforceDocCommentInspection */
 /** @noinspection DuplicatedCode */
 // Above because tests have different code standards.
@@ -248,6 +249,7 @@ final class UserTest extends TestCase
         // Now log out
         User::handleUserLogout();
 
+        /** @noinspection PhpConditionAlreadyCheckedInspection */
         self::assertFalse($user->isLoggedIn);
         self::assertArrayNotHasKey('userId', $_SESSION);
     }
@@ -360,7 +362,7 @@ final class UserTest extends TestCase
     {
         $this->useRealDb();
         // Prepopulate user
-        $username = 'deleteme';
+        $username = 'test_user';
         $passwordHash = password_hash('irrelevant', PASSWORD_DEFAULT);
 
         Db::sqlExec(
