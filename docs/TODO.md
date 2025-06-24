@@ -2,11 +2,13 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
-* loginAs() does not seem to be working for one unit test.
+Following will enable .css and .js files to be used at all: currently they fail as they aren't recognised filetypes.
 
 * Create `/raw/` folder for CSS, JS, icons... that we don't even want to log access to.
     * Update .htaccess to give direct access to files in `/raw/`.
     * This will also prevent conflicts with files from Dropbox.
+    * Also whitelist /nonexistent.file, so 404 page can happen?
+
 * Rate-limit by the IP as well as the username?
 * Add unit tests for everything.
     * Get API tests working.

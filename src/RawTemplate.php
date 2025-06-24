@@ -28,7 +28,7 @@ class RawTemplate
             Log::debug("Not a file: $itemPath");
             static::show404Page();
         } elseif (!Path::canViewFilename($itemPath)) {
-            Log::debug("Not an viewable file: $itemPath");
+            Log::debug("Not a viewable file: $itemPath");
             static::show404Page();
         }
 
@@ -43,7 +43,7 @@ class RawTemplate
     #[NoReturn] private static function show404Page(): void
     {
         http_response_code(404);
-        include($_SERVER['DOCUMENT_ROOT'] . '/nonexistent.file'); // Triggers Apache's 404
+        include($_SERVER['DOCUMENT_ROOT'] . '/nonexistent.file'); // Triggers Apache's 404. Supposedly.
         exit;
     }
 }
