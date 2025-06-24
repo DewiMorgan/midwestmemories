@@ -39,10 +39,10 @@ class JsCompiler
         $outputDir = __DIR__ . '/../' . Conf::get(Key::IMAGE_DIR);
         $result = true;
         if (!self::isFileCompiled(self::$adminFiles, "$outputDir/admin.js")) {
-            $result &= self::compile(self::$adminFiles, "$outputDir/admin.js");
+            $result = self::compile(self::$adminFiles, "$outputDir/admin.js");
         }
         if (!self::isFileCompiled(self::$userFiles, "$outputDir/user.js")) {
-            $result &= self::compile(self::$userFiles, "$outputDir/user.js");
+            $result = $result && self::compile(self::$userFiles, "$outputDir/user.js");
         }
         return $result;
     }
