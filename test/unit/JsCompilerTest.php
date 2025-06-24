@@ -124,13 +124,13 @@ class JsCompilerTest extends TestCase
     public function testIsFileCompiledWhenOutputDoesNotExist(): void
     {
         $outputFile = self::OUTPUT_DIR . '/nonexistent.js';
-        $result = JsCompiler::isFileCompiled(
+        $result = JsCompiler::isFileOutdated(
             ['test1.js'],
             $outputFile,
             self::TEST_JS_DIR . '/'
         );
 
-        static::assertFalse($result, 'Should return false when output file does not exist');
+        static::assertTrue($result, 'Should return false when output file does not exist');
     }
 
     public function testIsFileCompiledWhenInputDoesNotExist(): void
@@ -138,13 +138,13 @@ class JsCompilerTest extends TestCase
         $outputFile = self::OUTPUT_DIR . '/output.js';
         file_put_contents($outputFile, 'test');
 
-        $result = JsCompiler::isFileCompiled(
+        $result = JsCompiler::isFileOutdated(
             ['nonexistent.js'],
             $outputFile,
             self::TEST_JS_DIR . '/'
         );
 
-        static::assertFalse($result, 'Should return false when any input file does not exist');
+        static::assertTrue($result, 'Should return false when any input file does not exist');
     }
 
     public function testIsFileCompiledWhenInputIsNewer(): void
@@ -159,13 +159,13 @@ class JsCompilerTest extends TestCase
         // Update input file to be newer than output.
         touch($inputFile);
 
-        $result = JsCompiler::isFileCompiled(
+        $result = JsCompiler::isFileOutdated(
             ['test1.js'],
             $outputFile,
             self::TEST_JS_DIR . '/'
         );
 
-        static::assertFalse($result, 'Should return false when any input file is newer than output');
+        static::assertTrue($result, 'Should return false when any input file is newer than output');
     }
 
     public function testIsFileCompiledWhenUpToDate(): void
@@ -176,12 +176,12 @@ class JsCompilerTest extends TestCase
         // Make sure output file is newer than input files.
         touch($outputFile, time() + 3600);
 
-        $result = JsCompiler::isFileCompiled(
+        $result = JsCompiler::isFileOutdated(
             ['test1.js', 'test2.js'],
             $outputFile,
             self::TEST_JS_DIR . '/'
         );
 
-        static::assertTrue($result, 'Should return true when all input files are older than output');
+        static::assertFalse($result, 'Should return true when all input files are older than output');
     }
 }

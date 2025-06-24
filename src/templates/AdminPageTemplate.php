@@ -23,7 +23,7 @@ use MidwestMemories\Enum\Key;
     <link rel="manifest" href="/site.webmanifest">
     <title><?= htmlspecialchars($pageTitle) ?></title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/src/Css/admin.css">
+    <link rel="stylesheet" href="/<?php echo Conf::get(Key::IMAGE_DIR); ?>/admin.css?i=2">
     <script src="/<?php echo Conf::get(Key::IMAGE_DIR); ?>/admin.js?i=2"></script>
 </head>
 <body>

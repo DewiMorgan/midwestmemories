@@ -31,44 +31,53 @@ class JsCompiler
     ];
 
     /**
-     * If the output files are outdated, compile them.
+     * If the output files are outdated, compile the JS files and copy the CSS.
      * @return bool Success.
      */
     public static function compileAllIfNeeded(): bool
     {
         $outputDir = __DIR__ . '/../' . Conf::get(Key::IMAGE_DIR);
         $result = true;
-        if (!self::isFileCompiled(self::$adminFiles, "$outputDir/admin.js")) {
+        // Handle Js.
+        if (self::isFileOutdated(self::$adminFiles, "$outputDir/admin.js")) {
             $result = self::compile(self::$adminFiles, "$outputDir/admin.js");
         }
-        if (!self::isFileCompiled(self::$userFiles, "$outputDir/user.js")) {
+        if (self::isFileOutdated(self::$userFiles, "$outputDir/user.js")) {
             $result = $result && self::compile(self::$userFiles, "$outputDir/user.js");
+        }
+        // Handle Css.
+        $cssDir = __DIR__ . '/Css/';
+        if (self::isFileOutdated(['admin.css'], "$outputDir/admin.css", $cssDir)) {
+            $result = $result && copy("$cssDir/admin.css", "$outputDir/admin.css");
+        }
+        if (self::isFileOutdated(['user.css'], "$outputDir/user.css", $cssDir)) {
+            $result = $result && copy("$cssDir/admin.css", "$outputDir/admin.css");
         }
         return $result;
     }
 
     /**
-     * Check if the output file exists and is up to date.
+     * Check if an output file needs reinstalling or recompiling.
      * @param array $inputFiles Array of filenames relative to /src/Js/
      * @param string $outputFile Absolute path to the output file
      * @param string|null $jsDir Folder to find source JS files in, including trailing slash.
-     * @return bool
+     * @return bool If file is outdated or missing.
      */
-    public static function isFileCompiled(array $inputFiles, string $outputFile, string $jsDir = null): bool
+    public static function isFileOutdated(array $inputFiles, string $outputFile, string $jsDir = null): bool
     {
         if (!file_exists($outputFile)) {
-            return false;
+            return true;
         }
         foreach ($inputFiles as $file) {
             $inputFilePath = $jsDir . ltrim($file, '/');
             if (!file_exists($inputFilePath)) {
-                return false;
+                return true;
             }
             if (filemtime($inputFilePath) > filemtime($outputFile)) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     /**

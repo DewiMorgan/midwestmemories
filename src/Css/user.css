@@ -1,0 +1,89 @@
+/* Non-admin page styles */
+
+/* Image styling. */
+img.file {
+    /* Sane size */
+    max-width: 100%;
+    max-height: 70vh; /* % of visible height */
+    width: auto;
+    height: auto;
+    /* Center */
+    display: block;
+    margin: 0 auto;
+}
+
+/* Page layout. */
+body {
+    overflow: hidden;
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.flex-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Drag-bar layout. */
+.left-column {
+    width: 25%;
+    overflow: auto;
+}
+
+.right-column {
+    width: 75%;
+    overflow: auto;
+}
+
+.drag-bar {
+    width: 10px;
+    background-color: darkgrey;
+    cursor: col-resize;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Tree-view styling. */
+.tree-view {
+    background-color: lightgrey;
+}
+
+/* Folders in the tree view. */
+.folder {
+    cursor: pointer;
+}
+
+/* Expand/collapse span. */
+.expand-collapse {
+    font-weight: bold;
+}
+
+li.collapsed > ul {
+    display: none;
+}
+
+li.expanded > ul {
+    display: block;
+}
+
+/* Bolding for selected items. */
+li.selected > .path-link {
+    font-weight: bold;
+}
+
+/* Override bolding for children of selected items. */
+.path-link {
+    font-weight: normal;
+}
+
+/* Files in the tree view. */
+.file {
+    cursor: default;
+}
+
+/* Content styling. */
+.content {
+    background-color: lightblue;
+}
