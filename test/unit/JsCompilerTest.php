@@ -120,4 +120,68 @@ class JsCompilerTest extends TestCase
 
         static::assertFalse($result);
     }
+
+    public function testIsFileCompiledWhenOutputDoesNotExist(): void
+    {
+        $outputFile = self::OUTPUT_DIR . '/nonexistent.js';
+        $result = JsCompiler::isFileCompiled(
+            ['test1.js'],
+            $outputFile,
+            self::TEST_JS_DIR . '/'
+        );
+
+        static::assertFalse($result, 'Should return false when output file does not exist');
+    }
+
+    public function testIsFileCompiledWhenInputDoesNotExist(): void
+    {
+        $outputFile = self::OUTPUT_DIR . '/output.js';
+        file_put_contents($outputFile, 'test');
+
+        $result = JsCompiler::isFileCompiled(
+            ['nonexistent.js'],
+            $outputFile,
+            self::TEST_JS_DIR . '/'
+        );
+
+        static::assertFalse($result, 'Should return false when any input file does not exist');
+    }
+
+    public function testIsFileCompiledWhenInputIsNewer(): void
+    {
+        $outputFile = self::OUTPUT_DIR . '/output.js';
+        $inputFile = self::TEST_JS_DIR . '/test1.js';
+
+        // Create output file first.
+        file_put_contents($outputFile, 'test');
+        touch($outputFile, time() - 3600); // Set modification time to 1 hour ago.
+
+        // Update input file to be newer than output.
+        touch($inputFile);
+
+        $result = JsCompiler::isFileCompiled(
+            ['test1.js'],
+            $outputFile,
+            self::TEST_JS_DIR . '/'
+        );
+
+        static::assertFalse($result, 'Should return false when any input file is newer than output');
+    }
+
+    public function testIsFileCompiledWhenUpToDate(): void
+    {
+        $outputFile = self::OUTPUT_DIR . '/output.js';
+        file_put_contents($outputFile, 'test');
+
+        // Make sure output file is newer than input files.
+        touch($outputFile, time() + 3600);
+
+        $result = JsCompiler::isFileCompiled(
+            ['test1.js', 'test2.js'],
+            $outputFile,
+            self::TEST_JS_DIR . '/'
+        );
+
+        static::assertTrue($result, 'Should return true when all input files are older than output');
+    }
 }

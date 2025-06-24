@@ -31,54 +31,97 @@ class JsCompiler
     ];
 
     /**
-     * Generate all the JavaScript files.
+     * If the output files are outdated, compile them.
+     * @return bool Success.
+     */
+    public static function compileAllIfNeeded(): bool
+    {
+        $outputDir = __DIR__ . '/../' . Conf::get(Key::IMAGE_DIR);
+        $result = true;
+        if (!self::isFileCompiled(self::$adminFiles, "$outputDir/admin.js")) {
+            $result &= self::compile(self::$adminFiles, "$outputDir/admin.js");
+        }
+        if (!self::isFileCompiled(self::$userFiles, "$outputDir/user.js")) {
+            $result &= self::compile(self::$userFiles, "$outputDir/user.js");
+        }
+        return $result;
+    }
+
+    /**
+     * Check if the output file exists and is up to date.
+     * @param array $inputFiles Array of filenames relative to /src/Js/
+     * @param string $outputFile Absolute path to the output file
+     * @param string|null $jsDir Folder to find source JS files in, including trailing slash.
      * @return bool
+     */
+    public static function isFileCompiled(array $inputFiles, string $outputFile, string $jsDir = null): bool
+    {
+        if (!file_exists($outputFile)) {
+            return false;
+        }
+        foreach ($inputFiles as $file) {
+            $inputFilePath = $jsDir . ltrim($file, '/');
+            if (!file_exists($inputFilePath)) {
+                return false;
+            }
+            if (filemtime($inputFilePath) > filemtime($outputFile)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Generate all the JavaScript files.
+     * @return bool Success.
      */
     public static function compileAll(): bool
     {
-        return self::compile(self::$adminFiles, __DIR__ . '/Js/admin.js')
-            && self::compile(self::$userFiles, __DIR__ . '/Js/user.js');
+        $outputDir = __DIR__ . '/../' . Conf::get(Key::IMAGE_DIR);
+        return self::compile(self::$adminFiles, "$outputDir/admin.js")
+            && self::compile(self::$userFiles, "$outputDir/user.js");
     }
 
     /**
      * Concatenates multiple JavaScript files into a single output file.
      *
      * @param string[] $inputFiles Array of filenames relative to /src/Js/
-     * @param string $outputFile The target output file path
+     * @param string $outputFile The target output file path.
+     * @param string|null $jsDir Folder to find source JS files in, including trailing slash.
      * @return bool True on success, false on failure
      */
     public static function compile(array $inputFiles, string $outputFile, string $jsDir = null): bool
     {
-        $jsDir = $jsDir ?? dirname(__DIR__) . '/../' . Conf::get(Key::IMAGE_DIR) . '/';
+        $jsDir = $jsDir ?? __DIR__ . '/Js/';
         $output = '';
 
         // First, verify all files exist.
         foreach ($inputFiles as $file) {
-            $filePath = $jsDir . ltrim($file, '/');
-            if (!file_exists($filePath)) {
-                Log::error('JsCompiler: File not found: ' . $filePath);
+            $inputFilePath = $jsDir . ltrim($file, '/');
+            if (!file_exists($inputFilePath)) {
+                Log::error('JsCompiler: Input file not found: ' . $inputFilePath);
                 return false;
             }
         }
 
         // Then process them.
         foreach ($inputFiles as $file) {
-            $filePath = $jsDir . ltrim($file, '/');
-            $content = file_get_contents($filePath);
+            $inputFilePath = $jsDir . ltrim($file, '/');
+            $content = file_get_contents($inputFilePath);
             if ($content === false) {
-                Log::error('JsCompiler: Could not read file: ' . $filePath);
+                Log::error('JsCompiler: Could not read input file: ' . $inputFilePath);
                 return false;
             }
 
             // Add file header.
-            $output .= "\n/* Source: " . basename($filePath) . " */\n";
+            $output .= "\n/* Source: " . basename($inputFilePath) . " */\n";
             $output .= $content . "\n";
         }
 
         // If the output directory doesn't exist, fail.
         $outputDir = dirname($outputFile);
         if (!is_dir($outputDir)) {
-            Log::error('JsCompiler: Directory not found: ' . $outputDir);
+            Log::error('JsCompiler: Output directory not found: ' . $outputDir);
             return false;
         }
 

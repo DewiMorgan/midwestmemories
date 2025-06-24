@@ -11,6 +11,9 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/ralouphie/getallheaders" />
       <excludeFolder url="file://$MODULE_DIR$/vendor" />
       <excludePattern pattern="composer.lock" />
+      <excludePattern pattern="mm.log" />
+      <excludePattern pattern=".htpasswd" />
+      <excludePattern pattern=".phpunit.result.cache" />
       <excludePattern pattern="ApiResponse.txt" />
     </content>
     <orderEntry type="inheritedJdk" />
