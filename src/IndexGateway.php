@@ -33,9 +33,8 @@ class IndexGateway
     private static function handleLogouts(): void
     {
         // Handle logouts.
-        if (array_key_exists('logout', $_REQUEST) && $_REQUEST['logout'] && 'true' === $_SESSION['login']) {
+        if (array_key_exists('logout', $_REQUEST)) {
             header('HTTP/1.1 401 Unauthorized');
-            $_SESSION['login'] = 'false';
             echo "<!DOCTYPE html>\n";
             echo '<html lang="en"><head><title>Logout</title></head><body><h1>Logged out</h1><p><a href="'
                 . $_SERVER['PHP_SELF'] . '">Click here to log back in.</a></p></body></html>' . "\n";
@@ -48,9 +47,6 @@ class IndexGateway
      */
     private static function initSession(): void
     {
-        $_SESSION['login'] = 'true';
-        $_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
-
         $connection = Connection::getInstance();
 
         // Log this login. No error handling if we fail.
