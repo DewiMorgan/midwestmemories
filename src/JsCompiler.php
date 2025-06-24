@@ -51,7 +51,7 @@ class JsCompiler
             $result = $result && copy("$cssDir/admin.css", "$outputDir/admin.css");
         }
         if (self::isFileOutdated(['user.css'], "$outputDir/user.css", $cssDir)) {
-            $result = $result && copy("$cssDir/admin.css", "$outputDir/admin.css");
+            $result = $result && copy("$cssDir/user.css", "$outputDir/user.css");
         }
         return $result;
     }
