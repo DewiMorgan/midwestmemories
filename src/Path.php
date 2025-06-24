@@ -167,10 +167,11 @@ class Path
             return 'NO UNIX PATH FOR API CALLS';
         }
 
-        $realPath = realpath(self::$imgBaseUnixPath . $webPath);
+        $joined = self::$imgBaseUnixPath . $webPath;
+        $realPath = realpath($joined);
         if (false === $realPath) {
             if (true === $mustExist) {
-                Log::debug('Validated path was not found as: ' . self::$imgBaseUnixPath . " . " . $webPath);
+                Log::debug('Validated path was not found as: ' . self::$imgBaseUnixPath . " . " . $webPath, $joined);
                 http_response_code(404); // Not found.
                 die(1);
             }
