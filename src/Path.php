@@ -170,7 +170,7 @@ class Path
         $realPath = realpath(self::$imgBaseUnixPath . '/' . $webPath);
         if (false === $realPath) {
             if (true === $mustExist) {
-                Log::debug('Validated path was not found', $webPath);
+                Log::debug('Validated path was not found as: ' . self::$imgBaseUnixPath . " . '/' . $webPath");
                 http_response_code(404); // Not found.
                 die(1);
             }
