@@ -17,7 +17,7 @@ class Path
     public const LINK_SEARCH = '3';
     public const LINK_USER = '';
 
-    // The full filesystem path to the image folder. We don't allow access to files outside this folder.
+    // Full filesystem path to image folder, with trailing slash. We don't allow access to files outside this folder.
     public static string $imgBaseUnixPath;
 
     /**
@@ -167,10 +167,10 @@ class Path
             return 'NO UNIX PATH FOR API CALLS';
         }
 
-        $realPath = realpath(self::$imgBaseUnixPath . '/' . $webPath);
+        $realPath = realpath(self::$imgBaseUnixPath . $webPath);
         if (false === $realPath) {
             if (true === $mustExist) {
-                Log::debug('Validated path was not found as: ' . self::$imgBaseUnixPath . " . '/' . $webPath");
+                Log::debug('Validated path was not found as: ' . self::$imgBaseUnixPath . " . " . $webPath);
                 http_response_code(404); // Not found.
                 die(1);
             }
