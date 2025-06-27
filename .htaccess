@@ -1,8 +1,9 @@
 # Allow access to files in the /raw directory
 <Directory "/raw">
+#    Satisfy Any
     Order allow,deny
     Allow from all
-    Require all granted
+   Require all granted
 </Directory>
 
 <Files "dropboxwebhook.php">

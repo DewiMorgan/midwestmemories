@@ -1,2 +1,0 @@
-# This prevents anyone directly accessing the images and config files.
-deny from all
