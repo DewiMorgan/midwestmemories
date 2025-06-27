@@ -36,7 +36,7 @@ class JsCompiler
      */
     public static function compileAllIfNeeded(): bool
     {
-        $outputDir = __DIR__ . '/../' . Conf::get(Key::IMAGE_DIR);
+        $outputDir = __DIR__ . '/../raw';
         $result = true;
         // Handle Js.
         if (self::isFileOutdated(self::$adminFiles, "$outputDir/admin.js")) {
@@ -86,7 +86,7 @@ class JsCompiler
      */
     public static function compileAll(): bool
     {
-        $outputDir = __DIR__ . '/../' . Conf::get(Key::IMAGE_DIR);
+        $outputDir = __DIR__ . '/../raw';
         return self::compile(self::$adminFiles, "$outputDir/admin.js")
             && self::compile(self::$userFiles, "$outputDir/user.js");
     }
