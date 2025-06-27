@@ -10,6 +10,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/http-message" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/ralouphie/getallheaders" />
       <excludeFolder url="file://$MODULE_DIR$/vendor" />
+      <excludeFolder url="file://$MODULE_DIR$/raw" />
       <excludePattern pattern="composer.lock" />
       <excludePattern pattern="mm.log" />
       <excludePattern pattern=".htpasswd" />
