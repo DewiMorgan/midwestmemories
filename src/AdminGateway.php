@@ -98,8 +98,6 @@ class AdminGateway
     private static function showAdminTemplate(): void
     {
         $user = User::getInstance();
-        // Compile JavaScript if necessary.
-        JsCompiler::compileAllIfNeeded();
 
         $templateVars = [
             'pageTitle' => 'Admin: Midwest Memories',

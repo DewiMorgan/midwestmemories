@@ -21,9 +21,9 @@ declare(strict_types=1);
     <title><?= htmlspecialchars($pageTitle) ?></title>
     <meta charset="UTF-8">
     <!--suppress HtmlUnknownTarget -->
-    <link rel="stylesheet" href="/raw/admin.css?i=2">
+    <link rel="stylesheet" href="/raw/admin.css">
     <!--suppress HtmlUnknownTarget -->
-    <script src="/raw/admin.js?i=2"></script>
+    <script src="/raw/admin.js"></script>
 </head>
 <body>
 <div class="header">

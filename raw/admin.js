@@ -590,11 +590,14 @@ function runAdminTasks() {
     userListDiv.appendChild(UserTable.table);
 
     // Populate the user list.
+    // noinspection JSIgnoredPromiseFromCall
     Users.listUsers();
 
     // Do any pending Dropbox activities.
+    // noinspection JSIgnoredPromiseFromCall
     Dropbox.runAllUpdates();
 }
 
-runAdminTasks();
+// Wait for the DOM to be fully loaded before running admin tasks.
+document.addEventListener('DOMContentLoaded', runAdminTasks);
 
