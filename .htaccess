@@ -1,3 +1,10 @@
+# Allow access to files in the /raw directory
+<Directory "/raw">
+    Order allow,deny
+    Allow from all
+    Require all granted
+</Directory>
+
 <Files "dropboxwebhook.php">
     Satisfy Any
     Order allow,deny
@@ -13,7 +20,6 @@ RewriteEngine On
     AuthUserFile .htpasswd
     Require valid-user
 </Files>
-
 
 # Exclude dropboxwebhook.php from rewriting
 RewriteCond %{REQUEST_URI} ^/dropboxwebhook\.php$ [NC]

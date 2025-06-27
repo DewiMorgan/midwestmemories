@@ -9,9 +9,6 @@ declare(strict_types=1);
  * @var string $username The current user's username
  */
 
-use MidwestMemories\Conf;
-use MidwestMemories\Enum\Key;
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,8 +20,10 @@ use MidwestMemories\Enum\Key;
     <link rel="manifest" href="/site.webmanifest">
     <title><?= htmlspecialchars($pageTitle) ?></title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="admin.css?i=2">
-    <script src="admin.js?i=2"></script>
+    <!--suppress HtmlUnknownTarget -->
+    <link rel="stylesheet" href="/raw/admin.css?i=2">
+    <!--suppress HtmlUnknownTarget -->
+    <script src="/raw/admin.js?i=2"></script>
 </head>
 <body>
 <div class="header">

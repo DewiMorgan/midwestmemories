@@ -11,7 +11,8 @@ declare(strict_types=1);
 <head>
     <title>Login - Midwest Memories Admin</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/src/Css/admin.css">
+    <!--suppress HtmlUnknownTarget -->
+    <link rel="stylesheet" href="/raw/admin.css">
 </head>
 <body class="login-page">
 <div class="login-form">

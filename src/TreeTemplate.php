@@ -12,8 +12,10 @@ use MidwestMemories\Enum\Key;
 <html lang="en">
 <head>
     <title><?php IndexGateway::getSiteName(); ?> - Folder Tree</title>
-    <link rel="stylesheet" href="user.css?i=2">
-    <script src="user.js?i=2"></script>
+    <!--suppress HtmlUnknownTarget -->
+    <link rel="stylesheet" href="/raw/user.css">
+    <!--suppress HtmlUnknownTarget -->
+    <script src="/raw/user.js"></script>
 </head>
 <?php
 $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
