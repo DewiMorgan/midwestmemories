@@ -73,7 +73,7 @@ class JsCompiler
      * @param ?string $jsDir Folder to find source JS files in, including trailing slash.
      * @return bool If file is outdated or missing.
      */
-    public static function isFileOutdated(array $inputFiles, string $outputFile, ?string $jsDir): bool
+    public static function isFileOutdated(array $inputFiles, string $outputFile, ?string $jsDir = null): bool
     {
         if (!file_exists($outputFile)) {
             return true;
