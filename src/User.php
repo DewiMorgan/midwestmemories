@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use JetBrains\PhpStorm\NoReturn;
 use MidwestMemories\Enum\UserAccess;
 
 /*
@@ -107,6 +108,57 @@ class User extends Singleton
         // $_SESSION = [];
         // session_destroy();
         return ['status' => 403, 'data' => 'Error: access denied'];
+    }
+
+    /**
+     * Handle a request from the user to log them out.
+     */
+    public static function handleHtmlLogout(): void
+    {
+        // Only log out if logout was requested.
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || ($_POST['action'] ?? '') !== 'logout') {
+            return;
+        }
+
+        self::handleUserLogout();
+
+        // Clear session data.
+        $_SESSION = [];
+
+        // Redirect back to current page to show login form.
+        header('Location: ' . $_SERVER['PHP_SELF']);
+
+        // Not sure if this will show up at all.
+        echo "<!DOCTYPE html>\n";
+        echo '<html lang="en"><head><title>Logout</title></head><body><h1>Logged out</h1><p><a href="'
+            . $_SERVER['PHP_SELF'] . '">Click here to log back in.</a></p></body></html>' . "\n";
+        exit(0);
+    }
+
+    /**
+     * Handle session and connection.
+     */
+    public static function handleHtmlSession(): void
+    {
+        $connection = Connection::getInstance();
+
+        // Handle login form submission
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['username']) && !empty($_POST['password'])) {
+            User::handleUserLogin();
+        }
+
+        // Log this access. No error handling if we fail.
+        $user = User::getInstance();
+        Db::sqlExec(
+            'INSERT INTO `' . Db::TABLE_VISITORS . '` (`request`, `main_ip`, `all_ips_string`, `user`, `agent`)'
+            . ' VALUES (?, ?, ?, ?, ?)',
+            'sssss',
+            $connection->request,
+            $connection->ip,
+            $connection->ipList,
+            $user->isLoggedIn ? $user->username : 'guest',
+            $connection->agent
+        );
     }
 
     /**

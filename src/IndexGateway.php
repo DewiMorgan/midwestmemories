@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use JetBrains\PhpStorm\NoReturn;
 use JsonException;
 
 /**
@@ -17,50 +18,40 @@ class IndexGateway
 
     public function __construct()
     {
-        self::handleLogouts();
+        // Handle logout if requested
+        User::handleHtmlLogout();
+
+        // Auth and session management. Must not output anything.
+        User::handleHtmlSession();
         Path::validateBaseDir();
-        self::initSession();
+        static::dieIfNotUser();
 
         self::$requestWebPath = $_REQUEST['path'] ?? '/';
         self::$requestUnixPath = Path::webToUnixPath(self::$requestWebPath); // Dies if not correct.
 
+        // static::showUserTemplate();
         self::showPage();
     }
 
     /**
-     * Handle logout requests.
+     * Verify that we are only being accessed by an authorized user.
      */
-    private static function handleLogouts(): void
+    private static function dieIfNotUser(): void
     {
-        // Handle logouts.
-        if (array_key_exists('logout', $_REQUEST)) {
-            header('HTTP/1.1 401 Unauthorized');
-            echo "<!DOCTYPE html>\n";
-            echo '<html lang="en"><head><title>Logout</title></head><body><h1>Logged out</h1><p><a href="'
-                . $_SERVER['PHP_SELF'] . '">Click here to log back in.</a></p></body></html>' . "\n";
-            exit(0);
+        $user = User::getInstance();
+        if (!$user->isLoggedIn && !$user->isUser) {
+            self::showLoginForm();
         }
     }
 
     /**
-     * Handle session and connection.
+     * Display the login form template.
      */
-    private static function initSession(): void
+    #[NoReturn] private static function showLoginForm(): void
     {
-        $connection = Connection::getInstance();
-
-        // Log this login. No error handling if we fail.
-        // ToDo: this is very low level, and duplicated code. Should probably be wrapped in a connectionLogger.
-        Db::sqlExec(
-            'INSERT INTO `' . Db::TABLE_VISITORS . '` (`request`, `main_ip`, `all_ips_string`, `user`, `agent`)'
-            . ' VALUES (?, ?, ?, ?, ?)',
-            'sssss',
-            $connection->request,
-            $connection->ip,
-            $connection->ipList,
-            $connection->usernameGuesses,
-            $connection->agent
-        );
+        // Include the template file
+        require __DIR__ . '/templates/UserLoginTemplate.php';
+        exit();
     }
 
     /**

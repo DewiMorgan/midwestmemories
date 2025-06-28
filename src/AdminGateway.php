@@ -14,12 +14,10 @@ class AdminGateway
     public function __construct()
     {
         // Handle logout if requested
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logout') {
-            $this->handleLogout();
-        }
+        User::handleHtmlLogout();
 
         // Auth and session management. Must not output anything.
-        static::initSession();
+        User::handleHtmlSession();
         static::dieIfNotAdmin();
         static::showAdminTemplate();
     }

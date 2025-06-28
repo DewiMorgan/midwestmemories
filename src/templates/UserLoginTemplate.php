@@ -2,20 +2,20 @@
 declare(strict_types=1);
 
 /**
- * Template for the admin login form.
+ * Template for the user login form.
  * Shows an error message if a login was attempted and failed.
  */
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Login - Midwest Memories Admin</title>
+    <title>Login - Midwest Memories</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/raw/admin.css">
+    <link rel="stylesheet" href="/raw/user.css">
 </head>
 <body class="login-page">
 <div class="login-form">
-    <h2>Admin Login</h2>
+    <h2>User Login</h2>
     <?php if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['username'])): ?>
         <div class="error">Invalid username or password</div>
     <?php endif; ?>
