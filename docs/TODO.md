@@ -12,14 +12,13 @@ This is the stuff I'm actually working on, as steps towards the ultimate goal.
 * Create CommentManager class.
 * Convert Comments to use new API.
 * Generate Web page tests.
+* Add unit tests for everything.
 
 * Whitelist /nonexistent.file, so 404 page can happen?
 * Rate-limit by the IP as well as the username?
 * User endpoints return a string, should maybe return an object like the file endpoints?
 * Make the JS also handle endpoints using the lookup table?
 * Change endpoints to be loaded as a class or config file or something.
-* WONTFIX: Move source out of web root (edit autoloader?).
-* DONE: Convert user management to session-and-DB based.
 
 * Handle API errors instead of just checking `result.ok` (which just checks it was a 200).
     * Also make API errors not return 200 OK.

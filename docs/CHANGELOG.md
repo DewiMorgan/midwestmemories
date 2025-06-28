@@ -6,7 +6,6 @@ which might not be when they were actually implemented/committed.
 
 ## 2025/06/28 Fri
 
-* DONE: Add unit tests for everything.
 * DONE: Get API tests working.
 * DONE: Add PHPUnit configuration.
 * DONE: Add PHPUnit tests for User.
@@ -39,6 +38,8 @@ which might not be when they were actually implemented/committed.
 * DONE: Add response types to EndpointRegistry.
 * DONE: Strip out old API handling.
 * DONE: Utterly ridiculous amounts of debugging to track down all the issues with APIs.
+* SKIPPED: Move source out of web root (edit autoloader?).
+* DONE: Convert user management to session-and-DB based.
 
 ## 2025/06/20 Sat
 
