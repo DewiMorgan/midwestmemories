@@ -3,6 +3,43 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+
+## 2025/06/28 Fri
+
+* DONE: Add unit tests for everything.
+* DONE: Get API tests working.
+* DONE: Add PHPUnit configuration.
+* DONE: Add PHPUnit tests for User.
+* DONE: Add PHPUnit tests for Singleton.
+* DONE: Add TestHelper class to handle testing APIs
+* DONE: Add PHPUnit tests for TestHelper.
+* DONE: Add PHPUnit tests for APIs.
+* DONE: Add a Users class to represent the new database-stored users.
+* DONE: Update Connection class to use the Users class when logging/validating connections.
+* DONE: Add new Auth to admin page.
+* DONE: Add login form as a template.
+* DONE: Significant template cleanup and consolidation, to use the same CSS, JS, etc.
+* DONE: Create `/Templates/` folder and move templating HTML out from the PHP code and into templates.
+* DONE: Create `/Css/` and `/Js/` folders for their respective languages.
+* DONE: Create `/raw/` folder for CSS, JS, icons... to prevent log spam, dropbox conflicts, etc.
+* DONE: Update .htaccess to give direct access to files in `/raw/`.
+* DONE: Future: a compile step for JS.
+* DONE: Compile (well, consolidate) admin files from `/Css/` and `/Js/` to `/raw/admin.css` and `/raw/admin.js`
+* DONE: Compile user files from `/Css/` and `/Js/` to `/raw/user.css` and `/raw/user.js`
+* DONE: Do that compilation automatically before each commit, so I don't forget.
+* DONE: Change templates to use the compiled files from the `/raw/` folder.
+* DONE: JS is probably broken. Modify AdminApiTemplate to include all JS.
+* DONE: Move Javascript logging to its own class.
+* DONE: Rename `/src/Admin.php` to `/src/AdminGateway.php`, avoiding name conflict with `/admin.php`.
+* DONE: Rename `/src/Index.php` to `/src/IndexGateway.php`, avoiding name conflict with `/index.php`.
+* DONE: Rename `/app/` folder to `/src/` folder.
+* DONE: API to be a separate file.
+* DONE: Rewrite the APIs to go through a single /api.php/ file and use a consistent format.
+* DONE: Clean up the API calls in the JS.
+* DONE: Add response types to EndpointRegistry.
+* DONE: Strip out old API handling.
+* DONE: Utterly ridiculous amounts of debugging to track down all the issues with APIs.
+
 ## 2025/06/20 Sat
 
 * Items moved over from README's "How it should work (Phase 1)" section:

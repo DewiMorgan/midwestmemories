@@ -2,32 +2,24 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
-Following will enable .css and .js files to be used at all: currently they fail as they aren't recognised filetypes.
-
-* Create `/raw/` folder for CSS, JS, icons... that we don't even want to log access to.
-    * Update .htaccess to give direct access to files in `/raw/`.
-    * This will also prevent conflicts with files from Dropbox.
-    * Also whitelist /nonexistent.file, so 404 page can happen?
-
-* Rate-limit by the IP as well as the username?
-* Add unit tests for everything.
-    * Get API tests working.
-    * Generate Web page tests.
 * Finish converting user logins to new mechanism.
-* JS is probably broken. Modify AdminApiTemplate to include all JS.
-    * Future: a compile step for JS.
-* Convert API to be a separate file.
-    * Need to change the UI to use the new system.
-    * User endpoints return a string, should maybe return an object like the file endpoints?
-    * Make the JS also handle endpoints using the lookup table?
-    * Create CommentManager class.
-    * Convert Comments to use new API.
-* Change endpoints to be loaded as a class or config file or something.
-* Move source out of web root (edit autoloader?).
-* Convert user management to session-and-DB based.
+* Need to change the UI to use the new JS/CSS system.
+* Need to change the UI to use the new API system.
 * Get folder-level details showing.
 * Faster page loads (smaller initial images?)
 * Create a "live" site, and a "test" site.
+
+* Create CommentManager class.
+* Convert Comments to use new API.
+* Generate Web page tests.
+
+* Whitelist /nonexistent.file, so 404 page can happen?
+* Rate-limit by the IP as well as the username?
+* User endpoints return a string, should maybe return an object like the file endpoints?
+* Make the JS also handle endpoints using the lookup table?
+* Change endpoints to be loaded as a class or config file or something.
+* WONTFIX: Move source out of web root (edit autoloader?).
+* DONE: Convert user management to session-and-DB based.
 
 * Handle API errors instead of just checking `result.ok` (which just checks it was a 200).
     * Also make API errors not return 200 OK.
