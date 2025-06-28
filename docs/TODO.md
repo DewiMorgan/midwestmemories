@@ -3,9 +3,11 @@
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
 * DONE: Finish converting user logins to new mechanism.
-* Fix folder icons.
-* Need to change the UI to use the new JS/CSS system.
-* Need to change the UI to use the new API system.
+* DONE: Fix folder icons.
+* DONE: Add a welcome and logout button for the username.
+
+* Need to change the user UI to use the new JS/CSS system.
+* Need to change the user UI to use the new API system.
 * Get folder-level details showing.
 * Faster page loads (smaller initial images?)
 * Create a "live" site, and a "test" site.

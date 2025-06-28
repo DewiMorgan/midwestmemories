@@ -17,9 +17,8 @@ use ValueError;
 /**
  * Handle all JSON API calls.
  * REST-ful, CRUD, and other buzzwords apply here.
- * @noinspection PhpClassNamingConventionInspection
  */
-class Api
+class ApiGateway
 {
     private string $method;
     private string $path;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
-use MidwestMemories\Api\Api;
+use MidwestMemories\Api\ApiGateway;
 
 /**
  * All JSON APIs go through this endpoint.
@@ -17,5 +17,5 @@ header('Content-Type: application/json');
 
 require_once(__DIR__ . '/src/autoload.php');
 
-$api = new Api();
+$api = new ApiGateway();
 $api->handleApiCall();
