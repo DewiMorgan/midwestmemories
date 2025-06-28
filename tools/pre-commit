@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Run the PHP compilation check in silent mode
+php tools/compile.php --silent
+EXIT_CODE=$?
+
+# If the exit code is 1, files needed recompilation
+if [ $EXIT_CODE -eq 1 ]; then
+    echo "Error: JavaScript/CSS files have been recompiled. Please add the compiled files to your commit."
+    exit 1
+fi
+
+exit 0
