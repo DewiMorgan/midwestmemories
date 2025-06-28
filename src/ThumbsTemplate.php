@@ -147,10 +147,10 @@ use MidwestMemories\Enum\Key;
                 $h_thumbTitle = htmlspecialchars($item);
             } elseif ('..' === $item) {
                 $h_thumbTitle = '<strong>..</strong> - up one folder.';
-                $u_thumbUrl = Path::unixPathToUrl('/tn_folder_up.png', Path::LINK_RAW);
+                $u_thumbUrl = '/raw/tn_folder_up.png';
             } else {
                 $h_thumbTitle = htmlspecialchars($item);
-                $u_thumbUrl = Path::unixPathToUrl('/tn_folder.png', Path::LINK_RAW);
+                $u_thumbUrl = '/raw/tn_folder.png';
             }
             $u_linkUrl = Path::unixPathToUrl($itemPath, Path::LINK_INLINE);
 

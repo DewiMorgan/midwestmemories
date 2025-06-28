@@ -2,7 +2,8 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
-* Finish converting user logins to new mechanism.
+* DONE: Finish converting user logins to new mechanism.
+* Fix folder icons.
 * Need to change the UI to use the new JS/CSS system.
 * Need to change the UI to use the new API system.
 * Get folder-level details showing.
