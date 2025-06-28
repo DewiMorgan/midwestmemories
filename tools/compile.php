@@ -1,69 +1,79 @@
 #!/usr/bin/env php
 <?php
+
 declare(strict_types=1);
-/**
- * Generate a single JS file from multiple JS files.
- */
-require_once(__DIR__ . '/../src/JsCompiler.php');
-compileAllFiles();
-echo(0);
 
 /**
- * @return void
+ * Checks for JS/CSS files needing to be recompiled.
+ * It can be used as a pre-commit hook.
+ *
+ * Usage: PHP check-js-compilation.php [--silent]
+ *
+ * Options:
+ *   --silent = Suppress all output (useful for scripts).
+ *
+ * Exit codes:
+ * 0 - No compilation needed, or compilation caused no changes.
+ * 1 - Compilation was needed, and caused changes, or failed.
  */
-function compileAllFiles(): void
+
+require_once(__DIR__ . '/../src/JsCompiler.php');
+
+use JetBrains\PhpStorm\NoReturn;
+use MidwestMemories\JsCompiler;
+
+// Parse command line arguments.
+$options = getopt('', ['silent']);
+/** @noinspection PhpVariableNamingConventionInspection */
+$SILENT = isset($options['silent']);
+
+compileAllFiles();
+
+/**
+ * Check if any files are outdated and need recompilation.
+ */
+#[NoReturn] function compileAllFiles(): void
 {
+    // Check if any files need recompilation.
+    if (!JsCompiler::areAnyFilesOutdated()) {
+        silentEcho('No files need recompilation.');
+        exit(0);
+    }
+
     $outputDir = __DIR__ . '/../raw';
 
-// Get initial checksums.
-    $initialChecksums = getFileChecksums($outputDir);
-
-    echo 'Compiling...';
-    MidwestMemories\JsCompiler::compileAllIfNeeded();
-    echo "complete.\n\n";
-
-// Get checksums after compilation.
-    $finalChecksums = getFileChecksums($outputDir);
-    $changedFiles = getChangedFiles($initialChecksums, $finalChecksums);
+    // If we get here, files need recompilation.
+    silentEcho('Some files need recompilation. Running compiler...');
+    $initialChecksums = JsCompiler::getFileChecksums($outputDir);
+    $result = MidwestMemories\JsCompiler::compileAllIfNeeded();
+    if (!$result) {
+        silentEcho('Error: Failed to compile JavaScript/CSS files.');
+        exit(1);
+    }
+    $finalChecksums = JsCompiler::getFileChecksums($outputDir);
+    $changedFiles = JsCompiler::getChangedFiles($initialChecksums, $finalChecksums);
+    silentEcho("Complete.\n");
 
     if (empty($changedFiles)) {
-        echo "No files were modified.\n";
+        silentEcho('No files were modified.');
+        exit(0);
     } else {
-        echo "Modified files:\n" . implode("\n", $changedFiles) . "\n";
+        silentEcho("Some files have been modified:\n" . implode("\n", $changedFiles));
+        silentEcho('Please add them to your commit.');
+        exit(1);
     }
 }
 
 /**
- * @param array $before The checksums before compilation.
- * @param array $after The checksums after compilation.
- * @return array The list of changed files.
+ * Echo a string, unless in silent mode.
+ * @param string $str
+ * @return void
  */
-function getChangedFiles(array $before, array $after): array
+function silentEcho(string $str): void
 {
-    $changed = [];
-    foreach ($after as $file => $newChecksum) {
-        if (!isset($before[$file]) || $before[$file] !== $newChecksum) {
-            $status = !isset($before[$file]) ? 'NEW' : 'MODIFIED';
-            $changed[] = sprintf(
-                '%s: %s (%s bytes)',
-                $status,
-                basename($file),
-                filesize($file)
-            );
-        }
+    /** @noinspection PhpVariableNamingConventionInspection */
+    global $SILENT;
+    if (!$SILENT) {
+        echo $str . "\n";
     }
-    return $changed;
-}
-
-/**
- * @param string $dir The directory to scan.
- * @return array The checksums of the files in the directory.
- */
-function getFileChecksums(string $dir): array
-{
-    $checksums = [];
-    foreach (glob($dir . '/*.{css,js}', GLOB_BRACE) as $file) {
-        $checksums[$file] = md5_file($file);
-    }
-    return $checksums;
 }

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
-use MidwestMemories\Enum\Key;
-
 /**
  * JsCompiler - A utility class for compiling JavaScript files.
  *
@@ -29,6 +27,18 @@ class JsCompiler
         'Log.js',
         'UserPage.js',
     ];
+
+    /**
+     * Check if any files are outdated and need recompilation.
+     * @return bool If any files need recompilation.
+     */
+    public static function areAnyFilesOutdated(): bool
+    {
+        return self::isFileOutdated(self::$adminFiles, __DIR__ . '/../raw/admin.js')
+            || self::isFileOutdated(self::$userFiles, __DIR__ . '/../raw/user.js')
+            || self::isFileOutdated(['admin.css'], __DIR__ . '/../raw/admin.css')
+            || self::isFileOutdated(['user.css'], __DIR__ . '/../raw/user.css');
+    }
 
     /**
      * If the output files are outdated, compile the JS files and copy the CSS.
@@ -60,10 +70,10 @@ class JsCompiler
      * Check if an output file needs reinstalling or recompiling.
      * @param array $inputFiles Array of filenames relative to /src/Js/
      * @param string $outputFile Absolute path to the output file
-     * @param string|null $jsDir Folder to find source JS files in, including trailing slash.
+     * @param ?string $jsDir Folder to find source JS files in, including trailing slash.
      * @return bool If file is outdated or missing.
      */
-    public static function isFileOutdated(array $inputFiles, string $outputFile, string $jsDir = null): bool
+    public static function isFileOutdated(array $inputFiles, string $outputFile, ?string $jsDir): bool
     {
         if (!file_exists($outputFile)) {
             return true;
@@ -78,17 +88,6 @@ class JsCompiler
             }
         }
         return false;
-    }
-
-    /**
-     * Generate all the JavaScript files.
-     * @return bool Success.
-     */
-    public static function compileAll(): bool
-    {
-        $outputDir = __DIR__ . '/../raw';
-        return self::compile(self::$adminFiles, "$outputDir/admin.js")
-            && self::compile(self::$userFiles, "$outputDir/user.js");
     }
 
     /**
@@ -135,5 +134,40 @@ class JsCompiler
         }
 
         return file_put_contents($outputFile, $output, LOCK_EX) !== false;
+    }
+
+    /**
+     * @param string $dir The directory to scan.
+     * @return array The checksums of the files in the directory.
+     */
+    public static function getFileChecksums(string $dir): array
+    {
+        $checksums = [];
+        foreach (glob($dir . '/*.{css,js}', GLOB_BRACE) as $file) {
+            $checksums[$file] = md5_file($file);
+        }
+        return $checksums;
+    }
+
+    /**
+     * @param array $before The checksums before compilation.
+     * @param array $after The checksums after compilation.
+     * @return array The list of changed files.
+     */
+    public static function getChangedFiles(array $before, array $after): array
+    {
+        $changed = [];
+        foreach ($after as $file => $newChecksum) {
+            if (!isset($before[$file]) || $before[$file] !== $newChecksum) {
+                $status = !isset($before[$file]) ? 'NEW' : 'MODIFIED';
+                $changed[] = sprintf(
+                    '%s: %s (%s bytes)',
+                    $status,
+                    basename($file),
+                    filesize($file)
+                );
+            }
+        }
+        return $changed;
     }
 }
