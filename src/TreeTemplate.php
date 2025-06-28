@@ -21,6 +21,11 @@ use MidwestMemories\Enum\Key;
 $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
 ?>
 <body onload="openLinkInline('<?= $u_linkUrl ?>')">
+<form method="post" style="display: inline;">
+    <input type="hidden" name="action" value="logout">
+    <button type="submit" style="margin-left: 10px;">Logout</button>
+</form>
+
 <div class="flex-container" id="parent-container">
     <div class="tree-view left-column">
         <?php
