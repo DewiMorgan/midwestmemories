@@ -141,7 +141,7 @@ class IndexGateway
                     $data = self::execGetComments($fileId, $pageSize, $startItem);
                     break;
                 case 'postComment':
-                    $userName = $_SERVER['PHP_AUTH_USER'];
+                    $userName = User::getInstance()->username;
                     $bodyText = json_decode(file_get_contents('php://input'), true);
                     if (empty($bodyText)) {
                         Log::warning('Ignoring empty comment struct from ' . self::$requestWebPath, $bodyText);
