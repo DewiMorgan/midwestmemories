@@ -26,7 +26,7 @@ class JsCompiler
         'HtmlUtils.js',
         'DragBar.js',
         'Log.js',
-        'UserPage.js',
+        'TreeView.js',
     ];
 
     /**
