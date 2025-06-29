@@ -302,7 +302,7 @@ window.TreeView = class {
 
     addFoldClickHandler(folder) {
         console.log("Adding onClick to fold: " + folder.textContent);
-        folder.addEventListener('click', foldElement);
+        folder.addEventListener('click', this.handleFoldClick);
     }
 
 
