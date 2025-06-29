@@ -25,7 +25,7 @@ use MidwestMemories\JsCompiler;
 // Parse command line arguments.
 $options = getopt('', ['silent']);
 /** @noinspection PhpVariableNamingConventionInspection */
-$SILENT = isset($options['silentX']);
+$SILENT = isset($options['silent']);
 
 compileAllFiles();
 
@@ -43,7 +43,7 @@ compileAllFiles();
     $outputDir = __DIR__ . '/../raw';
 
     // If we get here, files need recompilation.
-    silentEcho('Some files need recompilation. Running compiler...');
+    silentEcho('Some files may need recompilation. Running compiler...');
     $initialChecksums = JsCompiler::getFileChecksums($outputDir);
     $result = MidwestMemories\JsCompiler::compileAllIfNeeded();
     if (!$result) {
