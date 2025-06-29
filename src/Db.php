@@ -217,7 +217,7 @@ class Db extends Singleton
             return [];
         }
         if (self::TYPE_EXEC == $queryType) {
-            return ['id', $db->insert_id, 'rows' => $db->affected_rows];
+            return ['id' => $db->insert_id, 'rows' => $db->affected_rows];
         }
         if (!($result = $query->get_result())) {
             Log::warn('get_result failed, db error', $db->error);
