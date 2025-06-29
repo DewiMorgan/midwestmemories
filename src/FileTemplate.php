@@ -226,6 +226,7 @@ use MidwestMemories\Enum\Key;
         commentControlDiv.id = 'comment-controls';
 
         const commentsDiv = document.getElementById('comments');
+        // ToDo: sometimes this gives an error, because comments wasn't found, when switching to a thumbs template. Why?
         commentsDiv.appendChild(commentControlDiv);
 
         return commentControlDiv;

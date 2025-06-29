@@ -233,8 +233,9 @@ class IndexGateway
         Log::debug("Db::sqlExec('$insertSql', 'ssii', '$userName', '$bodyText', '$nextSeq', '$fileId')");
         $insertResult = Db::sqlExec($insertSql, 'ssii', $userName, $bodyText, $nextSeq, $fileId);
 
-        if (empty($insertResult) || (0 === $insertResult['rows'] ?? 0) || (0 === $insertResult['id'] ?? 0)) {
+        if (empty($insertResult) || (0 === ($insertResult['rows'] ?? 0)) || (0 === ($insertResult['id'] ?? 0))) {
             Log::debug("Failed to add comment by $userName on $fileId", $bodyText);
+            Log::debug('Insert result', $insertResult);
             return ['error' => 'Failed to save comment 5'];
         } else {
             Log::debug("Added comment by $userName on $fileId", $bodyText);

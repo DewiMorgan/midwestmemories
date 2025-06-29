@@ -7,6 +7,8 @@ This is the stuff I'm actually working on, as steps towards the ultimate goal.
 * DONE: Add a welcome and logout button for the username.
 * DONE: Create CommentManager class.
 
+* Loading thumb or image page overwrites the LoadTemplate() function, so we can't use it.
+
 * Convert Comments to use new API.
 
 * Need to change the user UI to use the new JS/CSS system.

@@ -15,14 +15,14 @@ namespace MidwestMemories;
     <script src="/raw/user.js"></script>
 </head>
 <body onload="setupTemplate()">
-Welcome, <?= htmlspecialchars(User::getInstance()->username) ?>!
-<form method="post" style="display: inline;">
-    <input type="hidden" name="action" value="logout">
-    <button type="submit" style="margin-left: 10px;">Logout</button>
-</form>
-
 <div class="flex-container" id="parent-container">
     <div class="tree-view left-column">
+        Welcome, <?= htmlspecialchars(User::getInstance()->username) ?>!
+        <form method="post" style="display: inline;">
+            <input type="hidden" name="action" value="logout">
+            <button type="submit" style="margin-left: 10px;">Logout</button>
+        </form>
+
         <?php
         // Set the root directory to display in the tree view.
         $root = Path::$imgBaseUnixPath;
