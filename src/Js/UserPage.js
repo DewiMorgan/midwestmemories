@@ -4,46 +4,6 @@
  */
 
 ///////////////////
-// DragBar behavior.
-///////////////////
-const dragBar = document.querySelector('.drag-bar');
-const leftColumn = document.querySelector('.left-column');
-let rightColumn = document.querySelector('.right-column');
-
-let isDragging = false;
-let currentX;
-let leftColumnWidth;
-let rightColumnWidth;
-
-dragBar.addEventListener('mousedown', handleDragBarMouseDown);
-document.addEventListener('mousemove', handleDragBarMouseMove);
-document.addEventListener('mouseup', handleDragBarMouseUp);
-
-function handleDragBarMouseMove(e) {
-    if (isDragging) {
-        e.preventDefault();
-        const deltaX = e.clientX - currentX;
-        const newLeftColumnWidth = Math.max(50, leftColumnWidth + deltaX);
-        const newRightColumnWidth = Math.max(50, rightColumnWidth - deltaX);
-        leftColumn.style.width = newLeftColumnWidth + 'px';
-        rightColumn.style.width = newRightColumnWidth + 'px';
-    }
-}
-
-function handleDragBarMouseDown(e) {
-    // Reselect this as it may have been recreated.
-    rightColumn = document.querySelector('.right-column');
-    isDragging = true;
-    currentX = e.clientX;
-    leftColumnWidth = leftColumn.offsetWidth;
-    rightColumnWidth = rightColumn.offsetWidth;
-}
-
-function handleDragBarMouseUp() {
-    isDragging = false;
-}
-
-///////////////////
 // Tree view event listeners to handle expand/collapse behavior.
 ///////////////////
 
