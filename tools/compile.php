@@ -25,7 +25,7 @@ use MidwestMemories\JsCompiler;
 // Parse command line arguments.
 $options = getopt('', ['silent']);
 /** @noinspection PhpVariableNamingConventionInspection */
-$SILENT = isset($options['silent']);
+$SILENT = isset($options['silentX']);
 
 compileAllFiles();
 
