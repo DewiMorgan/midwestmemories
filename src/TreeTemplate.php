@@ -14,7 +14,7 @@ namespace MidwestMemories;
     <!--suppress HtmlUnknownTarget -->
     <script src="/raw/user.js"></script>
 </head>
-<body>
+<body onload="setupTemplate()">
 Welcome, <?= htmlspecialchars(User::getInstance()->username) ?>!
 <form method="post" style="display: inline;">
     <input type="hidden" name="action" value="logout">
