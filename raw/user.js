@@ -421,7 +421,6 @@ window.TreeView = class {
      * Import predefined template elements (content and scripts) from the remote page to the target container.
      * @param {HTMLElement} remoteBody - The body element of the remote document.
      * @param {HTMLElement} targetContainer - The container to import content into.
-     * ToDo: we probably do not need the script part any more.
      */
     importRemoteContent(remoteBody, targetContainer) {
         // Cleanup from previous template
@@ -439,6 +438,7 @@ window.TreeView = class {
             targetContainer.appendChild(clonedNode);
         }
 
+        // The script is used to handle any template-specific setup.
         if (script) {
             const newScript = document.createElement('script');
             newScript.textContent = script.textContent;
@@ -574,7 +574,4 @@ window.TreeView = class {
         new TreeView();
     }
 };
-
-// Initialize the TreeView when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', TreeView.init);
 

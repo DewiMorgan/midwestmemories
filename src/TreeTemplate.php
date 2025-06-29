@@ -4,9 +4,6 @@
 declare(strict_types=1);
 
 namespace MidwestMemories;
-
-use MidwestMemories\Enum\Key;
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -106,6 +103,13 @@ Welcome, <?= htmlspecialchars(User::getInstance()->username) ?>!
     </div>
     <div class="drag-bar"></div>
     <div class="content right-column" id="content">Hello, world!</div>
+    <script>
+        // Initialize the TreeView.
+        function setupTemplate() {
+            console.log("Fetching comments...");
+            TreeView.init();
+        }
+    </script>
 </div>
 </body>
 </html>

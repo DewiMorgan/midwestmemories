@@ -51,10 +51,10 @@ class JsCompiler
         $result = true;
         // Handle Js.
         if (self::isFileOutdated(self::$adminFiles, "$outputDir/admin.js")) {
-            $result = self::compile(self::$adminFiles, "$outputDir/admin.js");
+            $result = self::compile(self::$adminFiles, "$outputDir/admin.js", '');
         }
         if (self::isFileOutdated(self::$userFiles, "$outputDir/user.js")) {
-            $result = $result && self::compile(self::$userFiles, "$outputDir/user.js");
+            $result = $result && self::compile(self::$userFiles, "$outputDir/user.js", '');
         }
         // Handle Css.
         $cssDir = __DIR__ . '/Css/';
@@ -96,12 +96,12 @@ class JsCompiler
      *
      * @param string[] $inputFiles Array of filenames relative to /src/Js/
      * @param string $outputFile The target output file path.
-     * @param string|null $jsDir Folder to find source JS files in, including trailing slash.
+     * @param string $jsDir Folder to find source JS files in, including trailing slash.
      * @return bool True on success, false on failure
      */
-    public static function compile(array $inputFiles, string $outputFile, string $jsDir = null): bool
+    public static function compile(array $inputFiles, string $outputFile, string $jsDir): bool
     {
-        $jsDir = $jsDir ?? __DIR__ . '/Js/';
+        $jsDir = $jsDir !== '' ? $jsDir : __DIR__ . '/Js/';
         $output = '';
 
         // First, verify all files exist.
