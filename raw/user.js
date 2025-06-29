@@ -571,7 +571,7 @@ window.TreeView = class {
      */
     static init() {
         // noinspection ObjectAllocationIgnored
-        new TreeView();
+        return new TreeView();
     }
 };
 
