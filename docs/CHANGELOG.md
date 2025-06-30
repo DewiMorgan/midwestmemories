@@ -3,9 +3,14 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
-## 2025/06/29 Fri
+## 2025/06/29 Sat
 
-
+* DONE: Finish converting user logins to new mechanism.
+* DONE: Fix folder icons.
+* DONE: Add a welcome and logout button for the username.
+* DONE: Create CommentManager class.
+* DONE: User pages are back to being as functional as before I started changing things.
+* FIXED: Loading a thumb or image page overwrites the LoadTemplate() function, so we can't use it.
 
 ## 2025/06/28 Fri
 

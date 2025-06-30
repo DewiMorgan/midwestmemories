@@ -2,21 +2,12 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
-* DONE: Finish converting user logins to new mechanism.
-* DONE: Fix folder icons.
-* DONE: Add a welcome and logout button for the username.
-* DONE: Create CommentManager class.
-
-* Loading thumb or image page overwrites the LoadTemplate() function, so we can't use it.
-
 * Convert Comments to use new API.
-
 * Need to change the user UI to use the new JS/CSS system.
 * Need to change the user UI to use the new API system.
 * Get folder-level details showing.
 * Faster page loads (smaller initial images?)
 * Create a "live" site, and a "test" site.
-
 * Generate Web page tests.
 * Add unit tests for everything.
 

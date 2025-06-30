@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MidwestMemories\Enum;
 
 /**
- * Enum representing all API endpoints in the system.
+ * Enum representing all API endpoints and their methods in the system.
  */
 enum EndpointKey: string
 {

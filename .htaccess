@@ -1,6 +1,5 @@
 # Allow access to files in the /raw directory
 <Directory "/raw">
-#    Satisfy Any
     Order allow,deny
     Allow from all
    Require all granted
@@ -22,11 +21,11 @@ RewriteEngine On
     Require valid-user
 </Files>
 
-# Exclude dropboxwebhook.php from rewriting
+# Exclude dropboxwebhook.php from rewriting.
 RewriteCond %{REQUEST_URI} ^/dropboxwebhook\.php$ [NC]
 RewriteRule ^ - [L]
 
-# Skip existing files or directories
+# Skip existing files or directories. Access to these is controlled by .htaccess files in their directories.
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
