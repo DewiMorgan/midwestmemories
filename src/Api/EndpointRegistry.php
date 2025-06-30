@@ -109,33 +109,37 @@ class EndpointRegistry
                 'auth' => 'none',
                 'params' => ['username' => ParamTypes::STRING, 'password' => ParamTypes::STRING],
                 'callback' => User::handleUserLogin(...),
-                'responseType' => 'object', // Returns a string 'OK' or 'Error: ...'.
+                'responseType' => 'object', // Returns an associative array with status, etc.
             ],
 
             // User-accessible comment endpoints with rate limiting
             EndpointKey::GET_COMMENT => [
                 'auth' => 'user',
-                'params' => ['image_id' => ParamTypes::INT],
+                'params' => ['file_id' => ParamTypes::INT, 'comment_text' => ParamTypes::STRING],
                 'rate_limit' => ['limit' => 30, 'window' => 60],
                 'callback' => CommentManager::getComments(...),
+                'responseType' => 'object', // Returns an associative array with status, etc.
             ],
             EndpointKey::POST_COMMENT => [
                 'auth' => 'user',
-                'params' => ['image_id' => ParamTypes::INT, 'comment_text' => ParamTypes::STRING],
+                'params' => ['file_id' => ParamTypes::INT, 'comment_text' => ParamTypes::STRING],
                 'rate_limit' => ['limit' => 20, 'window' => 60],
                 'callback' => CommentManager::addComment(...),
+                'responseType' => 'object', // Returns an associative array with status, etc.
             ],
             EndpointKey::PUT_COMMENT => [
                 'auth' => 'user',
                 'params' => ['comment_id' => ParamTypes::INT, 'new_comment_text' => ParamTypes::STRING],
                 'rate_limit' => ['limit' => 20, 'window' => 60],
                 'callback' => CommentManager::editComment(...),
+                'responseType' => 'object', // Returns an associative array with status, etc.
             ],
             EndpointKey::DELETE_COMMENT => [
                 'auth' => 'user',
                 'params' => ['comment_id' => ParamTypes::INT],
                 'rate_limit' => ['limit' => 20, 'window' => 60],
                 'callback' => CommentManager::deleteComment(...),
+                'responseType' => 'object', // Returns an associative array with status, etc.
             ],
 
             default => null,

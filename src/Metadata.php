@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use MidwestMemories\Enum\Key;
+
 /**
  * Purely static class to handle moving metadata between ini files, DB, web display, and web form.
  * Metadata can be inherited from parent folders, etc. So we need to store the entire tree, lazy-loaded.
@@ -22,70 +24,15 @@ class Metadata
     private static array $folderTree = [];
 
     /**
-     * Load in our data from an Ini file, and all parents, into the singleton's $folderTree datastore.
-     * @param string $webPath The web path to load build and load the folder tree down to, from the root.
-     */
-    public static function loadFromInis(string $webPath): void
-    {
-        $webPathSoFar = '';
-        $currentNode = &self::$folderTree;
-        // "/var/www/path/to/file" => '/path/to/file' => ['', 'path', 'to', 'file']
-        foreach (explode('/', $webPath) AS $pathElement) {
-            // Build the folder tree to the branch we're interested in.
-            if ($pathElement !== '') {
-                if (!array_key_exists($pathElement, $currentNode)) {
-                    $currentNode[$pathElement] = [];
-                }
-                $currentNode = &$currentNode[$pathElement];
-            }
-            // Create the data only if it doesn't already exist.
-            if (!array_key_exists('data', $currentNode)) {
-                $currentNode['data'] = [];
-            }
-            $webPathSoFar .= '/' . $pathElement;
-            $webPathSoFar = preg_replace('#//#', '/', $webPathSoFar);
-            if (empty($currentNode['data'])) {
-                $currentNode['data'] = self::loadOneFolderIni($webPathSoFar);
-            }
-        }
-    }
-
-    /**
-     * Load data block for a single folder, and return it without changing the singleton's datastore.
-     * @param string $webPath Web path to parse.
-     * @return array|array[] The array structure read for that folder.
-     */
-    private static function loadOneFolderIni(string $webPath): array
-    {
-        $iniUnixPath = Path::webToUnixPath(preg_replace('#//#', '/', "$webPath/index.txt"), false);
-        if (!file_exists($iniUnixPath)) {
-            Log::debug("loadFolderIni found no ini from webPath $webPath at unix path", $iniUnixPath);
-            // Can't print this as we call it for every parent/ancestor folder, too.
-            // Index::showError('No ini file for this folder.');
-            return [];
-        }
-        Log::debug("loadFolderIni found ini from webPath $webPath at unix path", $iniUnixPath);
-
-        $iniFileData = parse_ini_file($iniUnixPath, true);
-
-        if (false === $iniFileData) {
-            Log::error('loadFolderIni failed to parse ini file', $webPath);
-            IndexGateway::showError('Failed to parse ini file for this folder.');
-            die(1);
-        }
-
-        return MetadataCleaner::cleanDirData($iniFileData);
-    }
-
-    /**
-     * Get the directory's metadata entry for the given absolute file, or folder.
-     * @see getFileDataByWebPath for more info.
-     * @param string $unixFilePath The absolute unix file to get the information for.
+     * Get the directory's metadata entry for the given absolute file or folder, escaped for HTML.
+     * @param string $requestUnixPath The absolute unix file to get the information for.
      * @return array Subarray from the metadata in self::$folderTree.
+     * @see getFileDataByWebPath for more info.
      */
-    public static function getFileDataByUnixPath(string $unixFilePath): array
+    public static function getEscapedByUnixPath(string $requestUnixPath): array
     {
-        return self::getFileDataByWebPath(Path::unixToWebPath($unixFilePath));
+        $path = Path::unixToWebPath($requestUnixPath);
+        return self::htmlEscape(self::getFileDataByWebPath($path));
     }
 
     /**
@@ -140,5 +87,103 @@ class Metadata
         }
         Log::warning("File entry at '$webFilePath' was not an array: returning empty.", $currentLevel);
         return [];
+    }
+
+    /**
+     * Get the ID of the displayed file.
+     * @return int
+     */
+    public static function getFileId(): int
+    {
+        $webPath = IndexGateway::$requestWebPath;
+        $dropboxPath = Conf::get(Key::IMAGE_DIR) . $webPath;
+        $sql = 'SELECT `id` FROM `' . Db::TABLE_FILE_QUEUE . '` WHERE `full_path` = ?';
+        return intval(Db::sqlGetValue('id', $sql, 's', $dropboxPath));
+    }
+
+    /**
+     * Convert the raw file details into an HTML-escaped version.
+     * @param array $fileDetails Array from which to HTML escape all fields.
+     * @return array The resulting escaped array.
+     */
+    public static function htmlEscape(array $fileDetails): array
+    {
+        $htmlEscaped = [];
+        foreach ($fileDetails as $key => $fileDetail) {
+            if (is_array($fileDetail)) {
+                if ('date' === $key) {
+                    $htmlEscaped[$key] = htmlspecialchars($fileDetail['dateString']);
+                } else {
+                    $htmlEscaped[$key] = htmlspecialchars(implode(', ', $fileDetail));
+                }
+            } elseif (is_numeric($fileDetail)) {
+                $htmlEscaped[$key] = $fileDetail;
+            } elseif (is_string($fileDetail) && '' !== $fileDetail) {
+                $htmlEscaped[$key] = htmlspecialchars($fileDetail);
+            } else {
+                $htmlEscaped[$key] = match ($key) {
+                    'slideorigin', 'slidenumber', 'slidesubsection' => '?',
+                    'displayname' => 'unknown image',
+                    default => 'unknown',
+                };
+            }
+        }
+        return $htmlEscaped;
+    }
+
+    /**
+     * Load in our data from an Ini file, and all parents, into the singleton's $folderTree datastore.
+     * @param string $webPath The web path to load build and load the folder tree down to, from the root.
+     */
+    public static function loadFromInis(string $webPath): void
+    {
+        $webPathSoFar = '';
+        $currentNode = &self::$folderTree;
+        // "/var/www/path/to/file" => '/path/to/file' => ['', 'path', 'to', 'file']
+        foreach (explode('/', $webPath) as $pathElement) {
+            // Build the folder tree to the branch we're interested in.
+            if ($pathElement !== '') {
+                if (!array_key_exists($pathElement, $currentNode)) {
+                    $currentNode[$pathElement] = [];
+                }
+                $currentNode = &$currentNode[$pathElement];
+            }
+            // Create the data only if it doesn't already exist.
+            if (!array_key_exists('data', $currentNode)) {
+                $currentNode['data'] = [];
+            }
+            $webPathSoFar .= '/' . $pathElement;
+            $webPathSoFar = preg_replace('#//#', '/', $webPathSoFar);
+            if (empty($currentNode['data'])) {
+                $currentNode['data'] = self::loadOneFolderIni($webPathSoFar);
+            }
+        }
+    }
+
+    /**
+     * Load data block for a single folder, and return it without changing the singleton's datastore.
+     * @param string $webPath Web path to parse.
+     * @return array|array[] The array structure read for that folder.
+     */
+    private static function loadOneFolderIni(string $webPath): array
+    {
+        $iniUnixPath = Path::webToUnixPath(preg_replace('#//#', '/', "$webPath/index.txt"), false);
+        if (!file_exists($iniUnixPath)) {
+            Log::debug("loadFolderIni found no ini from webPath $webPath at unix path", $iniUnixPath);
+            // Can't print this as we call it for every parent/ancestor folder, too.
+            // Index::showError('No ini file for this folder.');
+            return [];
+        }
+        Log::debug("loadFolderIni found ini from webPath $webPath at unix path", $iniUnixPath);
+
+        $iniFileData = parse_ini_file($iniUnixPath, true);
+
+        if (false === $iniFileData) {
+            Log::error('loadFolderIni failed to parse ini file', $webPath);
+            IndexGateway::showError('Failed to parse ini file for this folder.');
+            die(1);
+        }
+
+        return MetadataCleaner::cleanDirData($iniFileData);
     }
 }
