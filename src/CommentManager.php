@@ -158,43 +158,41 @@ class CommentManager extends Singleton
         return Db::sqlGetRow($sql, 'i', $commentId);
     }
 
-
-
-    /**
-     * Looks at the request method and the first element of the path, to generate an endpoint string.
-     * So "GET /api/v1.0/messages/test" => "getMessages". Then performs an operation depending on that string.
-     * @return string The output of the API call, as JSON.
-     */
-    private static function execApiCall(): string
-    {
-        Log::debug('Starting...', self::$requestWebPath);
-        $pathParts = preg_split('#/#', self::$requestWebPath, -1, PREG_SPLIT_NO_EMPTY);
-        if (is_array($pathParts)) {
-            $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($pathParts[1]);
-
-            $fileId = intval($pathParts[2] ?? 0);
-            switch ($endpoint) {
-                case 'getComment':
-                    $data = self::getCommentX($pathParts[3], $fileId);
-                    break;
-                case 'postComment':
-                    $data = self::PostCommentX($fileId);
-                    break;
-                default:
-                    $data = ['error' => "Unknown endpoint $endpoint"];
-                    break;
-            }
-            try {
-                $encoded = json_encode($data, JSON_THROW_ON_ERROR);
-            } catch (JsonException) {
-                Log::error('Failed to encode data', self::$requestWebPath);
-                $encoded = "{'error':'Failed to encode data'}";
-            }
-        } else {
-            Log::warning('Bad API request path', self::$requestWebPath);
-            $encoded = "{'error':'Bad API request path'}";
-        }
-        Log::debug('...returning', $encoded);
-        return $encoded;
-    }
+//    /**
+//     * Looks at the request method and the first element of the path, to generate an endpoint string.
+//     * So "GET /api/v1.0/messages/test" => "getMessages". Then performs an operation depending on that string.
+//     * @return string The output of the API call, as JSON.
+//     */
+//    private static function execApiCall(): string
+//    {
+//        Log::debug('Starting...', self::$requestWebPath);
+//        $pathParts = preg_split('#/#', self::$requestWebPath, -1, PREG_SPLIT_NO_EMPTY);
+//        if (is_array($pathParts)) {
+//            $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($pathParts[1]);
+//
+//            $fileId = intval($pathParts[2] ?? 0);
+//            switch ($endpoint) {
+//                case 'getComment':
+//                    $data = self::getComment($pathParts[3], $fileId);
+//                    break;
+//                case 'postComment':
+//                    $data = self::postComment($fileId);
+//                    break;
+//                default:
+//                    $data = ['error' => "Unknown endpoint $endpoint"];
+//                    break;
+//            }
+//            try {
+//                $encoded = json_encode($data, JSON_THROW_ON_ERROR);
+//            } catch (JsonException) {
+//                Log::error('Failed to encode data', self::$requestWebPath);
+//                $encoded = "{'error':'Failed to encode data'}";
+//            }
+//        } else {
+//            Log::warning('Bad API request path', self::$requestWebPath);
+//            $encoded = "{'error':'Bad API request path'}";
+//        }
+//        Log::debug('...returning', $encoded);
+//        return $encoded;
+//    }
 }
