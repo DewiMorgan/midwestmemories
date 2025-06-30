@@ -66,6 +66,26 @@ class TestHelper
     }
 
     /**
+     * Force a logout of the current user by logging them in improperly.
+     */
+    public static function logout(): void
+    {
+        $response = self::request('POST', '/api/v1.0/login', [
+            'username' => 'invalid username',
+            'password' => 'invalid password'
+        ]);
+        if (200 !== $response['status']) {
+            throw new RuntimeException(
+                sprintf(
+                    "Logout failed with status '%d'. Body: %s",
+                    $response['status'],
+                    $response['data']
+                )
+            );
+        }
+    }
+
+    /**
      * Logs in a user and throws an exception if the login fails.
      *
      * @param string $username
@@ -83,7 +103,7 @@ class TestHelper
         if (200 !== $response['status']) {
             throw new RuntimeException(
                 sprintf(
-                    "Login failed for user '%s' with status %d. Body: %s",
+                    "Login failed for user '%s' with status '%d'. Body: %s",
                     $username,
                     $response['status'],
                     $response['data']

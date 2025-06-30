@@ -66,7 +66,7 @@ class TestHelperTest extends TestCase
     public function testLoginAsThrowsExceptionWithInvalidPassword(): void
     {
         static::expectException(RuntimeException::class);
-        static::expectExceptionMessage("Login failed for user 'test_user' with status 403");
+        static::expectExceptionMessage("Login failed for user 'test_user' with status '403'");
 
         TestHelper::loginAs(TestHelper::USER_NAME, 'wrong_password');
     }
@@ -74,7 +74,7 @@ class TestHelperTest extends TestCase
     public function testLoginAsThrowsExceptionWithUnknownUser(): void
     {
         static::expectException(RuntimeException::class);
-        static::expectExceptionMessage("Login failed for user 'unknown_user' with status 403");
+        static::expectExceptionMessage("Login failed for user 'unknown_user' with status '403'");
 
         TestHelper::loginAs('unknown_user', 'any_password');
     }
