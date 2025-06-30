@@ -208,4 +208,146 @@ class ApiTest extends TestCase
         static::assertEquals(403, $response['status'], 'Deleted user should not be able to login');
     }
 
+    public function testCommentLifecycle(): void
+    {
+        $fileId = 1; // Assuming this is a valid file ID in test environment
+
+        // Login as a regular user
+        TestHelper::loginAs(self::USER_NAME, self::PASSWORD);
+
+        // Test 1: Get initial comments (should be empty)
+        $response = TestHelper::request('GET', "/api/v1.0/comment?file_id=$fileId");
+        static::assertEquals(200, $response['status'], 'Should be able to get comments');
+        $data = json_decode($response['data'], true);
+        static::assertIsArray($data);
+        static::assertArrayHasKey('data', $data);
+        static::assertIsArray($data['data']);
+        $initialCommentCount = count($data['data']);
+
+        // Test 2: Add a new comment
+        $commentText = 'Test comment ' . time();
+        $response = TestHelper::request('POST', '/api/v1.0/comment', [
+            'file_id' => $fileId,
+            'comment_text' => $commentText
+        ]);
+        static::assertEquals(200, $response['status'], 'Should be able to add comment');
+        $data = json_decode($response['data'], true);
+        static::assertIsArray($data);
+        static::assertArrayHasKey('data', $data);
+        static::assertArrayHasKey('comment_id', $data['data']);
+        $commentId = $data['data']['comment_id'];
+
+        // Verify comment was added
+        $response = TestHelper::request('GET', "/api/v1.0/comment?file_id=$fileId");
+        $data = json_decode($response['data'], true);
+        static::assertCount($initialCommentCount + 1, $data['data'], 'Should have one more comment');
+
+        // Find our comment in the list
+        $ourComment = null;
+        foreach ($data['data'] as $comment) {
+            if ($comment['comment_id'] === $commentId) {
+                $ourComment = $comment;
+                break;
+            }
+        }
+        static::assertNotNull($ourComment, 'Our comment should be in the list');
+        static::assertEquals($commentText, $ourComment['comment_text']);
+
+        // Test 3: Edit the comment
+        $newCommentText = 'Updated comment ' . time();
+        $response = TestHelper::request('PUT', '/api/v1.0/comment', [
+            'comment_id' => $commentId,
+            'new_comment_text' => $newCommentText
+        ]);
+        static::assertEquals(200, $response['status'], 'Should be able to edit comment');
+
+        // Verify the edit
+        $response = TestHelper::request('GET', "/api/v1.0/comment?file_id=$fileId");
+        $data = json_decode($response['data'], true);
+        $found = false;
+        foreach ($data['data'] as $comment) {
+            if ($comment['comment_id'] === $commentId) {
+                static::assertEquals($newCommentText, $comment['comment_text'], 'Comment text should be updated');
+                $found = true;
+                break;
+            }
+        }
+        static::assertTrue($found, 'Updated comment should be in the list');
+
+        // Test 4: Delete the comment
+        $response = TestHelper::request('DELETE', "/api/v1.0/comment?comment_id=$commentId");
+        static::assertEquals(200, $response['status'], 'Should be able to delete comment');
+
+        // Verify deletion
+        $response = TestHelper::request('GET', "/api/v1.0/comment?file_id=$fileId");
+        $data = json_decode($response['data'], true);
+        $commentExists = false;
+        foreach ($data['data'] as $comment) {
+            if ($comment['comment_id'] === $commentId) {
+                $commentExists = true;
+                break;
+            }
+        }
+        static::assertFalse($commentExists, 'Comment should be deleted');
+    }
+
+    public function testCommentPermissions(): void
+    {
+        $fileId = 1; // Assuming this is a valid file ID in test environment
+        $commentText = 'Test comment ' . time();
+        $commentId = null;
+
+        // User 1 creates a comment
+        TestHelper::loginAs(self::USER_NAME, self::PASSWORD);
+        $response = TestHelper::request('POST', '/api/v1.0/comment', [
+            'file_id' => $fileId,
+            'comment_text' => $commentText
+        ]);
+        $data = json_decode($response['data'], true);
+        $commentId = $data['data']['comment_id'];
+
+        // User 2 tries to edit the comment (should fail)
+        TestHelper::loginAs(self::ADMIN_NAME, self::PASSWORD);
+        $response = TestHelper::request('PUT', '/api/v1.0/comment', [
+            'comment_id' => $commentId,
+            'new_comment_text' => 'Modified by admin'
+        ]);
+        static::assertEquals(403, $response['status'], 'Should not allow editing other user\'s comment');
+
+        // User 2 tries to delete the comment (should fail)
+        $response = TestHelper::request('DELETE', "/api/v1.0/comment?comment_id=$commentId");
+        static::assertEquals(403, $response['status'], 'Should not allow deleting other user\'s comment');
+
+        // Clean up (original user deletes their comment)
+        TestHelper::loginAs(self::USER_NAME, self::PASSWORD);
+        TestHelper::request('DELETE', "/api/v1.0/comment?comment_id=$commentId");
+    }
+
+    public function testCommentRateLimiting(): void
+    {
+        TestHelper::loginAs(self::USER_NAME, self::PASSWORD);
+        $fileId = 1; // Assuming this is a valid file ID in test environment
+
+        // We'll try to exceed the rate limit (20 requests per minute)
+        $successfulRequests = 0;
+        for ($i = 0; $i < 25; $i++) {
+            $response = TestHelper::request('POST', '/api/v1.0/comment', [
+                'file_id' => $fileId,
+                'comment_text' => 'Test comment ' . $i
+            ]);
+
+            if ($response['status'] === 200) {
+                $successfulRequests++;
+                // Clean up the comment to avoid polluting the test database
+                $data = json_decode($response['data'], true);
+                TestHelper::request('DELETE', "/api/v1.0/comment?comment_id=" . $data['data']['comment_id']);
+            } else if ($response['status'] === 429) {
+                // Expected rate limit hit
+                break;
+            }
+        }
+
+        // We should have been rate limited after 20 requests
+        static::assertLessThanOrEqual(20, $successfulRequests, 'Should be rate limited after 20 requests');
+    }
 }
