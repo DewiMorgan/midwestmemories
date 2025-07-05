@@ -39,10 +39,9 @@ class DropboxManager extends Singleton
 
     /**
      * @param array $list
-     * @param string $error
      * @return array
      */
-    public function handleFileList(array $list, string $error): array
+    public function handleFileList(array $list): array
     {
         $numAddedFiles = 0;
         $hasMoreFiles = false;
@@ -66,8 +65,7 @@ class DropboxManager extends Singleton
         $result = [
             static::KEY_ADDED_FILES => $numAddedFiles,
             static::KEY_TOTAL_FILES => count($list['entries'] ?? []),
-            static::KEY_MORE_FILES => $hasMoreFiles,
-            static::KEY_ERROR => $error
+            static::KEY_MORE_FILES => $hasMoreFiles
         ];
         Log::debug('FileList Result', $result);
         return $result;
@@ -85,17 +83,17 @@ class DropboxManager extends Singleton
         if (array_key_exists('cursor', $list)) {
             $saveResult = $instance->setNewCursor($list['cursor']);
             if (empty($saveResult)) {
-                $error = 'Error: Root cursor not saved to MySQL';
-                Log::error('Root cursor not saved to MySQL', $saveResult);
-            } else {
-                $error = 'OK';
+                $error = 'Server Error: Failed to save root cursor';
+                Log::error($error, $saveResult);
+                return ['status' => 500, 'data' => $error];
             }
         } else {
-            $error = 'Error: Root cursor not set in returned file details';
-            Log::warn('Root cursor not set in returned file details', $list);
+            $error = 'Server Error: Root cursor not set during initialization';
+            Log::warn($error, $list);
+            return ['status' => 500, 'data' => $error];
         }
-        $data = $instance->handleFileList($list, $error);
-        return ['data' => $data];
+        $data = $instance->handleFileList($list);
+        return ['status' => 200, 'data' => $data];
     }
 
     /**
@@ -112,12 +110,12 @@ class DropboxManager extends Singleton
             if (array_key_exists('cursor', $list)) {
                 $instance->setNewCursor($list['cursor']);
             }
-            $error = 'OK';
         } else {
-            $list = [];
-            $error = 'Error: Root cursor not initially set';
+            $error = 'Server Error: Root cursor not initially set';
+            Log::warn($error);
+            return ['status' => 500, 'data' => $error];
         }
-        $data = $instance->handleFileList($list, $error);
+        $data = $instance->handleFileList($list);
         return ['data' => $data];
     }
 

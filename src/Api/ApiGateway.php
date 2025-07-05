@@ -37,7 +37,7 @@ Log::debug('Starting up API gateway', $_REQUEST); // DELETEME DEBUG
         $this->apiVersion = $_GET['apiversion'] ?? 'v0.0';
         if ('v1.0' !== $this->apiVersion) {
             Log::error('Unsupported API version', $this->apiVersion);
-            $this->jsonResponse(400, ['error' => "Unsupported API version: $this->apiVersion"]);
+            $this->jsonResponse(400, "Unsupported API version: $this->apiVersion");
         }
         $this->path = $_GET['path'] ?? '';
         $parts = preg_split('#[?/]+#', $this->path, 2, PREG_SPLIT_NO_EMPTY);
@@ -45,12 +45,13 @@ Log::debug('Starting up API gateway', $_REQUEST); // DELETEME DEBUG
         $this->pathParams = $parts[1] ?? '';
         if (!preg_match('/^\w+$/', $this->path)) {
             Log::error('Path not found', $this->path);
-            $this->jsonResponse(404, ['error' => "Path not found: $this->path"]);
+            $this->jsonResponse(404, "Path not found: $this->path");
         }
     }
 
     /**
      * Called to handle an API call. Having as a public method may be unnecessary - could be called from constructor.
+     * All callbacks must return an array with the keys 'status' (int HTTP status code) and 'data' (array or string).
      * @return void
      */
     public function handleApiCall(): void
@@ -78,10 +79,10 @@ Log::debug('Validated params');// DELETEME DEBUG
             $result = call_user_func($callback, $params);
             Log::debug('Result', $result);
 
-            $this->jsonResponse($result['status'] ?? 200, ['data' => $result['data'] ?? []]);
+            $this->jsonResponse($result['status'] ?? 200, $result['data'] ?? []);
         } catch (Exception $e) {
             Log::error("API Exception: {$e->getMessage()}");
-            $this->jsonResponse(500, ['error' => 'Server error: ' . $e->getMessage()]);
+            $this->jsonResponse(500, 'Server error: ' . $e->getMessage());
         }
     }
 
@@ -100,7 +101,7 @@ Log::debug('Validated params');// DELETEME DEBUG
             Log::debug('URI', $_SERVER['REQUEST_URI']);
             Log::debug('Server', $_SERVER);
 
-            $this->jsonResponse(404, ['error' => 'Endpoint not found']);
+            $this->jsonResponse(404, 'Endpoint not found');
         }
     }
 
@@ -116,13 +117,13 @@ Log::debug('Validated params');// DELETEME DEBUG
         $user = User::getInstance();
         if ($auth === 'admin' && !$user->isAdmin) {
             Log::warn("Forbidden: admin required for $this->method $this->path");
-            $this->jsonResponse(403, ['error' => 'Admin access required']);
+            $this->jsonResponse(403, 'Admin access required');
         }
 
         // Anyone using the API should be at least an authenticated user.
         if ($auth === 'user' && !$user->isUser) {
             Log::warn("Forbidden: login required for $this->method $this->path");
-            $this->jsonResponse(403, ['error' => 'User access required']);
+            $this->jsonResponse(403, 'User access required');
         }
     }
 
@@ -140,7 +141,7 @@ Log::debug('Validated params');// DELETEME DEBUG
 
             if (!$this->checkRateLimit($key, $limit, $window)) {
                 Log::warn("Rate limit exceeded for key: $key");
-                $this->jsonResponse(429, ['error' => 'Rate limit exceeded']);
+                $this->jsonResponse(429, 'Rate limit exceeded');
             }
         }
     }
@@ -198,7 +199,7 @@ Log::debug('Validated params');// DELETEME DEBUG
 
         if (!is_array($decoded)) {
             Log::warn('Expected JSON or encoded object, got something else.');
-            $this->jsonResponse(400, ['error' => 'Expected JSON object.']);
+            $this->jsonResponse(400, 'Expected JSON object.');
         }
         Log::debug('= Read', $decoded); // DELETEME DEBUG
         return $decoded;
@@ -256,21 +257,31 @@ Log::debug('Validated params');// DELETEME DEBUG
         }
 
         if ($message) {
-            $this->jsonResponse(400, ['error' => $message]);
+            $this->jsonResponse(400, $message);
         }
     }
 
     /**
+     * Exit, after outputting an API call's JSON response.
+     * The output will be one of:
+     * `{'success': true, 'error': ...}` if the statusCode is an HTTP error.
+     * `{'success': false, 'data': ...}` if the statusCode is an HTTP success.
+     * The contents of `error` or `data` are defined by the caller.
+     *
      * @param int $statusCode
-     * @param array $body
-     * @return void
+     * @param array|string $body
      */
-    #[NoReturn] private function jsonResponse(int $statusCode, array $body): void
+    #[NoReturn] private function jsonResponse(int $statusCode, array|string $body): void
     {
 Log::debug("$statusCode", $body);// DELETEME DEBUG
         http_response_code($statusCode);
-        echo json_encode(['success' => $statusCode < 400] + $body);
-Log::debug(json_encode(['success' => $statusCode < 400] + $body));// DELETEME DEBUG
+        if ($statusCode < 400) {
+            $output = json_encode(['success' => true, 'data' => $body]);
+        } else {
+            $output = json_encode(['success' => false, 'error' => $body]);
+        }
+Log::debug($output);// DELETEME DEBUG
+        echo $output;
         exit;
     }
 

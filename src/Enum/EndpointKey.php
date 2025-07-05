@@ -24,4 +24,5 @@ enum EndpointKey: string
     case PUT_COMMENT = 'PUT#comment';
     case PUT_USER = 'PUT#user';
     case POST_LOGIN = 'POST#login';
+    case ANY_ERROR = 'ANY#error';
 }

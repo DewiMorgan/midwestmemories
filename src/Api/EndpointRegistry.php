@@ -40,55 +40,99 @@ class EndpointRegistry
         }
 
         // Endpoint definitions keyed by ApiEndpoint enum.
-        // Each value includes auth level, parameters, and the callback.
-        // The callback returns an array ['status'=>HTTP status, 'data'=>payload].
-        // Status defaults to 200, payload to empty.
-        // Todo: some errors return in 'data', some in 'error'. Make consistent.
+        // Each value includes auth level, parameters, list of possible response structures, and the callback.
+        // The callback returns an array `['status'=>int HTTP status, 'data'=>string or array payload]`.
+        // Status defaults to 200, and the data payload to empty.
+        // This will be output by `ApiGateway::jsonResponse` as Json, either:
+        //  `{'success':true,'data': <payload>}` or `{'success':false,'error': <payload>}`
         return match ($key) {
+            // Universal default API error responses.
+            EndpointKey::ANY_ERROR => [
+                'auth' => 'none',
+                'params' => [],
+                'callback' => self::apiError(...),
+                'responseType' => [
+                    400 => ['success' => false, 'error' => ParamTypes::STRING], // Bad request (API version, etc).
+                    403 => ['success' => false, 'error' => ParamTypes::STRING], // Bad access level.
+                    404 => ['success' => false, 'error' => ParamTypes::STRING], // Bad API path.
+                    429 => ['success' => false, 'error' => ParamTypes::STRING], // Rate limit exceeded.
+                    500 => ['success' => false, 'error' => ParamTypes::STRING], // Internal Server error.
+                ],
+            ],
             // Admin-only endpoints.
             EndpointKey::POST_CURSOR => [
                 'auth' => 'admin',
                 'params' => [],
                 'callback' => DropboxManager::initRootCursor(...),
-                'responseType' => 'object', // Returns an associative array with status, etc.
+                'responseType' => [
+                    200 => [ // From handleFileList
+                        'success' => true,
+                        'data' => [
+                            'numAddedFiles' => ParamTypes::INT,
+                            'numTotalFiles' => ParamTypes::INT,
+                            'moreFilesToGo' => ParamTypes::BOOL
+                        ]
+                    ],
+                ],
             ],
             EndpointKey::GET_CURSOR => [
                 'auth' => 'admin',
                 'params' => [],
                 'callback' => DropboxManager::readCursorUpdate(...),
-                'responseType' => 'object', // Returns an associative array with status, etc.
+                'responseType' => [
+                    200 => [ // From handleFileList
+                        'success' => true,
+                        'data' => [
+                            'numAddedFiles' => ParamTypes::INT,
+                            'numTotalFiles' => ParamTypes::INT,
+                            'moreFilesToGo' => ParamTypes::BOOL
+                        ]
+                    ],
+                ],
             ],
             EndpointKey::GET_DOWNLOAD => [
                 'auth' => 'admin',
                 'params' => [],
                 'callback' => FileProcessor::listNewFiles(...),
-                'responseType' => 'array', // Returns a list of items.
+                'responseType' => [
+                    // Array of string file paths, or empty.
+                    200 => ['success' => true, 'data' => ParamTypes::STRING_ARRAY],
+                ]
             ],
             EndpointKey::POST_DOWNLOAD => [
                 'auth' => 'admin',
                 'params' => [],
                 'callback' => FileProcessor::downloadNextFile(...),
-                'responseType' => 'object', // Returns an associative array with status, etc.
+                'responseType' => [
+                    200 => ['success' => true, 'data' => ParamTypes::OK],
+                ]
             ],
             EndpointKey::GET_PROCESS => [
                 'auth' => 'admin',
                 'params' => [],
                 'callback' => FileProcessor::listDownloadedFiles(...),
-                'responseType' => 'array', // Returns a list of items.
+                'responseType' => [
+                    // Array of string file paths, or empty.
+                    200 => ['success' => true, 'data' => ParamTypes::STRING_ARRAY],
+                ]
             ],
             EndpointKey::POST_PROCESS => [
                 'auth' => 'admin',
                 'params' => [],
                 'callback' => FileProcessor::processNextFile(...),
-                'responseType' => 'object', // Returns an associative array with status, etc.
+                'responseType' => [
+                    200 => ['success' => true, 'data' => ParamTypes::OK],
+                ]
             ],
             EndpointKey::GET_USER => [
                 'auth' => 'admin',
                 'params' => [],
                 'callback' => User::getUsers(...),
                 'responseType' => [
-                    200 => ['success' => true, 'data' => [0 => ['username' => '/^.+$/', 'comment' => '/^.*$/']]],
-                    403 => ['success' => false, 'error' => 'Admin access required']
+                    200 => ['success' => true, 'data' => [0 => [
+                        'username' => ParamTypes::STRING,
+                        'comment' => ParamTypes::STRING
+                    ]]],
                 ]
             ],
             EndpointKey::POST_USER => [
@@ -97,7 +141,8 @@ class EndpointRegistry
                 'callback' => User::addUser(...),
                 'responseType' => [
                     200 => ['success' => true, 'data' => 'OK'],
-                    409 => ['success' => false, 'data' => '/^Error: Conflict\. .*/']
+                    409 => ['success' => false, 'data' => '/^Error: Conflict\. .*/'],
+                    422 => ['success' => false, 'data' => '/^Error: Unprocessable content\. .*/'],
                 ]
             ],
             EndpointKey::PUT_USER => [
@@ -123,7 +168,6 @@ class EndpointRegistry
                 'callback' => User::handleUserLogin(...),
                 'responseType' => [
                     200 => ['success' => true, 'data' => 'OK'],
-                    403 => ['success' => false, 'data' => 'Error: access denied'],
                     409 => ['success' => false, 'data' => '/^Error: Conflict\. .*/']
                 ],
             ],
@@ -134,7 +178,15 @@ class EndpointRegistry
                 'params' => ['file_id' => ParamTypes::INT, 'page_id' => ParamTypes::INT],
                 'rate_limit' => ['limit' => 30, 'window' => 60],
                 'callback' => CommentManager::getComments(...),
-                'responseType' => 'object', // Returns an associative array with status, etc.
+                'responseType' => [
+                    200 => ['success' => true, 'data' => [0 => [
+                        'sequence' => ParamTypes::INT,
+                        'date_created' => ParamTypes::DATE,
+                        'user' => ParamTypes::INT,
+                        'body_text' => ParamTypes::STRING,
+                        'num_pages' => ParamTypes::INT,
+                    ]]],
+                ]
             ],
             EndpointKey::POST_COMMENT => [
                 'auth' => 'user',
@@ -142,10 +194,7 @@ class EndpointRegistry
                 'rate_limit' => ['limit' => 20, 'window' => 60],
                 'callback' => CommentManager::addComment(...),
                 'responseType' => [
-                    // TODO: Data here is wrong.
-                    200 => ['success' => true, 'data' => []],
-                    429 => ['success' => false, 'error' => 'Rate limit exceeded'],
-                    500 => ['success' => false, 'error' => '/Server error: .+/']
+                    200 => ['success' => true, 'data' => ParamTypes::INT],
                 ]
             ],
             EndpointKey::PUT_COMMENT => [
@@ -154,8 +203,7 @@ class EndpointRegistry
                 'rate_limit' => ['limit' => 20, 'window' => 60],
                 'callback' => CommentManager::editComment(...),
                 'responseType' => [
-                    // ToDo: missing success case.
-                    400 => ['success' => false, 'error' => 'Missing parameters: .+']
+                    200 => ['success' => true, 'data' => ParamTypes::OK],
                 ]
             ],
             EndpointKey::DELETE_COMMENT => [
@@ -164,10 +212,20 @@ class EndpointRegistry
                 'rate_limit' => ['limit' => 20, 'window' => 60],
                 'callback' => CommentManager::deleteComment(...),
                 'responseType' => [
-                    // ToDo: missing success case.
-                    400 => ['success' => false, 'error' => '/.+/']
+                    200 => ['success' => true, 'data' => ParamTypes::OK],
                 ]
             ]
         };
+    }
+
+    /**
+     * Placeholder method for API calls that failed.
+     * @return array
+     */
+    public static function apiError(): array
+    {
+        $error = 'API Error method was somehow actually called.';
+        Log::error($error);
+        return ['status' => 500, 'data' => $error];
     }
 }

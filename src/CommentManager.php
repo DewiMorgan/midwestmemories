@@ -20,7 +20,7 @@ class CommentManager extends Singleton
     /**
      * POST `/api/v1.0/comment`: add a comment.
      * @param array $params as `['file_id' => '1', 'comment_text' => 'text', path' => 'comments', ...]`.
-     * @return string[] The output of the API call, not yet converted to JSON.
+     * @return array The output of the API call, not yet converted to JSON.
      * ToDo: verification that the file exists.
      */
     public static function addComment(array $params): array
@@ -35,7 +35,7 @@ Log::debug(''); // DELETEME DEBUG
 Log::debug($userName); // DELETEME DEBUG
         if (empty($commentText)) {
             Log::warning('Ignoring empty comment string from ' . $params['path'], $commentText);
-            $data = ['error' => 'Failed to save comment: empty comment'];
+            return ['status' => 400, 'data' => 'Failed to save comment: empty comment'];
         } else {
             Log::debug('Valid data found from ' . $params['path'], $commentText);
             $data = self::execPostComment($fileId, $commentText, $userName);
@@ -53,7 +53,7 @@ Log::debug(
      * @param int $fileId Foreign key into midmem_file_queue.
      * @param string $userName Username who made the comment.
      * @param string $commentText The text they are inserting.
-     * @return string[]
+     * @return array The output of the API call, not yet converted to JSON.
      */
     private static function execPostComment(int $fileId, string $commentText, string $userName): array
     {
@@ -74,17 +74,17 @@ Log::debug(
         if (empty($insertResult) || (0 === ($insertResult['rows'] ?? 0)) || (0 === ($insertResult['id'] ?? 0))) {
             Log::debug("Failed to add comment by $userName on $fileId", $commentText);
             Log::debug('Insert result', $insertResult);
-            return ['error' => 'Failed to save comment: insert failed'];
+            return ['status' => 500, 'data' => 'Server error: Failed to save comment'];
         } else {
             Log::debug("Added comment by $userName on $fileId", $commentText);
-            return self::getCommentById($insertResult['id']);
+            return ['status' => 200, 'data' => self::getCommentById($insertResult['id'])];
         }
     }
 
     /**
      * DELETE `/api/v1.0/comment` endpoint marks a comment as soft-deleted.
      * @param int $commentId
-     * @return void
+     * @return array The output of the API call, not yet converted to JSON.
      */
     public static function deleteComment(int $commentId): array
     {
@@ -93,19 +93,23 @@ Log::debug(' - Before:',
     var_export(Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $commentId), true)
 ); // DELETEME DEBUG
         $sql = 'UPDATE `' . Db::TABLE_COMMENTS . '` SET `hidden` = true WHERE `id` = ?';
-        Db::sqlExec($sql, 'i', $commentId);
+        $success = Db::sqlExec($sql, 'i', $commentId);
 Log::debug(' - After:',
     var_export(Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $commentId), true)
 ); // DELETEME DEBUG
+        if ($success) {
+            return ['status' => 200, 'data' => 'OK'];
+        }
+        return ['status' => 500, 'data' => 'Server error: Failed to update comment'];
     }
 
     /**
      * PUT `/api/v1.0/comment`: edit a comment.
      * @param int $commentId The database `id` field of the comment to edit.
      * @param string $newCommentText The new text for the comment.
-     * @return void
+     * @return array The output of the API call, not yet converted to JSON.
      */
-    public static function editComment(int $commentId, string $newCommentText): void
+    public static function editComment(int $commentId, string $newCommentText): array
     {
 Log::debug("Editing comment: $commentId", $newCommentText);
 Log::debug(
@@ -113,11 +117,15 @@ Log::debug(
     var_export(Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $commentId), true)
 ); // DELETEME DEBUG
         $sql = 'UPDATE `' . Db::TABLE_COMMENTS . '` SET `body_text` = ? WHERE `id` = ?';
-        Db::sqlExec($sql, 'si', $newCommentText, $commentId);
+        $success = Db::sqlExec($sql, 'si', $newCommentText, $commentId);
 Log::debug(
     ' - After:',
     var_export(Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $commentId), true)
 ); // DELETEME DEBUG
+        if ($success) {
+            return ['status' => 200, 'data' => 'OK'];
+        }
+        return ['status' => 500, 'data' => 'Server error: Failed to update comment'];
     }
 
     /**

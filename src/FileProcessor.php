@@ -27,7 +27,7 @@ class FileProcessor extends Singleton
         if (!file_exists($fullPath)) {
             $error = 'file_exists failed';
             $instance->setSyncStatus($fullPath, SyncStatus::ERROR, $error);
-            return ['status' => 500, 'data' => "Error: $error"];
+            return ['status' => 500, 'data' => "Server Error: $error"];
         }
 
         // Get the mime type.
@@ -322,7 +322,7 @@ class FileProcessor extends Singleton
 
     /**
      * Download the first file from the file queue table.
-     * @return array [ "OK" or "Error: ...", depending on the result.
+     * @return array API response array, not yet JSON encoded.
      */
     public static function downloadNextFile(): array
     {

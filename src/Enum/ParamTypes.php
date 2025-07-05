@@ -16,4 +16,7 @@ enum ParamTypes: string
     case EMAIL = 'email';
     case IP = 'ip';
     case URL = 'url';
+    case STRING_ARRAY = 'string_array'; // Array/list of strings.
+    case OK = 'ok'; // The literal string "OK".
+    case DATE = 'date';
 }

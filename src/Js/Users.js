@@ -16,7 +16,6 @@ window.Users = class {
             } else {
                 Log.message(`= Got ${numUsers} users!`);
             }
-            console.log('Users:', users);
 
             UserTable.populateUserTable(users);
         } catch (err) {
