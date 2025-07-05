@@ -422,7 +422,11 @@ window.UserTable = class {
     static addUserRowToTable(username, password) {
         const newRow = UserTable.instance.#createUserTableRow(username, password);
         const lastRow = UserTable.table.rows[UserTable.table.rows.length - 1];
-        UserTable.table.insertBefore(newRow, lastRow);
+        if (lastRow) {
+            UserTable.table.insertBefore(newRow, lastRow);
+        } else {
+            UserTable.table.append(newRow);
+        }
     }
 
     /**
