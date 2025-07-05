@@ -13,9 +13,6 @@ window.UserTable = class {
     constructor() {
         /** @type {HTMLTableElement} */
         UserTable.table = this.#createUserTable();
-        this.#createUserFooterRow = this.#createUserFooterRow.bind(this);
-        this.#createUserTableRow = this.#createUserTableRow.bind(this);
-        this.#createUserTable = this.#createUserTable.bind(this);
     }
 
     /**
