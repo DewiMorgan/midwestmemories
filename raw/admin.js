@@ -391,10 +391,20 @@ window.UserTable = class {
 
     /** @type {HTMLTableElement} */
     static table;
+    static instance;
+
+    static {
+        if (!UserTable.instance) {
+            UserTable.instance = new UserTable();
+        }
+    }
 
     constructor() {
         /** @type {HTMLTableElement} */
         UserTable.table = this.#createUserTable();
+        this.#createUserFooterRow = this.#createUserFooterRow.bind(this);
+        this.#createUserTableRow = this.#createUserTableRow.bind(this);
+        this.#createUserTable = this.#createUserTable.bind(this);
     }
 
     /**
@@ -405,7 +415,7 @@ window.UserTable = class {
         for (let i = 0; i < userList.length; i++) {
             const username = userList[i]['username'];
             const password = userList[i]['comment'];
-            this.addUserRowToTable(username, password);
+            UserTable.instance.addUserRowToTable(username, password);
         }
     }
 
@@ -416,7 +426,7 @@ window.UserTable = class {
      * @param {string} password
      */
     static addUserRowToTable(username, password) {
-        const newRow = this.#createUserTableRow(username, password);
+        const newRow = UserTable.instance.#createUserTableRow(username, password);
         const lastRow = UserTable.table.rows[UserTable.table.rows.length - 1];
         UserTable.table.insertBefore(newRow, lastRow);
     }
