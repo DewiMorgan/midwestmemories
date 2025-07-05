@@ -38,11 +38,11 @@ declare(strict_types=1);
 </div>
 
 <h2>Users</h2>
-<div id="user-list">Loading users...</div>
+<div id="user-list"><!-- User table goes here. --></div>
 <hr>
 
 <h2>Background Task Output</h2>
-<div id="messages"></div>
+<div id="messages"><!-- Output text goes here. --></div>
 <br>
 <input type="checkbox" id="autoscroll" name="autoscroll" checked>
 <label for="autoscroll">Auto scroll</label><br>
