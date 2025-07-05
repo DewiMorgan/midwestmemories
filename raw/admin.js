@@ -437,6 +437,7 @@ console.log(newRow); // Should be a <tr>
 console.log(newRow.outerHTML); // Check structure
 console.log(UserTable.table.tBodies[0].innerHTML); // Before and after insertion
 console.log(UserTable.table.innerHTML); // See if the row ends up somewhere unexpected
+console.log(document.getElementById('user-list').innerHTML); // See if the row ends up somewhere unexpected
         } else {
             console.log("Appending row", newRow);
             tbody.append(newRow);
