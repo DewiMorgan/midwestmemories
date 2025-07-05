@@ -391,11 +391,7 @@ window.UserTable = class {
 
     /** @type {HTMLTableElement} */
     static table;
-    static instance;
-
-    static {
-        UserTable.instance = new UserTable();
-    }
+    static instance = new UserTable();
 
     constructor() {
         /** @type {HTMLTableElement} */
