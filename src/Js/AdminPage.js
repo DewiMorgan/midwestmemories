@@ -15,7 +15,7 @@ function runAdminTasks() {
 
     // Do any pending Dropbox activities.
     // noinspection JSIgnoredPromiseFromCall
-    Dropbox.runAllUpdates();
+    //Dropbox.runAllUpdates(); // Commented out: UNDELETEME DEBUG
 }
 
 // Wait for the DOM to be fully loaded before running admin tasks.
