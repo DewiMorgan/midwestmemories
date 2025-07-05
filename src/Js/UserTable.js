@@ -8,7 +8,7 @@ window.UserTable = class {
 
     /** @type {HTMLTableElement} */
     static table;
-    static instance = new UserTable();
+    static instance;
 
     constructor() {
         /** @type {HTMLTableElement} */
@@ -23,6 +23,9 @@ window.UserTable = class {
      * @param {Array<{username: string, comment: string}>} userList
      */
     static populateUserTable(userList) {
+        if (!UserTable.instance) {
+            UserTable.instance = new UserTable();
+        }
         for (let i = 0; i < userList.length; i++) {
             const username = userList[i]['username'];
             const password = userList[i]['comment'];
