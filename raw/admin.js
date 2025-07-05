@@ -409,7 +409,7 @@ window.UserTable = class {
         for (let i = 0; i < userList.length; i++) {
             const username = userList[i]['username'];
             const password = userList[i]['comment'];
-            UserTable.instance.addUserRowToTable(username, password);
+            UserTable.addUserRowToTable(username, password);
         }
     }
 
