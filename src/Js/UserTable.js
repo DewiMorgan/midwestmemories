@@ -12,7 +12,9 @@ window.UserTable = class {
 
     constructor() {
         /** @type {HTMLTableElement} */
-        UserTable.table = this.#createUserTable();
+        if (!UserTable.table) {
+            UserTable.table = this.#createUserTable();
+        }
     }
 
     /**
