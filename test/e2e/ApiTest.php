@@ -16,6 +16,7 @@ class ApiTest extends TestCase
 {
     public const DISABLED_NAME = 'disabled_user';
     public const USER_NAME = 'test_user';
+    public const USER_NAME_2 = 'test_user_2';
     public const ADMIN_NAME = 'test_admin';
     public const SUPERADMIN_NAME = 'test_superadmin';
     public const PASSWORD = 'test_pass';
@@ -48,6 +49,7 @@ class ApiTest extends TestCase
     {
         parent::setUp();
         TestHelper::insertTestUsers();
+        TestHelper::insertTestFiles();
     }
 
     /**
@@ -56,10 +58,12 @@ class ApiTest extends TestCase
      */
     protected function tearDown(): void
     {
+        TestHelper::removeTestFiles();
         TestHelper::removeTestUsers();
         parent::tearDown();
     }
 
+    /** Test DELETE /api/v1.0/user/{username} */
     public function testDeleteUserAsAdmin(): void
     {
         TestHelper::loginAs(self::ADMIN_NAME, self::PASSWORD);
@@ -70,6 +74,7 @@ class ApiTest extends TestCase
         static::assertSame('OK', $data['data']);
     }
 
+    /** Test POST /api/v1.0/login */
     public function testSuccessfulLoginReturnsOk(): void
     {
         $response = TestHelper::request('POST', '/api/v1.0/login', [
@@ -84,6 +89,7 @@ class ApiTest extends TestCase
         static::assertEquals('OK', $data['data'] ?? '');
     }
 
+    /** Test POST /api/v1.0/login */
     public function testLoginFailsWithBadPassword(): void
     {
         $response = TestHelper::request('POST', '/api/v1.0/login', [
@@ -98,6 +104,7 @@ class ApiTest extends TestCase
         static::assertStringStartsWith('Error:', $data['data'] ?? '');
     }
 
+    /** Test POST /api/v1.0/login */
     public function testLoginFailsWithUnknownUser(): void
     {
         $response = TestHelper::request('POST', '/api/v1.0/login', [
@@ -112,6 +119,7 @@ class ApiTest extends TestCase
         static::assertStringStartsWith('Error:', $data['data'] ?? '');
     }
 
+    /** Test GET /api/v1.0/login */
     public function testGetUsersRequiresAdmin(): void
     {
         // Regular user should be denied
@@ -150,7 +158,7 @@ class ApiTest extends TestCase
             'username' => $newUser,
             'password' => 'another_pass'
         ]);
-        static::assertEquals(400, $response['status'], 'Should not allow duplicate usernames');
+        static::assertEquals(409, $response['status'], 'Should not allow duplicate usernames');
     }
 
     public function testChangePassword(): void
@@ -216,7 +224,8 @@ class ApiTest extends TestCase
         TestHelper::loginAs(self::USER_NAME, self::PASSWORD);
 
         // Test 1: Get initial comments (should be empty)
-        $response = TestHelper::request('GET', "/api/v1.0/comment?file_id=$fileId");
+        $response = TestHelper::request('GET', "/api/v1.0/comment?file_id=$fileId&page_id=1");
+//var_export($response); // DELETEME DEBUG
         static::assertEquals(200, $response['status'], 'Should be able to get comments');
         $data = json_decode($response['data'], true);
         static::assertIsArray($data);
@@ -230,8 +239,10 @@ class ApiTest extends TestCase
             'file_id' => $fileId,
             'comment_text' => $commentText
         ]);
+//var_export($response); // DELETEME DEBUG
         static::assertEquals(200, $response['status'], 'Should be able to add comment');
         $data = json_decode($response['data'], true);
+var_export($data); // DELETEME DEBUG
         static::assertIsArray($data);
         static::assertArrayHasKey('data', $data);
         static::assertArrayHasKey('comment_id', $data['data']);
@@ -291,14 +302,17 @@ class ApiTest extends TestCase
         static::assertFalse($commentExists, 'Comment should be deleted');
     }
 
+    /**
+     * Compound test of POST, PUT, and DELETE endpoints.
+     */
     public function testCommentPermissions(): void
     {
         $fileId = 1; // Assuming this is a valid file ID in test environment
         $commentText = 'Test comment ' . time();
         $commentId = null;
 
-        // User 1 creates a comment
-        TestHelper::loginAs(self::USER_NAME, self::PASSWORD);
+        // User 2 creates a comment
+        TestHelper::loginAs(self::ADMIN_NAME, self::PASSWORD);
         $response = TestHelper::request('POST', '/api/v1.0/comment', [
             'file_id' => $fileId,
             'comment_text' => $commentText
@@ -306,20 +320,20 @@ class ApiTest extends TestCase
         $data = json_decode($response['data'], true);
         $commentId = $data['data']['comment_id'];
 
-        // User 2 tries to edit the comment (should fail)
-        TestHelper::loginAs(self::ADMIN_NAME, self::PASSWORD);
+        // User 1 tries to edit the comment (should fail)
+        TestHelper::loginAs(self::USER_NAME, self::PASSWORD);
         $response = TestHelper::request('PUT', '/api/v1.0/comment', [
             'comment_id' => $commentId,
             'new_comment_text' => 'Modified by admin'
         ]);
         static::assertEquals(403, $response['status'], 'Should not allow editing other user\'s comment');
 
-        // User 2 tries to delete the comment (should fail)
+        // User 1 tries to delete the comment (should fail)
         $response = TestHelper::request('DELETE', "/api/v1.0/comment?comment_id=$commentId");
         static::assertEquals(403, $response['status'], 'Should not allow deleting other user\'s comment');
 
         // Clean up (original user deletes their comment)
-        TestHelper::loginAs(self::USER_NAME, self::PASSWORD);
+        TestHelper::loginAs(self::ADMIN_NAME, self::PASSWORD);
         TestHelper::request('DELETE', "/api/v1.0/comment?comment_id=$commentId");
     }
 

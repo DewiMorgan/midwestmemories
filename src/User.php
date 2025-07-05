@@ -47,7 +47,7 @@ class User extends Singleton
         $userId = $_SESSION['userId'];
 
         // Fetch user data from the DB.
-        $sql = 'SELECT * FROM `midmem_users` WHERE `id` = ?';
+        $sql = 'SELECT * FROM `midmem_users` WHERE `id` = ? and `is_disabled` = 0';
         $user = Db::sqlGetRow($sql, 'd', $userId);
         $this->populateUser($user);
     }
@@ -67,8 +67,8 @@ class User extends Singleton
 
         $username = trim($_POST['username']);
         $password = $_POST['password'];
-        // Try to authenticate.
-        $sql = 'SELECT * FROM `midmem_users` WHERE `username` = ?';
+        // Try to authenticate. Don't let disabled users login.
+        $sql = 'SELECT * FROM `midmem_users` WHERE `username` = ? and `is_disabled` = 0';
         $user = Db::sqlGetRow($sql, 's', $username);
         if ($user && password_verify($password, $user['password_hash'] ?? '')) {
             $instance = self::getInstance();
@@ -195,7 +195,7 @@ class User extends Singleton
         // Check for existing user
         $existing = Db::sqlGetRow('SELECT id FROM midmem_users WHERE username = ?', 's', $username);
         if ($existing) {
-            return ['status' => 500, 'data' => 'Error: User already exists: ' . var_export($existing, true)];
+            return ['status' => 409, 'data' => 'Error: Conflict. User already exists: ' . var_export($existing, true)];
         }
 
         // Hash password
@@ -211,15 +211,14 @@ class User extends Singleton
         );
 
         if (!$ok) {
-            return ['status' => 500, 'data' => 'Error: Could not add user'];
+            return ['status' => 422, 'data' => 'Error: Unprocessable content. Could not add user'];
         }
 
         return ['status' => 200, 'data' => 'OK'];
     }
 
     /**
-     * Updates or inserts a user's password in the `.htpasswd` file.
-     *
+     * Updates or inserts a user's password in the `.htpasswd` file. This also enables the user if disabled.
      * @param array $params ['username' => {string}, 'password' => {string}]
      * @return array ['status' => {int Http Status}, 'data' => 'OK' or 'Error: {string reason}'].
      */
@@ -241,7 +240,7 @@ class User extends Singleton
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
         $ok = Db::sqlExec(
-            'UPDATE `midmem_users` SET `password_hash` = ? WHERE `username` = ?',
+            'UPDATE `midmem_users` SET `password_hash` = ?, is_disabled = 0 WHERE `username` = ?',
             'ss',
             $hash,
             $username
@@ -267,13 +266,13 @@ class User extends Singleton
             return ['status' => 400, 'data' => 'Error: Missing username for deletion'];
         }
 
-        // Check if user exists
+        // Check if user exists.
         $user = Db::sqlGetRow('SELECT id FROM midmem_users WHERE username = ?', 's', $username);
         if (!$user) {
             return ['status' => 404, 'data' => 'Error: User not found for deletion'];
         }
 
-        // Soft delete: set is_disabled = 1
+        // Soft delete: set is_disabled = 1.
         $ok = Db::sqlExec(
             'UPDATE midmem_users SET is_disabled = 1 WHERE username = ?',
             's',

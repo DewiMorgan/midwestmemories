@@ -38,32 +38,6 @@ class AdminGateway
     }
 
     /**
-     * Handle session and connection.
-     */
-    private static function initSession(): void
-    {
-        $connection = Connection::getInstance();
-
-        // Handle login form submission
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['username']) && !empty($_POST['password'])) {
-            User::handleUserLogin();
-        }
-
-        // Log this access. No error handling if we fail.
-        $user = User::getInstance();
-        Db::sqlExec(
-            'INSERT INTO `' . Db::TABLE_VISITORS . '` (`request`, `main_ip`, `all_ips_string`, `user`, `agent`)'
-            . ' VALUES (?, ?, ?, ?, ?)',
-            'sssss',
-            $connection->request,
-            $connection->ip,
-            $connection->ipList,
-            $user->isLoggedIn ? $user->username : 'guest',
-            $connection->agent
-        );
-    }
-
-    /**
      * Verify that we are only being accessed by an admin user.
      */
     private static function dieIfNotAdmin(): void

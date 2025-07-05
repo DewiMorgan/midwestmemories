@@ -2,7 +2,9 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
-* Convert Comments to use new API.
+* Convert Comments class to use new API.
+    * Check return types of all API endpoints.
+    * Update JS to use these correct return types.
 * Need to change the user UI to use the new JS/CSS system.
 * Need to change the user UI to use the new API system.
 * Get folder-level details showing.
@@ -146,8 +148,8 @@ From Code comments:
 * Admin: Maybe a web cron to hit the webhook? Or does cpanel allow cron jobs? Edit crontab manually?
 * `inst-mwm`: Delete `inst-mwm.php`
 * Admin: Make Admin.php ShowPage() a template.
-* Admin: Wrap InitSession() logging in a connectionLogger.
-* Index: Wrap InitSession() logging in a connectionLogger.
+* DONE: Admin: Wrap InitSession() logging in a connectionLogger. (Well, moved into User)
+* DONE: Index: Wrap InitSession() logging in a connectionLogger. (Well, moved into User)
 * Connection: isBot to use BotSign table.
 * Connection: Do something with the ipLookup table.
 * Connection: Timestamps with timezone-aware display.
@@ -156,6 +158,9 @@ From Code comments:
 * Connection: Ability to change passwords
 * DropboxManager::processTextFile(): Some processing.
 * DropboxManager::convertToJpeg(): How should this be reflected in the DB?
+
+* Log class:
+    * Consider PSR-3 compatability. But their LoggerAwareInterface is not as trivially usable as our static `Log` class.
 
 Low priority:
 

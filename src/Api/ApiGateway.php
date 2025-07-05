@@ -30,6 +30,7 @@ class ApiGateway
 
     public function __construct()
     {
+Log::debug('Starting up API gateway', $_REQUEST); // DELETEME DEBUG
         // Get method and request path.
         $this->method = $_SERVER['REQUEST_METHOD'];
         // API version gets put into the GET params by .htaccess mod_rewrite.
@@ -39,7 +40,7 @@ class ApiGateway
             $this->jsonResponse(400, ['error' => "Unsupported API version: $this->apiVersion"]);
         }
         $this->path = $_GET['path'] ?? '';
-        $parts = preg_split('#/+#', $this->path, 2, PREG_SPLIT_NO_EMPTY);
+        $parts = preg_split('#[?/]+#', $this->path, 2, PREG_SPLIT_NO_EMPTY);
         $this->path = $parts[0] ?? '';
         $this->pathParams = $parts[1] ?? '';
         if (!preg_match('/^\w+$/', $this->path)) {
@@ -60,14 +61,15 @@ class ApiGateway
             $this->rateLimit($endpointDef);
 
             // Get our parameters from every possible source. Later sources overwrite earlier ones.
-            Log::debug('Getting GET params', $_GET);// DELETEME DEBUG
+Log::debug('Getting GET params', $_GET);// DELETEME DEBUG
             $params = array_merge(
                 $this->getPathParams($endpointDef),
                 $_GET,
                 $this->getJsonParams()
             );
-            Log::debug('Merged params', $params);// DELETEME DEBUG
+Log::debug('Merged params', $params);// DELETEME DEBUG
             $this->validateRequiredParams($endpointDef, $params);
+Log::debug('Validated params');// DELETEME DEBUG
 
             /** @var Callable $callback */
             $callback = $endpointDef['callback'];
@@ -76,7 +78,7 @@ class ApiGateway
             $result = call_user_func($callback, $params);
             Log::debug('Result', $result);
 
-            $this->jsonResponse($result['status'] ?? 200, ['data' => $result['data'] ?? null]);
+            $this->jsonResponse($result['status'] ?? 200, ['data' => $result['data'] ?? []]);
         } catch (Exception $e) {
             Log::error("API Exception: {$e->getMessage()}");
             $this->jsonResponse(500, ['error' => 'Server error: ' . $e->getMessage()]);
@@ -158,7 +160,8 @@ class ApiGateway
         // [0=>'fred', 1=>'abc', 2=>'unnamed'] => [0=>'fred', 1=>'abc', 2=>'banana', 'user'=>'fred', 'pass'=>'abc']
         if (array_key_exists('params', $endpoint)) {
             $paramNames = array_keys($endpoint['params']);
-            for ($i = 0; $i < count($params); $i++) {
+            $numParams = count($params); // Count before we append named keys.
+            for ($i = 0; $i < $numParams; $i++) {
                 // Append named key if it exists in the endpoint 'params'.
                 $name = $paramNames[$i] ?? null;
                 if ($name) {
@@ -264,8 +267,10 @@ class ApiGateway
      */
     #[NoReturn] private function jsonResponse(int $statusCode, array $body): void
     {
+Log::debug("$statusCode", $body);// DELETEME DEBUG
         http_response_code($statusCode);
         echo json_encode(['success' => $statusCode < 400] + $body);
+Log::debug(json_encode(['success' => $statusCode < 400] + $body));// DELETEME DEBUG
         exit;
     }
 

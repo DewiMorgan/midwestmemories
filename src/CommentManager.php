@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
-use JsonException;
-
 /**
  * Manage the operations on comments.
  */
@@ -21,29 +19,32 @@ class CommentManager extends Singleton
 
     /**
      * POST `/api/v1.0/comment`: add a comment.
-     * @param int $fileId Foreign key into midmem_file_queue.
-     * @param string $bodyText The text they are inserting.
+     * @param array $params as `['file_id' => '1', 'comment_text' => 'text', path' => 'comments', ...]`.
      * @return string[] The output of the API call, not yet converted to JSON.
+     * ToDo: verification that the file exists.
      */
-    public static function addComment(int $fileId, string $bodyText): array
+    public static function addComment(array $params): array
     {
+Log::debug(''); // DELETEME DEBUG
+        // Params should be validated already, but we still give defaults.
+        $fileId = intval($params['file_id']) ?? 0;
+        $commentText = $params['comment_text'] ?? '';
+
+        Log::debug("Adding comment to file $fileId", $commentText);
         $userName = User::getInstance()->username;
-        if (empty($bodyText)) {
-            Log::warning('Ignoring empty comment struct from ' . IndexGateway::$requestWebPath, $bodyText);
-            $data = ['error' => 'Failed to save comment 1'];
-        } elseif (!is_array($bodyText)) {
-            Log::warning('Ignoring non-array comment text from ' . IndexGateway::$requestWebPath, $bodyText);
-            $data = ['error' => 'Failed to save comment 2'];
-        } elseif (!array_key_exists('body_text', $bodyText)) {
-            Log::warning('Ignoring missing body_text key from ' . IndexGateway::$requestWebPath, $bodyText);
-            $data = ['error' => 'Failed to save comment 3'];
-        } elseif (empty($bodyText['body_text'])) {
-            Log::warning('Ignoring empty body_text from ' . IndexGateway::$requestWebPath, $bodyText);
-            $data = ['error' => 'Failed to save comment 4'];
+Log::debug($userName); // DELETEME DEBUG
+        if (empty($commentText)) {
+            Log::warning('Ignoring empty comment string from ' . $params['path'], $commentText);
+            $data = ['error' => 'Failed to save comment: empty comment'];
         } else {
-            Log::debug('Valid data found from ' . IndexGateway::$requestWebPath, $bodyText);
-            $data = self::execPostComment($fileId, $bodyText['body_text'], $userName);
+            Log::debug('Valid data found from ' . $params['path'], $commentText);
+            $data = self::execPostComment($fileId, $commentText, $userName);
         }
+Log::debug(' - Returned:', $data); // DELETEME DEBUG
+Log::debug(
+    ' - Db After:',
+    Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $data['id'])
+); // DELETEME DEBUG
         return $data;
     }
 
@@ -51,10 +52,10 @@ class CommentManager extends Singleton
      * Helper to add a comment to an image's page.
      * @param int $fileId Foreign key into midmem_file_queue.
      * @param string $userName Username who made the comment.
-     * @param string $bodyText The text they are inserting.
+     * @param string $commentText The text they are inserting.
      * @return string[]
      */
-    private static function execPostComment(int $fileId, string $bodyText, string $userName): array
+    private static function execPostComment(int $fileId, string $commentText, string $userName): array
     {
         // Get the next sequence number for this file
         $sql = 'SELECT MAX(`sequence`) AS `seq` FROM `' . Db::TABLE_COMMENTS . '` WHERE `fk_file` = ?';
@@ -67,15 +68,15 @@ class CommentManager extends Singleton
             (`date_created`, `user`, `body_text`, `sequence`, `fk_file`, `hidden`)
         VALUES (NOW(), ?, ?, ?, ?, false)
         ';
-        Log::debug("Db::sqlExec('$insertSql', 'ssii', '$userName', '$bodyText', '$nextSeq', '$fileId')");
-        $insertResult = Db::sqlExec($insertSql, 'ssii', $userName, $bodyText, $nextSeq, $fileId);
+        Log::debug("Db::sqlExec('$insertSql', 'ssii', '$userName', '$commentText', '$nextSeq', '$fileId')");
+        $insertResult = Db::sqlExec($insertSql, 'ssii', $userName, $commentText, $nextSeq, $fileId);
 
         if (empty($insertResult) || (0 === ($insertResult['rows'] ?? 0)) || (0 === ($insertResult['id'] ?? 0))) {
-            Log::debug("Failed to add comment by $userName on $fileId", $bodyText);
+            Log::debug("Failed to add comment by $userName on $fileId", $commentText);
             Log::debug('Insert result', $insertResult);
-            return ['error' => 'Failed to save comment 5'];
+            return ['error' => 'Failed to save comment: insert failed'];
         } else {
-            Log::debug("Added comment by $userName on $fileId", $bodyText);
+            Log::debug("Added comment by $userName on $fileId", $commentText);
             return self::getCommentById($insertResult['id']);
         }
     }
@@ -87,9 +88,15 @@ class CommentManager extends Singleton
      */
     public static function deleteComment(int $commentId): array
     {
+Log::debug('Deleting comment', $commentId);
+Log::debug(' - Before:',
+    var_export(Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $commentId), true)
+); // DELETEME DEBUG
         $sql = 'UPDATE `' . Db::TABLE_COMMENTS . '` SET `hidden` = true WHERE `id` = ?';
         Db::sqlExec($sql, 'i', $commentId);
-
+Log::debug(' - After:',
+    var_export(Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $commentId), true)
+); // DELETEME DEBUG
     }
 
     /**
@@ -100,32 +107,47 @@ class CommentManager extends Singleton
      */
     public static function editComment(int $commentId, string $newCommentText): void
     {
+Log::debug("Editing comment: $commentId", $newCommentText);
+Log::debug(
+    ' - Before:',
+    var_export(Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $commentId), true)
+); // DELETEME DEBUG
         $sql = 'UPDATE `' . Db::TABLE_COMMENTS . '` SET `body_text` = ? WHERE `id` = ?';
         Db::sqlExec($sql, 'si', $newCommentText, $commentId);
+Log::debug(
+    ' - After:',
+    var_export(Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $commentId), true)
+); // DELETEME DEBUG
     }
 
     /**
      * GET `/api/v1.0/comment`: return one page of comments for the current file.
-     * @param int $pageId Which page of results to return.
-     * @param int $fileId The database `id` field of the file to retrieve comments for.
+     * @param array $params as `['file_id' => '1', 'page_id' => '2', ...]`.
+     * @param int $pageSize Only there for unit tests. API uses default value.
      * @return array One page of comments as a list of [sequence, date_created, user, body_text, num_pages].
-     * Note: `num_pages` is capped to 1000.
+     * Note: `page_id` is capped to 1000.
      * ToDo: increase `$pageSize` default to 100.
      */
-    public static function getComments(int $pageId, int $fileId, int $pageSize = 2): array
+    public static function getComments(array $params, int $pageSize = 2): array
     {
+        // Params should be validated already, but we still give defaults.
+        $fileId = $params['file_id'] ?? 0;
+        $pageId = $params['page_id'] ?? 0;
+
         $startItem = $pageId * $pageSize;
         $startItemCapped = max(0, min(1000, $startItem));
+Log::debug("Getting comments: file $fileId, page $pageId, size $pageSize, start $startItem, capped $startItemCapped");
+
         $sql = '
             WITH comment_count AS (
                 SELECT LEAST(CEIL(COUNT(*)/?), 1000) AS `num_pages`
                 FROM `' . Db::TABLE_COMMENTS . '`
                 WHERE `fk_file` = ? AND NOT `hidden`
             )
-            SELECT 
-                c.`sequence`, 
-                c.`date_created`, 
-                c.`user`, 
+            SELECT
+                c.`sequence`,
+                c.`date_created`,
+                c.`user`,
                 c.`body_text`,
                 cc.`num_pages`
             FROM `' . Db::TABLE_COMMENTS . '` c
@@ -135,7 +157,9 @@ class CommentManager extends Singleton
             ORDER BY c.`sequence`
             LIMIT ? OFFSET ?
         ';
-        return Db::sqlGetTable($sql, 'sssss', $pageSize, $fileId, $fileId, $pageSize, $startItemCapped);
+        $result = Db::sqlGetTable($sql, 'sssss', $pageSize, $fileId, $fileId, $pageSize, $startItemCapped);
+Log::debug('Result', $result);
+        return $result;
     }
 
     /**
@@ -147,6 +171,7 @@ class CommentManager extends Singleton
         $sql = "
             SELECT 
                 'OK' AS `error`,
+                c.`id`, 
                 c.`sequence`, 
                 c.`date_created`, 
                 c.`user`, 

@@ -11,6 +11,7 @@ class TestHelper
 {
     public const DISABLED_NAME = 'disabled_user';
     public const USER_NAME = 'test_user';
+    public const USER_NAME_2 = 'test_user_2';
     public const ADMIN_NAME = 'test_admin';
     public const SUPERADMIN_NAME = 'test_superadmin';
     public const PASSWORD = 'test_pass';
@@ -74,7 +75,7 @@ class TestHelper
             'username' => 'invalid username',
             'password' => 'invalid password'
         ]);
-        if (200 !== $response['status']) {
+        if (403 !== $response['status']) {
             throw new RuntimeException(
                 sprintf(
                     "Logout failed with status '%d'. Body: %s",
@@ -156,7 +157,39 @@ class TestHelper
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
+$paramsInOneLine = self::ve($params);
+$bodyAsPhp = self::v2($body);
+echo "Request to $method $url ($paramsInOneLine)  ->  $httpCode => $bodyAsPhp\n";
         return ['status' => $httpCode, 'data' => $body];
+    }
+
+
+    private static function v2($string)  // DELETEME DEBUG
+    {
+        $patterns = [
+            '/\{/' => '[',
+            '/\}/' => ']',
+            '/":/' => '" => ',
+            '/,"/' => ', "',
+            '/"/' => "'",
+        ];
+        return preg_replace(array_keys($patterns), array_values($patterns), $string);
+    }
+
+    private static function ve($string)  // DELETEME DEBUG
+    {
+        $export = var_export($string, TRUE);
+        $patterns = [
+            '/array \(/' => '[',
+            '/^([ ]*)\)(,?)$/m' => '$1]$2',
+            "/=>[ ]?\n[ ]+\[/" => '=> [',
+            "/([ ]*)(\'[^\']+\') => ([\[\'])/" => '$1$2 => $3',
+            '/\s+/' => ' ',
+            '/, ?\]/' => ']',
+            '/\[ /' => '[',
+            '/ => /' => '=>'
+        ];
+        return preg_replace(array_keys($patterns), array_values($patterns), $export);
     }
 
     /**
@@ -171,6 +204,7 @@ class TestHelper
                 INSERT INTO `midmem_users` (`username`, `password_hash`, `access_level`, `is_disabled`) VALUES 
                 ('" . self::DISABLED_NAME . "', '$passwordHash', " . UserAccess::USER->value . ", 1),
                 ('" . self::USER_NAME . "', '$passwordHash', " . UserAccess::USER->value . ", 0),
+                ('" . self::USER_NAME_2 . "', '$passwordHash', " . UserAccess::USER->value . ", 0),
                 ('" . self::ADMIN_NAME . "', '$passwordHash', " . UserAccess::ADMIN->value . ", 0),
                 ('" . self::SUPERADMIN_NAME . "', '$passwordHash', " . UserAccess::SUPER_ADMIN->value . ', 0)
             '
@@ -188,10 +222,35 @@ class TestHelper
                 WHERE `username` IN (
                    '" . self::DISABLED_NAME . "', 
                    '" . self::USER_NAME . "', 
+                   '" . self::USER_NAME_2 . "', 
                    '" . self::ADMIN_NAME . "', 
                    '" . self::SUPERADMIN_NAME . "'
                 )
             "
         );
+    }
+
+    /**
+     * Helper to recreate files before each test to ensure isolation.
+     */
+    public static function insertTestFiles(): void
+    {
+        self::removeTestFiles();
+        Db::sqlExec(
+            "
+                INSERT INTO `midmem_file_queue`
+                    (`id`, `file_name`, `full_path`, `sync_status`, `file_hash`, `error_message`) 
+                VALUES 
+                    (1, 'test.jpg', '/path/to/test.jpg', 'PROCESSED', 'hash', '')
+            "
+        );
+    }
+
+    /**
+     * Helper to clear files after each test to avoid DB clutter.
+     */
+    public static function removeTestFiles(): void
+    {
+        Db::sqlExec('DELETE FROM `midmem_file_queue` WHERE `id` IN (1)');
     }
 }

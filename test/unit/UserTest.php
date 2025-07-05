@@ -49,15 +49,14 @@ class DbStub extends Db
             ],
         ];
 
-        switch ($sql) {
-            case 'SELECT * FROM `midmem_users` WHERE `username` = ?':
+        if (str_contains($sql, 'WHERE `username` = ?')) {
                 $userName = $params[1];
                 $array = array_filter($dummyUsers, fn($u) => $u['username'] === $userName);
                 return array_pop($array) ?? [];
-            case 'SELECT * FROM `midmem_users` WHERE `id` = ?':
+        } elseif (str_contains($sql, 'WHERE `id` = ?')) {
                 $userId = $params[1];
                 return $dummyUsers[$userId] ?? [];
-            default:
+        } else {
                 return ['Unexpected SQL in test stub'];
         }
     }
@@ -138,6 +137,7 @@ final class UserTest extends TestCase
 
         $user = User::getInstance();
         $user->loadFromSession();
+
         static::assertTrue($user->isLoggedIn);
 
         // Clear session
@@ -155,12 +155,12 @@ final class UserTest extends TestCase
         $user = User::getInstance();
         $user->loadFromSession();
 
-        self::assertTrue($user->isLoggedIn);
-        self::assertEquals(1, $user->userId);
-        self::assertEquals('alice', $user->username);
-        self::assertTrue($user->isUser);
-        self::assertFalse($user->isAdmin);
-        self::assertFalse($user->isSuperAdmin);
+        static::assertTrue($user->isLoggedIn);
+        static::assertEquals(1, $user->userId);
+        static::assertEquals('alice', $user->username);
+        static::assertTrue($user->isUser);
+        static::assertFalse($user->isAdmin);
+        static::assertFalse($user->isSuperAdmin);
     }
 
     public function testLoadFromSessionWithAdmin(): void
@@ -170,12 +170,12 @@ final class UserTest extends TestCase
 
         $user = User::getInstance();
         $user->loadFromSession();
-        self::assertTrue($user->isLoggedIn);
-        self::assertEquals(2, $user->userId);
-        self::assertEquals('bob', $user->username);
-        self::assertTrue($user->isUser);
-        self::assertTrue($user->isAdmin);
-        self::assertFalse($user->isSuperAdmin);
+        static::assertTrue($user->isLoggedIn);
+        static::assertEquals(2, $user->userId);
+        static::assertEquals('bob', $user->username);
+        static::assertTrue($user->isUser);
+        static::assertTrue($user->isAdmin);
+        static::assertFalse($user->isSuperAdmin);
     }
 
     public function testLoadFromSessionWithSuperAdmin(): void
@@ -185,12 +185,12 @@ final class UserTest extends TestCase
 
         $user = User::getInstance();
         $user->loadFromSession();
-        self::assertTrue($user->isLoggedIn);
-        self::assertEquals(3, $user->userId);
-        self::assertEquals('claire', $user->username);
-        self::assertTrue($user->isUser);
-        self::assertTrue($user->isAdmin);
-        self::assertTrue($user->isSuperAdmin);
+        static::assertTrue($user->isLoggedIn);
+        static::assertEquals(3, $user->userId);
+        static::assertEquals('claire', $user->username);
+        static::assertTrue($user->isUser);
+        static::assertTrue($user->isAdmin);
+        static::assertTrue($user->isSuperAdmin);
     }
 
     public function testHandleUserLoginSuccess(): void
@@ -202,10 +202,10 @@ final class UserTest extends TestCase
         $user = User::getInstance();
         User::handleUserLogin();
 
-        self::assertTrue($user->isLoggedIn);
-        self::assertEquals(1, $user->userId);
-        self::assertEquals('alice', $user->username);
-        self::assertTrue($_SESSION['userId'] === 1);
+        static::assertTrue($user->isLoggedIn);
+        static::assertEquals(1, $user->userId);
+        static::assertEquals('alice', $user->username);
+        static::assertTrue($_SESSION['userId'] === 1);
     }
 
     public function testHandleUserLoginWrongPassword(): void
@@ -217,8 +217,8 @@ final class UserTest extends TestCase
         $user = User::getInstance();
         User::handleUserLogin();
 
-        self::assertFalse($user->isLoggedIn);
-        self::assertArrayNotHasKey('userId', $_SESSION);
+        static::assertFalse($user->isLoggedIn);
+        static::assertArrayNotHasKey('userId', $_SESSION);
     }
 
     public function testHandleUserLoginUnknownUser(): void
@@ -230,8 +230,8 @@ final class UserTest extends TestCase
         $user = User::getInstance();
         User::handleUserLogin();
 
-        self::assertFalse($user->isLoggedIn);
-        self::assertArrayNotHasKey('userId', $_SESSION);
+        static::assertFalse($user->isLoggedIn);
+        static::assertArrayNotHasKey('userId', $_SESSION);
     }
 
     public function testHandleUserLogout(): void
@@ -243,15 +243,15 @@ final class UserTest extends TestCase
         $user = User::getInstance();
         User::handleUserLogin();
 
-        self::assertTrue($user->isLoggedIn);
-        self::assertArrayHasKey('userId', $_SESSION);
+        static::assertTrue($user->isLoggedIn);
+        static::assertArrayHasKey('userId', $_SESSION);
 
         // Now log out
         User::handleUserLogout();
 
         /** @noinspection PhpConditionAlreadyCheckedInspection */
-        self::assertFalse($user->isLoggedIn);
-        self::assertArrayNotHasKey('userId', $_SESSION);
+        static::assertFalse($user->isLoggedIn);
+        static::assertArrayNotHasKey('userId', $_SESSION);
     }
 
     public function testAddUserSuccess(): void
@@ -261,9 +261,9 @@ final class UserTest extends TestCase
 
         $result = User::addUser($params);
 
-        self::assertIsArray($result);
-        self::assertSame(200, $result['status']);
-        self::assertSame('OK', $result['data']);
+        static::assertIsArray($result);
+        static::assertSame(200, $result['status']);
+        static::assertSame('OK', $result['data']);
     }
 
     public function testAddUserMissingUsername(): void
@@ -273,9 +273,9 @@ final class UserTest extends TestCase
 
         $result = User::addUser($params);
 
-        self::assertIsArray($result);
-        self::assertSame(400, $result['status']);
-        self::assertStringStartsWith('Error:', $result['data']);
+        static::assertIsArray($result);
+        static::assertSame(400, $result['status']);
+        static::assertStringStartsWith('Error:', $result['data']);
     }
 
     public function testAddUserMissingPassword(): void
@@ -285,9 +285,9 @@ final class UserTest extends TestCase
 
         $result = User::addUser($params);
 
-        self::assertIsArray($result);
-        self::assertSame(400, $result['status']);
-        self::assertStringStartsWith('Error:', $result['data']);
+        static::assertIsArray($result);
+        static::assertSame(400, $result['status']);
+        static::assertStringStartsWith('Error:', $result['data']);
     }
 
     public function testAddUserAlreadyExists(): void
@@ -301,9 +301,9 @@ final class UserTest extends TestCase
         // Second add should fail
         $result = User::addUser($params);
 
-        self::assertIsArray($result);
-        self::assertSame(500, $result['status']);
-        self::assertStringStartsWith('Error:', $result['data']);
+        static::assertIsArray($result);
+        static::assertSame(409, $result['status']);
+        static::assertStringStartsWith('Error:', $result['data']);
     }
 
     public function testAddUserStoresUserInDatabase(): void
