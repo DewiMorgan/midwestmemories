@@ -47,7 +47,7 @@ window.Dropbox = class {
             }
             for (const [index, filename] of files.entries()) {
                 Log.message(`= ${index + 1}/${numFiles} ${actionName} ${filename}...`);
-                await Api.fetchApiData(endpoint, 'POST', 'object');
+                await Api.fetchApiData(endpoint, 'POST', 'string');
             }
             Log.message(`= ${actionName} complete!`);
         } catch (err) {

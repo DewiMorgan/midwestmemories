@@ -46,7 +46,7 @@ window.Api = class {
             throw new Error(`Expected 'data' to be ${expectedType}, but got ${actualType}.`);
         }
 
-        if (jsonResponse.hasOwnProperty('error') && "OK" !== jsonResponse.error) {
+        if (jsonResponse.hasOwnProperty('error')) {
             throw new Error(jsonResponse.error);
         }
 
