@@ -39,10 +39,11 @@ window.UserTable = class {
     static addUserRowToTable(username, password) {
         const newRow = UserTable.instance.#createUserTableRow(username, password);
         const lastRow = UserTable.table.rows[UserTable.table.rows.length - 1];
+        const tbody = UserTable.table.tBodies[0];
         if (lastRow) {
-            UserTable.table.insertBefore(newRow, lastRow);
+            tbody.insertBefore(newRow, lastRow);
         } else {
-            UserTable.table.append(newRow);
+            tbody.append(newRow);
         }
     }
 
