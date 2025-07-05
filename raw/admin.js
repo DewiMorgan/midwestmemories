@@ -394,9 +394,7 @@ window.UserTable = class {
     static instance;
 
     static {
-        if (!UserTable.instance) {
-            UserTable.instance = new UserTable();
-        }
+        UserTable.instance = new UserTable();
     }
 
     constructor() {
