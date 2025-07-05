@@ -47,7 +47,7 @@ console.log(newRow instanceof HTMLTableRowElement); // should be true
 console.log(newRow.outerHTML);
 console.log(UserTable.table.tBodies.length); // should usually be 1
 console.log(window.getComputedStyle(newRow));
-console.log(addUserRow?.parentElement === tbody); // must be true
+//console.log(addUserRow?.parentElement === tbody); // must be true
 console.log(newRow); // Should be a <tr>
 console.log(newRow.outerHTML); // Check structure
 console.log(UserTable.table.tBodies[0].innerHTML); // Before and after insertion
