@@ -424,8 +424,10 @@ window.UserTable = class {
         const lastRow = UserTable.table.rows[UserTable.table.rows.length - 1];
         const tbody = UserTable.table.tBodies[0];
         if (lastRow) {
+            console.log("Inserting row before", newRow);
             tbody.insertBefore(newRow, lastRow);
         } else {
+            console.log("Appending row", newRow);
             tbody.append(newRow);
         }
     }
