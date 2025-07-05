@@ -35,7 +35,7 @@ window.Users = class {
             const passwordInput = row.querySelector('.password-input');
             const password = passwordInput.value;
             const endpoint = '/api/v1.0/user';
-            const apiResult = await this.callUserAction('Change password', endpoint, 'PUT', username, password);
+            const apiResult = await UserTable.callUserAction('Change password', endpoint, 'PUT', username, password);
             if (apiResult) {
                 // Unstrike through the username.
                 usernameText.style.textDecoration = 'none';
@@ -58,7 +58,7 @@ window.Users = class {
         const username = usernameText.textContent;
         if (confirm(`Really disable the existing user, "${username}"?`)) {
             const endpoint = `/api/v1.0/user/${username}`;
-            const apiResult = await this.callUserAction('Disable user', endpoint, 'DELETE');
+            const apiResult = await UserTable.callUserAction('Disable user', endpoint, 'DELETE');
             if (apiResult) {
                 UserTable.disableUsersRowInTable(row);
             }
@@ -77,7 +77,7 @@ window.Users = class {
             const passwordInput = row.querySelector('.password-input');
             const password = passwordInput.value;
             const endpoint = '/api/v1.0/user';
-            const apiResult = await this.callUserAction('Create user', endpoint, 'POST', username, password);
+            const apiResult = await UserTable.callUserAction('Create user', endpoint, 'POST', username, password);
             if (apiResult) {
                 console.log("apiResult true, adding row");
                 UserTable.addUserRowToTable(username, password);
