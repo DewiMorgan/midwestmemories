@@ -96,7 +96,7 @@ Log::debug(' - Before:',
         $success = Db::sqlExec($sql, 'i', $commentId);
 Log::debug(' - After:',
     var_export(Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $commentId), true)
-); // DELETEME DEBUG
+);  // DELETEME DEBUG
         if ($success) {
             return ['status' => 200, 'data' => 'OK'];
         }
