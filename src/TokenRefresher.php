@@ -45,24 +45,25 @@ class TokenRefresher implements TokenProvider
                 ]
             );
         } catch (GuzzleException $e) {
-            Log::debug("Failed to make dropbox API call to refresh token: '{$e->getCode()}: {$e->getMessage()}'.");
+            Log::error("Failed to make dropbox API call to refresh token: '{$e->getCode()}: {$e->getMessage()}'.");
             return false;
         }
 
         if ($request->getStatusCode() !== 200) {
+            Log::error("Dropbox API response code was not 200: '{$request->getStatusCode()}: {$request->getBody()}'.");
             return false;
         }
 
         try {
             $decodedRequest = json_decode($request->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
-            Log::debug("Failed to decode json: '{$e->getCode()}: {$e->getMessage()}'.");
+            Log::error("Failed to decode json: '{$e->getCode()}: {$e->getMessage()}'.");
             return false;
         }
         try {
             $encodedResponse = trim(json_encode($decodedRequest['access_token'], JSON_THROW_ON_ERROR), '"');
         } catch (JsonException $e) {
-            Log::debug("Failed to encode json: '{$e->getCode()}: {$e->getMessage()}'.");
+            Log::error("Failed to encode json: '{$e->getCode()}: {$e->getMessage()}'.");
             return false;
         }
         return $encodedResponse;

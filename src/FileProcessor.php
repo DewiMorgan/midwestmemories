@@ -33,15 +33,15 @@ class FileProcessor extends Singleton
         // Get the mime type.
         $mimeType = mime_content_type($fullPath);
         echo "Processing as $mimeType: $fullPath<br>\n";
-        $error = match ($mimeType) {
+        $success = match ($mimeType) {
             'text/plain' => $instance->processTextFile($fullPath),
             'image/gif' => $instance->processGifFile($fullPath),
             'image/png' => $instance->processPngFile($fullPath),
             'image/jpeg' => $instance->processJpegFile($fullPath),
             default => $instance->processOtherFile($fullPath),
         };
-        $data = $error ? "Error: $error" : 'OK';
-        $status = $error ? 500 : 200;
+        $data = $success ? 'OK' : "Error: failed to process file as $mimeType";
+        $status = $success ? 200 : 500;
         return ['status' => $status, 'data' => $data];
     }
 
@@ -51,18 +51,7 @@ class FileProcessor extends Singleton
      */
     private function processTextFile($fullPath): bool
     {
-        // ToDo: some parsing.
-        $result = Db::sqlExec(
-            '
-                UPDATE `' . Db::TABLE_FILE_QUEUE . '` 
-                SET `sync_status` = ?
-                WHERE full_path = ?
-            ',
-            'ss',
-            SyncStatus::PROCESSED->value,
-            $fullPath
-        );
-        return !empty($result);
+        return $this->setSyncStatus($fullPath, SyncStatus::PROCESSED, 'Processed as TXT.');
     }
 
     /**
@@ -119,17 +108,7 @@ class FileProcessor extends Singleton
     private function processOtherFile(string $fullPath): bool
     {
         // Nothing to do but mark it complete.
-        $result = Db::sqlExec(
-            '
-                UPDATE `' . Db::TABLE_FILE_QUEUE . "` 
-                SET `sync_status` = ?, `error_message`='Unknown type' 
-                WHERE full_path = ?
-            ",
-            'ss',
-            SyncStatus::PROCESSED->value,
-            $fullPath
-        );
-        return !empty($result);
+        return $this->setSyncStatus($fullPath, SyncStatus::PROCESSED, 'Unknown type');
     }
 
     // Privates
