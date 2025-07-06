@@ -72,8 +72,8 @@ Log::debug(
             (`date_created`, `user`, `comment_text`, `fk_file`, `hidden`)
         VALUES (NOW(), ?, ?, ?, false)
         ';
-        Log::debug("Db::sqlExec('$insertSql', 'ssii', '$userName', '$commentText', '$fileId')");
-        $insertResult = Db::sqlExec($insertSql, 'ssii', $userName, $commentText, $fileId);
+        Log::debug("Db::sqlExec('$insertSql', 'ssi', '$userName', '$commentText', '$fileId')");
+        $insertResult = Db::sqlExec($insertSql, 'ssi', $userName, $commentText, $fileId);
 
         if (empty($insertResult) || (0 === ($insertResult['rows'] ?? 0)) || (0 === ($insertResult['id'] ?? 0))) {
             Log::debug("Failed to add comment by $userName on $fileId", $commentText);

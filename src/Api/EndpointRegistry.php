@@ -180,7 +180,7 @@ class EndpointRegistry
                 'callback' => CommentManager::getComments(...),
                 'responseType' => [
                     200 => ['success' => true, 'data' => [0 => [
-                        'sequence' => ParamTypes::INT,
+                        'id' => ParamTypes::INT,
                         'date_created' => ParamTypes::DATE,
                         'user' => ParamTypes::INT,
                         'comment_text' => ParamTypes::STRING,
@@ -195,7 +195,7 @@ class EndpointRegistry
                 'callback' => CommentManager::addComment(...),
                 'responseType' => [
                     200 => ['success' => true, 'data' => [ // Returns the posted comment.
-                        'sequence' => ParamTypes::INT,
+                        'id' => ParamTypes::INT,
                         'date_created' => ParamTypes::DATE,
                         'user' => ParamTypes::INT,
                         'comment_text' => ParamTypes::STRING,

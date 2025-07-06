@@ -123,7 +123,6 @@ CREATE TABLE `midmem_comments`
     `id`           int(11)      NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `fk_file`      int(11)      NOT NULL COMMENT 'fk to midmem_file_queue',
     `hidden`       tinyint(1)   NOT NULL DEFAULT 0 COMMENT 'True if the comment is hidden by admin action, editing...',
-    `sequence`     int(11)      NOT NULL DEFAULT 1 COMMENT 'Their order within the file comments. For edits etc.',
     `date_created` datetime     NOT NULL DEFAULT current_timestamp(),
     `user`         varchar(255) NOT NULL COMMENT 'Who wrote it - should be fk int.',
     `comment_text` text         NOT NULL COMMENT 'The content of their comment',
