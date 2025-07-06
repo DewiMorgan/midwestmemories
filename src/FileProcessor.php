@@ -32,7 +32,7 @@ class FileProcessor extends Singleton
 
         // Get the mime type.
         $mimeType = mime_content_type($fullPath);
-        echo "Processing as $mimeType: $fullPath<br>\n";
+        Log::debug("Processing as $mimeType", $fullPath);
         $success = match ($mimeType) {
             'text/plain' => $instance->processTextFile($fullPath),
             'image/gif' => $instance->processGifFile($fullPath),
