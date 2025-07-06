@@ -240,7 +240,7 @@ Log::debug('Validated params');// DELETEME DEBUG
                 ParamTypes::URL => is_string($value) && filter_var($value, FILTER_VALIDATE_URL),
             };
 
-            if (!$valid) {
+            if (false === $valid) {
                 $actual = gettype($value);
                 $invalid[] = "$name (expected $expectedType->value, got $actual)";
             }
