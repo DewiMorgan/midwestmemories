@@ -94,16 +94,16 @@ class Path
         }
         $realPath = realpath($filePath);
         if (!$realPath) {
-            Log::debug('Converted path was not found', $filePath);
+            Log::warn('Converted path was not found', $filePath);
             return 'PATH-ERROR-404';
         }
         if (!str_starts_with($realPath, self::$imgBaseUnixPath)) {
-            Log::debug("Converted path was not within MM_BASE_DIR: '$realPath' from '$filePath'");
+            Log::warn("Converted path was not within MM_BASE_DIR: '$realPath' from '$filePath'");
             return 'PATH-ERROR-401';
         }
         $result = preg_replace('#^' . preg_quote(self::$imgBaseUnixPath, '#') . '/*#', '/', $realPath);
         if (!$result) {
-            Log::debug('Converted path gave an empty string or error', $filePath);
+            Log::warn('Converted path gave an empty string or error', $filePath);
             return 'PATH-ERROR-BAD';
         }
 
@@ -112,7 +112,7 @@ class Path
         if (self::LINK_USER !== (string)$linkType) {
             $result .= '?i=' . $linkType;
         }
-        Log::debug("$result from $filePath");
+//        Log::debug("$result from $filePath"); // DEBUG DELETEME
         return $result;
     }
 
@@ -167,7 +167,7 @@ class Path
         $realPath = realpath($joined);
         if (false === $realPath) {
             if (true === $mustExist) {
-                Log::debug('Validated path was not found as: ' . self::$imgBaseUnixPath . " . " . $webPath, $joined);
+                Log::warn('Validated path was not found as: ' . self::$imgBaseUnixPath . " . " . $webPath, $joined);
                 http_response_code(404); // Not found.
                 die(1);
             }
@@ -176,18 +176,18 @@ class Path
             $file = basename($webPath);
             $realPath = realpath($fullFolder);
             if (false === $realPath) {
-                Log::debug('Validated folder was not found', $webPath);
+                Log::warn('Validated folder was not found', $webPath);
                 http_response_code(404); // Not found.
                 die(1);
             }
             $realPath = "$realPath/$file";
         }
         if (!str_starts_with($realPath, self::$imgBaseUnixPath)) {
-            Log::debug('Validated path was not within MM_BASE_DIR', $webPath);
+            Log::warn('Validated path was not within MM_BASE_DIR', $webPath);
             http_response_code(404); // Not found.
             die(1);
         }
-        Log::debug("Validated path: '$webPath' as '$realPath'");
+        // Log::debug("Validated path: '$webPath' as '$realPath'"); // DELETEME DEBUG
         return $realPath;
     }
 

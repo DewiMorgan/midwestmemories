@@ -23,8 +23,9 @@ class JsCompiler
     ];
     public static array $userFiles = [
         'Api.js',
-        'HtmlUtils.js',
+        'Comments.js',
         'DragBar.js',
+        'HtmlUtils.js',
         'Log.js',
         'TreeView.js',
     ];

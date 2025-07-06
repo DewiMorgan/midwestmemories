@@ -74,6 +74,7 @@ use MidwestMemories\Enum\Key;
 <script id="template-script">
     // Initialize the TreeView.
     function setupTemplate() {
+        console.log("In FileTemplate.setupTemplate()");
         const comments = new Comments(<?= Metadata::getFileId() ?>);
         comments.setupTemplate();
     }
