@@ -45,7 +45,7 @@ Log::debug(
     ' - Db After:',
     Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $data['id'])
 ); // DELETEME DEBUG
-        return $data;
+        return ['status' => 200, 'data' => $data];
     }
 
     /**
@@ -132,7 +132,8 @@ Log::debug(
      * GET `/api/v1.0/comment`: return one page of comments for the current file.
      * @param array $params as `['file_id' => '1', 'page_id' => '2', ...]`.
      * @param int $pageSize Only there for unit tests. API uses default value.
-     * @return array One page of comments as a list of [sequence, date_created, user, body_text, num_pages].
+     * @return array One page of comments as:
+     *      ['status' => 200, 'data' => [sequence, date_created, user, body_text, num_pages]].
      * Note: `page_id` is capped to 1000.
      * ToDo: increase `$pageSize` default to 100.
      */
@@ -167,7 +168,7 @@ Log::debug("Getting comments: file $fileId, page $pageId, size $pageSize, start 
         ';
         $result = Db::sqlGetTable($sql, 'sssss', $pageSize, $fileId, $fileId, $pageSize, $startItemCapped);
 Log::debug('Result', $result);
-        return $result;
+        return ['status' => 200, 'data' => $result];
     }
 
     /**
