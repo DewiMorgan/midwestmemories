@@ -38,12 +38,21 @@ Log::debug($userName); // DELETEME DEBUG
             return ['status' => 400, 'data' => 'Failed to save comment: empty comment'];
         } else {
             Log::debug('Valid data found from ' . $params['path'], $commentText);
-            $data = self::execPostComment($fileId, $commentText, $userName);
+            $response = self::execPostComment($fileId, $commentText, $userName);
+            if ($response['status'] !== 200) {
+                return $response;
+            }
+            $data = $response['data'] ?? [];
+            if (empty($data)) {
+                $error = 'Server error: empty comment data once added';
+                Log::error('Empty data from comment by ' . $userName . ' on ' . $fileId, $commentText);
+                return ['status' => 500, 'data' => []];
+            }
         }
-Log::debug(' - Returned:', $data); // DELETEME DEBUG
+Log::debug(' - Returned:', $response); // DELETEME DEBUG
 Log::debug(
     ' - Db After:',
-    Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $data['id'])
+    Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', ($data['id'] ?? -1))
 ); // DELETEME DEBUG
         return ['status' => 200, 'data' => $data];
     }
