@@ -65,7 +65,7 @@ Log::debug(
         // Insert the new comment
         $insertSql = '
         INSERT INTO `' . Db::TABLE_COMMENTS . '`
-            (`date_created`, `user`, `body_text`, `sequence`, `fk_file`, `hidden`)
+            (`date_created`, `user`, `comment_text`, `sequence`, `fk_file`, `hidden`)
         VALUES (NOW(), ?, ?, ?, ?, false)
         ';
         Log::debug("Db::sqlExec('$insertSql', 'ssii', '$userName', '$commentText', '$nextSeq', '$fileId')");
@@ -116,7 +116,7 @@ Log::debug(
     ' - Before:',
     var_export(Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $commentId), true)
 ); // DELETEME DEBUG
-        $sql = 'UPDATE `' . Db::TABLE_COMMENTS . '` SET `body_text` = ? WHERE `id` = ?';
+        $sql = 'UPDATE `' . Db::TABLE_COMMENTS . '` SET `comment_text` = ? WHERE `id` = ?';
         $success = Db::sqlExec($sql, 'si', $newCommentText, $commentId);
 Log::debug(
     ' - After:',
@@ -133,7 +133,7 @@ Log::debug(
      * @param array $params as `['file_id' => '1', 'page_id' => '2', ...]`.
      * @param int $pageSize Only there for unit tests. API uses default value.
      * @return array One page of comments as:
-     *      ['status' => 200, 'data' => [sequence, date_created, user, body_text, num_pages]].
+     *      ['status' => 200, 'data' => [sequence, date_created, user, comment_text, num_pages]].
      * Note: `page_id` is capped to 1000.
      * ToDo: increase `$pageSize` default to 100.
      */
@@ -157,7 +157,7 @@ Log::debug("Getting comments: file $fileId, page $pageId, size $pageSize, start 
                 c.`sequence`,
                 c.`date_created`,
                 c.`user`,
-                c.`body_text`,
+                c.`comment_text`,
                 cc.`num_pages`
             FROM `' . Db::TABLE_COMMENTS . '` c
             CROSS JOIN comment_count cc
@@ -173,7 +173,7 @@ Log::debug('Result', $result);
 
     /**
      * @param int $commentId The `id` field of the comment to get.
-     * @return array Comments as a list of [sequence, date_created, user, body_text, num_pages].
+     * @return array Comments as a list of [sequence, date_created, user, comment_text, num_pages].
      */
     private static function getCommentById(int $commentId): array
     {
@@ -184,7 +184,7 @@ Log::debug('Result', $result);
                 c.`sequence`, 
                 c.`date_created`, 
                 c.`user`, 
-                c.`body_text`
+                c.`comment_text`
             FROM `" . Db::TABLE_COMMENTS . '` c
             WHERE c.id = ?
             LIMIT 1

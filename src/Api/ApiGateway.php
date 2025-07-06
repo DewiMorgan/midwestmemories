@@ -153,7 +153,7 @@ Log::debug('Validated params');// DELETEME DEBUG
      */
     private function getPathParams(array $endpoint): array
     {
-        Log::debug("Reading path params for $this->path as $this->pathParams:", $endpoint); // DELETEME DEBUG
+        Log::debug("Reading path params for $this->path as `$this->pathParams`", $endpoint); // DELETEME DEBUG
         // Example: 'fred/abc/unnamed' -> ['user', 'fred', 'abc', 'unnamed'].
         $params = array_values(array_filter(explode('/', $this->pathParams)));
 
@@ -181,7 +181,7 @@ Log::debug('Validated params');// DELETEME DEBUG
      */
     private function getJsonParams(): array
     {
-        Log::debug("Reading JSON params for $this->path:"); // DELETEME DEBUG
+        Log::debug("Reading JSON params for `$this->path`"); // DELETEME DEBUG
         if (!in_array($this->method, ['POST', 'PUT', 'PATCH'])) {
             Log::debug('= Empty: not POST/PUT/PATCH.'); // DELETEME DEBUG
             return [];

@@ -183,7 +183,7 @@ class EndpointRegistry
                         'sequence' => ParamTypes::INT,
                         'date_created' => ParamTypes::DATE,
                         'user' => ParamTypes::INT,
-                        'body_text' => ParamTypes::STRING,
+                        'comment_text' => ParamTypes::STRING,
                         'num_pages' => ParamTypes::INT,
                     ]]],
                 ]

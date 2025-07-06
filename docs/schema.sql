@@ -126,7 +126,7 @@ CREATE TABLE `midmem_comments`
     `sequence`     int(11)      NOT NULL DEFAULT 1 COMMENT 'Their order within the file comments. For edits etc.',
     `date_created` datetime     NOT NULL DEFAULT current_timestamp(),
     `user`         varchar(255) NOT NULL COMMENT 'Who wrote it - should be fk int.',
-    `body_text`    text         NOT NULL COMMENT 'The content of their comment',
+    `comment_text` text         NOT NULL COMMENT 'The content of their comment',
     FOREIGN KEY (`fk_file`) REFERENCES midmem_file_queue (id) ON UPDATE CASCADE ON DELETE CASCADE,
     UNIQUE KEY `file_id_index` (`fk_file`),
     UNIQUE KEY `user_index` (`user`)

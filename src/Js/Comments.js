@@ -16,7 +16,7 @@ window.Comments = class {
      * This comment defines the typedef for the API response that contains a comment.
      * @typedef {Object} Comment
      * @property {string} error
-     * @property {string} body_text
+     * @property {string} comment_text
      * @property {string} user
      * @property {string} date_created
      */
@@ -69,13 +69,13 @@ window.Comments = class {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({body_text: bodyText})
+            body: JSON.stringify({comment_text: bodyText})
         });
 
         if (!response.ok) {
             const errorMessage = `HTTP error ${response.status}`;
             console.error('Failed to post comment:', errorMessage);
-            return {error: 'Error', body_text: errorMessage, user: '', date_created: ''};
+            return {error: 'Error', comment_text: errorMessage, user: '', date_created: ''};
         }
 
         /** @type {Comment} */
@@ -85,7 +85,7 @@ window.Comments = class {
         if ('OK' !== result.error) {
             const errorMessage = result.error || 'Unknown error from server';
             console.error('Failed to post comment:', errorMessage);
-            return {error: 'Error', body_text: errorMessage, user: '', date_created: ''};
+            return {error: 'Error', comment_text: errorMessage, user: '', date_created: ''};
         }
 
         return result;
@@ -171,7 +171,7 @@ window.Comments = class {
         dateElem.textContent = '(' + comment.date_created + ')';
 
         const bodyElem = document.createElement('pre'); // preserves formatting
-        bodyElem.textContent = comment.body_text;
+        bodyElem.textContent = comment.comment_text;
 
         const brElem = document.createElement('br');
 
@@ -267,7 +267,7 @@ window.Comments = class {
                 // Scroll to show the new comment
                 commentControlDiv.scrollIntoView({behavior: 'smooth', block: 'start'});
             } else {
-                errorDiv.textContent = result.body_text || 'Failed to post comment.';
+                errorDiv.textContent = result.comment_text || 'Failed to post comment.';
             }
         } catch (error) {
             console.error('Error posting comment:', error);
