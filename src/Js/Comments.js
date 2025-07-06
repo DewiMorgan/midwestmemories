@@ -13,17 +13,52 @@ window.Comments = class {
     }
 
     /**
-     * This comment defines the typedef for the API response that contains a comment.
-     * @typedef {Object} Comment
-     * @property {string} error
+     * Type definitions for comment API responses.
+     * @typedef {Object} Comment - A single user comment.
      * @property {string} comment_text
      * @property {string} user
      * @property {string} date_created
      */
 
     /**
+     * @typedef {Object} ApiError - Generic error responses from all endpoints.
+     * @property {false} success
+     * @property {string} error
+     */
+
+    /**
+     * @typedef {Object} GetCommentSuccess - Successful GET.
+     * @property {true} success
+     * @property {Comment[]} data
+     */
+
+    /**
+     * @typedef {GetCommentSuccess | ApiError} GetCommentResponse - All valid GET responses.
+     */
+
+    /**
+     * @typedef {Object} PostCommentSuccess - Successful POST.
+     * @property {true} success
+     * @property {Comment} data
+     */
+
+    /**
+     * @typedef {PostCommentSuccess | ApiError} PostCommentResponse - All valid POST responses.
+     */
+
+    /**
+     * @typedef {Object} DeleteCommentSuccess - Successful DELETE.
+     * @property {true} success
+     * @property {"OK"} data
+     */
+
+    /**
+     * @typedef {DeleteCommentSuccess | ApiError} DeleteCommentResponse - All valid DELETE responses.
+     */
+
+    /**
      * Fetch all the comments for this file from the API.
-     * @return {Promise<Array>} Array of comments.
+     * @return {Promise<Comment[]>} Array of comments.
      */
     async fetchAllComments() {
         const allComments = [];
@@ -59,33 +94,33 @@ window.Comments = class {
 
     /**
      * Post a new comment to the server.
-     * @param {string} bodyText - The text of the comment to post.
-     * @return {Promise<Comment>} The server's response.
+     * @param {string} commentText - The text of the comment to post.
+     * @return {Promise<PostCommentResponse>} The server's response.
      */
-    async postComment(bodyText) {
+    async postComment(commentText) {
         const fileId = this.getFileId();
         const response = await fetch(`/api/v1.0/comment?file_id=${fileId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({comment_text: bodyText})
+            body: JSON.stringify({comment_text: commentText})
         });
 
         if (!response.ok) {
             const errorMessage = `HTTP error ${response.status}`;
             console.error('Failed to post comment:', errorMessage);
-            return {error: 'Error', comment_text: errorMessage, user: '', date_created: ''};
+            return {success: false, error: errorMessage};
         }
 
-        /** @type {Comment} */
+        /** @type {PostCommentResponse} */
         const result = await response.json();
         console.log("Awaited response: ", result);
 
-        if ('OK' !== result.error) {
+        if (!result.success) {
             const errorMessage = result.error || 'Unknown error from server';
             console.error('Failed to post comment:', errorMessage);
-            return {error: 'Error', comment_text: errorMessage, user: '', date_created: ''};
+            return {success: false, error: errorMessage};
         }
 
         return result;
@@ -251,14 +286,14 @@ window.Comments = class {
 
         try {
             errorDiv.textContent = 'Submitting...';
-            /** @type {Comment} */
+            /** @type {PostCommentResponse} */
             const result = await this.postComment(commentText);
             console.log("Result from postComment: ", result);
 
-            if ('OK' === result.error) {
+            if (result.success) {
                 // Append this comment.
                 const commentsDiv = document.getElementById('comments');
-                this.renderSingleComment(result, commentsDiv);
+                this.renderSingleComment(result.data, commentsDiv);
 
                 // Clear the editor and reset the UI.
                 const commentControlDiv = this.clearCommentControlDiv();
@@ -267,7 +302,7 @@ window.Comments = class {
                 // Scroll to show the new comment
                 commentControlDiv.scrollIntoView({behavior: 'smooth', block: 'start'});
             } else {
-                errorDiv.textContent = result.comment_text || 'Failed to post comment.';
+                errorDiv.textContent = result.error || 'Failed to post comment.';
             }
         } catch (error) {
             console.error('Error posting comment:', error);

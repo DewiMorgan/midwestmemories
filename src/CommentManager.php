@@ -46,7 +46,7 @@ Log::debug($userName); // DELETEME DEBUG
             if (empty($data)) {
                 $error = 'Server error: empty comment data once added';
                 Log::error('Empty data from comment by ' . $userName . ' on ' . $fileId, $commentText);
-                return ['status' => 500, 'data' => []];
+                return ['status' => 500, 'data' => $error];
             }
         }
 Log::debug(' - Returned:', $response); // DELETEME DEBUG
@@ -66,19 +66,14 @@ Log::debug(
      */
     private static function execPostComment(int $fileId, string $commentText, string $userName): array
     {
-        // Get the next sequence number for this file
-        $sql = 'SELECT MAX(`sequence`) AS `seq` FROM `' . Db::TABLE_COMMENTS . '` WHERE `fk_file` = ?';
-        $currentSeq = Db::sqlGetValue('seq', $sql, 'i', $fileId);
-        $nextSeq = is_numeric($currentSeq) ? ((int)$currentSeq + 1) : 1;
-
         // Insert the new comment
         $insertSql = '
         INSERT INTO `' . Db::TABLE_COMMENTS . '`
-            (`date_created`, `user`, `comment_text`, `sequence`, `fk_file`, `hidden`)
-        VALUES (NOW(), ?, ?, ?, ?, false)
+            (`date_created`, `user`, `comment_text`, `fk_file`, `hidden`)
+        VALUES (NOW(), ?, ?, ?, false)
         ';
-        Log::debug("Db::sqlExec('$insertSql', 'ssii', '$userName', '$commentText', '$nextSeq', '$fileId')");
-        $insertResult = Db::sqlExec($insertSql, 'ssii', $userName, $commentText, $nextSeq, $fileId);
+        Log::debug("Db::sqlExec('$insertSql', 'ssii', '$userName', '$commentText', '$fileId')");
+        $insertResult = Db::sqlExec($insertSql, 'ssii', $userName, $commentText, $fileId);
 
         if (empty($insertResult) || (0 === ($insertResult['rows'] ?? 0)) || (0 === ($insertResult['id'] ?? 0))) {
             Log::debug("Failed to add comment by $userName on $fileId", $commentText);
@@ -142,7 +137,7 @@ Log::debug(
      * @param array $params as `['file_id' => '1', 'page_id' => '2', ...]`.
      * @param int $pageSize Only there for unit tests. API uses default value.
      * @return array One page of comments as:
-     *      ['status' => 200, 'data' => [sequence, date_created, user, comment_text, num_pages]].
+     *      ['status' => 200, 'data' => [[id, date_created, user, comment_text, num_pages]...]].
      * Note: `page_id` is capped to 1000.
      * ToDo: increase `$pageSize` default to 100.
      */
@@ -163,7 +158,7 @@ Log::debug("Getting comments: file $fileId, page $pageId, size $pageSize, start 
                 WHERE `fk_file` = ? AND NOT `hidden`
             )
             SELECT
-                c.`sequence`,
+                c.id,
                 c.`date_created`,
                 c.`user`,
                 c.`comment_text`,
@@ -172,7 +167,7 @@ Log::debug("Getting comments: file $fileId, page $pageId, size $pageSize, start 
             CROSS JOIN comment_count cc
             WHERE c.`fk_file` = ?
             AND NOT c.`hidden`
-            ORDER BY c.`sequence`
+            ORDER BY c.`id`
             LIMIT ? OFFSET ?
         ';
         $result = Db::sqlGetTable($sql, 'sssss', $pageSize, $fileId, $fileId, $pageSize, $startItemCapped);
@@ -182,7 +177,7 @@ Log::debug('Result', $result);
 
     /**
      * @param int $commentId The `id` field of the comment to get.
-     * @return array Comments as a list of [sequence, date_created, user, comment_text, num_pages].
+     * @return array Comments as a list of `[id, date_created, user, comment_text, num_pages]`.
      */
     private static function getCommentById(int $commentId): array
     {
@@ -190,7 +185,6 @@ Log::debug('Result', $result);
             SELECT 
                 'OK' AS `error`,
                 c.`id`, 
-                c.`sequence`, 
                 c.`date_created`, 
                 c.`user`, 
                 c.`comment_text`
@@ -222,18 +216,18 @@ Log::debug('Result', $result);
 //                    $data = self::postComment($fileId);
 //                    break;
 //                default:
-//                    $data = ['error' => "Unknown endpoint $endpoint"];
+//                    $data = ['data' => "Unknown endpoint $endpoint"];
 //                    break;
 //            }
 //            try {
 //                $encoded = json_encode($data, JSON_THROW_ON_ERROR);
 //            } catch (JsonException) {
 //                Log::error('Failed to encode data', self::$requestWebPath);
-//                $encoded = "{'error':'Failed to encode data'}";
+//                $encoded = "{'data':'Failed to encode data'}";
 //            }
 //        } else {
 //            Log::warning('Bad API request path', self::$requestWebPath);
-//            $encoded = "{'error':'Bad API request path'}";
+//            $encoded = "{'data':'Bad API request path'}";
 //        }
 //        Log::debug('...returning', $encoded);
 //        return $encoded;

@@ -194,7 +194,13 @@ class EndpointRegistry
                 'rate_limit' => ['limit' => 20, 'window' => 60],
                 'callback' => CommentManager::addComment(...),
                 'responseType' => [
-                    200 => ['success' => true, 'data' => ParamTypes::INT],
+                    200 => ['success' => true, 'data' => [ // Returns the posted comment.
+                        'sequence' => ParamTypes::INT,
+                        'date_created' => ParamTypes::DATE,
+                        'user' => ParamTypes::INT,
+                        'comment_text' => ParamTypes::STRING,
+                        'num_pages' => ParamTypes::INT,
+                    ]],
                 ]
             ],
             EndpointKey::PUT_COMMENT => [
