@@ -37,13 +37,17 @@ window.Comments = class {
                 throw new Error(`Failed to fetch page ${currentPage}: ${response.statusText}`);
             }
 
-            /** @type {Comment[]} */
-            const comments = await response.json();
-            allComments.push(...comments);
-
-            // Update `num_pages` from latest comment objects, as more pages may be added as we get the first ones.
-            if (0 !== comments.length) {
-                totalPages = comments[0]["num_pages"];
+            /** @type {{ success: boolean, data?: Comment[] }} */
+            const result = await response.json();
+            if (result.success && Array.isArray(result.data)) {
+                const comments = result.data;
+                allComments.push(...comments);
+                // Update `num_pages` from latest comment objects, as more pages may be added as we get the first ones.
+                if (0 !== comments.length) {
+                    totalPages = comments[0]["num_pages"];
+                }
+            } else {
+                throw new Error(`Unexpected comment response format for page ${currentPage}`);
             }
 
             currentPage++;
