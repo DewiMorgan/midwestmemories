@@ -318,11 +318,11 @@ window.Comments = class {
             if ('OK' === result.error) {
                 // Append this comment.
                 const commentsDiv = document.getElementById('comments');
-                renderSingleComment(result, commentsDiv);
+                this.renderSingleComment(result, commentsDiv);
 
                 // Clear the editor and reset the UI.
-                const commentControlDiv = clearCommentControlDiv();
-                addCommentControlUI(commentControlDiv);
+                const commentControlDiv = this.clearCommentControlDiv();
+                this.addCommentControlUI(commentControlDiv);
 
                 // Scroll to show the new comment
                 commentControlDiv.scrollIntoView({behavior: 'smooth', block: 'start'});
@@ -367,7 +367,7 @@ window.Comments = class {
 
             // Add the "Add Comment" button
             console.log("Adding add-comment button:");
-            const commentControlDiv = clearCommentControlDiv();
+            const commentControlDiv = this.clearCommentControlDiv();
             this.addCommentControlUI(commentControlDiv);
             console.log("Displayed comments!");
         } catch (error) {
@@ -381,6 +381,7 @@ window.Comments = class {
      */
     setupTemplate() {
         console.log("Fetching comments...");
+        // noinspection JSIgnoredPromiseFromCall
         this.displayComments();
     }
 
