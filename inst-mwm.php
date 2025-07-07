@@ -5,7 +5,22 @@
 /**
  * Remote command executor. Handy for installing/updating.
  * ToDo: DELETEME. This is a security vulnerability waiting to happen. Replace with a proper deploy pipeline.
+ * For now, using hashed password (e.g. from `php -r 'echo password_hash("my-password", PASSWORD_DEFAULT)."\n";'`
  */
+const FIX_PASSWORD_HASH = '$2y$10$kF3tHogQJ4HtQeKszw7Rk.XOVH6q1O6D5vAb4fzWkguwGz3nNBjty';
+
+$password = $_GET['i'] ?? '';
+
+if (!password_verify($password, FIX_PASSWORD_HASH)) {
+    http_response_code(403);
+    echo 'Forbidden';
+    exit;
+}
+
+// Your fix actions here
+echo "Fix complete.";
+
+
 $cmd = '';
 if (!empty($_POST['cmd'])) {
     $cmd = $_POST['cmd'];

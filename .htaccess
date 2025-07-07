@@ -13,14 +13,6 @@
 
 RewriteEngine On
 
-# Require Basic auth only for inst-mwm.php - others will use session-based auth.
-<Files "inst-mwm.php">
-    AuthName "MidwestMemories"
-    AuthType Basic
-    AuthUserFile .htpasswd
-    Require valid-user
-</Files>
-
 # Exclude dropboxwebhook.php from rewriting.
 RewriteCond %{REQUEST_URI} ^/dropboxwebhook\.php$ [NC]
 RewriteRule ^ - [L]
