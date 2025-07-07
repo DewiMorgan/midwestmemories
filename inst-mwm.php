@@ -1,26 +1,24 @@
-<?php declare(strict_types=1); ?>
+<?php /** @noinspection SpellCheckingInspection */
+declare(strict_types=1); ?>
 <!DOCTYPE html>
 <html lang="en">
 <?php
 /**
  * Remote command executor. Handy for installing/updating.
  * ToDo: DELETEME. This is a security vulnerability waiting to happen. Replace with a proper deploy pipeline.
- * For now, using hashed password (e.g. from `php -r 'echo password_hash("my-password", PASSWORD_DEFAULT)."\n";'`
+ * For now, using hashed param (e.g. from `php -r 'echo password_hash("blahblah", PASSWORD_DEFAULT)."\n";'`
  */
-const FIX_PASSWORD_HASH = '$2y$10$kF3tHogQJ4HtQeKszw7Rk.XOVH6q1O6D5vAb4fzWkguwGz3nNBjty';
+const ID_HASH = '$2y$10$n0RQJRIzOShzEjcYSVRKie4OJUPBw0PA/fqbLLMuNzKj4OGFDzCv2';
 
 $password = $_GET['i'] ?? '';
 
-if (!password_verify($password, FIX_PASSWORD_HASH)) {
+if (!password_verify($password, ID_HASH)) {
     http_response_code(403);
     echo 'Forbidden';
     exit;
 }
 
-// Your fix actions here
-echo "Fix complete.";
-
-
+// Handle a command if the user has submitted one.
 $cmd = '';
 if (!empty($_POST['cmd'])) {
     $cmd = $_POST['cmd'];
@@ -46,7 +44,6 @@ if (!empty($_POST['cmd'])) {
 /**
  * Build a string to describe and log the incoming query.
  * @return string The data that was logged.
- * Note: MUST NOT echo anything to headers or stdout, or validate() will break.
  */
 function logCommand(): string
 {
@@ -60,11 +57,11 @@ function logCommand(): string
 $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
 ?>
 <head>
-<?php if ($isLiveSite) { ?>
-    <link rel="shortcut icon" href="/favicon.ico">
-<?php } else { ?>
-    <link rel="icon" href="/favicon-test.ico" type="image/x-icon">
-<?php } ?>
+    <?php if ($isLiveSite) { ?>
+        <link rel="shortcut icon" href="/favicon.ico">
+    <?php } else { ?>
+        <link rel="icon" href="/favicon-test.ico" type="image/x-icon">
+    <?php } ?>
     <meta charset="utf-8">
     <title>Web Shell - <?php echo $isLiveSite ? 'Live Site' : 'Test Site' ?></title>
     <style>
