@@ -16,7 +16,7 @@ use MidwestMemories\Enum\Key;
  */
 class Table
 {
-    private static string $prefix;
+    private static string $prefix = '';
 
     /**
      * Honestly, this is one of those few cases where magic methods are the best option.
@@ -25,7 +25,7 @@ class Table
      */
     public static function __callStatic(string $name, array $arguments): string
     {
-        if (!self::$prefix) {
+        if (!isset(self::$prefix) || self::$prefix === '') {
             self::$prefix = Conf::get(Key::MYSQL_PREFIX) ?? 'midmem_';
         }
         return self::$prefix . $name;
