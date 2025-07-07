@@ -4,11 +4,23 @@
 declare(strict_types=1);
 
 namespace MidwestMemories;
+
+$isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title><?php IndexGateway::getSiteName(); ?> - Folder Tree</title>
+    <?php if ($isLiveSite) { ?>
+        <link rel="shortcut icon" href="/favicon.ico">
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+        <link rel="manifest" href="/site.webmanifest">
+    <?php } else { ?>
+        <link rel="icon" href="/favicon-test.ico" type="image/x-icon">
+    <?php } ?>
+    <title><?php echo $isLiveSite ? '<!-- Live Site -->' : 'Test Site'; ?><?php IndexGateway::getSiteName(); ?>
+        - Folder Tree</title>
     <!--suppress HtmlUnknownTarget -->
     <link rel="stylesheet" href="/raw/user.css">
     <!--suppress HtmlUnknownTarget -->

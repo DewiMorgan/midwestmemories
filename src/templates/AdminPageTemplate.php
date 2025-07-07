@@ -4,28 +4,25 @@ declare(strict_types=1);
 /**
  * Template for the admin dashboard.
  *
- * @var string $pageTitle The title of the page
- * @var string $userRole The role of the current user (Admin/SuperAdmin)
- * @var string $username The current user's username
+ * @var string $h_userRole The role of the current user (Admin/SuperAdmin)
+ * @var string $h_username The current user's username.
+ * @var bool $isLiveSite True on the live site, false on the test site.
  */
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<?php
-$isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
-if ($isLiveSite) {
-?>
-    <link rel="shortcut icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-<?php } else { ?>
-    <link rel="icon" href="/favicon-test.ico" type="image/x-icon">
-<?php } ?>
-    <title><?= htmlspecialchars($pageTitle) ?></title>
+    <?php if ($isLiveSite) { ?>
+        <link rel="shortcut icon" href="/favicon.ico">
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+        <link rel="manifest" href="/site.webmanifest">
+    <?php } else { ?>
+        <link rel="icon" href="/favicon-test.ico" type="image/x-icon">
+    <?php } ?>
+    <title>Admin: Midwest Memories - <?= ($isLiveSite ? 'Live Site' : 'Test Site') ?></title>
     <meta charset="UTF-8">
     <!--suppress HtmlUnknownTarget -->
     <link rel="stylesheet" href="/raw/admin.css">
@@ -34,9 +31,9 @@ if ($isLiveSite) {
 </head>
 <body>
 <div class="header">
-    <h1>Midwest Memories - <?= htmlspecialchars($userRole) ?></h1>
+    <h1>Midwest Memories <?= $h_userRole ?> - <?= ($isLiveSite ? 'Live Site' : 'Test Site') ?></h1>
     <div class="user-info">
-        Logged in as: <?= htmlspecialchars($username) ?>
+        Logged in as: <?= $h_username ?> (<?= $h_userRole ?>)
         <form method="post" style="display: inline;">
             <input type="hidden" name="action" value="logout">
             <button type="submit" style="margin-left: 10px;">Logout</button>

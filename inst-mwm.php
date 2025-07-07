@@ -42,12 +42,16 @@ function logCommand(): string
     return $data;
 }
 
+$isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
 ?>
 <head>
+<?php if ($isLiveSite) { ?>
+    <link rel="shortcut icon" href="/favicon.ico">
+<?php } else { ?>
+    <link rel="icon" href="/favicon-test.ico" type="image/x-icon">
+<?php } ?>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Web Shell</title>
+    <title>Web Shell - <?php echo $isLiveSite ? 'Live Site' : 'Test Site' ?></title>
     <style>
         * {
             -webkit-box-sizing: border-box;

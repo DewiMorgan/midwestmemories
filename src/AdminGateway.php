@@ -72,9 +72,9 @@ class AdminGateway
         $user = User::getInstance();
 
         $templateVars = [
-            'pageTitle' => 'Admin: Midwest Memories',
-            'userRole' => $user->isSuperAdmin ? 'SuperAdmin' : 'Admin',
-            'username' => $user->username
+            'h_userRole' => $user->isSuperAdmin ? 'SuperAdmin' : 'Admin',
+            'h_username' => htmlspecialchars($user->username),
+            'isLiveSite' => str_contains(__DIR__, 'midwestmemoriesfamily'),
         ];
 
         // Extract variables for the template
