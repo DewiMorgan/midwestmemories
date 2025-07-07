@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 use MidwestMemories\Db;
 use MidwestMemories\Enum\UserAccess;
+use MidwestMemories\Table;
 use MidwestMemories\User;
 use PHPUnit\Framework\TestCase;
 
@@ -86,7 +87,7 @@ final class UserTest extends TestCase
     private function useRealDb(): void
     {
         Db::resetInstance();
-        Db::sqlExec('DELETE FROM midmem.midmem_users WHERE TRUE');
+        Db::sqlExec('DELETE FROM `' . Table::users() . '` WHERE TRUE');
     }
 
     public function testNotLoggedInBeforeLogin(): void
@@ -319,7 +320,7 @@ final class UserTest extends TestCase
         static::assertSame('OK', $result['data']);
 
         // Check user is now in the database (via mock or test DB)
-        $user = Db::sqlGetRow('SELECT * FROM midmem_users WHERE username = ?', 's', $username);
+        $user = Db::sqlGetRow('SELECT * FROM `' . Table::users() . '` WHERE `username` = ?', 's', $username);
         static::assertNotEmpty($user);
         static::assertTrue(password_verify($password, $user['password_hash']));
     }
@@ -366,7 +367,8 @@ final class UserTest extends TestCase
         $passwordHash = password_hash('irrelevant', PASSWORD_DEFAULT);
 
         Db::sqlExec(
-            'INSERT INTO midmem_users (username, password_hash, access_level, is_disabled) VALUES (?, ?, ?, 0)',
+            'INSERT INTO `' . Table::users() . '` (`username`, `password_hash`, `access_level`, `is_disabled`)
+                VALUES (?, ?, ?, 0)',
             'ssi',
             $username,
             $passwordHash,
@@ -380,7 +382,11 @@ final class UserTest extends TestCase
         static::assertSame(200, $result['status']);
         static::assertSame('OK', $result['data']);
 
-        $row = Db::sqlGetRow('SELECT is_disabled FROM midmem_users WHERE username = ?', 's', $username);
+        $row = Db::sqlGetRow(
+            'SELECT `is_disabled` FROM `' . Table::users() . '` WHERE `username` = ?',
+            's',
+            $username
+        );
         static::assertNotEmpty($row);
         static::assertSame(1, (int)$row['is_disabled']);
     }
@@ -437,7 +443,7 @@ final class UserTest extends TestCase
         $newPassword = 'new_pass';
 
         Db::sqlExec(
-            'INSERT INTO midmem_users (username, password_hash, access_level) VALUES (?, ?, ?)',
+            'INSERT INTO `' . Table::users() . '` (`username`, `password_hash`, `access_level`) VALUES (?, ?, ?)',
             'ssi',
             $username,
             $oldHash,
@@ -454,7 +460,7 @@ final class UserTest extends TestCase
 
         $newHash = Db::sqlGetValue(
             'password_hash',
-            'SELECT password_hash FROM midmem_users WHERE username = ?',
+            'SELECT `password_hash` FROM `' . Table::users() . '` WHERE `username` = ?',
             's',
             $username
         );
@@ -515,7 +521,7 @@ final class UserTest extends TestCase
     {
         $this->useRealDb();
         Db::sqlExec(
-            'INSERT INTO `midmem_users` (`username`, `password_hash`, `access_level`, `is_disabled`)
+            'INSERT INTO `' . Table::users() . '` (`username`, `password_hash`, `access_level`, `is_disabled`)
                 VALUES (?, ?, ?, ?)',
             'ssis',
             'alice',
@@ -525,7 +531,7 @@ final class UserTest extends TestCase
         );
 
         Db::sqlExec(
-            'INSERT INTO `midmem_users` (`username`, `password_hash`, `access_level`, `is_disabled`)
+            'INSERT INTO `' . Table::users() . '` (`username`, `password_hash`, `access_level`, `is_disabled`)
                 VALUES (?, ?, ?, ?)',
             'ssis',
             'bob',

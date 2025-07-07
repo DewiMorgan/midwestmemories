@@ -47,7 +47,7 @@ class User extends Singleton
         $userId = $_SESSION['userId'];
 
         // Fetch user data from the DB.
-        $sql = 'SELECT * FROM `midmem_users` WHERE `id` = ? and `is_disabled` = 0';
+        $sql = 'SELECT * FROM `' . Table::users() . '` WHERE `id` = ? and `is_disabled` = 0';
         $user = Db::sqlGetRow($sql, 'd', $userId);
         $this->populateUser($user);
     }
@@ -68,7 +68,7 @@ class User extends Singleton
         $username = trim($_POST['username']);
         $password = $_POST['password'];
         // Try to authenticate. Don't let disabled users login.
-        $sql = 'SELECT * FROM `midmem_users` WHERE `username` = ? and `is_disabled` = 0';
+        $sql = 'SELECT * FROM `' . Table::users() . '` WHERE `username` = ? and `is_disabled` = 0';
         $user = Db::sqlGetRow($sql, 's', $username);
         if ($user && password_verify($password, $user['password_hash'] ?? '')) {
             $instance = self::getInstance();
@@ -150,7 +150,7 @@ class User extends Singleton
         // Log this access. No error handling if we fail.
         $user = User::getInstance();
         Db::sqlExec(
-            'INSERT INTO `' . Db::TABLE_VISITORS . '` (`request`, `main_ip`, `all_ips_string`, `user`, `agent`)'
+            'INSERT INTO `' . Table::visitors() . '` (`request`, `main_ip`, `all_ips_string`, `user`, `agent`)'
             . ' VALUES (?, ?, ?, ?, ?)',
             'sssss',
             $connection->request,
@@ -193,7 +193,7 @@ class User extends Singleton
         }
 
         // Check for existing user
-        $existing = Db::sqlGetRow('SELECT id FROM midmem_users WHERE username = ?', 's', $username);
+        $existing = Db::sqlGetRow('SELECT `id` FROM `' . Table::users() . '` WHERE `username` = ?', 's', $username);
         if ($existing) {
             return ['status' => 409, 'data' => 'Error: Conflict. User already exists: ' . var_export($existing, true)];
         }
@@ -203,7 +203,7 @@ class User extends Singleton
 
         // Insert user with default access level
         $ok = Db::sqlExec(
-            'INSERT INTO midmem_users (username, password_hash, access_level) VALUES (?, ?, ?)',
+            'INSERT INTO `' . Table::users() . '` (`username`, `password_hash`, `access_level`) VALUES (?, ?, ?)',
             'ssi',
             $username,
             $hash,
@@ -232,7 +232,7 @@ class User extends Singleton
         }
 
         // Confirm user exists
-        $user = Db::sqlGetRow('SELECT `id` FROM `midmem_users` WHERE `username` = ?', 's', $username);
+        $user = Db::sqlGetRow('SELECT `id` FROM `' . Table::users() . '` WHERE `username` = ?', 's', $username);
         if (!$user) {
             return ['status' => 404, 'data' => 'Error: User not found for change password'];
         }
@@ -240,7 +240,7 @@ class User extends Singleton
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
         $ok = Db::sqlExec(
-            'UPDATE `midmem_users` SET `password_hash` = ?, is_disabled = 0 WHERE `username` = ?',
+            'UPDATE `' . Table::users() . '` SET `password_hash` = ?, `is_disabled` = 0 WHERE `username` = ?',
             'ss',
             $hash,
             $username
@@ -267,14 +267,14 @@ class User extends Singleton
         }
 
         // Check if user exists.
-        $user = Db::sqlGetRow('SELECT id FROM midmem_users WHERE username = ?', 's', $username);
+        $user = Db::sqlGetRow('SELECT `id` FROM `' . Table::users() . '` WHERE `username` = ?', 's', $username);
         if (!$user) {
             return ['status' => 404, 'data' => 'Error: User not found for deletion'];
         }
 
         // Soft delete: set is_disabled = 1.
         $ok = Db::sqlExec(
-            'UPDATE midmem_users SET is_disabled = 1 WHERE username = ?',
+            'UPDATE `' . Table::users() . '` SET `is_disabled` = 1 WHERE `username` = ?',
             's',
             $username
         );
@@ -295,10 +295,10 @@ class User extends Singleton
     {
         $rows = Db::sqlGetTable(
             "SELECT
-                username,
-                IF(is_disabled = 1, 'DISABLED', '') AS comment
-            FROM midmem_users
-            ORDER BY username"
+                `username`,
+                IF(`is_disabled` = 1, 'DISABLED', '') AS `comment`
+            FROM `" . Table::users() . '`
+            ORDER BY `username`'
         );
 
         if (!$rows) {

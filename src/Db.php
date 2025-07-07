@@ -18,11 +18,6 @@ class Db extends Singleton
     private const TYPE_EXEC = 0; // `TYPE_EXEC` returns [1] on success.
     private const TYPE_RESULT = 1; // `TYPE_RESULT` returns a result that must be freed.
     private const TYPE_ROW = 2; // `TYPE_ROW` is an associative array for the row.
-    public const TABLE_RATE_LIMIT = 'midmem_rate_limits';
-    public const TABLE_COMMENTS = 'midmem_comments';
-    public const TABLE_VISITORS = 'midmem_visitors';
-    public const TABLE_FILE_QUEUE = 'midmem_file_queue';
-    public const TABLE_DROPBOX_USERS = 'midmem_dropbox_users';
 
     private mysqli $db;
 

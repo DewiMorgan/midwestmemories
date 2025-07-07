@@ -11,6 +11,7 @@ use JetBrains\PhpStorm\NoReturn;
 use MidwestMemories\Db;
 use MidwestMemories\Enum\ParamTypes;
 use MidwestMemories\Log;
+use MidwestMemories\Table;
 use MidwestMemories\User;
 use ValueError;
 
@@ -306,7 +307,7 @@ Log::debug($output);// DELETEME DEBUG
 
         // Try to fetch the current rate limit entry
         $row = Db::sqlGetRow(
-            'SELECT * FROM `' . Db::TABLE_RATE_LIMIT . '` WHERE user_id = ? AND rate_key = ?',
+            'SELECT * FROM `' . Table::rate_limits() . '` WHERE user_id = ? AND rate_key = ?',
             'ds', $userId, $key
         );
 
@@ -318,8 +319,8 @@ Log::debug($output);// DELETEME DEBUG
 
                 // Reset the rate limit to recover automatically, since this is our error.
                 Db::sqlExec(
-                    'UPDATE ' . Db::TABLE_RATE_LIMIT .
-                    ' SET window_start = ?, request_count = 1 WHERE user_id = ? AND rate_key = ?',
+                    'UPDATE `' . Table::rate_limits() .
+                    '` SET `window_start` = ?, `request_count` = 1 WHERE `user_id` = ? AND `rate_key` = ?',
                     'sds', $now->format('Y-m-d H:i:s'), $userId, $key
                 );
 
@@ -331,8 +332,8 @@ Log::debug($output);// DELETEME DEBUG
             if ($now >= (clone $windowStart)->add($windowInterval)) {
                 // Reset window and count
                 Db::sqlExec(
-                    'UPDATE ' . Db::TABLE_RATE_LIMIT .
-                    ' SET window_start = ?, request_count = 1 WHERE user_id = ? AND rate_key = ?',
+                    'UPDATE `' . Table::rate_limits() .
+                    '` SET `window_start` = ?, `request_count` = 1 WHERE `user_id` = ? AND `rate_key` = ?',
                     'sds', $now->format('Y-m-d H:i:s'), $userId, $key
                 );
                 return true;
@@ -340,8 +341,8 @@ Log::debug($output);// DELETEME DEBUG
 
             if ($requestCount < $limit) {
                 Db::sqlExec(
-                    'UPDATE ' . Db::TABLE_RATE_LIMIT .
-                    ' SET request_count = request_count + 1 WHERE user_id = ? AND rate_key = ?',
+                    'UPDATE `' . Table::rate_limits() .
+                    '` SET `request_count` = `request_count` + 1 WHERE `user_id` = ? AND `rate_key` = ?',
                     'ds', $userId, $key
                 );
                 return true;
@@ -352,8 +353,8 @@ Log::debug($output);// DELETEME DEBUG
         } else {
             // First-time entry: insert new row
             Db::sqlExec(
-                'INSERT INTO ' . Db::TABLE_RATE_LIMIT .
-                ' (`request_count`, `user_id`, `rate_key`, `window_start`)
+                'INSERT INTO `' . Table::rate_limits() .
+                '` (`request_count`, `user_id`, `rate_key`, `window_start`)
                     VALUES (1, ?, ?, ?)',
                 'dss', $userId, $key, $now->format('Y-m-d H:i:s')
             );

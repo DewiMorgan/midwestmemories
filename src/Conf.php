@@ -90,6 +90,8 @@ class Conf extends Singleton
 
     /**
      * Parse a named folder from the current working directory, or any parent folder.
+     * If the file exists in multiple locations, the one from the deepest folder is used.
+     * So the test system's INIs are in the test folder, and it ignores the real site's INIs in the root folder.
      * @param string $filename The filename to find in the current folder or any parent folder.
      * @return array Array of data parsed from the ini file, or empty array on failure.
      */

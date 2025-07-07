@@ -97,7 +97,7 @@ class Metadata
     {
         $webPath = IndexGateway::$requestWebPath;
         $dropboxPath = Conf::get(Key::IMAGE_DIR) . $webPath;
-        $sql = 'SELECT `id` FROM `' . Db::TABLE_FILE_QUEUE . '` WHERE `full_path` = ?';
+        $sql = 'SELECT `id` FROM `' . Table::file_queue() . '` WHERE `full_path` = ?';
         return intval(Db::sqlGetValue('id', $sql, 's', $dropboxPath));
     }
 

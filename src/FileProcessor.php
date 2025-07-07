@@ -230,7 +230,7 @@ class FileProcessor extends Singleton
     public function setSyncStatus(string $fullPath, SyncStatus $status, string $errorMessage = ''): bool
     {
         $result = Db::sqlExec(
-            'UPDATE `' . Db::TABLE_FILE_QUEUE . '` SET `sync_status` = ?, error_message = ? WHERE full_path = ?',
+            'UPDATE `' . Table::file_queue() . '` SET `sync_status` = ?, error_message = ? WHERE full_path = ?',
             'sss',
             $status->value,
             $errorMessage,
@@ -269,7 +269,7 @@ class FileProcessor extends Singleton
             'full_path',
             '
                 SELECT `full_path` 
-                FROM `' . Db::TABLE_FILE_QUEUE . '`
+                FROM `' . Table::file_queue() . '`
                 WHERE `sync_status` = ?
                 ORDER BY `id`
             ',
@@ -289,7 +289,7 @@ class FileProcessor extends Singleton
             'full_path',
             '
                 SELECT `full_path`
-                FROM `' . Db::TABLE_FILE_QUEUE . '`
+                FROM `' . Table::file_queue() . '`
                 WHERE `sync_status` = ?
                 ORDER BY `id`
                 LIMIT 1

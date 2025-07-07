@@ -3,6 +3,29 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/07/05 Sat
+
+* DONE: Create a "live" site, and a "test" site.
+* DONE: Dynamic DB table prefix.
+* DONE: Remove hardcoded table names.
+* DONE: Dynamic favicons.
+* DONE: Convert Comments class to use new API.
+* DONE: Update JS to use these correct return types.
+* DONE: Change the user UI to use the new JS/CSS system.
+* DONE: Change the user UI to use the new API system.
+* DONE: User endpoints return a string, should maybe return an object like the file endpoints?
+* DONE: Change endpoints to be loaded into PHP as a class or config file or something.
+* DONE: make API errors not return 200 OK.
+* SKIPPED: In add users, grey out save button until both username and password are filled? (no, just show errors.)
+* SKIPPED: Handle/prevent users setting their passwords to the string 'DISABLED'. (disabled is now a DB flag.)
+* SKIPPED: Opa's slide folders are not showing up (site was just slow).
+
+## 2025/06/30 Sun
+
+Did the first steps of migrating the comment management to the new API system. Added tests. Tests are failing.
+Also added tests for user management. Some of those tests are failing.
+Unfortunately, midnight.
+
 ## 2025/06/29 Sat
 
 * DONE: Finish converting user logins to new mechanism.

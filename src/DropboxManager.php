@@ -129,7 +129,7 @@ class DropboxManager extends Singleton
         if (!empty($cursor) && (!isset($this->cursor) || $this->cursor !== $cursor)) {
             $this->cursor = $cursor;
             return Db::sqlExec(
-                'INSERT INTO `' . Db::TABLE_DROPBOX_USERS . '` (`user_id`, `cursor_id`) 
+                'INSERT INTO `' . Table::dropbox_users() . '` (`user_id`, `cursor_id`) 
                 VALUES (?, ?) 
                 ON DUPLICATE KEY UPDATE `cursor_id` = ?',
                 'dss',
@@ -160,7 +160,7 @@ class DropboxManager extends Singleton
             $numberOfFiles++;
             // The ON DUPLICATE KEY behavior only overwrites with updated values if the hash was changed.
             $result = Db::sqlExec(
-                'INSERT INTO `' . Db::TABLE_FILE_QUEUE . "` 
+                'INSERT INTO `' . Table::file_queue() . "` 
                     (`file_name`, `full_path`, `sync_status`, `file_hash`, `error_message`)
                  VALUES (?, ?, ?, ?, '')
                  ON DUPLICATE KEY UPDATE 
@@ -188,7 +188,7 @@ class DropboxManager extends Singleton
     {
         $this->cursor = Db::sqlGetValue(
             'cursor_id',
-            'SELECT `cursor_id` FROM `' . Db::TABLE_DROPBOX_USERS . '` LIMIT 1'
+            'SELECT `cursor_id` FROM `' . Table::dropbox_users() . '` LIMIT 1'
         );
     }
 

@@ -84,7 +84,7 @@ class DropboxWebhook
                     // No error handling if we fail.
                     Db::sqlExec(
                         '
-                        INSERT INTO `' . Db::TABLE_DROPBOX_USERS . "` (`user_id`, `cursor_id`, `webhook_timestamp`)
+                        INSERT INTO `' . Table::dropbox_users() . "` (`user_id`, `cursor_id`, `webhook_timestamp`)
                         VALUES (?, '', NOW())
                         ON DUPLICATE KEY UPDATE `webhook_timestamp` = NOW()",
                         'd',
@@ -95,7 +95,7 @@ class DropboxWebhook
         } else {
             // On failure, I set the webhook timestamp to now(). I no longer remember why.
             // ToDo: figure out why.
-            Db::sqlExec('UPDATE `' . Db::TABLE_DROPBOX_USERS . '` SET `webhook_timestamp` = NOW() WHERE 1');
+            Db::sqlExec('UPDATE `' . Table::dropbox_users() . '` SET `webhook_timestamp` = NOW() WHERE 1');
         }
     }
 
@@ -106,9 +106,6 @@ class DropboxWebhook
         <!DOCTYPE html>
         <html lang="en">
         <head>
-            <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-            <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-            <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
             <link rel="manifest" href="/site.webmanifest">
             <title>Midwest Memories</title>
             <meta charset="UTF-8">

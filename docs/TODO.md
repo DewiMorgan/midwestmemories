@@ -2,28 +2,20 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
-* Convert Comments class to use new API.
-    * Check return types of all API endpoints.
-    * Update JS to use these correct return types.
-* Need to change the user UI to use the new JS/CSS system.
-* Need to change the user UI to use the new API system.
+* Get CSV files auto-parsing.
 * Get folder-level details showing.
 * Faster page loads (smaller initial images?)
-* Create a "live" site, and a "test" site.
+* Bug: Folders are not numerically sorted: "Bundle 2" comes between "Bundle 19" and "Bundle 20".
+* Bug: Clicking dot doesn't cause folding.
+* Check return types of all API endpoints.
 * Generate Web page tests.
 * Add unit tests for everything.
-
 * Whitelist /nonexistent.file, so 404 page can happen?
 * Rate-limit by the IP as well as the username?
-* User endpoints return a string, should maybe return an object like the file endpoints?
 * Make the JS also handle endpoints using the lookup table?
-* Change endpoints to be loaded as a class or config file or something.
-
+* Change endpoints to be loaded into JS as a class or config file or something.
 * Handle API errors instead of just checking `result.ok` (which just checks it was a 200).
-    * Also make API errors not return 200 OK.
-* Maybe in add users, make save button grey out until both username and password are filled? Or just give error on save?
 * Improve admin UI: add "Are you sure" to cursor renewal.
-* Correctly handle (and prevent) users that try to set their passwords to the string 'DISABLED'.
 
 * Get it commentable.
     * sanitise comments

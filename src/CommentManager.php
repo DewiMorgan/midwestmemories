@@ -52,7 +52,7 @@ Log::debug($userName); // DELETEME DEBUG
 Log::debug(' - Returned:', $response); // DELETEME DEBUG
 Log::debug(
     ' - Db After:',
-    Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', ($data['id'] ?? -1))
+    Db::sqlGetRow('SELECT * FROM `' . Table::comments() . '` WHERE `id` = ?', 'i', ($data['id'] ?? -1))
 ); // DELETEME DEBUG
         return ['status' => 200, 'data' => $data];
     }
@@ -68,7 +68,7 @@ Log::debug(
     {
         // Insert the new comment
         $insertSql = '
-        INSERT INTO `' . Db::TABLE_COMMENTS . '`
+        INSERT INTO `' . Table::comments() . '`
             (`date_created`, `user`, `comment_text`, `fk_file`, `hidden`)
         VALUES (NOW(), ?, ?, ?, false)
         ';
@@ -94,12 +94,12 @@ Log::debug(
     {
 Log::debug('Deleting comment', $commentId);
 Log::debug(' - Before:',
-    var_export(Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $commentId), true)
+    var_export(Db::sqlGetRow('SELECT * FROM `' . Table::comments() . '` WHERE `id` = ?', 'i', $commentId), true)
 ); // DELETEME DEBUG
-        $sql = 'UPDATE `' . Db::TABLE_COMMENTS . '` SET `hidden` = true WHERE `id` = ?';
+        $sql = 'UPDATE `' . Table::comments() . '` SET `hidden` = true WHERE `id` = ?';
         $success = Db::sqlExec($sql, 'i', $commentId);
 Log::debug(' - After:',
-    var_export(Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $commentId), true)
+    var_export(Db::sqlGetRow('SELECT * FROM `' . Table::comments() . '` WHERE `id` = ?', 'i', $commentId), true)
 );  // DELETEME DEBUG
         if ($success) {
             return ['status' => 200, 'data' => 'OK'];
@@ -118,13 +118,13 @@ Log::debug(' - After:',
 Log::debug("Editing comment: $commentId", $newCommentText);
 Log::debug(
     ' - Before:',
-    var_export(Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $commentId), true)
+    var_export(Db::sqlGetRow('SELECT * FROM `' . Table::comments() . '` WHERE `id` = ?', 'i', $commentId), true)
 ); // DELETEME DEBUG
-        $sql = 'UPDATE `' . Db::TABLE_COMMENTS . '` SET `comment_text` = ? WHERE `id` = ?';
+        $sql = 'UPDATE `' . Table::comments() . '` SET `comment_text` = ? WHERE `id` = ?';
         $success = Db::sqlExec($sql, 'si', $newCommentText, $commentId);
 Log::debug(
     ' - After:',
-    var_export(Db::sqlGetRow('SELECT * FROM `' . Db::TABLE_COMMENTS . '` WHERE `id` = ?', 'i', $commentId), true)
+    var_export(Db::sqlGetRow('SELECT * FROM `' . Table::comments() . '` WHERE `id` = ?', 'i', $commentId), true)
 ); // DELETEME DEBUG
         if ($success) {
             return ['status' => 200, 'data' => 'OK'];
@@ -154,7 +154,7 @@ Log::debug("Getting comments: file $fileId, page $pageId, size $pageSize, start 
         $sql = '
             WITH comment_count AS (
                 SELECT LEAST(CEIL(COUNT(*)/?), 1000) AS `num_pages`
-                FROM `' . Db::TABLE_COMMENTS . '`
+                FROM `' . Table::comments() . '`
                 WHERE `fk_file` = ? AND NOT `hidden`
             )
             SELECT
@@ -163,7 +163,7 @@ Log::debug("Getting comments: file $fileId, page $pageId, size $pageSize, start 
                 c.`user`,
                 c.`comment_text`,
                 cc.`num_pages`
-            FROM `' . Db::TABLE_COMMENTS . '` c
+            FROM `' . Table::comments() . '` c
             CROSS JOIN comment_count cc
             WHERE c.`fk_file` = ?
             AND NOT c.`hidden`
@@ -188,7 +188,7 @@ Log::debug('Result', $result);
                 c.`date_created`, 
                 c.`user`, 
                 c.`comment_text`
-            FROM `" . Db::TABLE_COMMENTS . '` c
+            FROM `" . Table::comments() . '` c
             WHERE c.id = ?
             LIMIT 1
         ';

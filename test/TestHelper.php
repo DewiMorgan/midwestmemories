@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use MidwestMemories\Db;
 use MidwestMemories\Enum\UserAccess;
+use MidwestMemories\Table;
 
 /**
  * Helper to spin up the API server for testing.
@@ -200,8 +201,9 @@ echo "Request to $method $url ($paramsInOneLine)  ->  $httpCode => $bodyAsPhp\n"
         $passwordHash = password_hash(self::PASSWORD, PASSWORD_DEFAULT);
         self::removeTestUsers();
         Db::sqlExec(
-            "
-                INSERT INTO `midmem_users` (`username`, `password_hash`, `access_level`, `is_disabled`) VALUES 
+            '
+                INSERT INTO `' . Table::users() . "` (`username`, `password_hash`, `access_level`, `is_disabled`)
+                VALUES 
                 ('" . self::DISABLED_NAME . "', '$passwordHash', " . UserAccess::USER->value . ", 1),
                 ('" . self::USER_NAME . "', '$passwordHash', " . UserAccess::USER->value . ", 0),
                 ('" . self::USER_NAME_2 . "', '$passwordHash', " . UserAccess::USER->value . ", 0),
@@ -217,8 +219,8 @@ echo "Request to $method $url ($paramsInOneLine)  ->  $httpCode => $bodyAsPhp\n"
     public static function removeTestUsers(): void
     {
         Db::sqlExec(
-            "
-                DELETE FROM `midmem_users`
+            '
+                DELETE FROM `' . Table::users() . "`
                 WHERE `username` IN (
                    '" . self::DISABLED_NAME . "', 
                    '" . self::USER_NAME . "', 
@@ -237,8 +239,8 @@ echo "Request to $method $url ($paramsInOneLine)  ->  $httpCode => $bodyAsPhp\n"
     {
         self::removeTestFiles();
         Db::sqlExec(
-            "
-                INSERT INTO `midmem_file_queue`
+            '
+                INSERT INTO `' . Table::file_queue() . "`
                     (`id`, `file_name`, `full_path`, `sync_status`, `file_hash`, `error_message`) 
                 VALUES 
                     (1, 'test.jpg', '/path/to/test.jpg', 'PROCESSED', 'hash', '')
@@ -251,6 +253,6 @@ echo "Request to $method $url ($paramsInOneLine)  ->  $httpCode => $bodyAsPhp\n"
      */
     public static function removeTestFiles(): void
     {
-        Db::sqlExec('DELETE FROM `midmem_file_queue` WHERE `id` IN (1)');
+        Db::sqlExec('DELETE FROM `' . Table::file_queue() . '` WHERE `id` IN (1)');
     }
 }
