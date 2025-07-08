@@ -238,7 +238,7 @@ class Path
 
         foreach ($dir as $fileInfo) {
             $filename = $fileInfo->getFilename();
-            $fullUnixPath = "$unixPath/" . $filename;
+            $fullUnixPath = "$unixPath/$filename";
             if ($fileInfo->isDir()) {
                 if (Path::canListDirname($fullUnixPath)) {
                     $items[] = [

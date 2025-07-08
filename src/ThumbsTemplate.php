@@ -107,37 +107,22 @@ use MidwestMemories\Enum\Key;
         <div class="spacer">&nbsp;</div>
         <?php
         $items = Path::getDirItems(IndexGateway::$requestUnixPath);
-        $dirs = [];
-        $files = [];
+
+        // Output.
+        $fileNum = 0;
         foreach ($items as $item) {
             $filename = $item['name'];
             $isDir = $item['isDir'];
-
-            $itemPath = IndexGateway::$requestUnixPath . '/' . $filename;
-            if ($isDir) {
-                if (Path::canListDirname($itemPath)) {
-                    $dirs[] = $filename;
-                } else {
-                    Log::debug('Ignoring unlistable folder', $itemPath);
-                }
-            } elseif (is_file($itemPath)) {
-                if (Path::canListFilename($itemPath)) {
-                    $files[] = $filename;
-                } else {
-                    Log::debug('Ignoring unlistable file', $itemPath);
-                }
-            } else {
-                Log::debug('Ignoring unknown FS object', $itemPath);
-            }
-        }
-
-        // Output
-        $fileNum = 0;
-        foreach (array_merge($dirs, $files) as $filename) {
-            $itemPath = IndexGateway::$requestUnixPath . '/' . $filename;
+            $itemPath = $item['unixPath'];
 
             // Skip files without a matching thumbnail file: they have not been fully processed.
-            if (is_file($itemPath)) {
+            if ('..' === $filename) {
+                $h_thumbTitle = '<strong>..</strong> - up one folder.';
+                $u_thumbUrl = '/raw/tn_folder_up.png';
+            } elseif ($isDir) {
+                $h_thumbTitle = htmlspecialchars($filename);
+                $u_thumbUrl = '/raw/tn_folder.png';
+            } else {
                 $thumbUnixPath = FileProcessor::getThumbName($itemPath);
                 if (!is_file($thumbUnixPath)) {
                     Log::debug("No thumb found for image: '$thumbUnixPath' from '$itemPath'");
@@ -147,12 +132,6 @@ use MidwestMemories\Enum\Key;
                 $u_thumbUrl = Path::unixPathToUrl($thumbUnixPath, Path::LINK_RAW);
                 $fileNum++;
                 $h_thumbTitle = htmlspecialchars($filename);
-            } elseif ('..' === $filename) {
-                $h_thumbTitle = '<strong>..</strong> - up one folder.';
-                $u_thumbUrl = '/raw/tn_folder_up.png';
-            } else {
-                $h_thumbTitle = htmlspecialchars($filename);
-                $u_thumbUrl = '/raw/tn_folder.png';
             }
             $u_linkUrl = Path::unixPathToUrl($itemPath, Path::LINK_INLINE);
 
