@@ -68,16 +68,16 @@ $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
         function scanDirectory(string $scanUnixDir, string $targetUnixPath = ''): void
         {
             $items = Path::getDirItems($scanUnixDir);
-Log::debug('After sort', $items);
 
             // Loop through the items and output a list item for each one.
             $files = '';
             foreach ($items as $item) {
                 $filename = $item['name'];
+                $isDir = $item['isDir'];
                 $itemUnixPath = "$scanUnixDir/$filename";
 
                 // Validation.
-                if (is_dir($itemUnixPath)) {
+                if ($isDir) {
                     if (!Path::canListDirname($itemUnixPath)) {
                         continue;
                     }
@@ -90,7 +90,7 @@ Log::debug('After sort', $items);
                 $u_linkUrl = Path::unixPathToUrl($itemUnixPath, Path::LINK_INLINE);
                 $h_selectClass = ($itemUnixPath === $targetUnixPath) ? 'selected' : '';
                 // If the item is a directory, output a list item with a nested ul element.
-                if (is_dir($itemUnixPath)) {
+                if ($isDir) {
                     // Collapse, unless our target path is within this branch.
                     $h_expandClass = Path::isChildInPath($targetUnixPath, $itemUnixPath) ? 'expanded' : 'collapsed';
                     $h_expandIcon = ('expanded' === $h_expandClass) ? ICON_EXPANDED : ICON_COLLAPSED;

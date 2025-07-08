@@ -231,11 +231,34 @@ class Path
         $dir = new DirectoryIterator($unixPath);
 
         foreach ($dir as $fileInfo) {
-            $items[] = [
-                'name' => $fileInfo->getFilename(),
-                'is_dir' => $fileInfo->isDir()
-            ];
+            $filename = $fileInfo->getFilename();
+            $fullUnixPath = "$unixPath/" . $filename;
+            if ($fileInfo->isDir()) {
+                if (Path::canListDirname($fullUnixPath)) {
+                    $items[] = [
+                        'unixPath' => $fullUnixPath,
+                        'name' => $filename,
+                        'is_dir' => true
+                    ];
+                } else {
+                    Log::debug('Ignoring unlistable folder', $fullUnixPath);
+                }
+            } elseif (is_file($fullUnixPath)) {
+                if (Path::canListFilename($fullUnixPath)) {
+                    $items[] = [
+                        'unixPath' => $fullUnixPath,
+                        'name' => $filename,
+                        'is_dir' => false
+                    ];
+                } else {
+                    Log::debug('Ignoring unlistable file', $fullUnixPath);
+                }
+            } else {
+                Log::debug('Ignoring unknown FS object', $fullUnixPath);
+            }
         }
+
+        // Sort naturally, folders first.
         usort($items, [Path::class, 'sortFolder']);
 
         return $items;

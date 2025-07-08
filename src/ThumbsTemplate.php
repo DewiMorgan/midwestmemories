@@ -106,23 +106,23 @@ use MidwestMemories\Enum\Key;
     <div class="thumb-pad" id="rounded">
         <div class="spacer">&nbsp;</div>
         <?php
-        $items = scandir(IndexGateway::$requestUnixPath);
-        // Sort to natural order, with directories first.
-        usort($items, [Path::class, 'sortFolder']);
-
+        $items = Path::getDirItems(IndexGateway::$requestUnixPath);
         $dirs = [];
         $files = [];
         foreach ($items as $item) {
-            $itemPath = IndexGateway::$requestUnixPath . '/' . $item;
-            if (is_dir($itemPath)) {
+            $filename = $item['name'];
+            $isDir = $item['isDir'];
+
+            $itemPath = IndexGateway::$requestUnixPath . '/' . $filename;
+            if ($isDir) {
                 if (Path::canListDirname($itemPath)) {
-                    $dirs[] = $item;
+                    $dirs[] = $filename;
                 } else {
                     Log::debug('Ignoring unlistable folder', $itemPath);
                 }
             } elseif (is_file($itemPath)) {
                 if (Path::canListFilename($itemPath)) {
-                    $files[] = $item;
+                    $files[] = $filename;
                 } else {
                     Log::debug('Ignoring unlistable file', $itemPath);
                 }
@@ -133,8 +133,8 @@ use MidwestMemories\Enum\Key;
 
         // Output
         $fileNum = 0;
-        foreach (array_merge($dirs, $files) as $item) {
-            $itemPath = IndexGateway::$requestUnixPath . '/' . $item;
+        foreach (array_merge($dirs, $files) as $filename) {
+            $itemPath = IndexGateway::$requestUnixPath . '/' . $filename;
 
             // Skip files without a matching thumbnail file: they have not been fully processed.
             if (is_file($itemPath)) {
@@ -146,12 +146,12 @@ use MidwestMemories\Enum\Key;
                 Log::debug("Creating thumb-link for image: '$thumbUnixPath' from '$itemPath'");
                 $u_thumbUrl = Path::unixPathToUrl($thumbUnixPath, Path::LINK_RAW);
                 $fileNum++;
-                $h_thumbTitle = htmlspecialchars($item);
-            } elseif ('..' === $item) {
+                $h_thumbTitle = htmlspecialchars($filename);
+            } elseif ('..' === $filename) {
                 $h_thumbTitle = '<strong>..</strong> - up one folder.';
                 $u_thumbUrl = '/raw/tn_folder_up.png';
             } else {
-                $h_thumbTitle = htmlspecialchars($item);
+                $h_thumbTitle = htmlspecialchars($filename);
                 $u_thumbUrl = '/raw/tn_folder.png';
             }
             $u_linkUrl = Path::unixPathToUrl($itemPath, Path::LINK_INLINE);
