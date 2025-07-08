@@ -110,7 +110,7 @@ use MidwestMemories\Enum\Key;
 
         // Add the 'up one folder' item.
         addThumb(
-            IndexGateway::$requestUnixPath . '/..',
+            Path::unixPathToUrl(IndexGateway::$requestUnixPath . '/..'),
             '/raw/tn_folder_up.png',
             '<strong>..</strong> - up one folder.',
             0
