@@ -70,7 +70,7 @@ class IndexGateway
             Log::debug('User');
             // This is a request by a user, perhaps to a bookmark.
             // Load the tree view, which will then call us back for the inline version of the pointed-at $path resource.
-            include(__DIR__ . '/TreeTemplate.php');
+            include(__DIR__ . '/templates/TreeTemplate.php');
         } elseif (2 === (int)$_REQUEST['i']) {
             // We're showing raw file view, such as for an img link.
             include(__DIR__ . '/RawTemplate.php');
