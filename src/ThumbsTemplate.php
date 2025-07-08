@@ -108,6 +108,14 @@ use MidwestMemories\Enum\Key;
         <?php
         $items = Path::getDirItems(IndexGateway::$requestUnixPath);
 
+        // Add the 'up one folder' item.
+        addThumb(
+            IndexGateway::$requestUnixPath . '/..',
+            '/raw/tn_folder_up.png',
+            '<strong>..</strong> - up one folder.',
+            0
+        );
+
         // Output.
         $fileNum = 0;
         foreach ($items as $item) {
@@ -116,10 +124,7 @@ use MidwestMemories\Enum\Key;
             $itemPath = $item['unixPath'];
 
             // Skip files without a matching thumbnail file: they have not been fully processed.
-            if ('..' === $filename) {
-                $h_thumbTitle = '<strong>..</strong> - up one folder.';
-                $u_thumbUrl = '/raw/tn_folder_up.png';
-            } elseif ($isDir) {
+            if ($isDir) {
                 $h_thumbTitle = htmlspecialchars($filename);
                 $u_thumbUrl = '/raw/tn_folder.png';
             } else {
@@ -135,6 +140,19 @@ use MidwestMemories\Enum\Key;
             }
             $u_linkUrl = Path::unixPathToUrl($itemPath, Path::LINK_INLINE);
 
+            addThumb($u_linkUrl, $u_thumbUrl, $h_thumbTitle, $fileNum);
+        }
+
+        /**
+         * Add one thumbnail to the page.
+         * @param string $u_linkUrl URL-escaped link to the file.
+         * @param string $u_thumbUrl URL-escaped link to the thumbnail.
+         * @param string $h_thumbTitle HTML-escaped title of the thumbnail.
+         * @param int $fileNum The ordinal position of the file within the folder.
+         * @return void
+         */
+        function addThumb($u_linkUrl, $u_thumbUrl, $h_thumbTitle, $fileNum): void
+        {
             echo("<div class='thumb'><figure>");
 
             echo("<a href='$u_linkUrl'><img src='$u_thumbUrl' title='$h_thumbTitle' alt='$h_thumbTitle'></a>");
@@ -145,6 +163,7 @@ use MidwestMemories\Enum\Key;
             echo("<a href='$u_linkUrl'>$h_thumbTitle</a></figcaption>");
             echo('</figure></div>');
         }
+
         ?>
         <div class="spacer">&nbsp;</div>
     </div><!-- thumb-content -->
