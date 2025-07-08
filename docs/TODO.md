@@ -2,6 +2,7 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
+* "Go up one folder" link shouldn't appear in the root folder.
 * Change comment user db field to fk user_id.
 * Make only test server pull from /Dewi/ folder, and have live pull from /Auora/? Or, separate /test/ folder?
 * Get CSV files auto-parsing.

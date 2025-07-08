@@ -10,6 +10,7 @@ which might not be when they were actually implemented/committed.
 * DONE: Remove debugging code from CommentManager and tests.
 * DONE: Bug: Folders are not naturally sorted: "Bundle 2" comes between "Bundle 19" and "Bundle 20".
 * DONE: Bug: Thumbs are not naturally sorted.
+* DONE: Bug: "Go up one folder" link doesn't appear.
 * DONE: Check return types of all API endpoints.
 
 ## 2025/07/05 Sat

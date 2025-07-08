@@ -108,7 +108,8 @@ use MidwestMemories\Enum\Key;
         <?php
         $items = Path::getDirItems(IndexGateway::$requestUnixPath);
 
-        // Add the 'up one folder' item.
+        // Add the 'up one folder' item, unless we're at the root.
+        Log::debug('IndexGateway::requestUnixPath: ' . IndexGateway::$requestUnixPath);
         addThumb(
             Path::unixPathToUrl(IndexGateway::$requestUnixPath . '/..'),
             '/raw/tn_folder_up.png',
