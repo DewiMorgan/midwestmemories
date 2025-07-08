@@ -109,13 +109,14 @@ use MidwestMemories\Enum\Key;
         $items = Path::getDirItems(IndexGateway::$requestUnixPath);
 
         // Add the 'up one folder' item, unless we're at the root.
-        Log::debug('IndexGateway::requestUnixPath: ' . IndexGateway::$requestUnixPath);
-        addThumb(
-            Path::unixPathToUrl(IndexGateway::$requestUnixPath . '/..'),
-            '/raw/tn_folder_up.png',
-            '<strong>..</strong> - up one folder.',
-            0
-        );
+        if ('/' === IndexGateway::$requestWebPath) {
+            addThumb(
+                Path::unixPathToUrl(IndexGateway::$requestUnixPath . '/..'),
+                '/raw/tn_folder_up.png',
+                '<strong>..</strong> - up one folder.',
+                0
+            );
+        }
 
         // Output.
         $fileNum = 0;
