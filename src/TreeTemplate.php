@@ -67,10 +67,12 @@ $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
          */
         function scanDirectory(string $scanUnixDir, string $targetUnixPath = ''): void
         {
-Log::debug('scanDirectory in $scanUnixDir', $targetUnixPath);
+Log::debug("scanDirectory in $scanUnixDir", $targetUnixPath);
             $items = scandir($scanUnixDir);
+Log::debug('Before sort', $items);
             // Sort to natural order, with directories first.
             usort($items, [Path::class, 'sortFolder']);
+Log::debug('After sort', $items);
 
             // Loop through the items and output a list item for each one.
             $files = '';
