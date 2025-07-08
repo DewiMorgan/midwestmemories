@@ -25,14 +25,12 @@ class CommentManager extends Singleton
      */
     public static function addComment(array $params): array
     {
-Log::debug(''); // DELETEME DEBUG
         // Params should be validated already, but we still give defaults.
         $fileId = intval($params['file_id']) ?? 0;
         $commentText = $params['comment_text'] ?? '';
 
         Log::debug("Adding comment to file $fileId", $commentText);
         $userName = User::getInstance()->username;
-Log::debug($userName); // DELETEME DEBUG
         if (empty($commentText)) {
             Log::warning('Ignoring empty comment string from ' . $params['path'], $commentText);
             return ['status' => 400, 'data' => 'Failed to save comment: empty comment'];
@@ -49,11 +47,6 @@ Log::debug($userName); // DELETEME DEBUG
                 return ['status' => 500, 'data' => $error];
             }
         }
-Log::debug(' - Returned:', $response); // DELETEME DEBUG
-Log::debug(
-    ' - Db After:',
-    Db::sqlGetRow('SELECT * FROM `' . Table::comments() . '` WHERE `id` = ?', 'i', ($data['id'] ?? -1))
-); // DELETEME DEBUG
         return ['status' => 200, 'data' => $data];
     }
 
@@ -87,20 +80,26 @@ Log::debug(
 
     /**
      * DELETE `/api/v1.0/comment` endpoint marks a comment as soft-deleted.
-     * @param int $commentId
+     * @param array $params as `['id' => '1']`.
      * @return array The output of the API call, not yet converted to JSON.
      */
-    public static function deleteComment(int $commentId): array
+    public static function deleteComment(array $params): array
     {
-Log::debug('Deleting comment', $commentId);
-Log::debug(' - Before:',
-    var_export(Db::sqlGetRow('SELECT * FROM `' . Table::comments() . '` WHERE `id` = ?', 'i', $commentId), true)
-); // DELETEME DEBUG
+        $commentId = intval($params['id'] ?? 0);
+
+        // Verify the comment exists.
+        $comment = self::getCommentById($commentId);
+        if (empty($comment)) {
+            return ['status' => 404, 'data' => 'Comment not found'];
+        }
+        // Verify the user is an admin, or owns the comment.
+        if (!User::getInstance()->isAdmin && $comment['user'] !== User::getInstance()->username) {
+            return ['status' => 403, 'data' => "Cannot delete another user's comment"];
+        }
+
+        Log::debug('Deleting comment', $commentId);
         $sql = 'UPDATE `' . Table::comments() . '` SET `hidden` = true WHERE `id` = ?';
         $success = Db::sqlExec($sql, 'i', $commentId);
-Log::debug(' - After:',
-    var_export(Db::sqlGetRow('SELECT * FROM `' . Table::comments() . '` WHERE `id` = ?', 'i', $commentId), true)
-);  // DELETEME DEBUG
         if ($success) {
             return ['status' => 200, 'data' => 'OK'];
         }
@@ -109,23 +108,28 @@ Log::debug(' - After:',
 
     /**
      * PUT `/api/v1.0/comment`: edit a comment.
-     * @param int $commentId The database `id` field of the comment to edit.
-     * @param string $newCommentText The new text for the comment.
+     * @param array $params as `['id' => '1', 'new_comment_text' => 'text']`.
      * @return array The output of the API call, not yet converted to JSON.
      */
-    public static function editComment(int $commentId, string $newCommentText): array
+    public static function editComment(array $params): array
     {
-Log::debug("Editing comment: $commentId", $newCommentText);
-Log::debug(
-    ' - Before:',
-    var_export(Db::sqlGetRow('SELECT * FROM `' . Table::comments() . '` WHERE `id` = ?', 'i', $commentId), true)
-); // DELETEME DEBUG
+        $commentId = intval($params['id'] ?? 0);
+        $newCommentText = $params['new_comment_text'] ?? '';
+        if (empty($newCommentText)) {
+            return ['status' => 400, 'data' => 'Missing new comment text'];
+        }
+
+        // Verify the comment exists.
+        $comment = self::getCommentById($commentId);
+        if (empty($comment)) {
+            return ['status' => 404, 'data' => 'Comment not found'];
+        }
+        // Verify the user is an admin, or owns the comment.
+        if (!User::getInstance()->isAdmin && $comment['user'] !== User::getInstance()->username) {
+            return ['status' => 403, 'data' => "Cannot edit another user's comment"];
+        }
         $sql = 'UPDATE `' . Table::comments() . '` SET `comment_text` = ? WHERE `id` = ?';
         $success = Db::sqlExec($sql, 'si', $newCommentText, $commentId);
-Log::debug(
-    ' - After:',
-    var_export(Db::sqlGetRow('SELECT * FROM `' . Table::comments() . '` WHERE `id` = ?', 'i', $commentId), true)
-); // DELETEME DEBUG
         if ($success) {
             return ['status' => 200, 'data' => 'OK'];
         }
@@ -149,7 +153,6 @@ Log::debug(
 
         $startItem = $pageId * $pageSize;
         $startItemCapped = max(0, min(1000, $startItem));
-Log::debug("Getting comments: file $fileId, page $pageId, size $pageSize, start $startItem, capped $startItemCapped");
 
         $sql = '
             WITH comment_count AS (
@@ -171,7 +174,6 @@ Log::debug("Getting comments: file $fileId, page $pageId, size $pageSize, start 
             LIMIT ? OFFSET ?
         ';
         $result = Db::sqlGetTable($sql, 'sssss', $pageSize, $fileId, $fileId, $pageSize, $startItemCapped);
-Log::debug('Result', $result);
         return ['status' => 200, 'data' => $result];
     }
 
@@ -189,47 +191,9 @@ Log::debug('Result', $result);
                 c.`user`, 
                 c.`comment_text`
             FROM `" . Table::comments() . '` c
-            WHERE c.id = ?
+            WHERE c.`id` = ? AND NOT c.`hidden`
             LIMIT 1
         ';
         return Db::sqlGetRow($sql, 'i', $commentId);
     }
-
-//    /**
-//     * Looks at the request method and the first element of the path, to generate an endpoint string.
-//     * So "GET /api/v1.0/messages/test" => "getMessages". Then performs an operation depending on that string.
-//     * @return string The output of the API call, as JSON.
-//     */
-//    private static function execApiCall(): string
-//    {
-//        Log::debug('Starting...', self::$requestWebPath);
-//        $pathParts = preg_split('#/#', self::$requestWebPath, -1, PREG_SPLIT_NO_EMPTY);
-//        if (is_array($pathParts)) {
-//            $endpoint = strtolower($_SERVER['REQUEST_METHOD']) . ucwords($pathParts[1]);
-//
-//            $fileId = intval($pathParts[2] ?? 0);
-//            switch ($endpoint) {
-//                case 'getComment':
-//                    $data = self::getComment($pathParts[3], $fileId);
-//                    break;
-//                case 'postComment':
-//                    $data = self::postComment($fileId);
-//                    break;
-//                default:
-//                    $data = ['data' => "Unknown endpoint $endpoint"];
-//                    break;
-//            }
-//            try {
-//                $encoded = json_encode($data, JSON_THROW_ON_ERROR);
-//            } catch (JsonException) {
-//                Log::error('Failed to encode data', self::$requestWebPath);
-//                $encoded = "{'data':'Failed to encode data'}";
-//            }
-//        } else {
-//            Log::warning('Bad API request path', self::$requestWebPath);
-//            $encoded = "{'data':'Bad API request path'}";
-//        }
-//        Log::debug('...returning', $encoded);
-//        return $encoded;
-//    }
 }

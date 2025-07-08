@@ -158,39 +158,7 @@ class TestHelper
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-$paramsInOneLine = self::ve($params);
-$bodyAsPhp = self::v2($body);
-echo "Request to $method $url ($paramsInOneLine)  ->  $httpCode => $bodyAsPhp\n";
         return ['status' => $httpCode, 'data' => $body];
-    }
-
-
-    private static function v2($string)  // DELETEME DEBUG
-    {
-        $patterns = [
-            '/\{/' => '[',
-            '/\}/' => ']',
-            '/":/' => '" => ',
-            '/,"/' => ', "',
-            '/"/' => "'",
-        ];
-        return preg_replace(array_keys($patterns), array_values($patterns), $string);
-    }
-
-    private static function ve($string)  // DELETEME DEBUG
-    {
-        $export = var_export($string, TRUE);
-        $patterns = [
-            '/array \(/' => '[',
-            '/^([ ]*)\)(,?)$/m' => '$1]$2',
-            "/=>[ ]?\n[ ]+\[/" => '=> [',
-            "/([ ]*)(\'[^\']+\') => ([\[\'])/" => '$1$2 => $3',
-            '/\s+/' => ' ',
-            '/, ?\]/' => ']',
-            '/\[ /' => '[',
-            '/ => /' => '=>'
-        ];
-        return preg_replace(array_keys($patterns), array_values($patterns), $export);
     }
 
     /**
@@ -254,5 +222,42 @@ echo "Request to $method $url ($paramsInOneLine)  ->  $httpCode => $bodyAsPhp\n"
     public static function removeTestFiles(): void
     {
         Db::sqlExec('DELETE FROM `' . Table::file_queue() . '` WHERE `id` IN (1)');
+    }
+
+    /**
+     * Convert a JSON string to a PHP array.
+     * @param $string
+     * @return string
+     */
+    private static function jsonToPhp($string): string
+    {
+        $patterns = [
+            '/\{/' => '[',
+            '/\}/' => ']',
+            '/":/' => '" => ',
+            '/,"/' => ', "',
+            '/"/' => "'",
+        ];
+        return preg_replace(array_keys($patterns), array_values($patterns), $string);
+    }
+
+    /**
+     * Convert `var_export` output to a more concise string.
+     * @param $string
+     * @return string
+     */
+    private static function varExportToPhp($string): string
+    {
+        $export = var_export($string, TRUE);
+        $patterns = [
+            '/array \(/' => '[',              // Short arrays (open tag).
+            '/^([ ]*)\)(,?)$/m' => '$1]$2',   // Short arrays (close tag).
+            "/=>[ ]?\n[ ]+\[/" => '=> [',     // Inline subarrays.
+            '/\s+/' => ' ',                   // Compact all whitespace to one space.
+            '/, ?\]/' => ']',                 // Remove trailing comma inside arrays.
+            '/\[ /' => '[',                   // Remove leading space inside arrays.
+            '/ => /' => '=>'                  // remove extra space around `=>`.
+        ];
+        return preg_replace(array_keys($patterns), array_values($patterns), $export);
     }
 }

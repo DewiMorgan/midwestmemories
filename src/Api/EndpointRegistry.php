@@ -205,7 +205,7 @@ class EndpointRegistry
             ],
             EndpointKey::PUT_COMMENT => [
                 'auth' => 'user',
-                'params' => ['comment_id' => ParamTypes::INT, 'new_comment_text' => ParamTypes::STRING],
+                'params' => ['id' => ParamTypes::INT, 'new_comment_text' => ParamTypes::STRING],
                 'rate_limit' => ['limit' => 20, 'window' => 60],
                 'callback' => CommentManager::editComment(...),
                 'responseType' => [
@@ -214,7 +214,7 @@ class EndpointRegistry
             ],
             EndpointKey::DELETE_COMMENT => [
                 'auth' => 'user',
-                'params' => ['comment_id' => ParamTypes::INT],
+                'params' => ['id' => ParamTypes::INT],
                 'rate_limit' => ['limit' => 20, 'window' => 60],
                 'callback' => CommentManager::deleteComment(...),
                 'responseType' => [

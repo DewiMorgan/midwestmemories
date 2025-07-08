@@ -3,6 +3,12 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/07/07 Sat
+
+* DONE: Fix unit tests.
+* DONE: Add user ownership tests to comment delete and edit methods.
+* DONE: Remove debugging code from CommentManager and tests.
+
 ## 2025/07/05 Sat
 
 * DONE: Create a "live" site, and a "test" site.

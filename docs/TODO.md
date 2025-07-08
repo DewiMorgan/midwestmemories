@@ -2,6 +2,8 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
+* Change comment user db field to fk user_id.
+* Make only test server pull from /Dewi/ folder, and have live pull from /Auora/? Or, separate /test/ folder?
 * Get CSV files auto-parsing.
 * Get folder-level details showing.
 * Faster page loads (smaller initial images?)
@@ -10,12 +12,13 @@ This is the stuff I'm actually working on, as steps towards the ultimate goal.
 * Check return types of all API endpoints.
 * Generate Web page tests.
 * Add unit tests for everything.
-* Whitelist /nonexistent.file, so 404 page can happen?
-* Rate-limit by the IP as well as the username?
 * Make the JS also handle endpoints using the lookup table?
 * Change endpoints to be loaded into JS as a class or config file or something.
 * Handle API errors instead of just checking `result.ok` (which just checks it was a 200).
+* Whitelist /nonexistent.file, so 404 page can happen?
+* Rate-limit by their IP as well as their username?
 * Improve admin UI: add "Are you sure" to cursor renewal.
+* Change the user UI to use the new Template system.
 
 * Get it commentable.
     * sanitise comments
