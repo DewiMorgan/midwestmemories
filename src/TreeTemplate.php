@@ -73,7 +73,8 @@ Log::debug('After sort', $items);
             // Loop through the items and output a list item for each one.
             $files = '';
             foreach ($items as $item) {
-                $itemUnixPath = "$scanUnixDir/$item";
+                $filename = $item['name'];
+                $itemUnixPath = "$scanUnixDir/$filename";
 
                 // Validation.
                 if (is_dir($itemUnixPath)) {
@@ -84,8 +85,8 @@ Log::debug('After sort', $items);
                     continue;
                 }
 
-                $h_item = htmlspecialchars($item);
-                $itemUnixPath = "$scanUnixDir/$item";
+                $h_item = htmlspecialchars($filename);
+                $itemUnixPath = "$scanUnixDir/$filename";
                 $u_linkUrl = Path::unixPathToUrl($itemUnixPath, Path::LINK_INLINE);
                 $h_selectClass = ($itemUnixPath === $targetUnixPath) ? 'selected' : '';
                 // If the item is a directory, output a list item with a nested ul element.
