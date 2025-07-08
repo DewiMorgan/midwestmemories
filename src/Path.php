@@ -228,10 +228,11 @@ class Path
 
     /**
      * Get all the listable items in a directory, naturally sorted, folders first.
-     * @param $unixPath
+     * @param string $unixPath
      * @return array
      */
-    public static function getDirItems($unixPath): array {
+    public static function getDirItems(string $unixPath): array
+    {
         $items = [];
         $dir = new DirectoryIterator($unixPath);
 
