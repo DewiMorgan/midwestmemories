@@ -226,6 +226,11 @@ class Path
         return strnatcasecmp($a['name'], $b['name']);
     }
 
+    /**
+     * Get all the listable items in a directory, naturally sorted, folders first.
+     * @param $unixPath
+     * @return array
+     */
     public static function getDirItems($unixPath): array {
         $items = [];
         $dir = new DirectoryIterator($unixPath);
@@ -238,7 +243,7 @@ class Path
                     $items[] = [
                         'unixPath' => $fullUnixPath,
                         'name' => $filename,
-                        'is_dir' => true
+                        'isDir' => true
                     ];
                 } else {
                     Log::debug('Ignoring unlistable folder', $fullUnixPath);
@@ -248,7 +253,7 @@ class Path
                     $items[] = [
                         'unixPath' => $fullUnixPath,
                         'name' => $filename,
-                        'is_dir' => false
+                        'isDir' => false
                     ];
                 } else {
                     Log::debug('Ignoring unlistable file', $fullUnixPath);
