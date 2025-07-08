@@ -203,4 +203,25 @@ class Path
         }
         return '';
     }
+
+    /**
+     * Comparison function for natural sorting of directory items
+     *
+     * @param array $a First item
+     * @param array $b Second item
+     * @return int Comparison result for usort
+     */
+    public static function sortFolder(array $a, array $b): int
+    {
+        // First, sort directories before files
+        if ($a['is_dir'] && !$b['is_dir']) {
+            return -1;
+        }
+        if (!$a['is_dir'] && $b['is_dir']) {
+            return 1;
+        }
+
+        // If both are directories or both are files, sort naturally by name
+        return strnatcasecmp($a['name'], $b['name']);
+    }
 }

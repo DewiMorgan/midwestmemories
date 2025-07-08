@@ -25,6 +25,8 @@ namespace MidwestMemories;
     foreach ($items as $item) {
         // Todo: folders first.
         $itemPath = IndexGateway::$requestUnixPath . '/' . $item;
+        // Sort to natural order, with directories first.
+        usort($items, [Path::class, 'sortFolder']);
 
         // Skip files we're uninterested in.
         if (

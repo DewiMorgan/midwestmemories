@@ -61,3 +61,4 @@
 - Every new public method must have at least one unit test.
 - Use test doubles (mocks/stubs) only when isolating unit dependencies.
 - Place all test classes under `test/` with the same namespace and structure as `src/`.
+- To run phpunit, use `tools/phpunit.phar`.

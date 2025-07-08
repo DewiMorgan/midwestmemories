@@ -7,9 +7,7 @@ This is the stuff I'm actually working on, as steps towards the ultimate goal.
 * Get CSV files auto-parsing.
 * Get folder-level details showing.
 * Faster page loads (smaller initial images?)
-* Bug: Folders are not numerically sorted: "Bundle 2" comes between "Bundle 19" and "Bundle 20".
 * Bug: Clicking dot doesn't cause folding.
-* Check return types of all API endpoints.
 * Generate Web page tests.
 * Add unit tests for everything.
 * Make the JS also handle endpoints using the lookup table?

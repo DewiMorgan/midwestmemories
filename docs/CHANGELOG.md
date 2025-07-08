@@ -8,6 +8,9 @@ which might not be when they were actually implemented/committed.
 * DONE: Fix unit tests.
 * DONE: Add user ownership tests to comment delete and edit methods.
 * DONE: Remove debugging code from CommentManager and tests.
+* DONE: Bug: Folders are not naturally sorted: "Bundle 2" comes between "Bundle 19" and "Bundle 20".
+* DONE: Bug: Thumbs are not naturally sorted.
+* DONE: Check return types of all API endpoints.
 
 ## 2025/07/05 Sat
 

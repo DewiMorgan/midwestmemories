@@ -107,6 +107,8 @@ use MidwestMemories\Enum\Key;
         <div class="spacer">&nbsp;</div>
         <?php
         $items = scandir(IndexGateway::$requestUnixPath);
+        // Sort to natural order, with directories first.
+        usort($items, [Path::class, 'sortFolder']);
 
         $dirs = [];
         $files = [];
