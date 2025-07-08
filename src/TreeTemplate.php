@@ -67,6 +67,7 @@ $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
          */
         function scanDirectory(string $scanUnixDir, string $targetUnixPath = ''): void
         {
+Log::debug('scanDirectory in $scanUnixDir', $targetUnixPath);
             $items = scandir($scanUnixDir);
             // Sort to natural order, with directories first.
             usort($items, [Path::class, 'sortFolder']);
