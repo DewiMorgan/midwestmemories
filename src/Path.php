@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use DirectoryIterator;
 use MidwestMemories\Enum\Key;
 
 /**
@@ -223,5 +224,20 @@ class Path
 
         // If both are directories or both are files, sort naturally by name
         return strnatcasecmp($a['name'], $b['name']);
+    }
+
+    public static function getDirItems($unixPath): array {
+        $items = [];
+        $dir = new DirectoryIterator($unixPath);
+
+        foreach ($dir as $fileInfo) {
+            $items[] = [
+                'name' => $fileInfo->getFilename(),
+                'is_dir' => $fileInfo->isDir()
+            ];
+        }
+        usort($items, [Path::class, 'sortFolder']);
+
+        return $items;
     }
 }
