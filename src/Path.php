@@ -215,10 +215,10 @@ class Path
     public static function sortFolder(array $a, array $b): int
     {
         // First, sort directories before files
-        if ($a['is_dir'] && !$b['is_dir']) {
+        if ($a['isDir'] && !$b['isDir']) {
             return -1;
         }
-        if (!$a['is_dir'] && $b['is_dir']) {
+        if (!$a['isDir'] && $b['isDir']) {
             return 1;
         }
 
