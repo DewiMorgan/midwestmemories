@@ -12,6 +12,20 @@ use MidwestMemories\Enum\Key;
  */
 class Path
 {
+
+    /* Alternatives and options for image files include:
+     * U+1F4C1 📁 File Folder
+     * U+1F4C2 📂 Open File Folder
+     * U+1F5BF 🖿 Black Folder
+     * U+1F5C0 🗀 Folder
+     * U+1F5C1 🗁 Open Folder
+     * U+1F4F7 📷 Camera
+     * U+1F4C4 📄 Page Facing Up
+     * U+1F5BB 🖻 Document with Picture.
+     */
+    private const ICON_EXPANDED = '📂'; // U+1F4C2 Open File Folder
+    private const ICON_COLLAPSED = '📁'; // U+1F4C1 File Folder
+
     public const LINK_INLINE = '1';
     public const LINK_RAW = '2';
     /** @noinspection PhpUnused */
@@ -168,7 +182,7 @@ class Path
         $realPath = realpath($joined);
         if (false === $realPath) {
             if (true === $mustExist) {
-                Log::warn('Validated path was not found as: ' . self::$imgBaseUnixPath . " . " . $webPath, $joined);
+                Log::warn('Validated path was not found as: ' . self::$imgBaseUnixPath . ' . ' . $webPath, $joined);
                 http_response_code(404); // Not found.
                 die(1);
             }
@@ -222,7 +236,7 @@ class Path
             return 1;
         }
 
-        // If both are directories or both are files, sort naturally by name
+        // If both are directories or both are files, sort naturally by name.
         return strnatcasecmp($a['name'], $b['name']);
     }
 
@@ -268,5 +282,55 @@ class Path
         usort($items, [Path::class, 'sortFolder']);
 
         return $items;
+    }
+
+    /**
+     * Recursively scan a directory and output its contents in the format required for the tree view.
+     * @param string $scanUnixDir Full path to the dir being scanned. When first calling, pass the root of the tree.
+     * @param string $targetUnixPath The current item selected/expanded/viewed by the user.
+     */
+    public static function buildTree(string $scanUnixDir, string $targetUnixPath = ''): void
+    {
+        $items = Path::getDirItems($scanUnixDir);
+
+        // Loop through the items and output a list item for each one.
+        $files = '';
+        foreach ($items as $item) {
+            $filename = $item['name'];
+            $isDir = $item['isDir'];
+            $itemUnixPath = "$scanUnixDir/$filename";
+
+            // Validation.
+            if ($isDir) {
+                if (!Path::canListDirname($itemUnixPath)) {
+                    continue;
+                }
+            } elseif (!Path::canListFilename($itemUnixPath)) {
+                continue;
+            }
+
+            $h_item = htmlspecialchars($filename);
+            $itemUnixPath = "$scanUnixDir/$filename";
+            $u_linkUrl = Path::unixPathToUrl($itemUnixPath, Path::LINK_INLINE);
+            $h_selectClass = ($itemUnixPath === $targetUnixPath) ? 'selected' : '';
+            // If the item is a directory, output a list item with a nested ul element.
+            if ($isDir) {
+                // Collapse, unless our target path is within this branch.
+                $h_expandClass = Path::isChildInPath($targetUnixPath, $itemUnixPath) ? 'expanded' : 'collapsed';
+                $h_expandIcon = ('expanded' === $h_expandClass) ? self::ICON_EXPANDED : self::ICON_COLLAPSED;
+                echo "<li class='folder $h_expandClass $h_selectClass'>";
+                echo "<span class='expand-collapse'>$h_expandIcon</span>";
+                echo " <a href='$u_linkUrl' class='path-link'>$h_item</a>";
+                echo "<ul>\n";
+                // ToDo: If dir is empty, we make an empty UL. Output to a var, and only print if var has data.
+                self::buildTree($itemUnixPath, $targetUnixPath);
+                echo "</ul></li>\n";
+            } else {
+                $files .= "<li class='file $h_selectClass'>"
+                    . "<a href='$u_linkUrl' class='path-link'>$h_item</a>"
+                    . "</li>\n";
+            }
+        }
+        echo $files;
     }
 }

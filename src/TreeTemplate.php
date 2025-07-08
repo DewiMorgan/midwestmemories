@@ -39,77 +39,11 @@ $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
         // Set the root directory to display in the tree view.
         $root = Path::$imgBaseUnixPath;
 
-        /* Alternatives and options for image files include:
-         * U+1F4C1 📁 File Folder
-         * U+1F4C2 📂 Open File Folder
-         * U+1F5BF 🖿 Black Folder
-         * U+1F5C0 🗀 Folder
-         * U+1F5C1 🗁 Open Folder
-         * U+1F4F7 📷 Camera
-         * U+1F4C4 📄 Page Facing Up
-         * U+1F5BB 🖻 Document with Picture.
-         */
-        const ICON_EXPANDED = '📂'; // U+1F4C2 Open File Folder
-        const ICON_COLLAPSED = '📁'; // U+1F4C1 File Folder
-
         // This is the treeview component.
         echo '<ul>';
         echo "<li class='folder'><a href='/?i=1' class='path-link'>Home</a></li>";
-        scanDirectory($root, IndexGateway::$requestUnixPath);
+        Path::buildTree($root, IndexGateway::$requestUnixPath);
         echo '</ul>';
-
-        /**
-         * Recursively scan a directory and output its contents in a format appropriate for this template.
-         * ToDo: Expand to, and select, currently passed $path.
-         * ToDo: make it accept one or more callbacks to say how to recurse into, skip, or display entries.
-         * @param string $scanUnixDir Full path to the dir being scanned. When first calling, pass the root of the tree.
-         * @param string $targetUnixPath The current item selected/expanded/viewed by the user.
-         */
-        function scanDirectory(string $scanUnixDir, string $targetUnixPath = ''): void
-        {
-            $items = Path::getDirItems($scanUnixDir);
-
-            // Loop through the items and output a list item for each one.
-            $files = '';
-            foreach ($items as $item) {
-                $filename = $item['name'];
-                $isDir = $item['isDir'];
-                $itemUnixPath = "$scanUnixDir/$filename";
-
-                // Validation.
-                if ($isDir) {
-                    if (!Path::canListDirname($itemUnixPath)) {
-                        continue;
-                    }
-                } elseif (!Path::canListFilename($itemUnixPath)) {
-                    continue;
-                }
-
-                $h_item = htmlspecialchars($filename);
-                $itemUnixPath = "$scanUnixDir/$filename";
-                $u_linkUrl = Path::unixPathToUrl($itemUnixPath, Path::LINK_INLINE);
-                $h_selectClass = ($itemUnixPath === $targetUnixPath) ? 'selected' : '';
-                // If the item is a directory, output a list item with a nested ul element.
-                if ($isDir) {
-                    // Collapse, unless our target path is within this branch.
-                    $h_expandClass = Path::isChildInPath($targetUnixPath, $itemUnixPath) ? 'expanded' : 'collapsed';
-                    $h_expandIcon = ('expanded' === $h_expandClass) ? ICON_EXPANDED : ICON_COLLAPSED;
-                    echo "<li class='folder $h_expandClass $h_selectClass'>";
-                    echo "<span class='expand-collapse'>$h_expandIcon</span>";
-                    echo " <a href='$u_linkUrl' class='path-link'>$h_item</a>";
-                    echo "<ul>\n";
-                    // ToDo: If dir is empty, we make an empty UL. Output to a var, and only print if var has data.
-                    scanDirectory($itemUnixPath, $targetUnixPath);
-                    echo "</ul></li>\n";
-                } else {
-                    $files .= "<li class='file $h_selectClass'>"
-                        . "<a href='$u_linkUrl' class='path-link'>$h_item</a>"
-                        . "</li>\n";
-                }
-            }
-            echo $files;
-        }
-
         ?>
     </div>
     <div class="drag-bar"></div>
