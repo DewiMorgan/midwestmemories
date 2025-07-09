@@ -82,7 +82,7 @@ class IndexGateway
             include(__DIR__ . '/templates/ThumbsTemplate.php');
         } elseif (is_file(self::$requestUnixPath)) {
             // We're showing an inline file view.
-            include(__DIR__ . '/FileTemplate.php');
+            include(__DIR__ . '/templates/FileTemplate.php');
         } else {
             Log::debug('Search');
             // We're showing an inline search view, because we've nothing else to show.

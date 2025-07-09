@@ -261,7 +261,7 @@ class Path
                         'isDir' => true
                     ];
                 } else {
-                    Log::debug('Ignoring unlistable folder', $fullUnixPath);
+                    //Log::debug('Ignoring unlistable folder', $fullUnixPath);
                 }
             } elseif (is_file($fullUnixPath)) {
                 if (Path::canListFilename($fullUnixPath)) {
@@ -271,10 +271,10 @@ class Path
                         'isDir' => false
                     ];
                 } else {
-                    Log::debug('Ignoring unlistable file', $fullUnixPath);
+                    //Log::debug('Ignoring unlistable file', $fullUnixPath);
                 }
             } else {
-                Log::debug('Ignoring unknown FS object', $fullUnixPath);
+                //Log::debug('Ignoring unknown FS object', $fullUnixPath);
             }
         }
 

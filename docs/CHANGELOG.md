@@ -3,6 +3,14 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/07/08 Sat
+
+* DONE: Move TreeTemplate into /templates folder.
+* DONE: Move ThumbsTemplate into /templates folder.
+* DONE: Move FileTemplate into /templates folder.
+* DONE: Move CSS from ThumbsTemplate to /css/user.css.
+* DONE: Remove the "Go up one folder" link from the root folder.
+
 ## 2025/07/07 Sat
 
 * DONE: Fix unit tests.
