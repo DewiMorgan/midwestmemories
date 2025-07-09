@@ -333,4 +333,69 @@ class Path
         }
         echo $files;
     }
+
+    /**
+     * Generate the list of thumbnails for the folder view.
+     */
+    public static function generateThumbs(): void
+    {
+        $items = Path::getDirItems(IndexGateway::$requestUnixPath);
+
+        // Add the 'up one folder' item, unless we're at the root.
+        if ('/' !== IndexGateway::$requestWebPath) {
+            Path::addThumb(
+                Path::unixPathToUrl(IndexGateway::$requestUnixPath . '/..'),
+                '/raw/tn_folder_up.png',
+                '<strong>..</strong> - up one folder.'
+            );
+        }
+
+        // Output.
+        $fileNum = 0;
+        foreach ($items as $item) {
+            $filename = $item['name'];
+            $isDir = $item['isDir'];
+            $itemPath = $item['unixPath'];
+
+            // Skip files without a matching thumbnail file: they have not been fully processed.
+            if ($isDir) {
+                $h_thumbTitle = htmlspecialchars($filename);
+                $u_thumbUrl = '/raw/tn_folder.png';
+            } else {
+                $thumbUnixPath = FileProcessor::getThumbName($itemPath);
+                if (!is_file($thumbUnixPath)) {
+                    Log::debug("No thumb found for image: '$thumbUnixPath' from '$itemPath'");
+                    continue;
+                }
+                Log::debug("Creating thumb-link for image: '$thumbUnixPath' from '$itemPath'");
+                $u_thumbUrl = Path::unixPathToUrl($thumbUnixPath, Path::LINK_RAW);
+                $fileNum++;
+                $h_thumbTitle = htmlspecialchars($filename);
+            }
+            $u_linkUrl = Path::unixPathToUrl($itemPath, Path::LINK_INLINE);
+
+            Path::addThumb($u_linkUrl, $u_thumbUrl, $h_thumbTitle, $fileNum);
+        }
+    }
+
+    /**
+     * Add one thumbnail link to the page.
+     * @param string $u_linkUrl URL-escaped link to the file.
+     * @param string $u_thumbUrl URL-escaped link to the thumbnail.
+     * @param string $h_thumbTitle HTML-escaped title of the thumbnail.
+     * @param int $fileNum The ordinal position of the file within the folder.
+     * @return void
+     */
+    public static function addThumb(string $u_linkUrl, string $u_thumbUrl, string $h_thumbTitle, int $fileNum = 0): void
+    {
+        echo("<div class='thumb'><figure>");
+
+        echo("<a href='$u_linkUrl'><img src='$u_thumbUrl' title='$h_thumbTitle' alt='$h_thumbTitle'></a>");
+        echo('<figcaption>');
+        if ($fileNum) {
+            echo("<strong>$fileNum: </strong>");
+        }
+        echo("<a href='$u_linkUrl'>$h_thumbTitle</a></figcaption>");
+        echo('</figure></div>');
+    }
 }

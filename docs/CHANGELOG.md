@@ -289,7 +289,7 @@ Unfortunately, midnight.
 * FIXED: back button doesn't populate the page correctly (unnecessary i=1).
 * FIXED: Update browser history when navigating.
 * FIXED: Db::mkRefArray(): There's apparently a `...` operator that makes this kludge redundant: see man page.
-* FIXED: The ThumbTemplate doesn't fill out - maybe no suitable files with thumbs?
+* FIXED: The ThumbsTemplate doesn't fill out - maybe no suitable files with thumbs?
 * FIXED: Fifth argument ($port) must be of type ?int, string given in `.../public_html/midwestmemories/src/Db.php:41`.
 * FIXED: index.php double-loads the tree template.
 * FIXED: Content div has it as a class but not an ID.

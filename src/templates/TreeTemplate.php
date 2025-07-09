@@ -25,13 +25,6 @@ $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
         - Folder Tree</title>
     <link rel="stylesheet" href="/raw/user.css">
     <script src="/raw/user.js"></script>
-    <!-- Style elements that require dynamic PHP values -->
-    <style>
-        div.thumb img {
-            max-width: <?= Conf::get(Key::MAX_THUMB_WIDTH) ?>px;
-            max-height: <?= Conf::get(Key::MAX_THUMB_HEIGHT) ?>px;
-        }
-    </style>
 </head>
 <body onload="setupTemplate()">
 <div class="flex-container" id="parent-container">
