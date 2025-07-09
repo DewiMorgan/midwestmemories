@@ -27,6 +27,12 @@ use MidwestMemories\Enum\Key;
 <html lang="en">
 <head>
     <title>ToDo: a folder title here</title>
+    <style>
+        div.thumb img {
+            max-width: <?= Conf::get(Key::MAX_THUMB_WIDTH) ?>px;
+            max-height: <?= Conf::get(Key::MAX_THUMB_HEIGHT) ?>px;
+        }
+    </style>
 </head>
 <body>
 <div id="template-content">
