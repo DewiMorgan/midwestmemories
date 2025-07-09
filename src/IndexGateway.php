@@ -79,7 +79,7 @@ class IndexGateway
             include(__DIR__ . '/SearchTemplate.php');
         } elseif (is_dir(self::$requestUnixPath)) {
             // We're showing an inline folder view; a list of thumbnails.
-            include(__DIR__ . '/ThumbsTemplate.php');
+            include(__DIR__ . '/templates/ThumbsTemplate.php');
         } elseif (is_file(self::$requestUnixPath)) {
             // We're showing an inline file view.
             include(__DIR__ . '/FileTemplate.php');
