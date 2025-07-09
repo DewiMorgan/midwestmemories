@@ -10,6 +10,8 @@ which might not be when they were actually implemented/committed.
 * DONE: Move FileTemplate into /templates folder.
 * DONE: Move CSS from ThumbsTemplate to /css/user.css.
 * DONE: Remove the "Go up one folder" link from the root folder.
+* DONE: Make only test server pull from /Dewi/ folder, and have live pull from /Auora/? Or, separate /test/ folder?
+* DONE: Change live so that it shows contents of Auora as Home/root folder.
 
 ## 2025/07/07 Sat
 

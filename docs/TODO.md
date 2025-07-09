@@ -2,15 +2,13 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
-* "Go up one folder" link shouldn't appear in the root folder.
-* Change comment user db field to fk user_id.
-* Make only test server pull from /Dewi/ folder, and have live pull from /Auora/? Or, separate /test/ folder?
 * Get CSV files auto-parsing.
 * Get folder-level details showing.
 * Faster page loads (smaller initial images?)
 * Bug: Clicking dot doesn't cause folding.
 * Generate Web page tests.
 * Add unit tests for everything.
+* Change comment user db field to fk user_id.
 * Make the JS also handle endpoints using the lookup table?
 * Change endpoints to be loaded into JS as a class or config file or something.
 * Handle API errors instead of just checking `result.ok` (which just checks it was a 200).
