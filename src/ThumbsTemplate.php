@@ -153,7 +153,7 @@ use MidwestMemories\Enum\Key;
          * @param int $fileNum The ordinal position of the file within the folder.
          * @return void
          */
-        function addThumb($u_linkUrl, $u_thumbUrl, $h_thumbTitle, $fileNum): void
+        function addThumb(string $u_linkUrl, string $u_thumbUrl, string $h_thumbTitle, int $fileNum): void
         {
             echo("<div class='thumb'><figure>");
 

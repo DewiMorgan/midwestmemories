@@ -5,6 +5,8 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use MidwestMemories\Enum\Key;
+
 $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
 ?>
 <!DOCTYPE html>
@@ -21,10 +23,15 @@ $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
     <?php } ?>
     <title><?php echo $isLiveSite ? '<!-- Live Site -->' : 'Test Site'; ?><?php IndexGateway::getSiteName(); ?>
         - Folder Tree</title>
-    <!--suppress HtmlUnknownTarget -->
     <link rel="stylesheet" href="/raw/user.css">
-    <!--suppress HtmlUnknownTarget -->
     <script src="/raw/user.js"></script>
+    <!-- Style elements that require dynamic PHP values -->
+    <style>
+        div.thumb img {
+            max-width: <?= Conf::get(Key::MAX_THUMB_WIDTH) ?>px;
+            max-height: <?= Conf::get(Key::MAX_THUMB_HEIGHT) ?>px;
+        }
+    </style>
 </head>
 <body onload="setupTemplate()">
 <div class="flex-container" id="parent-container">
