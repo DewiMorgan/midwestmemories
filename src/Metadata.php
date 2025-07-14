@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
+use Exception;
 use MidwestMemories\Enum\Key;
+use SplFileObject;
 
 /**
  * Purely static class to handle moving metadata between ini files, DB, web display, and web form.
@@ -132,8 +134,67 @@ class Metadata
     }
 
     /**
+     * Load in our data from a CSV file into the singleton's $folderTree datastore.
+     * @param string $unixFilePath The web path to load the file from.
+     * Header can contain:
+     * 'Filename YYYYMMDD - Origin - #','Origin','Number','Bundle','Slide Txt','ICE?','Directory',,
+     * 'Filename YYYYMMDD - Origin - #','Origin','Number','Subsection','Slide Txt','ICE?','Directory',,
+     * // TODO: split this into two functions: readCsvFile and write/updateIniFiles.
+     */
+    public static function csvToIniFiles(string $unixFilePath): void
+    {
+        $csv = [];
+        $rows = array_map('str_getcsv', file('myfile.csv'));
+        array_shift($rows); // Skip the header row.
+
+        // Build a list of all file details, parsed-ini-file style, grouped by their directory.
+        foreach ($rows as $row) {
+            $filename = $row[0];              // "Filename" csv column.
+            $date = preg_replace('/^(....)(..)(..).*$/', '$1-$2-$3', $filename);
+            $fileDetails = [];
+            $fileDetails["$filename.jpg"] = [
+                'date' => $date,
+                'displayname' => $filename,
+                'slideorigin' => $row[1],     // "Origin" csv column.
+                'slidenumber' => $row[2],     // "Number" csv column.
+                'slidesubsection' => $row[3], // "Bundle" or "Subsection" csv column.
+                'writtennotes' => $row[4],    // "Slide Txt" csv column.
+                'filtered' => $row[5],        // "ICE?" csv column.
+            ];
+            // "Directory" csv column. Clean up slashes and dots.
+            $unixPath = preg_replace(['#[/\\\]+#', '#\.\.+#'], ['/', '.'], Path::$imgBaseUnixPath . $row[6]);
+            // Create the entry for the directory if it doesn't exist.
+            if (!array_key_exists($unixPath, $csv)) {
+                $csv[$unixPath] = [];
+            }
+            // Add this file's details to the directory's entry.
+            $csv[$unixPath][] = $fileDetails;
+        }
+
+        // Write the INI files.
+        foreach ($csv as $unixPath => $fileDetailList) {
+            // Create the directory if it doesn't exist.
+            if (!file_exists($unixPath)) {
+                mkdir($unixPath, 0777, true);
+            }
+
+            // If the ini file already exists, replace conflicting entries and append new ones.
+            if (file_exists($unixPath . '/index.txt')) {
+                $existingContent = parse_ini_file($unixPath . '/index.txt', true);
+                if ($existingContent) {
+                    $fileDetailList = array_merge($existingContent, $fileDetailList);
+                }
+            }
+
+            // Write the updated (or new) INI file.
+            file_put_contents($unixPath . '/index.txt', implode("\n\n", $fileDetailList), FILE_APPEND);
+        }
+    }
+
+
+    /**
      * Load in our data from an Ini file, and all parents, into the singleton's $folderTree datastore.
-     * @param string $webPath The web path to load build and load the folder tree down to, from the root.
+     * @param string $webPath The web path to load the folder tree down to, from the root.
      */
     public static function loadFromInis(string $webPath): void
     {

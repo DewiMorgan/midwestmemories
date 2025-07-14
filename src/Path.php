@@ -32,7 +32,7 @@ class Path
     public const LINK_SEARCH = '3';
     public const LINK_USER = '';
 
-    // Full filesystem path to image folder, with trailing slash. We don't allow access to files outside this folder.
+    /** Full filesystem path to image folder, with trailing slash. We forbid access to files outside this folder. */
     public static string $imgBaseUnixPath;
 
     /**
