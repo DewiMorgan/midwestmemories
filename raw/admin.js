@@ -18,7 +18,8 @@ window.Api = class {
             method,
             headers: {
                 'Accept': 'application/json',
-            }
+            },
+            credentials: 'same-origin'  // or 'include' if cross-origin with CORS
         };
 
         if (null !== payload && ['POST', 'PUT', 'PATCH'].includes(method)) {

@@ -3,6 +3,7 @@
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
 * Get CSV files auto-parsing.
+    * Call parser on ini files as they are added from Dropbox.
 * Get folder-level details showing.
 * Faster page loads (smaller initial images?)
 * Bug: Clicking dot doesn't cause folding.
