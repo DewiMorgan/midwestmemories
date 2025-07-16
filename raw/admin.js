@@ -1,5 +1,25 @@
 
 /* Source: Api.js */
+// iOS lacks native console debugging, so we work around it here:
+(function () {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    if (isIOS) {
+        const originalLog = console.log;
+        console.log = function () {
+            const debugDiv = document.getElementById("debug");
+            if (debugDiv) {
+                const args = Array.from(arguments).map(arg =>
+                    typeof arg === "object" ? JSON.stringify(arg) : String(arg)
+                );
+                debugDiv.innerHTML += args.join(" ") + "<br>";
+            }
+            originalLog.apply(console, arguments); // Preserve default behavior
+        };
+    }
+})();
+
+
 /* jshint esversion: 6 */
 window.Api = class {
     /**

@@ -45,6 +45,7 @@ $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
         Path::buildTree($root, IndexGateway::$requestUnixPath);
         echo '</ul>';
         ?>
+        <div id="debug"><!-- Debug info for iOS goes here as it lacks a real console. --></div>
     </div>
     <div class="drag-bar"></div>
     <div class="content right-column" id="content">Hello, world!</div>
