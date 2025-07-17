@@ -13,6 +13,8 @@ class AdminGateway
 {
     public function __construct()
     {
+        self::setNoCacheHeaders();
+
         // Handle logout if requested
         User::handleHtmlLogout();
 
@@ -79,5 +81,16 @@ class AdminGateway
 
         // Include the template file
         require __DIR__ . '/templates/AdminPageTemplate.php';
+    }
+
+    /**
+     * These headers prevent the browser from caching the page.
+     * This is important for updates and session-handling.
+     */
+    private static function setNoCacheHeaders(): void
+    {
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
     }
 }

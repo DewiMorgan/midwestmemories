@@ -17,6 +17,9 @@ class IndexGateway
 
     public function __construct()
     {
+        // Output no-cache headers.
+        self::setNoCacheHeaders();
+
         // Handle logout if requested
         User::handleHtmlLogout();
 
@@ -113,5 +116,16 @@ class IndexGateway
             ]
         );
         return 'Midwest ' . $a;
+    }
+
+    /**
+     * These headers prevent the browser from caching the page.
+     * This is important for updates and session-handling.
+     */
+    private static function setNoCacheHeaders(): void
+    {
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
     }
 }
