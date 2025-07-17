@@ -958,4 +958,3 @@ window.TreeView = class {
         listItem.classList.remove('selected');
     }
 };
-

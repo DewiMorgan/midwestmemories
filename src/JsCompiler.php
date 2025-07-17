@@ -77,6 +77,8 @@ class JsCompiler
      */
     public static function isFileOutdated(array $inputFiles, string $outputFile, ?string $jsDir = null): bool
     {
+        $jsDir = $jsDir ?: __DIR__ . '/Js/';
+
         if (!file_exists($outputFile)) {
             return true;
         }
@@ -85,7 +87,6 @@ class JsCompiler
             if (!file_exists($inputFilePath)) {
                 return true;
             }
-            echo filemtime($inputFilePath) . ' ' . filemtime($outputFile) . ' ' . $inputFilePath . "\n";
             if (filemtime($inputFilePath) > filemtime($outputFile)) {
                 return true;
             }
@@ -137,6 +138,7 @@ class JsCompiler
         }
 
         $version = self::getScriptVersion($outputFile);
+        $version++;
         $output = "/* Version: $version */\n\n" . $output;
 
         return file_put_contents($outputFile, $output, LOCK_EX) !== false;
