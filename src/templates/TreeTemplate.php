@@ -24,7 +24,7 @@ $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
     <title><?php echo $isLiveSite ? '<!-- Live Site -->' : 'Test Site'; ?><?php IndexGateway::getSiteName(); ?>
         - Folder Tree</title>
     <link rel="stylesheet" href="/raw/user.css">
-    <script src="/raw/user.js?1"></script>
+    <script src="/raw/user.js?v=<?= Path::getScriptVersion(__DIR__ . '/../raw/user.js') ?>"></script>
 </head>
 <body onload="setupTemplate()">
 <div class="flex-container" id="parent-container">

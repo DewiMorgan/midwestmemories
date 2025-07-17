@@ -1,3 +1,4 @@
+/* version: 1 */
 
 /* Source: Api.js */
 // iOS lacks native console debugging, so we work around it here:
@@ -978,4 +979,3 @@ window.TreeView = class {
         listItem.classList.remove('selected');
     }
 };
-

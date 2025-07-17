@@ -135,6 +135,9 @@ class JsCompiler
             return false;
         }
 
+        $version = Path::getScriptVersion($outputFile);
+        $output = "/* Version: $version */\n\n" . $output;
+
         return file_put_contents($outputFile, $output, LOCK_EX) !== false;
     }
 

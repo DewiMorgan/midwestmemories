@@ -71,14 +71,11 @@ class AdminGateway
     {
         $user = User::getInstance();
 
-        $templateVars = [
-            'h_userRole' => $user->isSuperAdmin ? 'SuperAdmin' : 'Admin',
-            'h_username' => htmlspecialchars($user->username),
-            'isLiveSite' => str_contains(__DIR__, 'midwestmemoriesfamily'),
-        ];
-
-        // Extract variables for the template
-        extract($templateVars);
+        // Generate the variables required by the template.
+        $h_userRole = $user->isSuperAdmin ? 'SuperAdmin' : 'Admin';
+        $h_username = htmlspecialchars($user->username);
+        $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
+        $i_scriptVersion = Path::getScriptVersion(__DIR__ . '/../raw/user.js');
 
         // Include the template file
         require __DIR__ . '/templates/AdminPageTemplate.php';

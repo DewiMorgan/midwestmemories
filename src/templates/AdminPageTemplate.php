@@ -7,7 +7,10 @@ declare(strict_types=1);
  * @var string $h_userRole The role of the current user (Admin/SuperAdmin)
  * @var string $h_username The current user's username.
  * @var bool $isLiveSite True on the live site, false on the test site.
+ * @var int $i_scriptVersion The version of the admin.js file.
  */
+
+use MidwestMemories\Path;
 
 ?>
 <!DOCTYPE html>
@@ -27,7 +30,7 @@ declare(strict_types=1);
     <!--suppress HtmlUnknownTarget -->
     <link rel="stylesheet" href="/raw/admin.css">
     <!--suppress HtmlUnknownTarget -->
-    <script src="/raw/admin.js"></script>
+    <script src="/raw/admin.js?v=<?= $i_scriptVersion ?>"></script>
 </head>
 <body>
 <div class="header">

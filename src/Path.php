@@ -12,7 +12,6 @@ use MidwestMemories\Enum\Key;
  */
 class Path
 {
-
     /* Alternatives and options for image files include:
      * U+1F4C1 📁 File Folder
      * U+1F4C2 📂 Open File Folder
@@ -397,5 +396,26 @@ class Path
         }
         echo("<a href='$u_linkUrl'>$h_thumbTitle</a></figcaption>");
         echo('</figure></div>');
+    }
+
+    /**
+     * Get a script's version number.
+     * @param string $unixPath The script file to read the version number from.
+     * @return int The version, or 0 if the file does not exist yet.
+     */
+    public static function getScriptVersion(string $unixPath): int
+    {
+        // If it doesn't exist, we can't get the version.
+        if (!file_exists($unixPath)) {
+            return 0;
+        }
+
+        // Read one line.
+        $file = fopen($unixPath, 'r');
+        $line = fgets($file);
+        fclose($file);
+
+        // Parse and return the version number.
+        return intval(preg_match('/(\d+)/', $line, $matches) ? $matches[1] : 0);
     }
 }
