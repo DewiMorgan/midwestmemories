@@ -136,7 +136,7 @@ class JsCompiler
             return false;
         }
 
-        $version = Path::getScriptVersion($outputFile);
+        $version = self::getScriptVersion($outputFile);
         $output = "/* Version: $version */\n\n" . $output;
 
         return file_put_contents($outputFile, $output, LOCK_EX) !== false;
@@ -175,5 +175,27 @@ class JsCompiler
             }
         }
         return $changed;
+    }
+
+    /**
+     * Get a script's version number.
+     * @param string $unixPath The script file to read the version number from.
+     * @return int The version, or 0 if the file does not exist yet.
+     * ToDo: duplicated in Path.php.
+     */
+    public static function getScriptVersion(string $unixPath): int
+    {
+        // If it doesn't exist, we can't get the version.
+        if (!file_exists($unixPath)) {
+            return 0;
+        }
+
+        // Read one line.
+        $file = fopen($unixPath, 'r');
+        $line = fgets($file);
+        fclose($file);
+
+        // Parse and return the version number.
+        return intval(preg_match('/(\d+)/', $line, $matches) ? $matches[1] : 0);
     }
 }
