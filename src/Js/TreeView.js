@@ -110,7 +110,7 @@ window.TreeView = class {
      * @returns {Promise<Document>}
      */
     async fetchRemoteDocument(url) {
-        const response = await fetch(url);
+        const response = await fetch(url, {credentials: 'same-origin'});
         const html = await response.text();
         const parser = new DOMParser();
         return parser.parseFromString(html, 'text/html');

@@ -67,7 +67,10 @@ window.Comments = class {
         let totalPages = 1; // Start assuming only 1 page until we know otherwise.
 
         do {
-            const response = await fetch(`/api/v1.0/comment?file_id=${fileId}&page_id=${currentPage}`);
+            const response = await fetch(
+                `/api/v1.0/comment?file_id=${fileId}&page_id=${currentPage}`,
+                {credentials: 'same-origin'}
+            );
             if (!response.ok) {
                 throw new Error(`Failed to fetch page ${currentPage}: ${response.statusText}`);
             }
@@ -104,7 +107,8 @@ window.Comments = class {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({comment_text: commentText})
+            body: JSON.stringify({comment_text: commentText}),
+            credentials: 'same-origin'
         });
 
         if (!response.ok) {
