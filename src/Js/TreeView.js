@@ -23,7 +23,6 @@ window.TreeView = class {
      * @param {HTMLSpanElement} folder
      */
     addFoldClickHandler = (folder) => {
-        console.log("Adding onClick to fold: " + folder.textContent);
         folder.addEventListener('click', this.handleFoldClick);
     };
 
@@ -34,10 +33,7 @@ window.TreeView = class {
     addLinkClickHandler = (link) => {
         const attr = link.getAttribute("href");
         if (attr && attr.includes('?i=1')) {
-            console.log("Adding onClick to child link: " + attr);
             link.addEventListener('click', this.handleLinkClick);
-        } else {
-            console.log("Not adding onClick to primary link: " + attr);
         }
     };
 
@@ -110,6 +106,7 @@ window.TreeView = class {
      * @returns {Promise<Document>}
      */
     async fetchRemoteDocument(url) {
+        console.log(`Fetch()ing remote document: ${url}`); // DELETEME DEBUG
         const response = await fetch(url, {credentials: 'same-origin'});
         const html = await response.text();
         const parser = new DOMParser();

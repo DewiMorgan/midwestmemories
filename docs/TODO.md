@@ -38,6 +38,10 @@ This is the stuff I'm actually working on, as steps towards the ultimate goal.
 * Get it usable on a phone.
 * Search template?
 
+* Debugging
+    * Implement https://github.com/liriliri/eruda if additional iOS debugging is needed.
+    * Otherwise, just use chrome://inspect to get the JS console in iOS Chrome.
+
 * Comments
     * Optimize adding comments, by show/hide the textarea instead of removing and recreating it all the time.
 

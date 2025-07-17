@@ -47,8 +47,7 @@ window.Api = class {
             options.body = JSON.stringify(payload);
         }
 
-        console.log(`Making API call ${method} ${url} ${expectedType}`, options); // DELETEME DEBUG
-
+        console.log(`Fetch()ing API call ${method} ${url} ${expectedType}`, options); // DELETEME DEBUG
         const response = await fetch(url, options);
 
         if (!response.ok) {

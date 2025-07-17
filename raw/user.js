@@ -47,8 +47,7 @@ window.Api = class {
             options.body = JSON.stringify(payload);
         }
 
-        console.log(`Making API call ${method} ${url} ${expectedType}`, options); // DELETEME DEBUG
-
+        console.log(`Fetch()ing API call ${method} ${url} ${expectedType}`, options); // DELETEME DEBUG
         const response = await fetch(url, options);
 
         if (!response.ok) {
@@ -148,6 +147,7 @@ window.Comments = class {
         let totalPages = 1; // Start assuming only 1 page until we know otherwise.
 
         do {
+            console.log(`Fetch()ing all comments via: /api/v1.0/comment?file_id=${fileId}&page_id=${currentPage}`); // DELETEME DEBUG
             const response = await fetch(
                 `/api/v1.0/comment?file_id=${fileId}&page_id=${currentPage}`,
                 {credentials: 'same-origin'}
@@ -183,6 +183,7 @@ window.Comments = class {
      */
     async postComment(commentText) {
         const fileId = this.getFileId();
+        console.log(`Fetch()ing result fo posting comment to /api/v1.0/comment?file_id=${fileId}`); // DELETEME DEBUG
         const response = await fetch(`/api/v1.0/comment?file_id=${fileId}`, {
             method: 'POST',
             headers: {
@@ -685,7 +686,6 @@ window.TreeView = class {
      * @param {HTMLSpanElement} folder
      */
     addFoldClickHandler = (folder) => {
-        console.log("Adding onClick to fold: " + folder.textContent);
         folder.addEventListener('click', this.handleFoldClick);
     };
 
@@ -696,10 +696,7 @@ window.TreeView = class {
     addLinkClickHandler = (link) => {
         const attr = link.getAttribute("href");
         if (attr && attr.includes('?i=1')) {
-            console.log("Adding onClick to child link: " + attr);
             link.addEventListener('click', this.handleLinkClick);
-        } else {
-            console.log("Not adding onClick to primary link: " + attr);
         }
     };
 
@@ -772,6 +769,7 @@ window.TreeView = class {
      * @returns {Promise<Document>}
      */
     async fetchRemoteDocument(url) {
+        console.log(`Fetch()ing remote document: ${url}`); // DELETEME DEBUG
         const response = await fetch(url, {credentials: 'same-origin'});
         const html = await response.text();
         const parser = new DOMParser();
