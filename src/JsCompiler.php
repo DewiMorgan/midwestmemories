@@ -85,6 +85,7 @@ class JsCompiler
             if (!file_exists($inputFilePath)) {
                 return true;
             }
+            echo filemtime($inputFilePath) . ' ' . filemtime($outputFile) . ' ' . $inputFilePath . "\n";
             if (filemtime($inputFilePath) > filemtime($outputFile)) {
                 return true;
             }
