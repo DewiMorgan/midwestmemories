@@ -109,7 +109,7 @@ class IndexGateway
         $a = array_rand(
             [
                 'Memories', 'Mayhem', 'Merriment', 'Madness', 'Moonshine', 'Mountains', 'Mastery', 'Machines',
-                'Messages', 'Metaphor', 'Meteor', 'Mistakes', 'Mondays', 'Mornings', 'Moaning', 'Mystery'
+                'Messages', 'Metaphors', 'Meteors', 'Mistakes', 'Mondays', 'Mornings', 'Moaning', 'Mysteries'
             ]
         );
         return 'Midwest ' . $a;

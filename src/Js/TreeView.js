@@ -107,8 +107,14 @@ window.TreeView = class {
      */
     async fetchRemoteDocument(url) {
         console.log(`Fetch()ing remote document: ${url}`); // DELETEME DEBUG
-        const response = await fetch(url, {credentials: 'same-origin'});
-        const html = await response.text();
+        let html = '';
+        try {
+            const response = await fetch(url, {credentials: 'same-origin'});
+            html = await response.text();
+        } catch (e) {
+            console.error(e.message);
+            console.error(e);
+        }
         const parser = new DOMParser();
         return parser.parseFromString(html, 'text/html');
     }
@@ -120,7 +126,7 @@ window.TreeView = class {
     getSiteName = () => {
         const a = [
             'Memories', 'Mayhem', 'Merriment', 'Madness', 'Moonshine', 'Mountains', 'Mastery', 'Machines',
-            'Messages', 'Metaphor', 'Meteor', 'Mistakes', 'Mondays', 'Mornings', 'Moaning', 'Mystery'
+            'Messages', 'Metaphors', 'Meteors', 'Mistakes', 'Mondays', 'Mornings', 'Moaning', 'Mysteries'
         ];
         return 'Midwest ' + a[~~(Math.random() * a.length)];
     };
