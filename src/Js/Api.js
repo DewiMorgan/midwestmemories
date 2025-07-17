@@ -14,9 +14,7 @@ window.Api = class {
     static async fetchApiData(url, method = 'GET', expectedType = 'array', payload = null) {
         const options = {
             method,
-            headers: {
-                'Accept': 'application/json',
-            },
+            headers: {'Accept': 'application/json'},
             credentials: 'same-origin'  // or 'include' if cross-origin with CORS
         };
 
