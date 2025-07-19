@@ -18,11 +18,11 @@ class FileProcessTypes
      * Process a GIF file, generating thumbnail.
      * @return bool Success.
      */
-    public static function processGifFile(string $fullPath): bool
+    public static function processGifFile(string $unixPath): bool
     {
-        $thumbResult = FileProcessor::makeThumb(imagecreatefromgif($fullPath), $fullPath);
+        $thumbResult = FileProcessor::makeThumb(imagecreatefromgif($unixPath), $unixPath);
         $status = ($thumbResult ? SyncStatus::PROCESSED : SyncStatus::ERROR);
-        $syncResult = FileProcessor::setSyncStatus($fullPath, $status, 'Processed as GIF.');
+        $syncResult = FileProcessor::setSyncStatus($unixPath, $status, 'Processed as GIF.');
         return $thumbResult && $syncResult;
     }
 
@@ -30,47 +30,47 @@ class FileProcessTypes
      * Process text file, parsing fields into the db.
      * @return bool Success.
      */
-    public static function processTextFile($fullPath): bool
+    public static function processTextFile($unixPath): bool
     {
-        return FileProcessor::setSyncStatus($fullPath, SyncStatus::PROCESSED, 'Processed as TXT.');
+        return FileProcessor::setSyncStatus($unixPath, SyncStatus::PROCESSED, 'Processed as TXT.');
     }
 
     /**
-     * Process a GIF file, generating thumbnail.
+     * Process a CSV file, generating/updating the per-folder INI files from it.
      * @return bool Success.
      */
-    public static function processCsvFile(string $fullPath): bool
+    public static function processCsvFile(string $unixPath): bool
     {
-        $thumbResult = FileProcessor::makeThumb(imagecreatefromgif($fullPath), $fullPath);
-        $status = ($thumbResult ? SyncStatus::PROCESSED : SyncStatus::ERROR);
-        $syncResult = FileProcessor::setSyncStatus($fullPath, $status, 'Processed as GIF.');
-        return $thumbResult && $syncResult;
+        $iniResult = Metadata::csvToIniFiles($unixPath);
+        $status = ($iniResult ? SyncStatus::PROCESSED : SyncStatus::ERROR);
+        $syncResult = FileProcessor::setSyncStatus($unixPath, $status, 'Processed as CSV.');
+        return $iniResult && $syncResult;
     }
 
     /**
      * Process an unknown file.
      * @return bool Success.
      */
-    public static function processOtherFile(string $fullPath): bool
+    public static function processOtherFile(string $unixPath): bool
     {
         // Nothing to do but mark it complete.
-        return FileProcessor::setSyncStatus($fullPath, SyncStatus::PROCESSED, 'Unknown type');
+        return FileProcessor::setSyncStatus($unixPath, SyncStatus::PROCESSED, 'Unknown type');
     }
 
     /**
      * Process a PNG file, generating thumbnail and converting to JPG if needed.
      * @return bool Success.
      */
-    public static function processPngFile(string $fullPath): bool
+    public static function processPngFile(string $unixPath): bool
     {
-        if ((filesize($fullPath) > Conf::get(Key::MAX_PNG_BYTES))) {
+        if ((filesize($unixPath) > Conf::get(Key::MAX_PNG_BYTES))) {
             // Thumbnail generation would be faster from the new JPG, so we roll this into convertToJpeg.
-            $thumbResult = FileProcessor::convertToJpeg($fullPath);
+            $thumbResult = FileProcessor::convertToJpeg($unixPath);
         } else {
-            $thumbResult = FileProcessor::makeThumb(imagecreatefrompng($fullPath), $fullPath);
+            $thumbResult = FileProcessor::makeThumb(imagecreatefrompng($unixPath), $unixPath);
         }
         $status = ($thumbResult ? SyncStatus::PROCESSED : SyncStatus::ERROR);
-        $syncResult = FileProcessor::setSyncStatus($fullPath, $status, 'Processed as PNG.');
+        $syncResult = FileProcessor::setSyncStatus($unixPath, $status, 'Processed as PNG.');
         return $thumbResult && $syncResult;
     }
 
@@ -78,17 +78,17 @@ class FileProcessTypes
      * Process a JPG file, generating thumbnail.
      * @return bool Success.
      */
-    public static function processJpegFile(string $fullPath): bool
+    public static function processJpegFile(string $unixPath): bool
     {
-        if (str_ends_with($fullPath, '-ICE.jpg')) {
-            Log::debug('Processing (skip ICE thumb)', $fullPath);
+        if (str_ends_with($unixPath, '-ICE.jpg')) {
+            Log::debug('Processing (skip ICE thumb)', $unixPath);
             $thumbResult = true;
         } else {
-            Log::debug('Processing', $fullPath);
-            $thumbResult = FileProcessor::makeThumb(imagecreatefromjpeg($fullPath), $fullPath);
+            Log::debug('Processing', $unixPath);
+            $thumbResult = FileProcessor::makeThumb(imagecreatefromjpeg($unixPath), $unixPath);
         }
         $status = ($thumbResult ? SyncStatus::PROCESSED : SyncStatus::ERROR);
-        $syncResult = FileProcessor::setSyncStatus($fullPath, $status, 'Processed as JPG.');
+        $syncResult = FileProcessor::setSyncStatus($unixPath, $status, 'Processed as JPG.');
         return $thumbResult && $syncResult;
     }
 }

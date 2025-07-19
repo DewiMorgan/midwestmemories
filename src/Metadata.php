@@ -136,59 +136,19 @@ class Metadata
     /**
      * Load in our data from a CSV file into the singleton's $folderTree datastore.
      * @param string $unixFilePath The web path to load the file from.
+     * @return bool Success.
+     *
      * Header can contain:
      * 'Filename YYYYMMDD - Origin - #','Origin','Number','Bundle','Slide Txt','ICE?','Directory',,
      * 'Filename YYYYMMDD - Origin - #','Origin','Number','Subsection','Slide Txt','ICE?','Directory',,
-     * // TODO: split this into two functions: readCsvFile and write/updateIniFiles.
      */
-    public static function csvToIniFiles(string $unixFilePath): void
+    public static function csvToIniFiles(string $unixFilePath): bool
     {
-        $csv = [];
-        $rows = array_map('str_getcsv', file('myfile.csv'));
-        array_shift($rows); // Skip the header row.
-
-        // Build a list of all file details, parsed-ini-file style, grouped by their directory.
-        foreach ($rows as $row) {
-            $filename = $row[0];              // "Filename" csv column.
-            $date = preg_replace('/^(....)(..)(..).*$/', '$1-$2-$3', $filename);
-            $fileDetails = [];
-            $fileDetails["$filename.jpg"] = [
-                'date' => $date,
-                'displayname' => $filename,
-                'slideorigin' => $row[1],     // "Origin" csv column.
-                'slidenumber' => $row[2],     // "Number" csv column.
-                'slidesubsection' => $row[3], // "Bundle" or "Subsection" csv column.
-                'writtennotes' => $row[4],    // "Slide Txt" csv column.
-                'filtered' => $row[5],        // "ICE?" csv column.
-            ];
-            // "Directory" csv column. Clean up slashes and dots.
-            $unixPath = preg_replace(['#[/\\\]+#', '#\.\.+#'], ['/', '.'], Path::$imgBaseUnixPath . $row[6]);
-            // Create the entry for the directory if it doesn't exist.
-            if (!array_key_exists($unixPath, $csv)) {
-                $csv[$unixPath] = [];
-            }
-            // Add this file's details to the directory's entry.
-            $csv[$unixPath][] = $fileDetails;
+        $csv = self::parseCsvMetadata($unixFilePath);
+        if (false === $csv) {
+            return false;
         }
-
-        // Write the INI files.
-        foreach ($csv as $unixPath => $fileDetailList) {
-            // Create the directory if it doesn't exist.
-            if (!file_exists($unixPath)) {
-                mkdir($unixPath, 0777, true);
-            }
-
-            // If the ini file already exists, replace conflicting entries and append new ones.
-            if (file_exists($unixPath . '/index.txt')) {
-                $existingContent = parse_ini_file($unixPath . '/index.txt', true);
-                if ($existingContent) {
-                    $fileDetailList = array_merge($existingContent, $fileDetailList);
-                }
-            }
-
-            // Write the updated (or new) INI file.
-            file_put_contents($unixPath . '/index.txt', implode("\n\n", $fileDetailList), FILE_APPEND);
-        }
+        return self::writeIniFiles($csv);
     }
 
 
@@ -246,5 +206,80 @@ class Metadata
         }
 
         return MetadataCleaner::cleanDirData($iniFileData);
+    }
+
+    /**
+     * Build a list of all file details, parsed-ini-file style, grouped by their directory.
+     * @param string $unixFilePath The file to parse.
+     * @return array|false The list of file details, or false on failure.
+     */
+    public static function parseCsvMetadata(string $unixFilePath): array|false
+    {
+        $fileData = file($unixFilePath);
+        if (false === $fileData) {
+            Log::error('Failed to read csv file', $unixFilePath);
+            return false;
+        }
+        $rows = array_map('str_getcsv', $fileData);
+        array_shift($rows); // Skip the header row.
+        $csv = [];
+        foreach ($rows as $row) {
+            $filename = $row[0];              // "Filename" csv column.
+            $date = preg_replace('/^(....)(..)(..).*$/', '$1-$2-$3', $filename);
+            $fileDetails = [];
+            $fileDetails["$filename.jpg"] = [
+                'date' => $date,
+                'displayname' => $filename,
+                'slideorigin' => $row[1],     // "Origin" csv column.
+                'slidenumber' => $row[2],     // "Number" csv column.
+                'slidesubsection' => $row[3], // "Bundle" or "Subsection" csv column.
+                'writtennotes' => $row[4],    // "Slide Txt" csv column.
+                'filtered' => $row[5],        // "ICE?" csv column.
+            ];
+            // "Directory" csv column. Clean up slashes and dots.
+            $unixPath = preg_replace(['#[/\\\]+#', '#\.\.+#'], ['/', '.'], Path::$imgBaseUnixPath . $row[6]);
+            // Create the entry for the directory if it doesn't exist.
+            if (!array_key_exists($unixPath, $csv)) {
+                $csv[$unixPath] = [];
+            }
+            // Add this file's details to the directory's entry.
+            $csv[$unixPath][] = $fileDetails;
+        }
+        return $csv;
+    }
+
+    /**
+     * Write the INI files from CSV metadata.
+     * @param array $csv The CSV metadata.
+     * @return bool Success.
+     */
+    public static function writeIniFiles(array $csv): bool
+    {
+        foreach ($csv as $unixPath => $fileDetailList) {
+            // Create the directory if it doesn't exist.
+            if (!file_exists($unixPath)) {
+                $result = mkdir($unixPath, 0777, true);
+                if (!$result) {
+                    Log::error('Failed to create directory ' . $unixPath);
+                    return false;
+                }
+            }
+
+            // If the ini file already exists, replace conflicting entries and append new ones.
+            if (file_exists($unixPath . '/index.txt')) {
+                $existingContent = parse_ini_file($unixPath . '/index.txt', true);
+                if ($existingContent) {
+                    $fileDetailList = array_merge($existingContent, $fileDetailList);
+                }
+            }
+
+            // Write the updated (or new) INI file.
+            $writeResult = file_put_contents($unixPath . '/index.txt', implode("\n\n", $fileDetailList), FILE_APPEND);
+            if (false === $writeResult) {
+                Log::error('Failed to write INI file ' . $unixPath . '/index.txt');
+                return false;
+            }
+        }
+        return true;
     }
 }
