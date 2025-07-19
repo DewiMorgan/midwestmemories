@@ -9,36 +9,36 @@ use MidwestMemories\Enum\SyncStatus;
 
 /**
  * File processing class for DropboxManager.
+ * Fully static. OOP might save us from passing $unixPath around, but nothing else is shared.
  */
-class FileProcessor extends Singleton
+class FileProcessor
 {
-
     /**
-     * Process the first downloaded file from the file queue table.
+     * Endpoint: POST `/api/v1.0/process`. Process the first downloaded file from the file queue table.
      * Add thumbnails, resample images, and parse txt files, then set status to PROCESSED.
      * @return array ['status'=>200 or 500, 'data'=>"OK" or "Error: ..."], depending on the result.
      */
     public static function processNextFile(): array
     {
-        $instance = self::getInstance();
-        $entry = $instance->listFirstFileByStatus(SyncStatus::DOWNLOADED);
+        $entry = self::listFirstFileByStatus(SyncStatus::DOWNLOADED);
         Log::debug('Processing', $entry);
-        $fullPath = ltrim($entry, '/\\');
-        if (!file_exists($fullPath)) {
+        $unixPath = ltrim($entry, '/\\');
+        if (!file_exists($unixPath)) {
             $error = 'file_exists failed';
-            $instance->setSyncStatus($fullPath, SyncStatus::ERROR, $error);
+            self::setSyncStatus($unixPath, SyncStatus::ERROR, $error);
             return ['status' => 500, 'data' => "Server Error: $error"];
         }
 
         // Get the mime type.
-        $mimeType = mime_content_type($fullPath);
-        Log::debug("Processing as $mimeType", $fullPath);
+        $mimeType = mime_content_type($unixPath);
+        Log::debug("Processing as $mimeType", $unixPath);
         $success = match ($mimeType) {
-            'text/plain' => $instance->processTextFile($fullPath),
-            'image/gif' => $instance->processGifFile($fullPath),
-            'image/png' => $instance->processPngFile($fullPath),
-            'image/jpeg' => $instance->processJpegFile($fullPath),
-            default => $instance->processOtherFile($fullPath),
+            'text/csv' => FileProcessTypes::processCsvFile($unixPath),
+            'image/gif' => FileProcessTypes::processGifFile($unixPath),
+            'image/jpeg' => FileProcessTypes::processJpegFile($unixPath),
+            'image/png' => FileProcessTypes::processPngFile($unixPath),
+            'text/plain' => FileProcessTypes::processTextFile($unixPath),
+            default => FileProcessTypes::processOtherFile($unixPath),
         };
         $data = $success ? 'OK' : "Error: failed to process file as $mimeType";
         $status = $success ? 200 : 500;
@@ -46,120 +46,52 @@ class FileProcessor extends Singleton
     }
 
     /**
-     * Process text file, parsing fields into the db.
-     * @return bool Success.
-     */
-    private function processTextFile($fullPath): bool
-    {
-        return $this->setSyncStatus($fullPath, SyncStatus::PROCESSED, 'Processed as TXT.');
-    }
-
-    /**
-     * Process a PNG file, generating thumbnail and converting to JPG if needed.
-     * @return bool Success.
-     */
-    private function processPngFile(string $fullPath): bool
-    {
-        if ((filesize($fullPath) > Conf::get(Key::MAX_PNG_BYTES))) {
-            // Thumbnail generation would be faster from the new JPG, so we roll this into convertToJpeg.
-            $thumbResult = $this->convertToJpeg($fullPath);
-        } else {
-            $thumbResult = $this->makeThumb(imagecreatefrompng($fullPath), $fullPath);
-        }
-        $status = ($thumbResult ? SyncStatus::PROCESSED : SyncStatus::ERROR);
-        $syncResult = $this->setSyncStatus($fullPath, $status, 'Processed as PNG.');
-        return $thumbResult && $syncResult;
-    }
-
-    /**
-     * Process a GIF file, generating thumbnail.
-     * @return bool Success.
-     */
-    private function processGifFile(string $fullPath): bool
-    {
-        $thumbResult = $this->makeThumb(imagecreatefromgif($fullPath), $fullPath);
-        $status = ($thumbResult ? SyncStatus::PROCESSED : SyncStatus::ERROR);
-        $syncResult = $this->setSyncStatus($fullPath, $status, 'Processed as GIF.');
-        return $thumbResult && $syncResult;
-    }
-
-    /**
-     * Process a JPG file, generating thumbnail.
-     * @return bool Success.
-     */
-    private function processJpegFile(string $fullPath): bool
-    {
-        if (str_ends_with($fullPath, '-ICE.jpg')) {
-            Log::debug('Processing (skip ICE thumb)', $fullPath);
-            $thumbResult = true;
-        } else {
-            Log::debug('Processing', $fullPath);
-            $thumbResult = $this->makeThumb(imagecreatefromjpeg($fullPath), $fullPath);
-        }
-        $status = ($thumbResult ? SyncStatus::PROCESSED : SyncStatus::ERROR);
-        $syncResult = $this->setSyncStatus($fullPath, $status, 'Processed as JPG.');
-        return $thumbResult && $syncResult;
-    }
-
-    /**
-     * Process an unknown file.
-     * @return bool Success.
-     */
-    private function processOtherFile(string $fullPath): bool
-    {
-        // Nothing to do but mark it complete.
-        return $this->setSyncStatus($fullPath, SyncStatus::PROCESSED, 'Unknown type');
-    }
-
-    // Privates
-
-    /**
      * Convert large PNG files to more-compressed jpgs.
      * ToDo: How should this be reflected in the DB?
-     * @param string $fullPath Full path to original file.
+     * @param string $unixPath Full path to original file.
      * @return bool success
      */
-    private function convertToJpeg(string $fullPath): bool
+    public static function convertToJpeg(string $unixPath): bool
     {
-        $sourceImage = imagecreatefrompng($fullPath);
+        $sourceImage = imagecreatefrompng($unixPath);
         if (false === $sourceImage) {
-            Log::debug('Source image false for convertToJpeg', $fullPath);
+            Log::debug('Source image false for convertToJpeg', $unixPath);
             return false;
         }
 
-        $newFullPath = dirname($fullPath) . '/' . basename($fullPath, '.png') . '.jpg';
+        $newFullPath = dirname($unixPath) . '/' . basename($unixPath, '.png') . '.jpg';
 
         /* Save as a renamed JPG at its destination */
         if (false === imagejpeg($sourceImage, $newFullPath, 70)) {
-            Log::debug('imagejpeg failed for convertToJpeg', $fullPath);
+            Log::debug('imagejpeg failed for convertToJpeg', $unixPath);
             return false;
         }
         // Try to delete the huge file. If we can't, no big loss.
-        unlink($fullPath);
+        unlink($unixPath);
 
         // Because it is slightly faster to create the thumbnail from here.
-        return $this->makeThumb(imagecreatefrompng($newFullPath), $newFullPath);
+        return self::makeThumb(imagecreatefrompng($newFullPath), $newFullPath);
     }
 
     /**
      * From: https://stackoverflow.com/questions/11376315/creating-a-thumbnail-from-an-uploaded-image
      * @param resource $sourceImage Image resource loaded from whatever image format.
-     * @param string $fullPath Target full path to original file.
+     * @param string $unixPath Target full path to original file.
      * @return bool success
      */
-    private function makeThumb($sourceImage, string $fullPath): bool
+    public static function makeThumb($sourceImage, string $unixPath): bool
     {
-        Log::debug('Processing', $fullPath);
+        Log::debug('Processing', $unixPath);
         if (false === $sourceImage) {
-            Log::debug('Source image false for makeThumb', $fullPath);
+            Log::debug('Source image false for makeThumb', $unixPath);
             return false;
         }
-        $dest = self::getThumbName($fullPath);
+        $dest = self::getThumbName($unixPath);
         // Read source image size.
         $origWidth = imagesx($sourceImage);
         $origHeight = imagesy($sourceImage);
         if (false === $origWidth || false === $origHeight) {
-            Log::debug('Source image dimensions false for makeThumb', [$origWidth, $origHeight, $fullPath]);
+            Log::debug('Source image dimensions false for makeThumb', [$origWidth, $origHeight, $unixPath]);
             return false;
         }
         $newWidth = $origWidth;
@@ -186,7 +118,7 @@ class FileProcessor extends Singleton
         /* Create a new, "virtual" image */
         $virtualImage = imagecreatetruecolor($newWidth, $newHeight);
         if (false === $virtualImage) {
-            Log::debug('Virtual image dimensions false for makeThumb', $fullPath);
+            Log::debug('Virtual image dimensions false for makeThumb', $unixPath);
             return false;
         }
 
@@ -203,13 +135,13 @@ class FileProcessor extends Singleton
                 $origWidth,
                 $origHeight
             )) {
-            Log::debug('imagecopyresampled failed for makeThumb', $fullPath);
+            Log::debug('imagecopyresampled failed for makeThumb', $unixPath);
             return false;
         }
 
         /* Create the physical thumbnail image at its destination */
         if (false === imagejpeg($virtualImage, $dest, 70)) {
-            Log::debug('imagejpeg failed for makeThumb', $fullPath);
+            Log::debug('imagejpeg failed for makeThumb', $unixPath);
             return false;
         }
         Log::debug(
@@ -222,48 +154,46 @@ class FileProcessor extends Singleton
 
     /**
      * Set the sync status of a given entry in the file queue.
-     * @param string $fullPath The path (unique key) of the record to change.
+     * @param string $unixPath The path (unique key) of the record to change.
      * @param SyncStatus $status The new status to give this record.
      * @param string $errorMessage Optional error message to log.
      * @return bool Success.
      */
-    public function setSyncStatus(string $fullPath, SyncStatus $status, string $errorMessage = ''): bool
+    public static function setSyncStatus(string $unixPath, SyncStatus $status, string $errorMessage = ''): bool
     {
         $result = Db::sqlExec(
             'UPDATE `' . Table::file_queue() . '` SET `sync_status` = ?, error_message = ? WHERE full_path = ?',
             'sss',
             $status->value,
             $errorMessage,
-            $fullPath
+            $unixPath
         );
         return !empty($result);
     }
 
     /**
-     * Static callback wrapper.
+     * Endpoint: GET `/api/v1.0/download`. Get the list of new files to download.
      * @return array ['data' => List of file paths.]
      */
     public static function listNewFiles(): array
     {
-        $instance = self::getInstance();
-        return $instance->listFilesByStatus(SyncStatus::NEW);
+        return self::listFilesByStatus(SyncStatus::NEW);
     }
 
     /**
-     * Static callback wrapper.
+     * Endpoint: GET `/api/v1.0/download`. Get the list of files downloaded and ready for postprocessing.
      * @return array ['data' => List of file paths.]
      */
     public static function listDownloadedFiles(): array
     {
-        $instance = self::getInstance();
-        return $instance->listFilesByStatus(SyncStatus::DOWNLOADED);
+        return self::listFilesByStatus(SyncStatus::DOWNLOADED);
     }
 
     /**
      * Get the list of files in a certain `sync_status`.
      * @return string[] List of file paths.
      */
-    public function listFilesByStatus(SyncStatus $status): array
+    public static function listFilesByStatus(SyncStatus $status): array
     {
         $data = Db::sqlGetList(
             'full_path',
@@ -283,7 +213,7 @@ class FileProcessor extends Singleton
      * Get the first of a list of files in a certain `sync_status`.
      * @return string List of file paths.
      */
-    private function listFirstFileByStatus(SyncStatus $status): string
+    private static function listFirstFileByStatus(SyncStatus $status): string
     {
         return Db::sqlGetValue(
             'full_path',
@@ -300,28 +230,27 @@ class FileProcessor extends Singleton
     }
 
     /**
-     * Download the first file from the file queue table.
+     * Endpoint: POST `/api/v1.0/download`. Download the first pending file from the file queue table.
      * @return array API response array, not yet JSON encoded.
      */
     public static function downloadNextFile(): array
     {
         $dropbox = DropboxManager::getInstance();
-        $instance = self::getInstance();
-        $untrimmedPath = $instance->listFirstFileByStatus(SyncStatus::NEW);
+        $untrimmedPath = self::listFirstFileByStatus(SyncStatus::NEW);
 
-        $fullPath = ltrim($untrimmedPath, '/\\');
+        $unixPath = ltrim($untrimmedPath, '/\\');
         // If the dir doesn't exist, then create it.
-        $dir = dirname($fullPath);
+        $dir = dirname($unixPath);
         // Repeat is_dir() check twice to ensure it either exists, or got created.
         if (!is_dir($dir) && !mkdir($dir, 0700, true) && !is_dir($dir)) {
             $error = "mkdir($dir,0700,true) failed";
-            $instance->setSyncStatus($fullPath, SyncStatus::ERROR, $error);
-            Log::error($error, $fullPath);
+            self::setSyncStatus($unixPath, SyncStatus::ERROR, $error);
+            Log::error($error, $unixPath);
             return ['status' => 500, 'data' => "Error: $error"];
         }
         // Download the file from Dropbox. If it already exists, it might've been edited, so we get it anyway.
         $url = $dropbox->getTemporaryLink($untrimmedPath); // Requires NON-trimmed full path!
-        $result = $dropbox->downloadFromUrl($url, $fullPath);
+        $result = $dropbox->downloadFromUrl($url, $unixPath);
         // Update the DB to DOWNLOADED or ERROR.
         if ($result) {
             $syncStatus = SyncStatus::DOWNLOADED;
@@ -332,7 +261,7 @@ class FileProcessor extends Singleton
             $error = 'False result from downloadFromUrl.';
             $httpStatus = 500;
         }
-        $instance->setSyncStatus($fullPath, $syncStatus, $error);
+        self::setSyncStatus($unixPath, $syncStatus, $error);
         $data = $error ? "Error: $error" : 'OK';
         return ['status' => $httpStatus, 'data' => $data];
     }

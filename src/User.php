@@ -53,8 +53,7 @@ class User extends Singleton
     }
 
     /**
-     * API callback.
-     * Attempt to authenticate the user using POST data.
+     * Endpoint: POST `/api/v1.0/login`. Attempt to authenticate the user using POST data.
      * @return array
      */
     public static function handleUserLogin(): array
@@ -178,7 +177,7 @@ class User extends Singleton
     }
 
     /**
-     * Adds a new user to the users table.
+     * Endpoint: POST `/api/v1.0/user`. Add a new user to the users table.
      * Sets status 500 if the user already exists, or an error occurs.
      * @param array $params ['username' => {string}, 'password' => {string}]
      * @return array ['status' => {int Http Status}, 'data' => 'OK' or 'Error: {string reason}'].
@@ -218,7 +217,7 @@ class User extends Singleton
     }
 
     /**
-     * Updates or inserts a user's password in the `.htpasswd` file. This also enables the user if disabled.
+     * Endpoint: PUT `/api/v1.0/user`. Update a user's password, re-enabling them if disabled.
      * @param array $params ['username' => {string}, 'password' => {string}]
      * @return array ['status' => {int Http Status}, 'data' => 'OK' or 'Error: {string reason}'].
      */
@@ -254,7 +253,7 @@ class User extends Singleton
     }
 
     /**
-     * Delete/disable a user.
+     * Endpoint: DELETE `/api/v1.0/user`. Delete/disable a user.
      * @param array $params ['username' => {string}]
      * @return array ['status' => {int Http Status}, 'data' => 'OK' or 'Error: {string reason}'].
      */
@@ -287,7 +286,7 @@ class User extends Singleton
     }
 
     /**
-     * Get all users, including disabled ones.
+     * Endpoint: GET `/api/v1.0/users`. Get all users, including disabled ones.
      * @return array `['status' => 200, 'data' => [['username'=>"...", 'comment'=>"..." ]...]]`
      * On failure, `['status' => 500, 'data' => 'Error: ...']` or similar.
      */

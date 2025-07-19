@@ -72,6 +72,7 @@ class DropboxManager extends Singleton
     }
 
     /**
+     * Endpoint: POST `/api/v1.0/cursor`
      * Initialize the cursor, and get the start of the list of all files for this website. Might be LONG.
      * @return array ['data' => [List of file details]].
      */
@@ -97,6 +98,7 @@ class DropboxManager extends Singleton
     }
 
     /**
+     * Endpoint: GET `/api/v1.0/cursor`
      * Get a page of updated files for the given cursor.
      * @return array ['data' => [Details of what was done]].
      */

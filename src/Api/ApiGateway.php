@@ -63,15 +63,12 @@ Log::debug('Starting up API gateway', $_REQUEST); // DELETEME DEBUG
             $this->rateLimit($endpointDef);
 
             // Get our parameters from every possible source. Later sources overwrite earlier ones.
-Log::debug('Getting GET params', $_GET);// DELETEME DEBUG
             $params = array_merge(
                 $this->getPathParams($endpointDef),
                 $_GET,
                 $this->getJsonParams()
             );
-Log::debug('Merged params', $params);// DELETEME DEBUG
             $this->validateRequiredParams($endpointDef, $params);
-Log::debug('Validated params');// DELETEME DEBUG
 
             /** @var Callable $callback */
             $callback = $endpointDef['callback'];

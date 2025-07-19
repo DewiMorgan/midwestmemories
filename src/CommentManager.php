@@ -18,7 +18,7 @@ class CommentManager extends Singleton
     }
 
     /**
-     * POST `/api/v1.0/comment`: add a comment.
+     * Endpoint: POST `/api/v1.0/comment`: add a comment.
      * @param array $params as `['file_id' => '1', 'comment_text' => 'text', path' => 'comments', ...]`.
      * @return array The output of the API call, not yet converted to JSON.
      * ToDo: verification that the file exists.
@@ -79,7 +79,7 @@ class CommentManager extends Singleton
     }
 
     /**
-     * DELETE `/api/v1.0/comment` endpoint marks a comment as soft-deleted.
+     * Endpoint: DELETE `/api/v1.0/comment` endpoint marks a comment as soft-deleted.
      * @param array $params as `['id' => '1']`.
      * @return array The output of the API call, not yet converted to JSON.
      */
@@ -107,7 +107,7 @@ class CommentManager extends Singleton
     }
 
     /**
-     * PUT `/api/v1.0/comment`: edit a comment.
+     * Endpoint: PUT `/api/v1.0/comment`: edit a comment.
      * @param array $params as `['id' => '1', 'new_comment_text' => 'text']`.
      * @return array The output of the API call, not yet converted to JSON.
      */
@@ -137,7 +137,7 @@ class CommentManager extends Singleton
     }
 
     /**
-     * GET `/api/v1.0/comment`: return one page of comments for the current file.
+     * Endpoint: GET `/api/v1.0/comment`: return one page of comments for the current file.
      * @param array $params as `['file_id' => '1', 'page_id' => '2', ...]`.
      * @param int $pageSize Only there for unit tests. API uses default value.
      * @return array One page of comments as:
