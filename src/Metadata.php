@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
-use Exception;
 use MidwestMemories\Enum\Key;
-use SplFileObject;
 
 /**
  * Purely static class to handle moving metadata between ini files, DB, web display, and web form.
@@ -139,8 +137,8 @@ class Metadata
      * @return bool Success.
      *
      * Header can contain:
-     * 'Filename YYYYMMDD - Origin - #','Origin','Number','Bundle','Slide Txt','ICE?','Directory',,
-     * 'Filename YYYYMMDD - Origin - #','Origin','Number','Subsection','Slide Txt','ICE?','Directory',,
+     * "'Filename YYYYMMDD - Origin - #','Origin','Number','Bundle','Slide Txt','ICE?','Directory',,"
+     * "'Filename YYYYMMDD - Origin - #','Origin','Number','Subsection','Slide Txt','ICE?','Directory',,"
      */
     public static function csvToIniFiles(string $unixFilePath): bool
     {
@@ -224,10 +222,14 @@ class Metadata
         array_shift($rows); // Skip the header row.
         $csv = [];
         foreach ($rows as $row) {
+            // Skip rows with missing fields.
+            if (empty($row[5])) {
+                continue;
+            }
+            // Create a structure to store each row.
             $filename = $row[0];              // "Filename" csv column.
             $date = preg_replace('/^(....)(..)(..).*$/', '$1-$2-$3', $filename);
-            $fileDetails = [];
-            $fileDetails["$filename.jpg"] = [
+            $fileDetails = [
                 'date' => $date,
                 'displayname' => $filename,
                 'slideorigin' => $row[1],     // "Origin" csv column.
@@ -243,7 +245,7 @@ class Metadata
                 $csv[$unixPath] = [];
             }
             // Add this file's details to the directory's entry.
-            $csv[$unixPath][] = $fileDetails;
+            $csv[$unixPath]["$filename.jpg"] = $fileDetails;
         }
         return $csv;
     }
@@ -262,6 +264,8 @@ class Metadata
                 if (!$result) {
                     Log::error('Failed to create directory ' . $unixPath);
                     return false;
+                } else {
+                    Log::debug('Created directory ' . $unixPath);
                 }
             }
 
@@ -274,10 +278,22 @@ class Metadata
             }
 
             // Write the updated (or new) INI file.
-            $writeResult = file_put_contents($unixPath . '/index.txt', implode("\n\n", $fileDetailList), FILE_APPEND);
+            $iniText = '';
+            foreach ($fileDetailList as $filename => $fileDetail) {
+                $iniText .= "[$filename]\n";
+                foreach ($fileDetail as $key => $value) {
+                    $iniText .= "$key = $value\n";
+                }
+                $iniText .= "\n\n";
+                $fileDetail['filename'] = $filename;
+            }
+
+            $writeResult = file_put_contents($unixPath . '/index.txt', $iniText, FILE_APPEND);
             if (false === $writeResult) {
                 Log::error('Failed to write INI file ' . $unixPath . '/index.txt');
                 return false;
+            } else {
+                Log::debug('Wrote INI file ' . $unixPath . '/index.txt');
             }
         }
         return true;

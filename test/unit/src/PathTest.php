@@ -1,8 +1,10 @@
 <?php
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
+namespace src;
+
 use MidwestMemories\Path;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Test natural sorting of filenames.

@@ -3,8 +3,6 @@
 /** @noinspection PhpEnforceDocCommentInspection */
 declare(strict_types=1);
 
-namespace Test\Unit;
-
 use MidwestMemories\JsCompiler;
 use PHPUnit\Framework\TestCase;
 

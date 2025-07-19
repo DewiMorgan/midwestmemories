@@ -4,8 +4,11 @@
 
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
+namespace src;
+
+use InvalidArgumentException;
 use MidwestMemories\Singleton;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Concrete test subclass of Singleton for testing.
