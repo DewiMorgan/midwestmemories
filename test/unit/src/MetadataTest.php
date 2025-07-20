@@ -8,6 +8,7 @@ namespace MidwestMemories\Test;
 use MidwestMemories\Metadata;
 use MidwestMemories\Path;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 /**
  * @covers \MidwestMemories\Metadata
@@ -280,5 +281,39 @@ CSV;
         $expectedPath = $this->testDir . '/test/dir/./dir';
         $keys = array_keys($result);
         static::assertContains($expectedPath, $keys, 'Should normalize directory path');
+    }
+
+    /**
+     * Test getting file data when the file doesn't exist and loadIfNotFound is false.
+     */
+    public function testGetFileDataByWebPath_NonExistentFile(): void
+    {
+        // Test with loadIfNotFound = false
+        $result = Metadata::getFileDataByWebPath('/non/existent/file.jpg', false);
+
+        // Should return an empty array when not found.
+        static::assertSame([], $result);
+    }
+
+    /**
+     * Verify htmlEscape correctly escapes HTML special characters.
+     */
+    public function testHtmlEscape_WithSpecialCharacters(): void
+    {
+        $input = [
+            'displayname' => 'Test & Image',
+            'slideorigin' => 'Test <Origin>',
+            'writtennotes' => 'Notes with "quotes" & special chars',
+            'slidenumber' => '1',
+            'date' => ['dateString' => '2023-01-01']
+        ];
+
+        $result = Metadata::htmlEscape($input);
+
+        static::assertSame('Test &amp; Image', $result['displayname']);
+        static::assertSame('Test &lt;Origin&gt;', $result['slideorigin']);
+        static::assertSame('Notes with &quot;quotes&quot; &amp; special chars', $result['writtennotes']);
+        static::assertSame('1', $result['slidenumber']);
+        static::assertSame('2023-01-01', $result['date']);
     }
 }

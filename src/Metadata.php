@@ -69,13 +69,11 @@ class Metadata
         foreach ($segments as $segment) {
             if (is_array($currentLevel) && array_key_exists($segment, $currentLevel)) {
                 $currentLevel = $currentLevel[$segment]; // Go one level deeper
-            } else {
-                if ($loadIfNotFound) {
-                    self::loadFromInis(dirname($webFilePath));
-                    return self::getFileDataByWebPath($webFilePath, false);
-                }
-                return [];
+            } elseif ($loadIfNotFound) {
+                self::loadFromInis(dirname($webFilePath));
+                return self::getFileDataByWebPath($webFilePath, false);
             }
+            return [];
         }
 
         if ($currentLevel === self::$folderTree) {
