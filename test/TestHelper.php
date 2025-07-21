@@ -134,6 +134,8 @@ class TestHelper
      */
     public static function request(string $method, string $uri, array $params = [], array $headers = []): array
     {
+//echo 'method: ' . $method . ', uri: ' . $uri . ', params: ' . json_encode($params) . ', headers: '
+// . json_encode($headers) . "\n"; // DELETEME DEBUG
         /** @noinspection HttpUrlsUsage */
         $url = sprintf('http://%s:%d%s', self::$host, self::$port, $uri);
 

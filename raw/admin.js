@@ -1,4 +1,4 @@
-/* Version: 1 */
+/* Version: 2 */
 
 
 /* Source: Api.js */
@@ -27,7 +27,7 @@ window.Api = class {
             options.body = JSON.stringify(payload);
         }
 
-        console.log(`Fetch()ing API call ${method} ${url} ${expectedType}`, options); // DELETEME DEBUG
+        //console.log(`Fetch()ing API call ${method} ${url} ${expectedType}`, options); // DELETEME DEBUG
         const response = await fetch(url, options);
 
         if (!response.ok) {
@@ -610,3 +610,4 @@ function runAdminTasks() {
 
 // Wait for the DOM to be fully loaded before running admin tasks.
 document.addEventListener('DOMContentLoaded', runAdminTasks);
+

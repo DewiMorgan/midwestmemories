@@ -67,7 +67,9 @@ window.Comments = class {
         let totalPages = 1; // Start assuming only 1 page until we know otherwise.
 
         do {
-            console.log(`Fetch()ing all comments via: /api/v1.0/comment?file_id=${fileId}&page_id=${currentPage}`); // DELETEME DEBUG
+            //console.log(
+            // `Fetch() comments: /api/v1.0/comment?file_id=${fileId}&page_id=${currentPage}`
+            // ); // DELETEME DEBUG
             const response = await fetch(
                 `/api/v1.0/comment?file_id=${fileId}&page_id=${currentPage}`,
                 {credentials: 'same-origin'}
@@ -103,7 +105,7 @@ window.Comments = class {
      */
     async postComment(commentText) {
         const fileId = this.getFileId();
-        console.log(`Fetch()ing result fo posting comment to /api/v1.0/comment?file_id=${fileId}`); // DELETEME DEBUG
+        //console.log(`Fetch()ing result fo posting comment to /api/v1.0/comment?file_id=${fileId}`); // DELETEME DEBUG
         const response = await fetch(`/api/v1.0/comment?file_id=${fileId}`, {
             method: 'POST',
             headers: {

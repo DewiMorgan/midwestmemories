@@ -41,14 +41,14 @@ class Conf extends Singleton
 
         // Parse the Dropbox INI file.
         if (!$dropboxConfig = self::readIniInParents(self::DROPBOX_INI_FILE)) {
-            Log::debug('Dropbox Auth information could not be read.');
+//            Log::debug('Dropbox Auth information could not be read.');
             die(1);
         }
         self::parseIniFileKey(Key::DROPBOX_KEY, $dropboxConfig);
         self::parseIniFileKey(Key::DROPBOX_SECRET, $dropboxConfig);
         self::parseIniFileKey(Key::DROPBOX_USER_ID, $dropboxConfig);
         self::parseIniFileKey(Key::DROPBOX_REFRESH_TOKEN, $dropboxConfig);
-        self::parseIniFileKey(Key::DROPBOX_PATH_PREFIX, $dropboxConfig);
+        self::parseIniFileKey(Key::DROPBOX_PATH_PREFIX, $dropboxConfig, '/midwestmemories/');
     }
 
     /**
@@ -69,9 +69,9 @@ class Conf extends Singleton
      */
     private function getValue(Key $key): ?string
     {
-        if ($key === Key::MYSQL_PREFIX) {
-            Log::debug('Data',$this->data);
-        }
+//        if ($key === Key::MYSQL_PREFIX) {
+//            Log::debug('Data',$this->data);
+//        }
         return $this->data[$key->value] ?? null;
     }
 
@@ -88,7 +88,7 @@ class Conf extends Singleton
         } elseif (!is_null($default)) {
             $this->data[$key->value] = $default;
         } else {
-            Log::debug('Config entry could not be found and there was no default:' . $key->value);
+//            Log::debug('Config entry could not be found and there was no default:' . $key->value);
             die(1);
         }
     }
@@ -104,16 +104,16 @@ class Conf extends Singleton
     {
         $dir = getcwd();
         while ($dir !== '/') {
-//            if ($filename == self::MYSQL_INI_FILE) { // DELETEME DEBUG
-//                if (!array_key_exists('Debugging', $this->data)) {
-//                    $this->data['Debugging'] = '';
-//                }
-//                $this->data['Debugging'] .= 'Checked for ' . $dir . '/' . $filename;
-//            }
+            if ($filename == self::MYSQL_INI_FILE) { // DELETEME DEBUG
+                if (!array_key_exists('Debugging', $this->data)) {
+                    $this->data['Debugging'] = '';
+                }
+                $this->data['Debugging'] .= 'Checked for ' . $dir . '/' . $filename;
+            }
             if (file_exists($dir . '/' . $filename)) {
-//                if ($filename == self::MYSQL_INI_FILE) { // DELETEME DEBUG
-//                    $this->data['Debugging'] .= 'Found ' . $dir . '/' . $filename;
-//                }
+                if ($filename == self::MYSQL_INI_FILE) { // DELETEME DEBUG
+                    $this->data['Debugging'] .= 'Found ' . $dir . '/' . $filename;
+                }
                 return parse_ini_file($dir . '/' . $filename);
             }
             $dir = dirname($dir);

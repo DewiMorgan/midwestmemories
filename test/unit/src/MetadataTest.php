@@ -101,13 +101,13 @@ CSV;
 
         $expectedContent = <<<INI
 [20230719 - Test - 1.jpg]
-date = 2023-07-19
-displayname = 20230719 - Test - 1
-slideorigin = Test Origin
-slidenumber = 1
-slidesubsection = Test Bundle
-writtennotes = Test Notes
-filtered = No
+date = "2023-07-19"
+displayname = "20230719 - Test - 1"
+slideorigin = "Test Origin"
+slidenumber = "1"
+slidesubsection = "Test Bundle"
+writtennotes = "Test Notes"
+filtered = "No"
 INI;
 
         $actualContent = file_get_contents($iniPath);

@@ -102,7 +102,6 @@ class JsCompilerTest extends TestCase
             $outputFile,
             self::TEST_JS_DIR . '/'
         );
-
         static::assertFalse($result);
         static::assertFileDoesNotExist($outputFile);
     }

@@ -106,7 +106,7 @@ window.TreeView = class {
      * @returns {Promise<Document>}
      */
     async fetchRemoteDocument(url) {
-        console.log(`Fetch()ing remote document v3: ${url}`); // DELETEME DEBUG
+        //console.log(`Fetch()ing remote document v3: ${url}`); // DELETEME DEBUG
         let html = '';
         try {
             const response = await fetch(url, {credentials: 'same-origin'});

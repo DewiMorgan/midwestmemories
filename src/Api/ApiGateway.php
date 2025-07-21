@@ -32,7 +32,7 @@ class ApiGateway
 
     public function __construct()
     {
-Log::debug('Starting up API gateway', $_REQUEST); // DELETEME DEBUG
+//Log::debug('Starting up API gateway', $_REQUEST); // DELETEME DEBUG
         // Get method and request path.
         $this->method = $_SERVER['REQUEST_METHOD'];
         // API version gets put into the GET params by .htaccess mod_rewrite.
@@ -77,7 +77,9 @@ Log::debug('Starting up API gateway', $_REQUEST); // DELETEME DEBUG
             $callback = $endpointDef['callback'];
 
             Log::info("Calling callback for $this->method /$this->path");
+Log::debug($this->path . ' ' . $this->method, $endpointDef);
             $result = call_user_func($callback, $params);
+Log::debug('');
             Log::debug('Result', $result);
 
             $this->jsonResponse($result['status'] ?? 200, $result['data'] ?? []);
@@ -154,7 +156,6 @@ Log::debug('Starting up API gateway', $_REQUEST); // DELETEME DEBUG
      */
     private function getPathParams(array $endpoint): array
     {
-        Log::debug("Reading path params for $this->path as `$this->pathParams`", $endpoint); // DELETEME DEBUG
         // Example: 'fred/abc/unnamed' -> ['user', 'fred', 'abc', 'unnamed'].
         $params = array_values(array_filter(explode('/', $this->pathParams)));
 
@@ -171,7 +172,7 @@ Log::debug('Starting up API gateway', $_REQUEST); // DELETEME DEBUG
                 }
             }
         }
-        Log::debug('= Read', $params); // DELETEME DEBUG
+        // Log::debug('= Read', $params); // DELETEME DEBUG
 
         return $params;
     }
@@ -182,16 +183,16 @@ Log::debug('Starting up API gateway', $_REQUEST); // DELETEME DEBUG
      */
     private function getJsonParams(): array
     {
-        Log::debug("Reading JSON params for `$this->path`"); // DELETEME DEBUG
-        if (!in_array($this->method, ['POST', 'PUT', 'PATCH'])) {
-            Log::debug('= Empty: not POST/PUT/PATCH.'); // DELETEME DEBUG
+        //Log::debug("Reading JSON params for `$this->path`"); // DELETEME DEBUG
+        if (!in_array($this->method, ['POST', 'PUT', 'PATCH', 'DELETE'])) {
+            Log::warn('API method unknown: not POST/PUT/PATCH/DELETE.'); // DELETEME DEBUG
             return [];
         }
 
         $raw = file_get_contents('php://input');
-        Log::debug('= Raw params', $raw);// DELETEME DEBUG
+        //Log::debug('= Raw params', $raw);// DELETEME DEBUG
         $decoded = json_decode($raw, true);
-        Log::debug('= Decoded params', $decoded);// DELETEME DEBUG
+        //Log::debug('= Decoded params', $decoded);// DELETEME DEBUG
 
         // If it isn't JSON, try to parse it as a query string.
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -202,7 +203,7 @@ Log::debug('Starting up API gateway', $_REQUEST); // DELETEME DEBUG
             Log::warn('Expected JSON or encoded object, got something else.');
             $this->jsonResponse(400, 'Expected JSON object.');
         }
-        Log::debug('= Read', $decoded); // DELETEME DEBUG
+        //Log::debug('= Read', $decoded); // DELETEME DEBUG
         return $decoded;
     }
 
@@ -250,7 +251,7 @@ Log::debug('Starting up API gateway', $_REQUEST); // DELETEME DEBUG
         $message = '';
         if ($missing) {
             $message = 'Missing parameters: ' . implode(', ', $missing) . '. ';
-            Log::warn($message);
+            Log::warn($message, $params);
         }
 
         if ($invalid) {
@@ -274,14 +275,12 @@ Log::debug('Starting up API gateway', $_REQUEST); // DELETEME DEBUG
      */
     #[NoReturn] private function jsonResponse(int $statusCode, array|string $body): void
     {
-Log::debug("$statusCode", $body);// DELETEME DEBUG
         http_response_code($statusCode);
         if ($statusCode < 400) {
             $output = json_encode(['success' => true, 'data' => $body]);
         } else {
             $output = json_encode(['success' => false, 'error' => $body]);
         }
-Log::debug($output);// DELETEME DEBUG
         echo $output;
         exit;
     }
