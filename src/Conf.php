@@ -104,10 +104,9 @@ class Conf extends Singleton
     {
         $dir = getcwd();
         while ($dir !== '/') {
-Log::debug('Checking for ' . $dir . '/' . $filename);
+            $this->data['Debugging'] .= 'Checked for ' . $dir . '/' . $filename;
             if (file_exists($dir . '/' . $filename)) {
-Log::debug('Found ' . $dir . '/' . $filename);
-                $this->data['Debugging'] = $dir . '/' . $filename;
+                $this->data['Debugging'] .= 'Found ' . $dir . '/' . $filename;
                 return parse_ini_file($dir . '/' . $filename);
             }
             $dir = dirname($dir);
