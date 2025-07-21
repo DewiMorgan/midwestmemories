@@ -104,6 +104,9 @@ class Conf extends Singleton
     {
         $dir = getcwd();
         while ($dir !== '/') {
+            if (!array_key_exists('Debugging', $this->data)) {
+                $this->data['Debugging'] = '';
+            }
             $this->data['Debugging'] .= 'Checked for ' . $dir . '/' . $filename;
             if (file_exists($dir . '/' . $filename)) {
                 $this->data['Debugging'] .= 'Found ' . $dir . '/' . $filename;
