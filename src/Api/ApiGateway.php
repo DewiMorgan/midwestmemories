@@ -11,6 +11,7 @@ use JetBrains\PhpStorm\NoReturn;
 use MidwestMemories\Db;
 use MidwestMemories\Enum\ParamTypes;
 use MidwestMemories\Log;
+use MidwestMemories\Path;
 use MidwestMemories\Table;
 use MidwestMemories\User;
 use ValueError;
@@ -57,6 +58,8 @@ Log::debug('Starting up API gateway', $_REQUEST); // DELETEME DEBUG
      */
     public function handleApiCall(): void
     {
+        // Make sure we know what our paths are.
+        Path::validateBaseDir();
         try {
             $endpointDef = $this->getEndpointDefinition();
             $this->authorize($endpointDef);
