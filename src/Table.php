@@ -27,6 +27,7 @@ class Table
     {
         if (!isset(self::$prefix) || self::$prefix === '') {
             self::$prefix = Conf::get(Key::MYSQL_PREFIX) ?? 'midmem_';
+            Log::debug('Set table prefix to ' . self::$prefix);
         }
         return self::$prefix . $name;
     }
