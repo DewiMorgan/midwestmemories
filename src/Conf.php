@@ -103,9 +103,7 @@ class Conf extends Singleton
         $dir = getcwd();
         while ($dir !== '/') {
             if (file_exists($dir . '/' . $filename)) {
-                if (self::MYSQL_INI_FILE == $filename) {
-                    echo('Found INI file ' . $dir . '/' . $filename);
-                }
+                $this->data['Debugging'] = $dir . '/' . $filename;
                 return parse_ini_file($dir . '/' . $filename);
             }
             $dir = dirname($dir);
