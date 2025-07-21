@@ -69,9 +69,9 @@ class Conf extends Singleton
      */
     private function getValue(Key $key): ?string
     {
-//        if ($key === Key::MYSQL_PREFIX) {
-//            Log::debug('Data',$this->data);
-//        }
+        if ($key === Key::MYSQL_PREFIX) {
+            Log::debug('mysql_prefix Data',$this->data);
+        }
         return $this->data[$key->value] ?? null;
     }
 

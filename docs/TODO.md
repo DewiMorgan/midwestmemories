@@ -2,6 +2,7 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
+* BUG: `midtest_` prefix is not applied to DB tables.
 * BUG: Missing '/' entry in MetadataCleaner.
 * BUG: CSV-generated INI files are not correctly quoted.
 * Find out what I broke
