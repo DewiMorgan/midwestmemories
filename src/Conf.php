@@ -29,7 +29,7 @@ class Conf extends Singleton
 
         // Parse the MySQL INI file.
         if (!$mysqlConfig = self::readIniInParents(self::MYSQL_INI_FILE)) {
-            Log::debug('MySQL Auth information could not be read.');
+//            Log::debug('MySQL Auth information could not be read.');
             die(1);
         }
         self::parseIniFileKey(Key::MYSQL_HOST, $mysqlConfig);
