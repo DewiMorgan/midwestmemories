@@ -50,6 +50,9 @@ class MetadataCleaner
         }
 
         $names = [];
+        if (!isset($data['/'])) {
+            Log::debug('Missing slash entry in cleanDirData', $data);
+        }
         foreach ($data['/'] as $key => $item) {
             $strippedKey = strtolower(preg_replace('/[^a-z0-9.]/', '', $key));
 
