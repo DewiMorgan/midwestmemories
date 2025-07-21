@@ -104,16 +104,16 @@ class Conf extends Singleton
     {
         $dir = getcwd();
         while ($dir !== '/') {
-            if ($filename == self::MYSQL_INI_FILE) { // DELETEME DEBUG
-                if (!array_key_exists('Debugging', $this->data)) {
-                    $this->data['Debugging'] = '';
-                }
-                $this->data['Debugging'] .= 'Checked for ' . $dir . '/' . $filename;
-            }
+//            if ($filename == self::MYSQL_INI_FILE) { // DELETEME DEBUG
+//                if (!array_key_exists('Debugging', $this->data)) {
+//                    $this->data['Debugging'] = '';
+//                }
+//                $this->data['Debugging'] .= 'Checked for ' . $dir . '/' . $filename;
+//            }
             if (file_exists($dir . '/' . $filename)) {
-                if ($filename == self::MYSQL_INI_FILE) { // DELETEME DEBUG
-                    $this->data['Debugging'] .= 'Found ' . $dir . '/' . $filename;
-                }
+//                if ($filename == self::MYSQL_INI_FILE) { // DELETEME DEBUG
+//                    $this->data['Debugging'] .= 'Found ' . $dir . '/' . $filename;
+//                }
                 return parse_ini_file($dir . '/' . $filename);
             }
             $dir = dirname($dir);
