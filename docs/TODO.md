@@ -2,9 +2,13 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
+* BUG: Missing '/' entry in MetadataCleaner.
+* BUG: CSV-generated INI files are not correctly quoted.
+
 * DONE: Get CSV files auto-parsing.
 * DONE: Call parser on ini files as they are added from Dropbox.
-* Write tests for
+* Write tests for ini parser.
+
   
 
 

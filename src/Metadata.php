@@ -280,7 +280,9 @@ class Metadata
             foreach ($fileDetailList as $filename => $fileDetail) {
                 $iniText .= "[$filename]\n";
                 foreach ($fileDetail as $key => $value) {
-                    $iniText .= "$key = $value\n";
+                    // Escape quotes in value, then quote it for the INI file.
+                    preg_replace('/"/', '\\"', $value);
+                    $iniText .= $key . ' = "' . $value . '"' . "\n";
                 }
                 $iniText .= "\n\n";
                 $fileDetail['filename'] = $filename;
