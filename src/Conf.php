@@ -37,6 +37,7 @@ class Conf extends Singleton
         self::parseIniFileKey(Key::MYSQL_NAME, $mysqlConfig);
         self::parseIniFileKey(Key::MYSQL_USER, $mysqlConfig);
         self::parseIniFileKey(Key::MYSQL_PASS, $mysqlConfig);
+        self::parseIniFileKey(Key::MYSQL_PREFIX, $mysqlConfig, 'midmem_');
 
         // Parse the Dropbox INI file.
         if (!$dropboxConfig = self::readIniInParents(self::DROPBOX_INI_FILE)) {
@@ -47,6 +48,7 @@ class Conf extends Singleton
         self::parseIniFileKey(Key::DROPBOX_SECRET, $dropboxConfig);
         self::parseIniFileKey(Key::DROPBOX_USER_ID, $dropboxConfig);
         self::parseIniFileKey(Key::DROPBOX_REFRESH_TOKEN, $dropboxConfig);
+        self::parseIniFileKey(Key::DROPBOX_PATH_PREFIX, $dropboxConfig);
     }
 
     /**
@@ -102,7 +104,9 @@ class Conf extends Singleton
     {
         $dir = getcwd();
         while ($dir !== '/') {
+Log::debug('Checking for ' . $dir . '/' . $filename);
             if (file_exists($dir . '/' . $filename)) {
+Log::debug('Found ' . $dir . '/' . $filename);
                 $this->data['Debugging'] = $dir . '/' . $filename;
                 return parse_ini_file($dir . '/' . $filename);
             }
