@@ -103,6 +103,7 @@ class Conf extends Singleton
         $dir = getcwd();
         while ($dir !== '/') {
             if (file_exists($dir . '/' . $filename)) {
+                Log::debug('Found INI file', $dir . '/' . $filename);
                 return parse_ini_file($dir . '/' . $filename);
             }
             $dir = dirname($dir);
