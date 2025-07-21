@@ -34,10 +34,10 @@ class FileProcessor
         Log::debug("Processing as $mimeType", $unixPath);
         $success = match ($mimeType) {
             'text/csv' => FileProcessTypes::processCsvFile($unixPath),
-//            'image/gif' => FileProcessTypes::processGifFile($unixPath),
-//            'image/jpeg' => FileProcessTypes::processJpegFile($unixPath),
-//            'image/png' => FileProcessTypes::processPngFile($unixPath),
-//            'text/plain' => FileProcessTypes::processTextFile($unixPath),
+            'image/gif' => FileProcessTypes::processGifFile($unixPath),
+            'image/jpeg' => FileProcessTypes::processJpegFile($unixPath),
+            'image/png' => FileProcessTypes::processPngFile($unixPath),
+            'text/plain' => FileProcessTypes::processTextFile($unixPath),
             default => FileProcessTypes::processOtherFile($unixPath),
         };
         $data = $success ? 'OK' : "Error: failed to process file as $mimeType";
