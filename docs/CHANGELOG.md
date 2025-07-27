@@ -3,6 +3,22 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/07/27 Sun
+
+* DONE: Move QA/Live to start of page title (hidden in live public pages).
+* DONE: Refactor Metadata cleaning for maintainability.
+* DONE: Correctly handle ini files with no '/' element.
+
+## 2025/07/20 Sun
+
+* FIXED: BUG: `midtest_` prefix is not applied to DB tables.
+* FIXED: BUG: Missing '/' entry in MetadataCleaner. (or at least, the error has gone away).
+* FIXED: BUG: CSV-generated INI files are not correctly quoted.
+* FIXED: The webside returns 503 (Service Unavailable). I think this was a pathing error.
+* DONE: Get CSV files auto-parsing.
+* DONE: Call parser on ini files as they are added from Dropbox.
+* DONE: Write tests for ini parser.
+
 ## 2025/07/08 Sat
 
 * DONE: Move TreeTemplate into /templates folder.
@@ -36,7 +52,7 @@ which might not be when they were actually implemented/committed.
 * DONE: User endpoints return a string, should maybe return an object like the file endpoints?
 * DONE: Change endpoints to be loaded into PHP as a class or config file or something.
 * DONE: make API errors not return 200 OK.
-* SKIPPED: In add users, grey out save button until both username and password are filled? (no, just show errors.)
+* SKIPPED: In add users, grey out the 'save' button until both username and password are filled? (no, just show errors.)
 * SKIPPED: Handle/prevent users setting their passwords to the string 'DISABLED'. (disabled is now a DB flag.)
 * SKIPPED: Opa's slide folders are not showing up (site was just slow).
 
@@ -94,13 +110,13 @@ Unfortunately, midnight.
 
 ## 2025/06/20 Sat
 
-* Items moved over from README's "How it should work (Phase 1)" section:
+* Items moved over from `README.md`'s "How it should work (Phase 1)" section:
     * Initially, params. Later, mod-rewrite.
     * path: path to folder. (later, search=search terms)
     * In folders: index.txt file (or HTML?) contains default values.
     * Display breadcrumb, album notes, and all images as thumbs in a fluid table. Likely need to generate thumbnails.
     * Clicking individual images shows image details and the image.
-* Items moved over from README's "Planned Features" section:
+* Items moved over from `README.md`'s "Planned Features" section:
     * DONE: Get namespaces and autoloading working per PSR.
     * DONE: Get testing working (again check PSR).
     * DONE: Hierarchical nav with breadcrumbs.

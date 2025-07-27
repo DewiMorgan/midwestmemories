@@ -63,7 +63,7 @@ $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
         <link rel="icon" href="/favicon-test.ico" type="image/x-icon">
     <?php } ?>
     <meta charset="utf-8">
-    <title>Web Shell - <?php echo $isLiveSite ? 'Live Site' : 'Test Site' ?></title>
+    <title><?php echo $isLiveSite ? 'Live' : 'QA' ?>: Web Shell</title>
     <style>
         * {
             -webkit-box-sizing: border-box;

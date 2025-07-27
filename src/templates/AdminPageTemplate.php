@@ -10,8 +10,6 @@ declare(strict_types=1);
  * @var int $i_scriptVersion The version of the admin.js file.
  */
 
-use MidwestMemories\Path;
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,7 +23,7 @@ use MidwestMemories\Path;
     <?php } else { ?>
         <link rel="icon" href="/favicon-test.ico" type="image/x-icon">
     <?php } ?>
-    <title>Admin: Midwest Memories - <?= ($isLiveSite ? 'Live Site' : 'Test Site') ?></title>
+    <title><?= ($isLiveSite ? 'Live' : 'QA') ?> Admin: Midwest Memories</title>
     <meta charset="UTF-8">
     <!--suppress HtmlUnknownTarget -->
     <link rel="stylesheet" href="/raw/admin.css">

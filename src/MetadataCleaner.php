@@ -37,77 +37,27 @@ class MetadataCleaner
     ];
 
     /**
-     * Clean up a directory array, removing anything "dirty"/unexpected, parsing non-string types, etc.
+     * Clean one level of ini file in a folder, removing anything "dirty"/unexpected, parsing non-strings, etc.
      * @param array $data The data to clean.
      * @return array The cleaned data.
      */
-    public static function cleanDirData(array $data): array
+    public static function cleanIniData(array $data): array
     {
-        // Initialize the keys in our data.
-        $newDirData = [];
-        foreach (self::DIR_KEY_NAMES as $key) {
-            $newDirData[$key] = null;
-        }
-
-        $names = [];
-        if (!isset($data['/'])) {
-            Log::debug('Missing slash entry in cleanDirData', $data);
-        }
-        foreach ($data['/'] as $key => $item) {
-            $strippedKey = strtolower(preg_replace('/[^a-z0-9.]/', '', $key));
-
-            if (!in_array($strippedKey, self::DIR_KEY_NAMES)) {
-                // Todo: handle the versioned comment history keys.
-                Log::warn("Unrecognized dir-level property $key as $strippedKey");
-                continue;
-            }
-
-            switch ($strippedKey) {
-                case 'displayname':
-                case 'source':
-                    $newDirData[$strippedKey] = self::cleanString($item, 255);
-                    break;
-                case 'writtennotes':
-                case 'visitornotes':
-                case 'location':
-                    $newDirData[$strippedKey] = self::cleanString($item);
-                    break;
-                case 'startdate':
-                case 'enddate':
-                    $newDirData[$strippedKey] = self::cleanDate($item);
-                    break;
-                case 'photographer':
-                    $names[$strippedKey] = self::cleanString($item, 255);
-                    break;
-                case 'people':
-                    $names[$strippedKey] = self::cleanCsvLine($item);
-                    break;
-                case 'keywords':
-                    $keywords = self::cleanCsvLine($item);
-                    $newDirData[$strippedKey] = self::cleanKeywords($keywords);
-                    break;
-                default:
-                    Log::warn('dir-level property default:', $key);
+        // Handle the directory data, if any.
+        $newData = [];
+        if (array_key_exists('/', $data)) {
+            if (is_array($data['/'])) {
+                $newData['/'] = self::cleanDirData($data['/']);
             }
         }
-
-        // Swap the dates if they're in the wrong order.
-        if ($newDirData['startdate'] > $newDirData['enddate']) {
-            Log::warn('Start date later than end date: swapping');
-            $tmp = $newDirData['startdate'];
-            $newDirData['startdate'] = $newDirData['enddate'];
-            $newDirData['enddate'] = $tmp;
-        }
-        self::cleanNamesInData($newDirData, $names);
 
         // Clean file sub-arrays, and remove non-array keys.
-        $newData = ['/' => $newDirData];
         foreach ($data as $key => $value) {
             if ('/' !== $key && is_array($value)) {
                 // Filenames may contain only space, hyphen and dot, plus underscore and alphanumerics.
                 $strippedKey = preg_replace('/[^- .\w]/', '', $key);
 
-                // For safety, this file may not be listed.
+                // For safety and non-spamminess, this metadata file isn't listed.
                 if ('index.txt' !== $strippedKey) {
                     $newData[$strippedKey] = self::cleanFileData($value);
                 }
@@ -410,5 +360,66 @@ class MetadataCleaner
         }
 
         return $trimmed;
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    public static function cleanDirData(array $data): array
+    {
+        $newDirData = [];
+        // Initialize the keys in our data.
+        foreach (self::DIR_KEY_NAMES as $key) {
+            $newDirData[$key] = null;
+        }
+        $names = [];
+        foreach ($data as $key => $item) {
+            $strippedKey = strtolower(preg_replace('/[^a-z0-9.]/', '', $key));
+
+            if (!in_array($strippedKey, self::DIR_KEY_NAMES)) {
+                // Todo: handle the versioned comment history keys.
+                Log::warn("Unrecognized dir-level property $key as $strippedKey");
+                continue;
+            }
+
+            switch ($strippedKey) {
+                case 'displayname':
+                case 'source':
+                    $newDirData[$strippedKey] = self::cleanString($item, 255);
+                    break;
+                case 'writtennotes':
+                case 'visitornotes':
+                case 'location':
+                    $newDirData[$strippedKey] = self::cleanString($item);
+                    break;
+                case 'startdate':
+                case 'enddate':
+                    $newDirData[$strippedKey] = self::cleanDate($item);
+                    break;
+                case 'photographer':
+                    $names[$strippedKey] = self::cleanString($item, 255);
+                    break;
+                case 'people':
+                    $names[$strippedKey] = self::cleanCsvLine($item);
+                    break;
+                case 'keywords':
+                    $keywords = self::cleanCsvLine($item);
+                    $newDirData[$strippedKey] = self::cleanKeywords($keywords);
+                    break;
+                default:
+                    Log::warn('dir-level property default:', $key);
+            }
+        }
+
+        // Swap the dates if they're in the wrong order.
+        if ($newDirData['startdate'] > $newDirData['enddate']) {
+            Log::warn('Start date later than end date: swapping');
+            $tmp = $newDirData['startdate'];
+            $newDirData['startdate'] = $newDirData['enddate'];
+            $newDirData['enddate'] = $tmp;
+        }
+        self::cleanNamesInData($newDirData, $names);
+        return $newDirData;
     }
 }

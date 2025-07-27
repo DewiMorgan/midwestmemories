@@ -21,7 +21,7 @@ $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
     <?php } else { ?>
         <link rel="icon" href="/favicon-test.ico" type="image/x-icon">
     <?php } ?>
-    <title><?php echo $isLiveSite ? '<!-- Live Site -->' : 'Test Site'; ?><?php IndexGateway::getSiteName(); ?>
+    <title><?php echo $isLiveSite ? '<!-- Live -->' : 'QA: '; ?><?php IndexGateway::getSiteName(); ?>
         - Folder Tree</title>
     <link rel="stylesheet" href="/raw/user.css">
     <script src="/raw/user.js?v=<?= Path::getScriptVersion(__DIR__ . '/../raw/user.js') ?>"></script>

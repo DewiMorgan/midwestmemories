@@ -1,4 +1,5 @@
 <?php
+/** @noinspection SpellCheckingException */
 
 declare(strict_types=1);
 
@@ -66,14 +67,19 @@ class Metadata
         // Reference to traverse the array.
         $currentLevel = self::$folderTree;
 
+        // Step into the tree until we find our target, or a branch that hasn't been loaded yet.
         foreach ($segments as $segment) {
             if (is_array($currentLevel) && array_key_exists($segment, $currentLevel)) {
-                $currentLevel = $currentLevel[$segment]; // Go one level deeper
+                // This branch is loaded, so step one level deeper.
+                $currentLevel = $currentLevel[$segment];
             } elseif ($loadIfNotFound) {
+                // This branch is not yet loaded, so load it and step one level deeper.
                 self::loadFromInis(dirname($webFilePath));
                 return self::getFileDataByWebPath($webFilePath, false);
+            } else {
+                // This branch is not loaded, and we don't want to.
+                return [];
             }
-            return [];
         }
 
         if ($currentLevel === self::$folderTree) {
@@ -134,9 +140,9 @@ class Metadata
      * @param string $unixFilePath The web path to load the file from.
      * @return bool Success.
      *
-     * Header can contain:
-     * "'Filename YYYYMMDD - Origin - #','Origin','Number','Bundle','Slide Txt','ICE?','Directory',,"
-     * "'Filename YYYYMMDD - Origin - #','Origin','Number','Subsection','Slide Txt','ICE?','Directory',,"
+     * Header rows will be one of (replace ... with any text):
+     * 'Filename YYYYMMDD - Origin - ...','Origin','Number','Bundle','Slide Txt','ICE?','Directory', ...
+     * 'Filename YYYYMMDD - Origin - ...','Origin','Number','Subsection','Slide Txt','ICE?','Directory', ...
      */
     public static function csvToIniFiles(string $unixFilePath): bool
     {
@@ -201,7 +207,7 @@ class Metadata
             die(1);
         }
 
-        return MetadataCleaner::cleanDirData($iniFileData);
+        return MetadataCleaner::cleanIniData($iniFileData);
     }
 
     /**

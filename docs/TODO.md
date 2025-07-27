@@ -2,15 +2,8 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
-* BUG: `midtest_` prefix is not applied to DB tables.
-* BUG: Missing '/' entry in MetadataCleaner.
-* BUG: CSV-generated INI files are not correctly quoted.
-* Find out what I broke
-* Test whether CSVs get re-parsed after being updated.
-
-* DONE: Get CSV files auto-parsing.
-* DONE: Call parser on ini files as they are added from Dropbox.
-* Write tests for ini parser.
+* Make filtered images viewable.
+* Verify CSVs get reparsed after being updated.
 
 * Get folder-level details showing.
 * Faster page loads (smaller initial images?)
