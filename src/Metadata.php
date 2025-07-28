@@ -153,7 +153,6 @@ class Metadata
         return self::writeIniFiles($csv);
     }
 
-
     /**
      * Load in our data from an Ini file, and all parents, into the singleton's $folderTree datastore.
      * @param string $webPath The web path to load the folder tree down to, from the root.
@@ -175,8 +174,7 @@ class Metadata
             if (!array_key_exists('data', $currentNode)) {
                 $currentNode['data'] = [];
             }
-            $webPathSoFar .= '/' . $pathElement;
-            $webPathSoFar = preg_replace('#//#', '/', $webPathSoFar);
+            $webPathSoFar .= Path::join($webPathSoFar, $pathElement);
             if (empty($currentNode['data'])) {
                 $currentNode['data'] = self::loadOneFolderIni($webPathSoFar);
             }
@@ -190,7 +188,7 @@ class Metadata
      */
     private static function loadOneFolderIni(string $webPath): array
     {
-        $iniUnixPath = Path::webToUnixPath(preg_replace('#//#', '/', "$webPath/index.txt"), false);
+        $iniUnixPath = Path::webToUnixPath(Path::join($webPath, 'index.txt'), false);
         if (!file_exists($iniUnixPath)) {
             Log::debug("loadFolderIni found no ini from webPath $webPath at unix path", $iniUnixPath);
             // Can't print this as we call it for every parent/ancestor folder, too.
@@ -243,7 +241,7 @@ class Metadata
                 'filtered' => $row[5],        // "ICE?" csv column.
             ];
             // "Directory" csv column. Clean up slashes and dots.
-            $unixPath = preg_replace(['#[/\\\]+#', '#\.\.+#'], ['/', '.'], Path::$imgBaseUnixPath . $row[6]);
+            $unixPath = preg_replace(['#[/\\\]+#', '#\.\.+#'], ['/', '.'], Path::join(Path::$imgBaseUnixPath, $row[6]));
             // Create the entry for the directory if it doesn't exist.
             if (!array_key_exists($unixPath, $csv)) {
                 $csv[$unixPath] = [];
@@ -274,8 +272,10 @@ class Metadata
             }
 
             // If the ini file already exists, replace conflicting entries and append new ones.
-            if (file_exists($unixPath . '/index.txt')) {
-                $existingContent = parse_ini_file($unixPath . '/index.txt', true);
+            $unixFilePath = Path::join($unixPath, 'index.txt');
+
+            if (file_exists($unixFilePath)) {
+                $existingContent = parse_ini_file($unixFilePath, true);
                 if ($existingContent) {
                     $fileDetailList = array_merge($existingContent, $fileDetailList);
                 }
@@ -294,12 +294,12 @@ class Metadata
                 $fileDetail['filename'] = $filename;
             }
 
-            $writeResult = file_put_contents($unixPath . '/index.txt', $iniText, FILE_APPEND);
+            $writeResult = file_put_contents($unixFilePath, $iniText, FILE_APPEND);
             if (false === $writeResult) {
-                Log::error('Failed to write INI file ' . $unixPath . '/index.txt');
+                Log::error("Failed to write INI file $unixFilePath");
                 return false;
             } else {
-                Log::debug('Wrote INI file ' . $unixPath . '/index.txt');
+                Log::debug("Wrote INI file $unixFilePath");
             }
         }
         return true;

@@ -31,7 +31,7 @@ class Path
     public const LINK_SEARCH = '3';
     public const LINK_USER = '';
 
-    /** Full filesystem path to image folder, with trailing slash. We forbid access to files outside this folder. */
+    /** Full filesystem path to image folder, no trailing slash. We forbid access to files outside this folder. */
     public static string $imgBaseUnixPath;
 
     /**
@@ -85,9 +85,9 @@ class Path
     {
         /** @noinspection RealpathInStreamContextInspection */
         $imageDir = Conf::get(Key::IMAGE_DIR);
-        $baseDir = realpath(__DIR__ . '/../' . $imageDir . '/');
+        $baseDir = realpath(Path::join(__DIR__, '..', $imageDir));
         if (empty($baseDir)) {
-            Log::debug('MM_BASE_DIR empty from "' . __DIR__ . ' + /../ + ' . $imageDir . ' + /".');
+            Log::debug('MM_BASE_DIR empty from "' . __DIR__ . ' + /../ + ' . $imageDir . '".');
             Log::debug('Not safe to continue');
             http_response_code(500); // Internal Server Error.
             die(1);
@@ -104,7 +104,7 @@ class Path
     {
         if (!str_starts_with($filePath, self::$imgBaseUnixPath)) {
             Log::debug('Prepending MM_BASE_DIR', $filePath);
-            $filePath = self::$imgBaseUnixPath . $filePath;
+            $filePath = self::join(self::$imgBaseUnixPath, $filePath);
         }
         $realPath = realpath($filePath);
         if (!$realPath) {
@@ -115,14 +115,14 @@ class Path
             Log::warn("Converted path was not within MM_BASE_DIR: '$realPath' from '$filePath'");
             return 'PATH-ERROR-401';
         }
-        $result = preg_replace('#^' . preg_quote(self::$imgBaseUnixPath, '#') . '/*#', '/', $realPath);
+        $result = preg_replace('#^' . preg_quote(Path::join(self::$imgBaseUnixPath, '*'), '#') . '#', '/', $realPath);
         if (!$result) {
             Log::warn('Converted path gave an empty string or error', $filePath);
             return 'PATH-ERROR-BAD';
         }
 
         // Folder names may need escaping, but the slashes must remain.
-        $result = Conf::get(Key::BASE_URL) . str_replace('%2F', '/', urlencode($result));
+        $result = Path::join(Conf::get(Key::BASE_URL), str_replace('%2F', '/', urlencode($result)));
         if (self::LINK_USER !== (string)$linkType) {
             $result .= '?i=' . $linkType;
         }
@@ -177,7 +177,7 @@ class Path
      */
     public static function webToUnixPath(string $webPath, bool $mustExist = true): string
     {
-        $joined = self::$imgBaseUnixPath . $webPath;
+        $joined = self::join(self::$imgBaseUnixPath, $webPath);
         $realPath = realpath($joined);
         if (false === $realPath) {
             if (true === $mustExist) {
@@ -186,7 +186,7 @@ class Path
                 die(1);
             }
             $folder = dirname($webPath);
-            $fullFolder = self::$imgBaseUnixPath . $folder;
+            $fullFolder = self::join(self::$imgBaseUnixPath, $folder);
             $file = basename($webPath);
             $realPath = realpath($fullFolder);
             if (false === $realPath) {
@@ -194,7 +194,7 @@ class Path
                 http_response_code(404); // Not found.
                 die(1);
             }
-            $realPath = "$realPath/$file";
+            $realPath = self::join($realPath, $file);
         }
         if (!str_starts_with($realPath, self::$imgBaseUnixPath)) {
             Log::warn('Validated path was not within MM_BASE_DIR', $webPath);
@@ -251,7 +251,7 @@ class Path
 
         foreach ($dir as $fileInfo) {
             $filename = $fileInfo->getFilename();
-            $fullUnixPath = "$unixPath/$filename";
+            $fullUnixPath = Path::join($unixPath, $filename);
             if ($fileInfo->isDir()) {
                 if (Path::canListDirname($fullUnixPath)) {
                     $items[] = [
@@ -297,7 +297,7 @@ class Path
         foreach ($items as $item) {
             $filename = $item['name'];
             $isDir = $item['isDir'];
-            $itemUnixPath = "$scanUnixDir/$filename";
+            $itemUnixPath = self::join($scanUnixDir, $filename);
 
             // Validation.
             if ($isDir) {
@@ -309,7 +309,6 @@ class Path
             }
 
             $h_item = htmlspecialchars($filename);
-            $itemUnixPath = "$scanUnixDir/$filename";
             $u_linkUrl = Path::unixPathToUrl($itemUnixPath, Path::LINK_INLINE);
             $h_selectClass = ($itemUnixPath === $targetUnixPath) ? 'selected' : '';
             // If the item is a directory, output a list item with a nested ul element.
@@ -343,7 +342,7 @@ class Path
         // Add the 'up one folder' item, unless we're at the root.
         if ('/' !== IndexGateway::$requestWebPath) {
             Path::addThumb(
-                Path::unixPathToUrl(IndexGateway::$requestUnixPath . '/..'),
+                Path::unixPathToUrl(Path::join(IndexGateway::$requestUnixPath, '..')),
                 '/raw/tn_folder_up.png',
                 '<strong>..</strong> - up one folder.'
             );
@@ -417,5 +416,30 @@ class Path
 
         // Parse and return the version number.
         return intval(preg_match('/(\d+)/', $line, $matches) ? $matches[1] : 0);
+    }
+
+    /**
+     * Join path elements together with exactly one directory separator between them.
+     * Preserves a leading slash on the first element if present, but removes all other slashes.
+     *
+     * @param string ...$parts The path parts to join.
+     * @return string The joined path with no trailing slash, and exactly one directory separator between elements.
+     */
+    public static function join(string ...$parts): string
+    {
+        if (empty($parts)) {
+            return '';
+        }
+
+        // Check for leading slash on the first part.
+        $hasLeadingSlash = $parts[0] !== '' && str_starts_with($parts[0], '/');
+
+        // Trim all parts and filter out empty ones.
+        $parts = array_map(static fn($part) => trim($part, '/'), $parts);
+        $parts = array_filter($parts, static fn($part) => $part !== '');
+
+        // Join with single slashes and add back leading slash if needed.
+        $result = implode('/', $parts);
+        return ($hasLeadingSlash ? '/' : '') . $result;
     }
 }

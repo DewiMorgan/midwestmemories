@@ -8,15 +8,18 @@ namespace MidwestMemories\Test;
 use MidwestMemories\Metadata;
 use MidwestMemories\Path;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 /**
  * @covers \MidwestMemories\Metadata
  */
 class MetadataTest extends TestCase
 {
-    private string $testDir = __DIR__ . '/test_data';
-    private string $testFilePath;
+    private const TEST_DIR = __DIR__ . '/test_data';
+    private const SUB_DIR = __DIR__ . '/test_data/sub_dir';
+    private const SUB_DIR_INI = __DIR__ . '/test_data/sub_dir/index.txt';
+    private const TEST_INI_PATH = __DIR__ . '/test_data/index.txt';
+    private const TEST_CSV_PATH = __DIR__ . '/test_data/test_metadata.csv';
+    private const READONLY_DIR = __DIR__ . '/test_data/readonly';
     private string $origImgBasePath;
 
     /**
@@ -32,20 +35,19 @@ class MetadataTest extends TestCase
 
         // Store and replace the original image base path.
         $this->origImgBasePath = Path::$imgBaseUnixPath;
-        Path::$imgBaseUnixPath = $this->testDir;
+        Path::$imgBaseUnixPath = self::TEST_DIR;
 
         // Create test directory if it doesn't exist.
-        if (!file_exists($this->testDir)) {
-            mkdir($this->testDir, 0777, true);
+        if (!file_exists(self::TEST_DIR)) {
+            mkdir(self::TEST_DIR, 0777, true);
         }
 
         // Create a test CSV file.
-        $this->testFilePath = $this->testDir . '/test_metadata.csv';
         $csvContent = <<<CSV
 "Filename YYYYMMDD - Origin - #","Origin","Number","Bundle","Slide Txt","ICE?","Directory"
-"20230719 - Test - 1","Test Origin","1","Test Bundle","Test Notes","No","/test_dir"
+"20230719 - Test - 1","Origin Setup()","1","Test Bundle","Test Notes","No","/"
 CSV;
-        file_put_contents($this->testFilePath, $csvContent);
+        file_put_contents(self::TEST_CSV_PATH, $csvContent);
     }
 
     /**
@@ -55,24 +57,23 @@ CSV;
     protected function tearDown(): void
     {
         // Clean up test files.
-        if (file_exists($this->testDir . '/test_dir/index.txt')) {
-            unlink($this->testDir . '/test_dir/index.txt');
-            rmdir($this->testDir . '/test_dir');
+        foreach (
+            [
+                self::TEST_INI_PATH,
+                self::SUB_DIR_INI,
+                self::READONLY_DIR,
+                self::TEST_CSV_PATH,
+                self::TEST_DIR, // Added as a file, as some tests create it as a file.
+            ] as $file
+        ) {
+            if (file_exists($file)) {
+                unlink($file);
+            }
         }
-        if (file_exists($this->testFilePath)) {
-            unlink($this->testFilePath);
-        }
-        if (file_exists($this->testDir . '/test_merge/index.txt')) {
-            unlink($this->testDir . '/test_merge/index.txt');
-            rmdir($this->testDir . '/test_merge');
-        }
-        if (file_exists($this->testDir . '/readonly')) {
-            rmdir($this->testDir . '/readonly');
-        }
-        if (file_exists($this->testDir) && is_dir($this->testDir)) {
-            $files = glob($this->testDir . '/*');
-            if ($files !== false && count($files) === 0) {
-                rmdir($this->testDir);
+        // Clean up test directories. Be sure to delete innermost directories first.
+        foreach ([self::SUB_DIR, self::TEST_DIR] as $dir) {
+            if (file_exists($dir) && is_dir($dir)) {
+                rmdir($dir);
             }
         }
 
@@ -88,7 +89,7 @@ CSV;
     public function testWriteIniFiles_CreatesIniFiles(): void
     {
         // Parse the test CSV file.
-        $csv = Metadata::parseCsvMetadata($this->testFilePath);
+        $csv = Metadata::parseCsvMetadata(self::TEST_CSV_PATH);
         static::assertNotFalse($csv, 'Failed to parse test CSV file');
 
         // Ensure writeIniFiles returns true on success.
@@ -96,21 +97,20 @@ CSV;
         static::assertTrue($result, 'writeIniFiles should return true on success');
 
         // Verify the INI file was created with the expected content.
-        $iniPath = $this->testDir . '/test_dir/index.txt';
-        static::assertFileExists($iniPath, 'INI file was not created');
+        static::assertFileExists(self::TEST_INI_PATH, 'INI file was not created');
 
         $expectedContent = <<<INI
 [20230719 - Test - 1.jpg]
 date = "2023-07-19"
 displayname = "20230719 - Test - 1"
-slideorigin = "Test Origin"
+slideorigin = "Origin Setup()"
 slidenumber = "1"
 slidesubsection = "Test Bundle"
 writtennotes = "Test Notes"
 filtered = "No"
 INI;
 
-        $actualContent = file_get_contents($iniPath);
+        $actualContent = file_get_contents(self::TEST_INI_PATH);
 
         static::assertStringContainsString(trim($expectedContent), trim($actualContent));
     }
@@ -120,37 +120,23 @@ INI;
      */
     public function testWriteIniFiles_MergesWithExistingIni(): void
     {
-        // Create a directory, and an existing INI file.
-        $testDir = $this->testDir . '/test_merge';
-        mkdir($testDir, 0777, true);
-        $existingIni = $testDir . '/index.txt';
-
         // Add an existing entry.
         $existingContent = "[existing_file.jpg]\ndate = 2023-01-01\ndisplayname = Existing File\n";
-        file_put_contents($existingIni, $existingContent);
+        file_put_contents(self::TEST_INI_PATH, $existingContent);
 
         // Parse the test CSV file.
-        $csv = Metadata::parseCsvMetadata($this->testFilePath);
+        $csv = Metadata::parseCsvMetadata(self::TEST_CSV_PATH);
         static::assertNotFalse($csv, 'Failed to parse test CSV file');
-
-        // Update the path in the CSV to point to our test merge directory.
-        /** @noinspection PhpAutovivificationOnFalseValuesInspection - we already checked it isn't false. */
-        $csv[$testDir] = $csv[$this->testDir . '/test_dir'];
-        unset($csv[$this->testDir . '/test_dir']);
 
         // Ensure writeIniFiles returns true on success.
         $result = Metadata::writeIniFiles($csv);
         static::assertTrue($result, 'writeIniFiles should return true on success');
 
         // Verify both entries exist in the INI file.
-        $actualContent = file_get_contents($existingIni);
+        $actualContent = file_get_contents(self::TEST_INI_PATH);
         static::assertStringContainsString('[existing_file.jpg]', $actualContent);
         static::assertStringContainsString('date = 2023-01-01', $actualContent);
         static::assertStringContainsString('[20230719 - Test - 1.jpg]', $actualContent);
-
-        // Clean up.
-        unlink($existingIni);
-        rmdir($testDir);
     }
 
     /**
@@ -158,24 +144,23 @@ INI;
      */
     public function testWriteIniFiles_HandlesDirectoryCreationFailure(): void
     {
-        // Create a file so that we can't create a directory with the same name.
-        $readOnlyDir = $this->testDir . '/readonly';
-        touch($readOnlyDir);
+        // Set the CSV to write to the subdirectory.
+        $csvContent = <<<CSV
+"Filename YYYYMMDD - Origin - #","Origin","Number","Bundle","Slide Txt","ICE?","Directory",""
+"TestFile","testWriteIniFiles_HandlesDirectoryCreationFailure","2","Test Bundle","Test Notes","Yes","/sub_dir",""
+CSV;
+        file_put_contents(self::TEST_CSV_PATH, $csvContent);
+
+        // Create a file so that we can't create a subdirectory with the same name.
+        touch(self::SUB_DIR);
 
         // Parse the test CSV file.
-        $csv = Metadata::parseCsvMetadata($this->testFilePath);
+        $csv = Metadata::parseCsvMetadata(self::TEST_CSV_PATH);
         static::assertNotFalse($csv, 'Failed to parse test CSV file');
-
-        // Update the path in the CSV to point to our read-only directory.
-        /** @noinspection PhpAutovivificationOnFalseValuesInspection - we already checked it isn't false. */
-        $csv[$readOnlyDir . '/subdir'] = $csv[$this->testDir . '/test_dir'];
 
         // Ensure writeIniFiles returns false on failure.
         $result = Metadata::writeIniFiles($csv);
         static::assertFalse($result, 'writeIniFiles should return false on directory creation failure');
-
-        // Clean up.
-        unlink($readOnlyDir);
     }
 
     /**
@@ -185,33 +170,31 @@ INI;
     {
         $csvContent = <<<CSV
 "Filename YYYYMMDD - Origin - #","Origin","Number","Bundle","Slide Txt","ICE?","Directory",""
-"20230719 - Test - 1","Test Origin","1","Test Bundle","Test Notes","No","/test_dir",""
-"20230720 - Another - 2","Another Origin","2","Another Bundle","More Notes","Yes","/another_dir",""
+"20230719 - Test - 1","WithValidData1","1","Test Bundle","Test Notes","No","/",""
+"20230720 - Another - 2","WithValidData2","2","Another Bundle","More Notes","Yes","/sub_dir",""
 CSV;
-        file_put_contents($this->testFilePath, $csvContent);
+        file_put_contents(self::TEST_CSV_PATH, $csvContent);
 
-        $result = Metadata::parseCsvMetadata($this->testFilePath);
+        $result = Metadata::parseCsvMetadata(self::TEST_CSV_PATH);
         static::assertIsArray($result, 'Should return an array on success');
         static::assertCount(2, $result, 'Should parse all rows from CSV');
 
         // Verify first entry.
-        $firstDir = $this->testDir . '/test_dir';
-        static::assertArrayHasKey($firstDir, $result, 'Should create entry for first directory');
-        static::assertCount(1, $result[$firstDir], 'Should have one file in first directory');
+        static::assertArrayHasKey(self::TEST_DIR, $result, 'Should create entry for first directory');
+        static::assertCount(1, $result[self::TEST_DIR], 'Should have one file in first directory');
 
-        $firstFile = $result[$firstDir];
+        $firstFile = $result[self::TEST_DIR];
         static::assertArrayHasKey('20230719 - Test - 1.jpg', $firstFile, 'Should create entry for first file');
         $firstFileData = $firstFile['20230719 - Test - 1.jpg'];
         static::assertSame('2023-07-19', $firstFileData['date'], 'Should parse date from filename');
-        static::assertSame('Test Origin', $firstFileData['slideorigin'], 'Should parse origin');
+        static::assertSame('WithValidData1', $firstFileData['slideorigin'], 'Should parse origin');
         static::assertSame('1', $firstFileData['slidenumber'], 'Should parse slide number');
         static::assertSame('Test Bundle', $firstFileData['slidesubsection'], 'Should parse subsection/bundle');
         static::assertSame('Test Notes', $firstFileData['writtennotes'], 'Should parse notes');
         static::assertSame('No', $firstFileData['filtered'], 'Should parse ICE flag');
 
         // Verify second entry.
-        $secondDir = $this->testDir . '/another_dir';
-        static::assertArrayHasKey($secondDir, $result, 'Should create entry for second directory');
+        static::assertArrayHasKey(self::SUB_DIR, $result, 'Should create entry for second directory');
     }
 
     /**
@@ -219,7 +202,7 @@ CSV;
      */
     public function testParseCsvMetadata_WithNonExistentFile(): void
     {
-        $result = Metadata::parseCsvMetadata($this->testDir . '/nonexistent.csv');
+        $result = Metadata::parseCsvMetadata(self::TEST_DIR . '/nonexistent.csv');
         static::assertFalse($result, 'Should return false for non-existent file');
     }
 
@@ -228,8 +211,8 @@ CSV;
      */
     public function testParseCsvMetadata_WithEmptyFile(): void
     {
-        file_put_contents($this->testFilePath, '');
-        $result = Metadata::parseCsvMetadata($this->testFilePath);
+        file_put_contents(self::TEST_CSV_PATH, '');
+        $result = Metadata::parseCsvMetadata(self::TEST_CSV_PATH);
         static::assertEmpty($result, 'Should return empty array for empty file');
     }
 
@@ -239,9 +222,9 @@ CSV;
     public function testParseCsvMetadata_WithOnlyHeader(): void
     {
         $csvContent = "'Filename YYYYMMDD - Origin - #','Origin','Number','Bundle','Slide Txt','ICE?','Directory',,\n";
-        file_put_contents($this->testFilePath, $csvContent);
+        file_put_contents(self::TEST_CSV_PATH, $csvContent);
 
-        $result = Metadata::parseCsvMetadata($this->testFilePath);
+        $result = Metadata::parseCsvMetadata(self::TEST_CSV_PATH);
         static::assertIsArray($result, 'Should return an array even with only header');
         static::assertEmpty($result, 'Should return empty array for CSV with only header');
     }
@@ -253,14 +236,14 @@ CSV;
     {
         $csvContent = <<<CSV
 "Filename YYYYMMDD - Origin - #","Origin","Number","Bundle","Slide Txt","ICE?","Directory"
-"20230719 - Test - 1","Test Origin","1","Test Bundle","Test Notes","No","/test_dir"
+"20230719 - Test - 1","WithMalformedRows1","1","Test Bundle","Test Notes","No","/"
 "invalid row","missing","fields"
 
 
-"20230720 - Another - 2","Another Origin","2","Another Bundle","More Notes","Yes","/another_dir"
+"20230720 - Another - 2","WithMalformedRows2","2","Another Bundle","More Notes","Yes","/sub_dir"
 CSV;
-        file_put_contents($this->testFilePath, $csvContent);
-        $result = Metadata::parseCsvMetadata($this->testFilePath);
+        file_put_contents(self::TEST_CSV_PATH, $csvContent);
+        $result = Metadata::parseCsvMetadata(self::TEST_CSV_PATH);
         static::assertIsArray($result, 'Should return an array even with malformed rows');
         static::assertCount(2, $result, 'Should parse valid rows and skip invalid ones');
     }
@@ -272,13 +255,13 @@ CSV;
     {
         $csvContent = <<<CSV
 "Filename YYYYMMDD - Origin - #","Origin","Number","Bundle","Slide Txt","ICE?","Directory",""
-"20230719 - Test - 1","Test Origin","1","Test Bundle","Test Notes","No","/test//dir/../dir",""
+"20230719 - Test - 1","DirectoryPathNormalization","1","Test Bundle","Test Notes","No","/test//dir/../dir",""
 CSV;
-        file_put_contents($this->testFilePath, $csvContent);
+        file_put_contents(self::TEST_CSV_PATH, $csvContent);
 
-        $result = Metadata::parseCsvMetadata($this->testFilePath);
+        $result = Metadata::parseCsvMetadata(self::TEST_CSV_PATH);
         static::assertIsArray($result);
-        $expectedPath = $this->testDir . '/test/dir/./dir';
+        $expectedPath = self::TEST_DIR . '/test/dir/./dir';
         $keys = array_keys($result);
         static::assertContains($expectedPath, $keys, 'Should normalize directory path');
     }
@@ -302,7 +285,7 @@ CSV;
     {
         $input = [
             'displayname' => 'Test & Image',
-            'slideorigin' => 'Test <Origin>',
+            'slideorigin' => 'Origin <testHtmlEscape_WithSpecialCharacters>',
             'writtennotes' => 'Notes with "quotes" & special chars',
             'slidenumber' => '1',
             'date' => ['dateString' => '2023-01-01']
@@ -311,7 +294,7 @@ CSV;
         $result = Metadata::htmlEscape($input);
 
         static::assertSame('Test &amp; Image', $result['displayname']);
-        static::assertSame('Test &lt;Origin&gt;', $result['slideorigin']);
+        static::assertSame('Origin &lt;testHtmlEscape_WithSpecialCharacters&gt;', $result['slideorigin']);
         static::assertSame('Notes with &quot;quotes&quot; &amp; special chars', $result['writtennotes']);
         static::assertSame('1', $result['slidenumber']);
         static::assertSame('2023-01-01', $result['date']);

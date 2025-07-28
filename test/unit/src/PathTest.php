@@ -1,9 +1,8 @@
 <?php
 declare(strict_types=1);
 
-namespace src;
+namespace MidwestMemories;
 
-use MidwestMemories\Path;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -45,5 +44,38 @@ class PathTest extends TestCase
         usort($items, [Path::class, 'sortFolder']);
 
         self::assertSame($expected, $items);
+    }
+
+    /**
+     * Test joining path elements with proper slash handling.
+     */
+    public function testJoin(): void
+    {
+        // Test basic path joining.
+        self::assertSame('path/to/folder', Path::join('path', 'to', 'folder'));
+
+        // Test with leading slash on first element.
+        self::assertSame('/path/to/folder', Path::join('/path', 'to', 'folder'));
+
+        // Test with multiple slashes between elements.
+        self::assertSame('path/to/folder', Path::join('path/', '/to/', '/folder'));
+
+        // Test with all slashes.
+        self::assertSame('/path/to/folder', Path::join('/path/', '/to/', '/folder/'));
+
+        // Test with empty elements.
+        self::assertSame('path/to/folder', Path::join('path', '', 'to', '', 'folder'));
+
+        // Test with first element empty, second element starting with a slash.
+        self::assertSame('lose/leading/slash', Path::join('', '/lose', 'leading', 'slash/', ''));
+
+        // Test with single element.
+        self::assertSame('path', Path::join('path'));
+
+        // Test with single element with slashes.
+        self::assertSame('/path', Path::join('/path/'));
+
+        // Test with all empty strings.
+        self::assertSame('', Path::join('', '', ''));
     }
 }

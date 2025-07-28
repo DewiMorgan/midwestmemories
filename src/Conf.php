@@ -70,7 +70,7 @@ class Conf extends Singleton
     private function getValue(Key $key): ?string
     {
         if ($key === Key::MYSQL_PREFIX) {
-            Log::debug('mysql_prefix Data',$this->data);
+            Log::debug('mysql_prefix Data', $this->data);
         }
         return $this->data[$key->value] ?? null;
     }
@@ -104,17 +104,18 @@ class Conf extends Singleton
     {
         $dir = getcwd();
         while ($dir !== '/') {
+            $joined = Path::join($dir, $filename);
             if ($filename == self::MYSQL_INI_FILE) { // DELETEME DEBUG
                 if (!array_key_exists('Debugging', $this->data)) {
                     $this->data['Debugging'] = '';
                 }
-                $this->data['Debugging'] .= 'Checked for ' . $dir . '/' . $filename;
+                $this->data['Debugging'] .= 'Checked for ' . $joined;
             }
-            if (file_exists($dir . '/' . $filename)) {
+            if (file_exists($joined)) {
                 if ($filename == self::MYSQL_INI_FILE) { // DELETEME DEBUG
-                    $this->data['Debugging'] .= 'Found ' . $dir . '/' . $filename;
+                    $this->data['Debugging'] .= 'Found ' . $joined;
                 }
-                return parse_ini_file($dir . '/' . $filename);
+                return parse_ini_file($joined);
             }
             $dir = dirname($dir);
         }

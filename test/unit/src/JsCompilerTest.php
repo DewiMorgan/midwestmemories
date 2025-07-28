@@ -4,6 +4,7 @@
 declare(strict_types=1);
 
 use MidwestMemories\JsCompiler;
+use MidwestMemories\Path;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -13,6 +14,10 @@ class JsCompilerTest extends TestCase
 {
     private const TEST_JS_DIR = __DIR__ . '/../../test-js';
     private const OUTPUT_DIR = __DIR__ . '/../../test-output';
+    private const OUTPUT_FILE = __DIR__ . '/../../test-output/output.js';
+    private const INPUT_FILE_1 = __DIR__ . '/../../test-js/test1.js';
+    private const INPUT_FILE_2 = __DIR__ . '/../../test-js/test2.js';
+    private const NONEXISTENT_FILE = __DIR__ . '/../../nonexistent/file.js';
 
     /**
      * This method is called before each test.
@@ -32,8 +37,8 @@ class JsCompilerTest extends TestCase
         }
 
         // Create test JS files
-        file_put_contents(self::TEST_JS_DIR . '/test1.js', "// Test file 1\nconst test1 = 1;");
-        file_put_contents(self::TEST_JS_DIR . '/test2.js', "// Test file 2\nconst test2 = 2;");
+        file_put_contents(self::INPUT_FILE_1, "// Test file 1\nconst test1 = 1;");
+        file_put_contents(self::INPUT_FILE_2, "// Test file 2\nconst test2 = 2;");
     }
 
     /**
@@ -48,8 +53,8 @@ class JsCompilerTest extends TestCase
         // If test directories exist, delete them and clean up test files.
         if (is_dir(self::TEST_JS_DIR) && is_dir(self::OUTPUT_DIR)) {
             $files = array_merge(
-                glob(self::TEST_JS_DIR . '/*.js') ?: [],
-                glob(self::OUTPUT_DIR . '/*.js') ?: []
+                glob(Path::join(self::TEST_JS_DIR, '*.js')) ?: [],
+                glob(Path::join(self::OUTPUT_DIR, '/*.js')) ?: []
             );
 
             foreach ($files as $file) {
@@ -65,30 +70,28 @@ class JsCompilerTest extends TestCase
 
     public function testCompileSingleFile(): void
     {
-        $outputFile = self::OUTPUT_DIR . '/output.js';
         $result = JsCompiler::compile(
             ['test1.js'],
-            $outputFile,
-            self::TEST_JS_DIR . '/' // Override default JS directory for testing
+            self::OUTPUT_FILE,
+            self::TEST_JS_DIR // Override default JS directory for testing
         );
 
         static::assertTrue($result);
-        static::assertFileExists($outputFile);
-        static::assertStringContainsString('// Test file 1', file_get_contents($outputFile));
+        static::assertFileExists(self::OUTPUT_FILE);
+        static::assertStringContainsString('// Test file 1', file_get_contents(self::OUTPUT_FILE));
     }
 
     public function testCompileMultipleFiles(): void
     {
-        $outputFile = self::OUTPUT_DIR . '/output.js';
         $result = JsCompiler::compile(
             ['test1.js', 'test2.js'],
-            $outputFile,
-            self::TEST_JS_DIR . '/'
+            self::OUTPUT_FILE,
+            self::TEST_JS_DIR
         );
 
         static::assertTrue($result);
-        static::assertFileExists($outputFile);
-        $content = file_get_contents($outputFile);
+        static::assertFileExists(self::OUTPUT_FILE);
+        $content = file_get_contents(self::OUTPUT_FILE);
         static::assertStringContainsString('// Test file 1', $content);
         static::assertStringContainsString('// Test file 2', $content);
         static::assertStringContainsString('/* Source: test1.js */', $content);
@@ -96,23 +99,21 @@ class JsCompilerTest extends TestCase
 
     public function testCompileNonExistentFile(): void
     {
-        $outputFile = self::OUTPUT_DIR . '/output.js';
         $result = JsCompiler::compile(
             ['nonexistent.js'],
-            $outputFile,
-            self::TEST_JS_DIR . '/'
+            self::OUTPUT_FILE,
+            self::TEST_JS_DIR
         );
         static::assertFalse($result);
-        static::assertFileDoesNotExist($outputFile);
+        static::assertFileDoesNotExist(self::OUTPUT_FILE);
     }
 
     public function testCompileToNonWritableDirectory(): void
     {
-        $outputFile = '/non/existent/path/output.js';
         $result = JsCompiler::compile(
             ['test1.js'],
-            $outputFile,
-            self::TEST_JS_DIR . '/'
+            self::NONEXISTENT_FILE,
+            self::TEST_JS_DIR
         );
 
         static::assertFalse($result);
@@ -120,11 +121,10 @@ class JsCompilerTest extends TestCase
 
     public function testIsFileCompiledWhenOutputDoesNotExist(): void
     {
-        $outputFile = self::OUTPUT_DIR . '/nonexistent.js';
         $result = JsCompiler::isFileOutdated(
             ['test1.js'],
-            $outputFile,
-            self::TEST_JS_DIR . '/'
+            self::NONEXISTENT_FILE,
+            self::TEST_JS_DIR
         );
 
         static::assertTrue($result, 'Should return false when output file does not exist');
@@ -132,13 +132,12 @@ class JsCompilerTest extends TestCase
 
     public function testIsFileCompiledWhenInputDoesNotExist(): void
     {
-        $outputFile = self::OUTPUT_DIR . '/output.js';
-        file_put_contents($outputFile, 'test');
+        file_put_contents(self::OUTPUT_FILE, 'test');
 
         $result = JsCompiler::isFileOutdated(
             ['nonexistent.js'],
-            $outputFile,
-            self::TEST_JS_DIR . '/'
+            self::OUTPUT_FILE,
+            self::TEST_JS_DIR
         );
 
         static::assertTrue($result, 'Should return false when any input file does not exist');
@@ -146,20 +145,17 @@ class JsCompilerTest extends TestCase
 
     public function testIsFileCompiledWhenInputIsNewer(): void
     {
-        $outputFile = self::OUTPUT_DIR . '/output.js';
-        $inputFile = self::TEST_JS_DIR . '/test1.js';
-
         // Create output file first.
-        file_put_contents($outputFile, 'test');
-        touch($outputFile, time() - 3600); // Set modification time to 1 hour ago.
+        file_put_contents(self::OUTPUT_FILE, 'test');
+        touch(self::OUTPUT_FILE, time() - 3600); // Set modification time to 1 hour ago.
 
         // Update input file to be newer than output.
-        touch($inputFile);
+        touch(self::INPUT_FILE_1);
 
         $result = JsCompiler::isFileOutdated(
             ['test1.js'],
-            $outputFile,
-            self::TEST_JS_DIR . '/'
+            self::OUTPUT_FILE,
+            self::TEST_JS_DIR
         );
 
         static::assertTrue($result, 'Should return false when any input file is newer than output');
@@ -167,16 +163,15 @@ class JsCompilerTest extends TestCase
 
     public function testIsFileCompiledWhenUpToDate(): void
     {
-        $outputFile = self::OUTPUT_DIR . '/output.js';
-        file_put_contents($outputFile, 'test');
+        file_put_contents(self::OUTPUT_FILE, 'test');
 
         // Make sure output file is newer than input files.
-        touch($outputFile, time() + 3600);
+        touch(self::OUTPUT_FILE, time() + 3600);
 
         $result = JsCompiler::isFileOutdated(
             ['test1.js', 'test2.js'],
-            $outputFile,
-            self::TEST_JS_DIR . '/'
+            self::OUTPUT_FILE,
+            self::TEST_JS_DIR
         );
 
         static::assertFalse($result, 'Should return true when all input files are older than output');

@@ -155,8 +155,10 @@ class TestHelper
 
         curl_setopt($ch, CURLOPT_COOKIEFILE, self::$cookieJar);
         curl_setopt($ch, CURLOPT_COOKIEJAR, self::$cookieJar);
-
         $body = curl_exec($ch);
+        if ($body === false) {
+            $body = json_encode(curl_error($ch));
+        }
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 

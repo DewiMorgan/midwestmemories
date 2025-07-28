@@ -59,7 +59,7 @@ class FileProcessor
             return false;
         }
 
-        $newFullPath = dirname($unixPath) . '/' . basename($unixPath, '.png') . '.jpg';
+        $newFullPath = Path::join(dirname($unixPath), basename($unixPath, '.png')) . '.jpg';
 
         /* Save as a renamed JPG at its destination */
         if (false === imagejpeg($sourceImage, $newFullPath, 70)) {

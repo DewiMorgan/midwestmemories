@@ -43,7 +43,7 @@ class RawTemplate
     #[NoReturn] private static function show404Page(): void
     {
         http_response_code(404);
-        include($_SERVER['DOCUMENT_ROOT'] . '/nonexistent.file'); // Triggers Apache's 404. Supposedly.
+        include(Path::join($_SERVER['DOCUMENT_ROOT'], 'nonexistent.file')); // Triggers Apache's 404. Supposedly.
         exit;
     }
 }

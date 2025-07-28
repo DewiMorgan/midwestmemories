@@ -24,7 +24,7 @@ namespace MidwestMemories;
     $items = scandir(IndexGateway::$requestUnixPath);
     foreach ($items as $item) {
         // Todo: folders first.
-        $itemPath = IndexGateway::$requestUnixPath . '/' . $item;
+        $itemPath = Path::join(IndexGateway::$requestUnixPath, $item);
         // Sort to natural order, with directories first.
         usort($items, [Path::class, 'sortFolder']);
 

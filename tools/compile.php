@@ -17,10 +17,11 @@ declare(strict_types=1);
  * 1 - Compilation was needed, and caused changes, or failed.
  */
 
-require_once(__DIR__ . '/../src/JsCompiler.php');
-
 use JetBrains\PhpStorm\NoReturn;
 use MidwestMemories\JsCompiler;
+use MidwestMemories\Path;
+
+require_once(Path::join(__DIR__, '/../src/JsCompiler.php'));
 
 // Parse command line arguments.
 $options = getopt('', ['silent']);
@@ -40,7 +41,7 @@ compileAllFiles();
         exit(0);
     }
 
-    $outputDir = __DIR__ . '/../raw';
+    $outputDir = Path::join(__DIR__, '../raw');
 
     // If we get here, files need recompilation.
     silentEcho('Some files may need recompilation. Running compiler...');

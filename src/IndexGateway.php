@@ -52,7 +52,7 @@ class IndexGateway
     #[NoReturn] private static function showLoginForm(): void
     {
         // Include the template file
-        require __DIR__ . '/templates/UserLoginTemplate.php';
+        require Path::join(__DIR__, '/templates/UserLoginTemplate.php');
         exit();
     }
 
@@ -73,23 +73,23 @@ class IndexGateway
             Log::debug('User');
             // This is a request by a user, perhaps to a bookmark.
             // Load the tree view, which will then call us back for the inline version of the pointed-at $path resource.
-            include(__DIR__ . '/templates/TreeTemplate.php');
+            require Path::join(__DIR__, 'templates/TreeTemplate.php');
         } elseif (2 === (int)$_REQUEST['i']) {
             // We're showing raw file view, such as for an img link.
-            include(__DIR__ . '/RawTemplate.php');
+            require Path::join(__DIR__, 'RawTemplate.php');
         } elseif (3 === (int)$_REQUEST['i']) {
             // We're showing an inline search view, by choice.
-            include(__DIR__ . '/SearchTemplate.php');
+            require Path::join(__DIR__, 'SearchTemplate.php');
         } elseif (is_dir(self::$requestUnixPath)) {
             // We're showing an inline folder view; a list of thumbnails.
-            include(__DIR__ . '/templates/ThumbsTemplate.php');
+            require Path::join(__DIR__, 'templates/ThumbsTemplate.php');
         } elseif (is_file(self::$requestUnixPath)) {
             // We're showing an inline file view.
-            include(__DIR__ . '/templates/FileTemplate.php');
+            require Path::join(__DIR__, 'templates/FileTemplate.php');
         } else {
             Log::debug('Search');
             // We're showing an inline search view, because we've nothing else to show.
-            include(__DIR__ . '/SearchTemplate.php');
+            require Path::join(__DIR__, 'SearchTemplate.php');
         }
     }
 

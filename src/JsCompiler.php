@@ -36,10 +36,10 @@ class JsCompiler
      */
     public static function areAnyFilesOutdated(): bool
     {
-        return self::isFileOutdated(self::$adminFiles, __DIR__ . '/../raw/admin.js')
-            || self::isFileOutdated(self::$userFiles, __DIR__ . '/../raw/user.js')
-            || self::isFileOutdated(['admin.css'], __DIR__ . '/../raw/admin.css')
-            || self::isFileOutdated(['user.css'], __DIR__ . '/../raw/user.css');
+        return self::isFileOutdated(self::$adminFiles, Path::join(__DIR__, '../raw/admin.js'))
+            || self::isFileOutdated(self::$userFiles, Path::join(__DIR__, '../raw/user.js'))
+            || self::isFileOutdated(['admin.css'], Path::join(__DIR__, '../raw/admin.css'))
+            || self::isFileOutdated(['user.css'], Path::join(__DIR__, '../raw/user.css'));
     }
 
     /**
@@ -48,7 +48,7 @@ class JsCompiler
      */
     public static function compileAllIfNeeded(): bool
     {
-        $outputDir = __DIR__ . '/../raw';
+        $outputDir = Path::join(__DIR__, '/../raw');
         $result = true;
         // Handle Js.
         if (self::isFileOutdated(self::$adminFiles, "$outputDir/admin.js")) {
@@ -58,7 +58,7 @@ class JsCompiler
             $result = $result && self::compile(self::$userFiles, "$outputDir/user.js", '');
         }
         // Handle Css.
-        $cssDir = __DIR__ . '/Css/';
+        $cssDir = Path::join(__DIR__, '/Css/');
         if (self::isFileOutdated(['admin.css'], "$outputDir/admin.css", $cssDir)) {
             $result = $result && copy("$cssDir/admin.css", "$outputDir/admin.css");
         }
@@ -72,18 +72,18 @@ class JsCompiler
      * Check if an output file needs reinstalling or recompiling.
      * @param array $inputFiles Array of filenames relative to /src/Js/
      * @param string $outputFile Absolute path to the output file
-     * @param ?string $jsDir Folder to find source JS files in, including trailing slash.
+     * @param ?string $jsDir Folder to find source JS files in.
      * @return bool If file is outdated or missing.
      */
     public static function isFileOutdated(array $inputFiles, string $outputFile, ?string $jsDir = null): bool
     {
-        $jsDir = $jsDir ?: __DIR__ . '/Js/';
+        $jsDir = $jsDir ?: Path::join(__DIR__, '/Js/');
 
         if (!file_exists($outputFile)) {
             return true;
         }
         foreach ($inputFiles as $file) {
-            $inputFilePath = $jsDir . ltrim($file, '/');
+            $inputFilePath = Path::join($jsDir, $file);
             if (!file_exists($inputFilePath)) {
                 return true;
             }
@@ -99,17 +99,17 @@ class JsCompiler
      *
      * @param string[] $inputFiles Array of filenames relative to /src/Js/
      * @param string $outputFile The target output file path.
-     * @param string $jsDir Folder to find source JS files in, including trailing slash.
+     * @param string $jsDir Folder to find source JS files in.
      * @return bool True on success, false on failure
      */
     public static function compile(array $inputFiles, string $outputFile, string $jsDir): bool
     {
-        $jsDir = $jsDir !== '' ? $jsDir : __DIR__ . '/Js/';
+        $jsDir = $jsDir !== '' ? $jsDir : Path::join(__DIR__, '/Js/');
         $output = '';
 
         // First, verify all files exist.
         foreach ($inputFiles as $file) {
-            $inputFilePath = $jsDir . ltrim($file, '/');
+            $inputFilePath = Path::join($jsDir, $file);
             if (!file_exists($inputFilePath)) {
                 Log::error('JsCompiler: Input file not found: ' . $inputFilePath);
                 return false;
@@ -118,7 +118,7 @@ class JsCompiler
 
         // Then process them.
         foreach ($inputFiles as $file) {
-            $inputFilePath = $jsDir . ltrim($file, '/');
+            $inputFilePath = Path::join($jsDir, $file);
             $content = file_get_contents($inputFilePath);
             if ($content === false) {
                 Log::error('JsCompiler: Could not read input file: ' . $inputFilePath);
@@ -151,7 +151,7 @@ class JsCompiler
     public static function getFileChecksums(string $dir): array
     {
         $checksums = [];
-        foreach (glob($dir . '/*.{css,js}', GLOB_BRACE) as $file) {
+        foreach (glob(Path::join($dir, '*.{css,js}'), GLOB_BRACE) as $file) {
             $checksums[$file] = md5_file($file);
         }
         return $checksums;

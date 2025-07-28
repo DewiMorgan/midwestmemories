@@ -62,7 +62,7 @@ class AdminGateway
     #[NoReturn] private static function showLoginForm(): void
     {
         // Include the template file
-        require __DIR__ . '/templates/AdminLoginTemplate.php';
+        require Path::join(__DIR__, 'templates/AdminLoginTemplate.php');
         exit();
     }
 
@@ -77,10 +77,10 @@ class AdminGateway
         $h_userRole = $user->isSuperAdmin ? 'SuperAdmin' : 'Admin';
         $h_username = htmlspecialchars($user->username);
         $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
-        $i_scriptVersion = Path::getScriptVersion(__DIR__ . '/../raw/user.js');
+        $i_scriptVersion = Path::getScriptVersion(Path::join(__DIR__, '../raw/user.js'));
 
         // Include the template file
-        require __DIR__ . '/templates/AdminPageTemplate.php';
+        require Path::join(__DIR__, 'templates/AdminPageTemplate.php');
     }
 
     /**

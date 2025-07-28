@@ -17,10 +17,10 @@ if (preg_match('#^/api/(v[0-9.]+)/(.+)$#i', $requestUri, $matches)) {
 }
 
 // Include the relevant bootstrap file.
-if (str_starts_with($_SERVER['REQUEST_URI'], '/api/' )) {
-    require_once(__DIR__ . '/../api.php');
+if (str_starts_with($_SERVER['REQUEST_URI'], '/api/')) {
+    require_once __DIR__ . '/../api.php';
 } elseif (str_starts_with($_SERVER['REQUEST_URI'], '/admin')) {
-    require_once(__DIR__ . '/../admin.php');
+    require_once __DIR__ . '/../admin.php';
 } else {
     require_once __DIR__ . '/../index.php';
 }

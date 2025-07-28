@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 use MidwestMemories\Db;
+use MidwestMemories\Path;
 use MidwestMemories\Table;
 use PHPUnit\Framework\TestCase;
 
@@ -72,9 +73,9 @@ class ApiTest extends TestCase
     public function testDeleteUserAsAdmin(): void
     {
         TestHelper::loginAs(self::ADMIN_NAME, self::PASSWORD);
-        $response = TestHelper::request('DELETE', '/api/v1.0/user/' . self::USER_NAME);
+        $response = TestHelper::request('DELETE', Path::join('/api/v1.0/user', self::USER_NAME));
         $data = json_decode($response['data'], true);
-        static::assertSame(200, $response['status'], "Should be success: " . $response['data']);
+        static::assertSame(200, $response['status'], 'Should be success: ' . $response['data']);
         static::assertIsArray($data);
         static::assertSame('OK', $data['data']);
     }
@@ -86,7 +87,11 @@ class ApiTest extends TestCase
             'username' => self::USER_NAME,
             'password' => self::PASSWORD
         ]);
-        static::assertEquals(200, $response['status'], 'Login should return 200 on success: ' . $response['data']);
+        static::assertEquals(
+            200,
+            $response['status'],
+            'Login should return 200 on success: ' . var_export($response, true)
+        );
 
         $data = json_decode($response['data'], true);
         static::assertIsArray($data);
