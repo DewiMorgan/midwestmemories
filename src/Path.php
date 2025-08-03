@@ -177,7 +177,11 @@ class Path
      */
     public static function webToUnixPath(string $webPath, bool $mustExist = true): string
     {
-        $joined = self::join(self::$imgBaseUnixPath, $webPath);
+        if (!str_starts_with($webPath, self::$imgBaseUnixPath)) {
+            $joined = self::join(self::$imgBaseUnixPath, $webPath);
+        } else {
+            $joined = $webPath;
+        }
         $realPath = realpath($joined);
         if (false === $realPath) {
             if (true === $mustExist) {
