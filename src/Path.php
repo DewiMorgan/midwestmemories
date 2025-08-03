@@ -196,6 +196,7 @@ class Path
             $realPath = realpath($fullFolder);
             if (false === $realPath) {
                 Log::warn('Validated folder was not found', $webPath);
+                Log::warn(var_export(debug_backtrace(), true));
                 http_response_code(404); // Not found.
                 die(1);
             }
