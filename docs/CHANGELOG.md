@@ -8,6 +8,7 @@ which might not be when they were actually implemented/committed.
 * DONE: Move QA/Live to start of page title (hidden in live public pages).
 * DONE: Refactor Metadata cleaning for maintainability.
 * DONE: Correctly handle ini files with no '/' element.
+* DONE: Create `Path::join() to ensure all paths are joined correctly.
 
 ## 2025/07/20 Sun
 

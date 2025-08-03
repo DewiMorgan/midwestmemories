@@ -182,6 +182,7 @@ class Path
         if (false === $realPath) {
             if (true === $mustExist) {
                 Log::warn('Validated path was not found as: ' . self::$imgBaseUnixPath . ' . ' . $webPath, $joined);
+                Log::warn(var_export(debug_backtrace(), true));
                 http_response_code(404); // Not found.
                 die(1);
             }
