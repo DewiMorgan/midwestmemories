@@ -185,17 +185,18 @@ class Path
         $realPath = realpath($joined);
         if (false === $realPath) {
             if (true === $mustExist) {
-                Log::warn('Validated path was not found as: ' . self::$imgBaseUnixPath . ' . ' . $webPath, $joined);
+                Log::warn("Validated path '$webPath' was not found as", $joined);
                 Log::warn(var_export(debug_backtrace(), true));
                 http_response_code(404); // Not found.
                 die(1);
             }
-            $folder = dirname($webPath);
-            $fullFolder = self::join(self::$imgBaseUnixPath, $folder);
-            $file = basename($webPath);
+
+            // Try to build it as a canonical path within a real folder, even though the file itself doesn't exist.
+            $file = basename($joined);
+            $fullFolder = dirname($joined);
             $realPath = realpath($fullFolder);
             if (false === $realPath) {
-                Log::warn('Validated folder was not found', $webPath);
+                Log::warn("Validated folder '$webPath' was not found as", $fullFolder);
                 Log::warn(var_export(debug_backtrace(), true));
                 http_response_code(404); // Not found.
                 die(1);
