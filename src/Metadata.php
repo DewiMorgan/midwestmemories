@@ -174,7 +174,9 @@ class Metadata
             if (!array_key_exists('data', $currentNode)) {
                 $currentNode['data'] = [];
             }
+Log::debug("1 webPathSoFar='$webPathSoFar', pathElement='$pathElement'"); // DELETEME DEBUG
             $webPathSoFar .= Path::join($webPathSoFar, $pathElement);
+Log::debug("2 webPathSoFar='$webPathSoFar'"); // DELETEME DEBUG
             if (empty($currentNode['data'])) {
                 $currentNode['data'] = self::loadOneFolderIni($webPathSoFar);
             }
