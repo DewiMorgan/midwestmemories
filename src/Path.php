@@ -196,7 +196,7 @@ class Path
             $fullFolder = dirname($joined);
             $realPath = realpath($fullFolder);
             if (false === $realPath) {
-                Log::warn("Validated folder '$webPath' was not found as", $fullFolder);
+                Log::warn("Validated folder '$webPath' was not found as '$fullFolder'", $fullFolder);
                 Log::warn(var_export(debug_backtrace(), true));
                 http_response_code(404); // Not found.
                 die(1);
