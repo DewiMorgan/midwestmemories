@@ -440,10 +440,10 @@ class Path
 
         // Check for leading slash on the first part.
         $hasLeadingSlash = $parts[0] !== '' && str_starts_with($parts[0], '/');
-Log::debug('hasLeadingSlash', $hasLeadingSlash ? 'true' : 'false');
+//Log::debug('hasLeadingSlash: ' . $hasLeadingSlash ? 'true' : 'false');
         // Trim all parts and filter out empty ones.
         $parts = array_map(static fn($part) => trim($part, '/'), $parts);
-//Log::debug('1 Parts', $parts);
+Log::debug('1 Parts', $parts);
         $parts = array_filter($parts, static fn($part) => $part !== '');
 //Log::debug('2 Parts', $parts);
 
