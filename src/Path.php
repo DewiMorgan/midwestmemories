@@ -440,19 +440,31 @@ class Path
 
         // Check for leading slash on the first part.
         $hasLeadingSlash = $parts[0] !== '' && str_starts_with($parts[0], '/');
-file_put_contents('/data0/ulixamvtuwwyaykg/tmp/debugJoin', 'hasLeadingSlash: ' . ($hasLeadingSlash ? 'true' : 'false') . "\n", FILE_APPEND);
+self::basicLog('hasLeadingSlash: ' . ($hasLeadingSlash ? 'true' : 'false')); // DEBUG DELETEME
         // Trim all parts and filter out empty ones.
         $parts = array_map(static fn($part) => trim($part, '/'), $parts);
-file_put_contents('/data0/ulixamvtuwwyaykg/tmp/debugJoin', '1 parts: ' . var_export($parts, true) . "\n", FILE_APPEND);
-if ('Opa\'s SlidesOpa\'s Slides/B1TU' === $parts[0]) {
-    file_put_contents('/data0/ulixamvtuwwyaykg/tmp/debugJoin', var_export(debug_backtrace(), true) . "\n", FILE_APPEND);
-}
+self::basicLog('1 parts: ' . var_export($parts, true)); // DEBUG DELETEME
+if ('Opa\'s SlidesOpa\'s Slides/B1TU' === $parts[0]) { // DEBUG DELETEME
+    self::basicLog(var_export(debug_backtrace(), true)); // DEBUG DELETEME
+} // DEBUG DELETEME
         $parts = array_filter($parts, static fn($part) => $part !== '');
-file_put_contents('/data0/ulixamvtuwwyaykg/tmp/debugJoin', '2 parts: ' . var_export($parts, true) . "\n", FILE_APPEND);
+self::basicLog('2 parts: ' . var_export($parts, true)); // DEBUG DELETEME
 
         // Join with single slashes and add back leading slash if needed.
         $result = implode('/', $parts);
-file_put_contents('/data0/ulixamvtuwwyaykg/tmp/debugJoin', 'Result: ' . var_export($result, true) . "\n", FILE_APPEND);
+self::basicLog('Result: ' . var_export($result, true)); // DEBUG DELETEME
         return ($hasLeadingSlash ? '/' : '') . $result;
+    }
+
+    /**
+     * Basic logging function for debugging things like `Path::join()` that can't include the Log class.
+     * @param string $msg
+     * @return void
+     */
+    public static function basicLog(string $msg)
+    {
+        $file = '/data0/ulixamvtuwwyaykg/public_html/midwestmemories/mm.log';
+
+        file_put_contents($file, 'BasicLog: ' . $msg . "\n", FILE_APPEND);
     }
 }
