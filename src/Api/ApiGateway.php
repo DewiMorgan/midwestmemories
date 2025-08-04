@@ -183,7 +183,7 @@ class ApiGateway
     {
         //Log::debug("Reading JSON params for `$this->path`"); // DELETEME DEBUG
         if (!in_array($this->method, ['POST', 'PUT', 'PATCH', 'DELETE'])) {
-            Log::warn('API method unknown: not POST/PUT/PATCH/DELETE.'); // DELETEME DEBUG
+            Log::warn('API method unknown: not POST/PUT/PATCH/DELETE.', $this->method); // DELETEME DEBUG
             return [];
         }
 

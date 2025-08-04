@@ -25,10 +25,7 @@ use MidwestMemories\Enum\Key;
     // ToDo: Add next/prev buttons.
 
     $u_linkUrl = Path::unixPathToUrl(IndexGateway::$requestUnixPath, Path::LINK_RAW);
-    $fileDetails = Metadata::getEscapedByUnixPath(IndexGateway::$requestUnixPath);
-
-    // Escape the details array.
-    $h_fd = Metadata::htmlEscape($fileDetails);
+    $h_fd = Metadata::getEscapedByUnixPath(IndexGateway::$requestUnixPath);
 
     // Special cases.
     $h_slide = ($h_fd['slideorigin'] ?? '')

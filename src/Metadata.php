@@ -241,7 +241,7 @@ class Metadata
                 'filtered' => $row[5],        // "ICE?" csv column.
             ];
             // "Directory" csv column. Clean up slashes and dots.
-            $unixPath = preg_replace(['#[/\\\]+#', '#\.\.+#'], ['/', '.'], Path::join(Path::$imgBaseUnixPath, $row[6]));
+            $unixPath = Path::join(Path::$imgBaseUnixPath, preg_replace(['#[/\\\]+#', '#\.\.+#'], ['/', '.'], $row[6]));
             // Create the entry for the directory if it doesn't exist.
             if (!array_key_exists($unixPath, $csv)) {
                 $csv[$unixPath] = [];

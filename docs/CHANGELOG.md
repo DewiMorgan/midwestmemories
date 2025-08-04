@@ -3,12 +3,17 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/08/03 Sun
+
+* DONE: Push to live
+* DONE: Fix double-escaping bug on image descriptions.
+
 ## 2025/07/27 Sun
 
 * DONE: Move QA/Live to start of page title (hidden in live public pages).
 * DONE: Refactor Metadata cleaning for maintainability.
 * DONE: Correctly handle ini files with no '/' element.
-* DONE: Create `Path::join() to ensure all paths are joined correctly.
+* DONE: Create `Path::join()` to ensure all paths are joined correctly.
 
 ## 2025/07/20 Sun
 
