@@ -428,7 +428,7 @@ class Path
     /**
      * Join path elements together with exactly one directory separator between them.
      * Preserves a leading slash on the first element if present, but removes all other slashes.
-     *
+     * Note: cannot use other classes in this (eg Log::debug) as it is called at a very low level.
      * @param string ...$parts The path parts to join.
      * @return string The joined path with no trailing slash, and exactly one directory separator between elements.
      */
@@ -440,16 +440,16 @@ class Path
 
         // Check for leading slash on the first part.
         $hasLeadingSlash = $parts[0] !== '' && str_starts_with($parts[0], '/');
-//Log::debug('hasLeadingSlash: ' . $hasLeadingSlash ? 'true' : 'false');
+file_put_contents('/tmp/debugJoin', 'hasLeadingSlash: ' . ($hasLeadingSlash ? 'true' : 'false') . "\n", FILE_APPEND);
         // Trim all parts and filter out empty ones.
         $parts = array_map(static fn($part) => trim($part, '/'), $parts);
-Log::debug('1 Parts', $parts);
+file_put_contents('/tmp/debugJoin', '1 parts: ' . var_export($parts, true) . "\n", FILE_APPEND);
         $parts = array_filter($parts, static fn($part) => $part !== '');
-//Log::debug('2 Parts', $parts);
+file_put_contents('/tmp/debugJoin', '2 parts: ' . var_export($parts, true) . "\n", FILE_APPEND);
 
         // Join with single slashes and add back leading slash if needed.
         $result = implode('/', $parts);
-//Log::debug('result', $result);
+file_put_contents('/tmp/debugJoin', 'Result: ' . var_export($result, true) . "\n", FILE_APPEND);
         return ($hasLeadingSlash ? '/' : '') . $result;
     }
 }
