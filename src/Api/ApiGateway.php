@@ -77,9 +77,7 @@ class ApiGateway
             $callback = $endpointDef['callback'];
 
             Log::info("Calling callback for $this->method /$this->path");
-Log::debug($this->path . ' ' . $this->method, $endpointDef);
             $result = call_user_func($callback, $params);
-Log::debug('');
             Log::debug('Result', $result);
 
             $this->jsonResponse($result['status'] ?? 200, $result['data'] ?? []);

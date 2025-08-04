@@ -36,9 +36,7 @@ class CommentManager extends Singleton
             return ['status' => 400, 'data' => 'Failed to save comment: empty comment'];
         } else {
             Log::debug('Valid data found from ' . $params['path'], $commentText);
-Log::debug('');
             $response = self::execPostComment($fileId, $commentText, $userName);
-Log::debug('');
             if ($response['status'] !== 200) {
                 return $response;
             }
@@ -68,9 +66,7 @@ Log::debug('');
         VALUES (NOW(), ?, ?, ?, false)
         ';
         Log::debug("Db::sqlExec('$insertSql', 'ssi', '$userName', '$commentText', '$fileId')");
-Log::debug('');
         $insertResult = Db::sqlExec($insertSql, 'ssi', $userName, $commentText, $fileId);
-Log::debug('');
 
         if (empty($insertResult) || (0 === ($insertResult['rows'] ?? 0)) || (0 === ($insertResult['id'] ?? 0))) {
             Log::debug("Failed to add comment by $userName on $fileId", $commentText);

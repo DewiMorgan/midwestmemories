@@ -174,9 +174,7 @@ class Metadata
             if (!array_key_exists('data', $currentNode)) {
                 $currentNode['data'] = [];
             }
-Log::debug("1 webPathSoFar='$webPathSoFar', pathElement='$pathElement'"); // DELETEME DEBUG
             $webPathSoFar = Path::join($webPathSoFar, $pathElement);
-Log::debug("2 webPathSoFar='$webPathSoFar'"); // DELETEME DEBUG
             if (empty($currentNode['data'])) {
                 $currentNode['data'] = self::loadOneFolderIni($webPathSoFar);
             }
@@ -190,7 +188,6 @@ Log::debug("2 webPathSoFar='$webPathSoFar'"); // DELETEME DEBUG
      */
     private static function loadOneFolderIni(string $webPath): array
     {
-Log::debug("webPath='$webPath'"); // DELETEME DEBUG
         $iniUnixPath = Path::webToUnixPath(Path::join($webPath, 'index.txt'), false);
         if (!file_exists($iniUnixPath)) {
             Log::debug("loadFolderIni found no ini from webPath $webPath at unix path", $iniUnixPath);
