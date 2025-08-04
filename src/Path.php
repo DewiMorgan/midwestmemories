@@ -440,16 +440,19 @@ class Path
 
         // Check for leading slash on the first part.
         $hasLeadingSlash = $parts[0] !== '' && str_starts_with($parts[0], '/');
-file_put_contents('/tmp/debugJoin', 'hasLeadingSlash: ' . ($hasLeadingSlash ? 'true' : 'false') . "\n", FILE_APPEND);
+file_put_contents('/data0/ulixamvtuwwyaykg/tmp/debugJoin', 'hasLeadingSlash: ' . ($hasLeadingSlash ? 'true' : 'false') . "\n", FILE_APPEND);
         // Trim all parts and filter out empty ones.
         $parts = array_map(static fn($part) => trim($part, '/'), $parts);
-file_put_contents('/tmp/debugJoin', '1 parts: ' . var_export($parts, true) . "\n", FILE_APPEND);
+file_put_contents('/data0/ulixamvtuwwyaykg/tmp/debugJoin', '1 parts: ' . var_export($parts, true) . "\n", FILE_APPEND);
+if ('Opa\'s SlidesOpa\'s Slides/B1TU' === $parts[0]) {
+    file_put_contents('/data0/ulixamvtuwwyaykg/tmp/debugJoin', var_export(debug_backtrace(), true) . "\n", FILE_APPEND);
+}
         $parts = array_filter($parts, static fn($part) => $part !== '');
-file_put_contents('/tmp/debugJoin', '2 parts: ' . var_export($parts, true) . "\n", FILE_APPEND);
+file_put_contents('/data0/ulixamvtuwwyaykg/tmp/debugJoin', '2 parts: ' . var_export($parts, true) . "\n", FILE_APPEND);
 
         // Join with single slashes and add back leading slash if needed.
         $result = implode('/', $parts);
-file_put_contents('/tmp/debugJoin', 'Result: ' . var_export($result, true) . "\n", FILE_APPEND);
+file_put_contents('/data0/ulixamvtuwwyaykg/tmp/debugJoin', 'Result: ' . var_export($result, true) . "\n", FILE_APPEND);
         return ($hasLeadingSlash ? '/' : '') . $result;
     }
 }
