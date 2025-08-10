@@ -2,11 +2,10 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
-* Make filtered images viewable.
-* Verify CSVs get reparsed after being updated.
-
+* Make filtered images viewable. Remember a session variable "imagetype"?
 * Get folder-level details showing.
 * Faster page loads (smaller initial images?)
+
 * Bug: Clicking dot doesn't cause folding.
 * Generate Web page tests.
 * Add unit tests for everything.

@@ -3,6 +3,10 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/08/10 Sun
+
+* DONE: Verify CSVs get reparsed after being updated.
+
 ## 2025/08/03 Sun
 
 * DONE: Push to live
