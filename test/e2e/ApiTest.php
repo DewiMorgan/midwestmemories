@@ -384,4 +384,96 @@ class ApiTest extends TestCase
         // We should have been rate limited after 20 requests
         static::assertLessThanOrEqual(20, $numSuccesses, 'Should be rate limited after 20 requests');
     }
+
+    /** Test GET /api/v1.0/image_type */
+    public function testGetImageType(): void
+    {
+        // First, log in as a test user
+        TestHelper::loginAs(self::USER_NAME, self::PASSWORD);
+
+        // Set a specific image type for the test user
+        $db = Db::getInstance();
+        $db::sqlExec(
+            'UPDATE `' . Table::users() . '` SET `image_type` = ? WHERE `username` = ?',
+            'ss',
+            'ice',
+            self::USER_NAME
+        );
+
+        // Call the endpoint
+        $response = TestHelper::request('GET', '/api/v1.0/image_type');
+
+        // Verify the response
+        static::assertEquals(200, $response['status'], 'Should be able to get image type: ' . $response['data']);
+
+        $data = json_decode($response['data'], true);
+        static::assertIsArray($data, 'Response should be a JSON object');
+        static::assertArrayHasKey('data', $data, 'Response should have a data field');
+        static::assertIsArray($data['data'], 'Data field should be an object');
+        static::assertArrayHasKey('image_type', $data['data'], 'Data should contain image_type');
+        static::assertEquals('ice', $data['data']['image_type'], 'Should return the correct image type');
+    }
+
+    /** Test POST /api/v1.0/image_type */
+    public function testSetImageType(): void
+    {
+        // First, log in as a test user
+        TestHelper::loginAs(self::USER_NAME, self::PASSWORD);
+
+        // Test setting a valid image type
+        $response = TestHelper::request('POST', '/api/v1.0/image_type', [
+            'image_type' => 'original'
+        ]);
+
+        // Verify the response
+        static::assertEquals(200, $response['status'], 'Should be able to set image type: ' . $response['data']);
+        
+        $data = json_decode($response['data'], true);
+        static::assertIsArray($data, 'Response should be a JSON object');
+        static::assertArrayHasKey('data', $data, 'Response should have a data field');
+        static::assertEquals('OK', $data['data'], 'Response should indicate success');
+
+        // Verify the image type was updated by getting it
+        $response = TestHelper::request('GET', '/api/v1.0/image_type');
+        $data = json_decode($response['data'], true);
+        static::assertEquals('original', $data['data']['image_type'], 'Image type should be updated to original');
+
+        // Test setting another valid image type
+        $response = TestHelper::request('POST', '/api/v1.0/image_type', [
+            'image_type' => 'thumbnail'
+        ]);
+
+        // Verify the response
+        static::assertEquals(200, $response['status'], 'Should be able to update image type: ' . $response['data']);
+        
+        // Verify the image type was updated again
+        $response = TestHelper::request('GET', '/api/v1.0/image_type');
+        $data = json_decode($response['data'], true);
+        static::assertEquals('thumbnail', $data['data']['image_type'], 'Image type should be updated to thumbnail');
+    }
+
+    /** Test POST /api/v1.0/image_type with invalid type */
+    public function testSetImageTypeWithInvalidType(): void
+    {
+        // First, log in as a test user
+        TestHelper::loginAs(self::USER_NAME, self::PASSWORD);
+
+        // Test setting an invalid image type
+        $response = TestHelper::request('POST', '/api/v1.0/image_type', [
+            'image_type' => 'invalid_type'
+        ]);
+
+        // Verify the error response
+        static::assertEquals(400, $response['status'], 'Should reject invalid image type');
+        
+        $data = json_decode($response['data'], true);
+        static::assertIsArray($data, 'Response should be a JSON object');
+        static::assertArrayHasKey('error', $data, 'Error response should have an error field');
+        static::assertStringStartsWith('Error:', $data['error'] ?? '', 'Should return an error message');
+
+        // Verify the image type was not updated by getting it
+        $response = TestHelper::request('GET', '/api/v1.0/image_type');
+        $data = json_decode($response['data'], true);
+        static::assertNotEquals('invalid_type', $data['data']['image_type'] ?? '', 'Invalid image type should not be set');
+    }
 }

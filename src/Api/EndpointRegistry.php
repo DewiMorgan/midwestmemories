@@ -6,8 +6,6 @@ namespace MidwestMemories\Api;
 use MidwestMemories\CommentManager;
 use MidwestMemories\DropboxManager;
 use MidwestMemories\Enum\EndpointKey;
-use MidwestMemories\Enum\EndpointPath;
-use MidwestMemories\Enum\HttpMethod;
 use MidwestMemories\Enum\ParamTypes;
 use MidwestMemories\FileProcessor;
 use MidwestMemories\Log;

@@ -50,7 +50,7 @@ CREATE TABLE `midmem_users`
     `failed_attempts`   int(10) unsigned NOT NULL                    DEFAULT 0 COMMENT 'Number of failed logins.',
     `last_failed_login` datetime                                     DEFAULT NULL,
     `lockout_until`     datetime                                     DEFAULT NULL,
-    `file_type`         enum ('ice', 'original', 'thumbnail', 'web') DEFAULT 'web' COMMENT 'Preferred image type.',
+    `image_type`        enum ('ice', 'original', 'thumbnail', 'web') DEFAULT 'web' COMMENT 'Preferred image type.',
     `created_at`        datetime         NOT NULL                    DEFAULT current_timestamp(),
     `updated_at`        datetime         NOT NULL                    DEFAULT current_timestamp()
         ON UPDATE current_timestamp(),

@@ -317,7 +317,7 @@ class User extends Singleton
         $value = Db::sqlGetValue(
             'image_type',
             'SELECT `image_type` FROM `' . Table::users() . '` WHERE `id` = ?',
-            's',
+            'd',
             $_SESSION['userId']
         );
         if (!$value) {

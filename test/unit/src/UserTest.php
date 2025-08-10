@@ -551,4 +551,115 @@ final class UserTest extends TestCase
         static::assertSame('DISABLED', $users[1]['comment']);
     }
 
+    public function testGetImageType(): void
+    {
+        $this->useRealDb();
+        $_SESSION['userId'] = 1;
+        Db::sqlExec(
+            'INSERT INTO `' . Table::users() . '` (`id`, `username`, `password_hash`, `access_level`, `image_type`)
+                VALUES (?, ?, ?, ?, ?)',
+            'issis',
+            1,
+            'bob',
+            'hash',
+            UserAccess::USER->value,
+            'ice'
+        );
+
+        // Call the method under test
+        $result = User::getImageType();
+
+        // Verify the response structure and values.
+        static::assertIsArray($result);
+        static::assertSame(200, $result['status']);
+        static::assertIsArray($result['data']);
+        static::assertArrayHasKey('image_type', $result['data']);
+        // The default is defined in ImageTypes::DEFAULT = 'web'.
+        static::assertSame('ice', $result['data']['image_type']);
+    }
+
+    public function testSetImageType(): void
+    {
+        $this->useRealDb();
+        $_SESSION['userId'] = 1;
+
+        // Insert a test user
+        Db::sqlExec(
+            'INSERT INTO `' . Table::users() . '` (`id`, `username`, `password_hash`, `access_level`)
+                VALUES (?, ?, ?, ?)',
+            'issi',
+            1,
+            'bob',
+            'hash',
+            UserAccess::USER->value
+        );
+
+        // Test setting a valid image type
+        $result = User::setImageType(['image_type' => 'original']);
+
+        // Verify the response
+        static::assertIsArray($result);
+        static::assertSame(200, $result['status']);
+        static::assertSame('OK', $result['data']);
+
+        // Verify the database was updated
+        $imageType = Db::sqlGetValue(
+            'image_type',
+            'SELECT `image_type` FROM `' . Table::users() . '` WHERE `id` = ?',
+            'd',
+            1
+        );
+        static::assertSame('original', $imageType);
+
+        // Test setting another valid image type
+        $result = User::setImageType(['image_type' => 'thumbnail']);
+
+        // Verify the response
+        static::assertIsArray($result);
+        static::assertSame(200, $result['status']);
+        static::assertSame('OK', $result['data']);
+
+        // Verify the database was updated again
+        $imageType = Db::sqlGetValue(
+            'image_type',
+            'SELECT `image_type` FROM `' . Table::users() . '` WHERE `id` = ?',
+            'd',
+            1
+        );
+        static::assertSame('thumbnail', $imageType);
+    }
+
+    public function testSetImageTypeWithInvalidType(): void
+    {
+        $this->useRealDb();
+        $_SESSION['userId'] = 1;
+
+        // Insert a test user
+        Db::sqlExec(
+            'INSERT INTO `' . Table::users() . '` (`id`, `username`, `password_hash`, `access_level`)
+                VALUES (?, ?, ?, ?)',
+            'issi',
+            1,
+            'bob',
+            'hash',
+            UserAccess::USER->value
+        );
+
+        // Test setting an invalid image type
+        $result = User::setImageType(['image_type' => 'invalid_type']);
+
+        // Verify the error response
+        static::assertIsArray($result);
+        static::assertSame(400, $result['status']);
+        static::assertSame('Error: Invalid Image Type', $result['data']);
+
+        // Verify the database was not updated
+        $imageType = Db::sqlGetValue(
+            'image_type',
+            'SELECT `image_type` FROM `' . Table::users() . '` WHERE `id` = ?',
+            'd',
+            1
+        );
+        static::assertSame('web', $imageType, 'Invalid image type should remain the default');
+    }
 }
