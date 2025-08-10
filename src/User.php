@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace MidwestMemories;
 
 use JetBrains\PhpStorm\NoReturn;
+use MidwestMemories\Enum\ImageTypes;
 use MidwestMemories\Enum\UserAccess;
 
 /*
@@ -305,6 +306,47 @@ class User extends Singleton
         }
 
         return ['status' => 200, 'data' => $rows];
+    }
+
+    /**
+     * Endpoint: GET `/api/v1.0/image_type`. Get all users, including disabled ones.
+     * @return array `['status' => 200, 'data' => ['image_type'=> '...']]`
+     */
+    public static function getImageType(): array
+    {
+        $value = Db::sqlGetValue(
+            'image_type',
+            'SELECT `image_type` FROM `' . Table::users() . '` WHERE `id` = ?',
+            's',
+            $_SESSION['userId']
+        );
+        if (!$value) {
+            $value = ImageTypes::DEFAULT->value;
+        }
+        return ['status' => 200, 'data' => ['image_type' => $value]];
+    }
+
+    /**
+     * Endpoint: POST `/api/v1.0/image_type`. Get all users, including disabled ones.
+     * @return array `['status' => 200, 'data' => ['image_type'=> '...']]`
+     * On failure, `['status' => 500, 'data' => 'Error: ...']` or similar.
+     */
+    public static function setImageType(array $params): array
+    {
+        $imageType = trim($params['image_type'] ?? '');
+        $enumType = ImageTypes::tryFrom($imageType);
+        if ($enumType === null) {
+            return ['status' => 400, 'data' => 'Error: Invalid Image Type'];
+        }
+        $ok = Db::sqlExec(
+            'UPDATE `' . Table::users() . '` SET `image_type` = ?',
+            's',
+            $enumType->value
+        );
+        if (!$ok) {
+            return ['status' => 500, 'data' => 'Error: Failed to update image type'];
+        }
+        return ['status' => 200, 'data' => 'OK'];
     }
 
 }

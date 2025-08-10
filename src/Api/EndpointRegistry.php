@@ -31,9 +31,7 @@ class EndpointRegistry
     public static function get(string $method, string $path): ?array
     {
         try {
-            $method = HttpMethod::from($method);
-            $path = EndpointPath::from(trim($path, '/'));
-            $key = EndpointKey::from(strtoupper($method->value) . '#' . $path->value);
+            $key = EndpointKey::from(strtoupper($method) . '#' . trim($path, '/'));
         } catch (ValueError) {
             Log::warn("Couldn't match enums for $method $path");
             return null;
@@ -140,7 +138,7 @@ class EndpointRegistry
                 'params' => ['username' => ParamTypes::STRING, 'password' => ParamTypes::STRING],
                 'callback' => User::addUser(...),
                 'responseType' => [
-                    200 => ['success' => true, 'data' => 'OK'],
+                    200 => ['success' => true, 'data' => ParamTypes::OK],
                     409 => ['success' => false, 'data' => '/^Error: Conflict\. .*/'],
                     422 => ['success' => false, 'data' => '/^Error: Unprocessable content\. .*/'],
                 ]
@@ -150,7 +148,7 @@ class EndpointRegistry
                 'params' => ['username' => ParamTypes::STRING, 'password' => ParamTypes::STRING],
                 'callback' => User::changePassword(...),
                 'responseType' => [
-                    200 => ['success' => true, 'data' => 'OK']
+                    200 => ['success' => true, 'data' => ParamTypes::OK]
                 ]
             ],
             EndpointKey::DELETE_USER => [
@@ -158,7 +156,7 @@ class EndpointRegistry
                 'params' => ['username' => ParamTypes::STRING],
                 'callback' => User::delete(...),
                 'responseType' => [
-                    200 => ['success' => true, 'data' => 'OK']
+                    200 => ['success' => true, 'data' => ParamTypes::OK]
                 ]
             ],
             // Universally accessible endpoints.
@@ -167,7 +165,7 @@ class EndpointRegistry
                 'params' => ['username' => ParamTypes::STRING, 'password' => ParamTypes::STRING],
                 'callback' => User::handleUserLogin(...),
                 'responseType' => [
-                    200 => ['success' => true, 'data' => 'OK'],
+                    200 => ['success' => true, 'data' => ParamTypes::OK],
                     409 => ['success' => false, 'data' => '/^Error: Conflict\. .*/']
                 ],
             ],
@@ -220,7 +218,24 @@ class EndpointRegistry
                 'responseType' => [
                     200 => ['success' => true, 'data' => ParamTypes::OK],
                 ]
-            ]
+            ],
+            EndpointKey::GET_IMAGE_TYPE => [
+                'auth' => 'user',
+                'params' => [],
+                'callback' => User::getImageType(...),
+                'responseType' => [
+                    200 => ['success' => true, 'data' => ['image_type' => ParamTypes::STRING]],
+                ],
+            ],
+            EndpointKey::POST_IMAGE_TYPE => [
+                'auth' => 'user',
+                'params' => ['image_type' => ParamTypes::STRING],
+                'callback' => User::setImageType(...),
+                'responseType' => [
+                    200 => ['success' => true, 'data' => ParamTypes::OK],
+                    400 => ['success' => false, 'error' => ParamTypes::STRING]
+                ],
+            ],
         };
     }
 
