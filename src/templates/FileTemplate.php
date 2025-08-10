@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
-use MidwestMemories\Enum\Key;
-
 /**
  * Template to display a single file and its details.
  */
@@ -35,6 +33,22 @@ use MidwestMemories\Enum\Key;
 
     ?>
     <img src="<?= $u_linkUrl ?>" alt="<?= $h_altText ?>" class="file">
+
+    <!-- Image Type Selector -->
+    <div class="image-type-selector" style="margin: 10px 0;">
+        <label for="image-type-selector">Image Type: </label>
+        <select id="image-type-selector">
+            <?php
+            $currentType = User::getImageType()['data']['image_type'] ?? 'web';
+            $types = ['original', 'web', 'thumbnail', 'ice'];
+            foreach ($types as $type):
+                $selected = $currentType === $type ? 'selected' : '';
+                echo "<option value=\"$type\" $selected>$type</option>";
+            endforeach;
+            ?>
+        </select>
+    </div>
+
     <table>
         <tr>
             <td>Slide:</td>
@@ -69,11 +83,15 @@ use MidwestMemories\Enum\Key;
 </div><!-- End template-content div-->
 
 <script id="template-script">
-    // Initialize the TreeView.
+    // Initialize the page components.
     function setupTemplate() {
         console.log("In FileTemplate.setupTemplate()");
         const comments = new Comments(<?= Metadata::getFileId() ?>);
         comments.setupTemplate();
+
+        // Initialize the image type selector
+        const currentType = '<?= $currentType ?>';
+        ImageTypes.init('image-type-selector', currentType);
     }
 </script>
 </body>
