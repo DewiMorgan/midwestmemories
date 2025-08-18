@@ -2,6 +2,11 @@
 
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
+(major): once they select ICE, they can't switch to other types.
+(major): I haven't made it generate the "web" version yet.
+(minor, not relevant to any of your files): If the original filetype is not .jpg, then web and thumb view selections don't work, as it keeps the file extension from the original image.
+(minor): I haven't made it handle "Back" images like ICE images yet. Not sure if I should, or if I should treat front & back as separate images.
+
 * Make filtered images viewable. Remember a session variable "imagetype"?
 * Get folder-level details showing.
 * Faster page loads (smaller initial images?)
