@@ -27,6 +27,7 @@ class JsCompiler
         'DragBar.js',
         'HtmlUtils.js',
         'ImageTypes.js',
+        'JsCompiler.js',
         'Log.js',
         'TreeView.js',
     ];
