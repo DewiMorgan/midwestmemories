@@ -21,6 +21,7 @@ use JetBrains\PhpStorm\NoReturn;
 use MidwestMemories\JsCompiler;
 use MidwestMemories\Path;
 
+require_once(__DIR__ . '/../src/autoload.php');
 require_once(Path::join(__DIR__, '/../src/JsCompiler.php'));
 
 // Parse command line arguments.

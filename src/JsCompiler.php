@@ -13,13 +13,13 @@ namespace MidwestMemories;
 class JsCompiler
 {
     public static array $adminFiles = [
+        'AdminPage.js',
         'Api.js',
         'Dropbox.js',
         'HtmlUtils.js',
         'Log.js',
         'Users.js',
         'UserTable.js',
-        'AdminPage.js',
     ];
     public static array $userFiles = [
         'Api.js',
@@ -27,7 +27,6 @@ class JsCompiler
         'DragBar.js',
         'HtmlUtils.js',
         'ImageTypes.js',
-        'JsCompiler.js',
         'Log.js',
         'TreeView.js',
     ];
