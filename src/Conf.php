@@ -59,6 +59,10 @@ class Conf extends Singleton
      */
     public static function get(Key $key): ?string
     {
+        // ToDo: Kludge. Need local config not to conflict with github: midwestmemories-local.ini file?
+        if ((Key::BASE_URL === $key) && !str_contains(__DIR__, '/midwestmemoriesfamily')) {
+            return 'https://midwestmemories.dewimorgan.com';
+        }
         return self::getInstance()->getValue($key);
     }
 
