@@ -78,4 +78,33 @@ class PathTest extends TestCase
         // Test with all empty strings.
         self::assertSame('', Path::join('', '', ''));
     }
+
+    /**
+     * Verify the unixPathToUrl properly converts urls for real files.
+     */
+    public function testUnixPathToUrl(): void
+    {
+        // Set up test environment
+        Path::validateBaseDir();
+        Path::$imgBaseUnixPath = __DIR__;
+        $expectedSuccess = 'https://midwestmemories.dewimorgan.com/test_data/test.jpg';
+        $expected404 = 'PATH-ERROR-404';
+
+        self::assertNotFalse(file_put_contents(__DIR__ . '/test_data/test.jpg', 'test'), 'Make test file');
+
+        // Test absolute path.
+        $result = Path::unixPathToUrl(__DIR__ . '/test_data/test.jpg');
+        self::assertSame($expectedSuccess, $result);
+
+        // Test absolute with parent directory traversal. Should fail: we don't support this.
+        $result = Path::unixPathToUrl(__DIR__ . 'test_data/../test_data/test.jpg');
+        self::assertSame($expected404, $result);
+
+        // Test relative path.
+        $result = Path::unixPathToUrl('test_data/test.jpg');
+        self::assertSame($expectedSuccess, $result);
+
+        // Clean up.
+        unlink('test_data/test.jpg');
+    }
 }

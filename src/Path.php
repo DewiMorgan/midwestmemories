@@ -87,7 +87,7 @@ class Path
         $imageDir = Conf::get(Key::IMAGE_DIR);
         $baseDir = realpath(Path::join(__DIR__, '..', $imageDir));
         if (empty($baseDir)) {
-            Log::debug('MM_BASE_DIR empty from "' . __DIR__ . ' + /../ + ' . $imageDir . '".');
+            Log::debug('MM_BASE_DIR empty from "' . __DIR__ . ' + /../ + ' . $imageDir . '"');
             Log::debug('Not safe to continue');
             http_response_code(500); // Internal Server Error.
             die(1);
@@ -97,27 +97,30 @@ class Path
 
     /**
      * Take a filesystem path of an object on the filesystem, and return an absolute URL.
-     * @param string $filePath The filesystem path to convert.
+     * @param string $fileUnixPath The filesystem path to convert.
      * @return string The converted path, or a string like 'PATH-ERROR-...' on failure, to avoid exploits.
      */
-    public static function unixPathToUrl(string $filePath, $linkType = self::LINK_USER): string
+    public static function unixPathToUrl(string $fileUnixPath, $linkType = self::LINK_USER): string
     {
-        if (!str_starts_with($filePath, self::$imgBaseUnixPath)) {
-            Log::debug('Prepending MM_BASE_DIR', $filePath);
-            $filePath = self::join(self::$imgBaseUnixPath, $filePath);
+        if (!str_starts_with($fileUnixPath, self::$imgBaseUnixPath)) {
+            Log::debug('Prepending MM_BASE_DIR', $fileUnixPath);
+            $fileUnixPath = self::join(self::$imgBaseUnixPath, $fileUnixPath);
         }
-        $realPath = realpath($filePath);
+        $realPath = realpath($fileUnixPath);
         if (!$realPath) {
-            Log::warn('Converted path was not found', $filePath);
+            Log::warn('Converted path was not found', $fileUnixPath);
             return 'PATH-ERROR-404';
         }
         if (!str_starts_with($realPath, self::$imgBaseUnixPath)) {
-            Log::warn("Converted path was not within MM_BASE_DIR: '$realPath' from '$filePath'");
+            Log::warn("Converted path was not within MM_BASE_DIR: '$realPath' from '$fileUnixPath'");
             return 'PATH-ERROR-401';
         }
-        $result = preg_replace('#^' . preg_quote(Path::join(self::$imgBaseUnixPath, '*'), '#') . '#', '/', $realPath);
+
+        // Strip self::$imgBaseUnixPath and any extra slashes from start of path, and replace with single leading slash.
+        $result = preg_replace('#^' . preg_quote(rtrim(self::$imgBaseUnixPath, '/')) . '/*#', '/', $realPath);
+
         if (!$result) {
-            Log::warn('Converted path gave an empty string or error', $filePath);
+            Log::warn('Converted path gave an empty string or error', $fileUnixPath);
             return 'PATH-ERROR-BAD';
         }
 
@@ -126,7 +129,6 @@ class Path
         if (self::LINK_USER !== (string)$linkType) {
             $result .= '?i=' . $linkType;
         }
-//        Log::debug("$result from $filePath"); // DEBUG DELETEME
         return $result;
     }
 
