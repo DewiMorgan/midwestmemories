@@ -27,8 +27,8 @@ namespace MidwestMemories;
 
     // Special cases.
     $h_slide = ($h_fd['slideorigin'] ?? '')
-        . ':' . ($h_fd['slidenumber'] ?? '')
-        . ':' . ($h_fd['slidesubsection'] ?? '');
+            . ':' . ($h_fd['slidenumber'] ?? '')
+            . ':' . ($h_fd['slidesubsection'] ?? '');
     $h_altText = $h_fd['displayname'] ?? '';
 
     ?>

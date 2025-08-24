@@ -430,7 +430,7 @@ class Path
     /**
      * Join path elements together with exactly one directory separator between them.
      * Preserves a leading slash on the first element if present, but removes all other slashes.
-     * Note: cannot use other classes in this (eg Log::debug) as it is called at a very low level.
+     * Note: cannot use other classes in this (like Log::debug) as it is called at a very low level.
      * @param string ...$parts The path parts to join.
      * @return string The joined path with no trailing slash, and exactly one directory separator between elements.
      */
@@ -449,17 +449,5 @@ class Path
         // Join with single slashes and add back leading slash if needed.
         $result = implode('/', $parts);
         return ($hasLeadingSlash ? '/' : '') . $result;
-    }
-
-    /**
-     * Basic logging function for debugging things like `Path::join()` that can't include the Log class.
-     * @param string $msg
-     * @return void
-     */
-    public static function basicLog(string $msg)
-    {
-        $file = '/data0/ulixamvtuwwyaykg/public_html/midwestmemories/mm.log';
-
-        file_put_contents($file, 'BasicLog: ' . $msg . "\n", FILE_APPEND);
     }
 }

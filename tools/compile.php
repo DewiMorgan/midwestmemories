@@ -34,7 +34,8 @@ compileAllFiles();
 /**
  * Check if any files are outdated and need recompilation.
  */
-#[NoReturn] function compileAllFiles(): void
+#[NoReturn]
+function compileAllFiles(): void
 {
     // Check if any files need recompilation.
     if (!JsCompiler::areAnyFilesOutdated()) {
