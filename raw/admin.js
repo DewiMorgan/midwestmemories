@@ -1,4 +1,29 @@
-/* Version: 2 */
+/* Version: 3 */
+
+
+/* Source: AdminPage.js */
+/**
+ * Call the various API tasks that we run automatically when displaying the admin page.
+ * First, list all users in a table to let them be edited.
+ * Then, process any pending Dropbox updates.
+ */
+function runAdminTasks() {
+    // noinspection VoidExpressionJS
+    void new UserTable();
+    const userListDiv = document.getElementById('user-list');
+    userListDiv.appendChild(UserTable.table);
+
+    // Populate the user list.
+    // noinspection JSIgnoredPromiseFromCall
+    Users.listUsers();
+
+    // Do any pending Dropbox activities.
+    // noinspection JSIgnoredPromiseFromCall
+    Dropbox.runAllUpdates();
+}
+
+// Wait for the DOM to be fully loaded before running admin tasks.
+document.addEventListener('DOMContentLoaded', runAdminTasks);
 
 
 /* Source: Api.js */
@@ -107,7 +132,20 @@ window.Dropbox = class {
             }
             for (const [index, filename] of files.entries()) {
                 Log.message(`= ${index + 1}/${numFiles} ${actionName} ${filename}...`);
-                await Api.fetchApiData(endpoint, 'POST', 'string');
+                try {
+                    await Api.fetchApiData(endpoint, 'POST', 'string');
+                } catch (err) {
+                    if ("HTTP error: 502" === "" + err.message) {
+                        Log.message(`= ${actionName} hit bad gateway, sleeping for 3 seconds and retrying...`);
+                        await new Promise(resolve => setTimeout(resolve, 3000));
+                    } else if ("HTTP error: 500" === "" + err.message) {
+                        Log.message(`= ${actionName} failed, likely file not found, trying to skip...`);
+                        await new Promise(resolve => setTimeout(resolve, 3000));
+                    } else {
+                        Log.message(`= ${actionName} failed in fetch, and could not continue: ${err.message}`);
+                        break;
+                    }
+                }
             }
             Log.message(`= ${actionName} complete!`);
         } catch (err) {
@@ -585,29 +623,4 @@ window.UserTable = class {
         return actionCell;
     }
 };
-
-
-/* Source: AdminPage.js */
-/**
- * Call the various API tasks that we run automatically when displaying the admin page.
- * First, list all users in a table to let them be edited.
- * Then, process any pending Dropbox updates.
- */
-function runAdminTasks() {
-    // noinspection VoidExpressionJS
-    void new UserTable();
-    const userListDiv = document.getElementById('user-list');
-    userListDiv.appendChild(UserTable.table);
-
-    // Populate the user list.
-    // noinspection JSIgnoredPromiseFromCall
-    Users.listUsers();
-
-    // Do any pending Dropbox activities.
-    // noinspection JSIgnoredPromiseFromCall
-    Dropbox.runAllUpdates();
-}
-
-// Wait for the DOM to be fully loaded before running admin tasks.
-document.addEventListener('DOMContentLoaded', runAdminTasks);
 

@@ -25,6 +25,7 @@ By priority:
 * Get folder-level details showing.
 * Faster page loads (smaller initial images?)
 
+* DONE: API often gets 502 errors. It should just retry.
 * Make cookies page: we use 1 essential cookie for the session id.
 * Make privacy page: List what DB stores, how to remove it, how photos/comments are stored, and who can see them.
 * Bug: Clicking dot doesn't cause folding.

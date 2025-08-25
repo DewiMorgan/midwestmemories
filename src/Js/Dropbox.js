@@ -47,7 +47,20 @@ window.Dropbox = class {
             }
             for (const [index, filename] of files.entries()) {
                 Log.message(`= ${index + 1}/${numFiles} ${actionName} ${filename}...`);
-                await Api.fetchApiData(endpoint, 'POST', 'string');
+                try {
+                    await Api.fetchApiData(endpoint, 'POST', 'string');
+                } catch (err) {
+                    if ("HTTP error: 502" === "" + err.message) {
+                        Log.message(`= ${actionName} hit bad gateway, sleeping for 3 seconds and retrying...`);
+                        await new Promise(resolve => setTimeout(resolve, 3000));
+                    } else if ("HTTP error: 500" === "" + err.message) {
+                        Log.message(`= ${actionName} failed, likely file not found, trying to skip...`);
+                        await new Promise(resolve => setTimeout(resolve, 3000));
+                    } else {
+                        Log.message(`= ${actionName} failed in fetch, and could not continue: ${err.message}`);
+                        break;
+                    }
+                }
             }
             Log.message(`= ${actionName} complete!`);
         } catch (err) {
