@@ -17,7 +17,7 @@ class FileProcessor
     private static int $origHeight = 0;
 
     /** @var array[] Cache of image sizes as [suffix => [width, height], ...]. */
-    private static array $imageSizes;
+    private static array $imageSizes = [];
     /**
      * @var resource
      */
@@ -248,10 +248,12 @@ class FileProcessor
      */
     private static function imageSize(string $suffix): array
     {
-        self::$imageSizes = self::$imageSizes ?: [
+        // Cache the config values, though for now we do not reuse them as we only process one file at a time.
+        // Mostly this is just to avoid passing the config values around.
+        self::$imageSizes = empty(self::$imageSizes) ? [
             'TN' => [Conf::get(Key::THUMB_MAX_WIDTH) ?: 0, Conf::get(Key::THUMB_MAX_HEIGHT) ?: 0],
             'WEB' => [Conf::get(Key::WEB_MAX_WIDTH) ?: 0, Conf::get(Key::WEB_MAX_HEIGHT) ?: 0]
-        ];
+        ] : self::$imageSizes;
         return self::$imageSizes[$suffix];
     }
 
