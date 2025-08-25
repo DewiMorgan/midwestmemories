@@ -17,6 +17,14 @@ use MidwestMemories\Enum\Key;
  */
 class Metadata
 {
+    private const COL_FILENAME = 0;
+    private const COL_ORIGIN = 1;
+    private const COL_SLIDE_NUMBER = 2;
+    private const COL_SUBSECTION = 3;
+    private const COL_WRITTEN_NOTES = 4;
+    private const COL_ICE = 5;
+    private const COL_DIRECTORY = 6;
+
     /**
      * Tree of folders in web path, starting from root, each with a 'data' element from the ini file for that folder.
      * That's a dict of string properties for the folder, and sub-arrays for properties for each file in the folder.
@@ -211,7 +219,8 @@ class Metadata
     /**
      * Build a list of all file details, parsed-ini-file style, grouped by their directory.
      * @param string $unixFilePath The file to parse.
-     * @return array|false The list of file details, or false on failure.
+     * @return array|false The list of file details, or false on failure, as follows.
+     * ['path/to/folder' => ['filename.ext' => [...details...], ...]
      */
     public static function parseCsvMetadata(string $unixFilePath): array|false
     {
@@ -225,23 +234,28 @@ class Metadata
         $csv = [];
         foreach ($rows as $row) {
             // Skip rows with missing fields.
-            if (empty($row[5])) {
+            if (empty($row[self::COL_DIRECTORY])) {
                 continue;
             }
             // Create a structure to store each row.
-            $filename = $row[0];              // "Filename" csv column.
+            $filename = $row[self::COL_FILENAME];
             $date = preg_replace('/^(....)(..)(..).*$/', '$1-$2-$3', $filename);
             $fileDetails = [
                 'date' => $date,
                 'displayname' => $filename,
-                'slideorigin' => $row[1],     // "Origin" csv column.
-                'slidenumber' => $row[2],     // "Number" csv column.
-                'slidesubsection' => $row[3], // "Bundle" or "Subsection" csv column.
-                'writtennotes' => $row[4],    // "Slide Txt" csv column.
-                'filtered' => $row[5],        // "ICE?" csv column.
+                'slideorigin' => $row[self::COL_ORIGIN],
+                'slidenumber' => $row[self::COL_SLIDE_NUMBER],
+                'slidesubsection' => $row[self::COL_SUBSECTION],
+                'writtennotes' => $row[self::COL_WRITTEN_NOTES],
+                'filtered' => $row[self::COL_ICE],
             ];
-            // "Directory" csv column. Clean up slashes and dots.
-            $unixPath = Path::join(Path::$imgBaseUnixPath, preg_replace(['#[/\\\]+#', '#\.\.+#'], ['/', '.'], $row[6]));
+            // Convert "Directory" csv column to unix path. Clean up slashes and dots.
+            $unixPath = Path::join(dirname($unixFilePath), preg_replace(['#[/\\\]+#', '#\.\.+#'], ['/', '.'], $row[6]));
+            // For safety, ensure we don't create anything outside the base path.
+            if (!str_starts_with($unixPath, Path::$imgBaseUnixPath)) {
+                Log::error("Target outside base path from $unixFilePath + $row[6]", $unixPath);
+                continue;
+            }
             // Create the entry for the directory if it doesn't exist.
             if (!array_key_exists($unixPath, $csv)) {
                 $csv[$unixPath] = [];
@@ -254,7 +268,7 @@ class Metadata
 
     /**
      * Write the INI files from CSV metadata.
-     * @param array $csv The CSV metadata.
+     * @param array $csv The CSV metadata, as returned by parseCsvMetadata.
      * @return bool Success.
      */
     public static function writeIniFiles(array $csv): bool

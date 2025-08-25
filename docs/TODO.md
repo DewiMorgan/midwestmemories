@@ -4,11 +4,18 @@ This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
 By priority:
 
-* (minor): my naming scheme is kinda crap. filename.jpg, tn_filename.jpg, web_filename.jpg, filename-ICE.jpg...
-* (major): once they select ICE, they can't switch to other types.
-* (major): Doesn't generate "web" version yet.
+* DONE: (major): I see both `/Auora/Carrie's Photos/Blue/` (has files) and `/Carrie's Photos/Blue/` (empty) in left-bar.
+    * This is because it is creating the index files without the Auora prefix.
+    * Fix is probably to create index files relative to the folder they're in.
+
+* DONE: (minor, blocker): prefix/suffix inconsistency: `tn_`, `web_`, `-ICE`, `-B`.
+    * Use: `.ext`, `-ICE.ext`, `-B.ext`, `-TN.jpg`, `-WEB.jpg`, `-B-WEB.jpg`?
+    * Should this be two dropdowns? "Type" and "Format"?
+
+* DONE: (major): Doesn't generate "web" version yet.
+
+* (major): BUG: once they select ICE, they can't switch to other types.
 * (minor): Doesn't handle "Back" images like ICE images yet. Should I? Or treat front & back as separate images?
-* (minor): I see both `/Auora/Carrie's Photos/Blue/` (has files) and `/Carrie's Photos/Blue/` (empty) in the left-bar.
 * (minor): no fallback for nonexistent images. "ICE" or "back" for images that lack them, shows no image.
 * (minor, irrelevant to existing files): looks for original file extension for generated images, instead of .jpg.
 * (very minor, future enhancement): Tree loads slowly with 1370 entries, will get worse. Options:

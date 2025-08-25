@@ -614,24 +614,24 @@ window.ImageTypes = class {
             return;
         }
 
-        // Store the current image element
+        // Store the current image element.
         this.imageElement = document.querySelector('img.file');
         if (!this.imageElement) {
             console.error('Could not find image element with class "file"');
             return;
         }
 
-        // Store the original image URL
+        // Store the original image URL.
         this.originalImageUrl = this.imageElement.src;
 
-        // Set the current value
+        // Set the current value.
         if (currentType) {
             dropdown.value = currentType;
-            // Ensure the current image URL matches the selected type
+            // Ensure the current image URL matches the selected type.
             this.updateImageUrl(currentType);
         }
 
-        // Add change event listener
+        // Add change event listener.
         dropdown.addEventListener('change', (event) => {
             const newType = event.target.value;
             this.updateImageUrl(newType);
@@ -652,27 +652,27 @@ window.ImageTypes = class {
         const pathParts = url.pathname.split('/');
         let filename = pathParts.pop();
 
-        // Remove any existing prefixes/suffixes to get the base filename
-        filename = filename.replace(/^(?:web_|tn_)|-ICE(?=\.[^.]+)$/, '');
+        // Remove any existing prefixes/suffixes to get the base filename.
+        filename = filename.replace(/-(WEB|TN|ICE)(?=\.[^.]+)$/, '');
 
-        // Apply the appropriate transformation based on the image type
+        // Apply the appropriate transformation based on the image type.
         switch (imageType) {
             case 'web':
-                filename = 'web_' + filename;
+                filename = filename.replace(/(?=\.[^.]+$)/, '-WEB');
                 break;
             case 'thumbnail':
-                filename = 'tn_' + filename;
+                filename = filename.replace(/(?=\.[^.]+$)/, '-TN');
                 break;
             case 'ice':
                 filename = filename.replace(/(?=\.[^.]+$)/, '-ICE');
-            // 'original' type uses the filename as-is
+            // 'original' type uses the filename as-is.
         }
 
-        // Reconstruct the URL with the new filename
+        // Reconstruct the URL with the new filename.
         pathParts.push(filename);
         url.pathname = pathParts.join('/');
 
-        // Update the image source
+        // Update the image source.
         this.imageElement.src = url.toString();
     }
 
@@ -1069,4 +1069,3 @@ window.TreeView = class {
         listItem.classList.remove('selected');
     }
 };
-

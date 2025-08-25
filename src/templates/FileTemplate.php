@@ -40,7 +40,7 @@ namespace MidwestMemories;
         <select id="image-type-selector">
             <?php
             $currentType = User::getImageType()['data']['image_type'] ?? 'web';
-            $types = ['original', 'web', 'thumbnail', 'ice'];
+            $types = ['web', 'original', 'back', 'ice', 'thumbnail'];
             foreach ($types as $type):
                 $selected = $currentType === $type ? 'selected' : '';
                 echo "<option value=\"$type\" $selected>$type</option>";

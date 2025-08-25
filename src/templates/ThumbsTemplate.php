@@ -14,8 +14,8 @@ use MidwestMemories\Enum\Key;
     <!-- Style elements that require dynamic PHP values -->
     <style>
         div.thumb img {
-            max-width: <?= Conf::get(Key::MAX_THUMB_WIDTH) ?>px;
-            max-height: <?= Conf::get(Key::MAX_THUMB_HEIGHT) ?>px;
+            max-width: <?= Conf::get(Key::THUMB_MAX_WIDTH) ?>px;
+            max-height: <?= Conf::get(Key::THUMB_MAX_HEIGHT) ?>px;
         }
     </style>
 </head>

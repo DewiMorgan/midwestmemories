@@ -20,7 +20,7 @@ class FileProcessTypes
      */
     public static function processGifFile(string $unixPath): bool
     {
-        $thumbResult = FileProcessor::makeThumb(imagecreatefromgif($unixPath), $unixPath);
+        $thumbResult = FileProcessor::makeThumbs(imagecreatefromgif($unixPath), $unixPath);
         $status = ($thumbResult ? SyncStatus::PROCESSED : SyncStatus::ERROR);
         $syncResult = FileProcessor::setSyncStatus($unixPath, $status, 'Processed as GIF.');
         return $thumbResult && $syncResult;
@@ -67,7 +67,7 @@ class FileProcessTypes
             // Thumbnail generation would be faster from the new JPG, so we roll this into convertToJpeg.
             $thumbResult = FileProcessor::convertToJpeg($unixPath);
         } else {
-            $thumbResult = FileProcessor::makeThumb(imagecreatefrompng($unixPath), $unixPath);
+            $thumbResult = FileProcessor::makeThumbs(imagecreatefrompng($unixPath), $unixPath);
         }
         $status = ($thumbResult ? SyncStatus::PROCESSED : SyncStatus::ERROR);
         $syncResult = FileProcessor::setSyncStatus($unixPath, $status, 'Processed as PNG.');
@@ -85,7 +85,7 @@ class FileProcessTypes
             $thumbResult = true;
         } else {
             Log::debug('Processing', $unixPath);
-            $thumbResult = FileProcessor::makeThumb(imagecreatefromjpeg($unixPath), $unixPath);
+            $thumbResult = FileProcessor::makeThumbs(imagecreatefromjpeg($unixPath), $unixPath);
         }
         $status = ($thumbResult ? SyncStatus::PROCESSED : SyncStatus::ERROR);
         $syncResult = FileProcessor::setSyncStatus($unixPath, $status, 'Processed as JPG.');

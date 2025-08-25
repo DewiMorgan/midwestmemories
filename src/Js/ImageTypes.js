@@ -51,19 +51,24 @@ window.ImageTypes = class {
         let filename = pathParts.pop();
 
         // Remove any existing prefixes/suffixes to get the base filename
-        filename = filename.replace(/^(?:web_|tn_)|-ICE(?=\.[^.]+)$/, '');
+        filename = filename.replace(/|-(?:ICE|WEB|TN|B)(?=\.[^.]+)$/, '');
 
         // Apply the appropriate transformation based on the image type
         switch (imageType) {
+            case 'back':
+                filename = filename.replace(/\.[^.]+$/, '-B.jpg');
+                break;
             case 'web':
-                filename = 'web_' + filename;
+                filename = filename.replace(/\.[^.]+$/, '-WEB.jpg');
                 break;
             case 'thumbnail':
-                filename = 'tn_' + filename;
+                filename = filename.replace(/\.[^.]+$/, '-TN.jpg');
                 break;
             case 'ice':
-                filename = filename.replace(/(?=\.[^.]+$)/, '-ICE');
-            // 'original' type uses the filename as-is
+                filename = filename.replace(/\.[^.]+$/, '-ICE.jpg');
+                break;
+            case 'original':
+                filename = filename.replace(/\.[^.]+$/, '.jpg');
         }
 
         // Reconstruct the URL with the new filename

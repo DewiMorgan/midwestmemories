@@ -31,16 +31,16 @@ namespace MidwestMemories;
         // Skip files we're uninterested in.
         if (
             !is_file($itemPath)
-            || str_starts_with($itemPath, 'tn_')
+            || preg_match('-(ICE|WEB|TN|B)\.[^.]+$', $itemPath)
             || str_starts_with($itemPath, '.')
             || !preg_match('/\.(gif|png|jpg|jpeg)$/', $itemPath)
         ) {
             continue;
         }
         // Skip files without a matching thumbnail file: they have not been fully processed.
-        $thumbName = FileProcessor::getThumbName($itemPath);
+        $thumbName = FileProcessor::getThumbName($itemPath, 'TN');
         if (!is_file($thumbName)) {
-            if (!str_starts_with($thumbName, 'tn_')) { // Avoid log spam from thumbs.
+            if (!preg_match('-(ICE|WEB|TN|B)\.[^.]+$', $thumbName)) { // Avoid log spam from thumbs etc.
                 Log::debug("No thumb found for image: $thumbName from $itemPath");
             }
             continue;

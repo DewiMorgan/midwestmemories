@@ -22,8 +22,10 @@ enum Key: string
     case LOG_FILE = 'log_file';
     case LOG_LEVEL = 'log_level';
     case MAX_PNG_BYTES = 'max_png_bytes';
-    case MAX_THUMB_HEIGHT = 'max_thumb_height';
-    case MAX_THUMB_WIDTH = 'max_thumb_width';
+    case THUMB_MAX_HEIGHT = 'thumb_max_height';
+    case THUMB_MAX_WIDTH = 'thumb_max_width';
+    case WEB_MAX_HEIGHT = 'web_max_height';
+    case WEB_MAX_WIDTH = 'web_max_width';
     case MYSQL_HOST = 'mysql_host';
     case MYSQL_NAME = 'mysql_name';
     case MYSQL_PASS = 'mysql_pass';

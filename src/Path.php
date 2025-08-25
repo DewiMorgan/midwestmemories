@@ -41,10 +41,10 @@ class Path
      */
     public static function canListFilename(string $filename): bool
     {
-        // Skip any hidden files. Also skip thumbnails, index files, and ICE files.
+        // Skip any hidden and index files, and alternate image versions.
         $basename = basename($filename);
         return (
-            !preg_match('/^(\.|tn_|index\.)|-ICE.jpg$/', $basename)
+            !preg_match('/^(\.|index\.)|-(ICE|WEB|TN|B)\.[^.]+$/', $basename)
             && preg_match('/\.(gif|png|jpg|jpeg)$/', $basename)
         );
     }
@@ -70,7 +70,7 @@ class Path
     public static function canViewFilename(string $filename): bool
     {
         // Skip any hidden files and index files.
-        // Allow thumbnails and ICE files to be viewed if directly requested.
+        // Allow thumbnails, ICE files and so on to be viewed if directly requested.
         $basename = basename($filename);
         return (
             !preg_match('/^(\.|index\.)/', $basename)
@@ -352,7 +352,7 @@ class Path
         if ('/' !== IndexGateway::$requestWebPath) {
             Path::addThumb(
                 Path::unixPathToUrl(Path::join(IndexGateway::$requestUnixPath, '..')),
-                '/raw/tn_folder_up.png',
+                '/raw/folder_up-TN.png',
                 '<strong>..</strong> - up one folder.'
             );
         }
@@ -367,9 +367,9 @@ class Path
             // Skip files without a matching thumbnail file: they have not been fully processed.
             if ($isDir) {
                 $h_thumbTitle = htmlspecialchars($filename);
-                $u_thumbUrl = '/raw/tn_folder.png';
+                $u_thumbUrl = '/raw/folder-TN.png';
             } else {
-                $thumbUnixPath = FileProcessor::getThumbName($itemPath);
+                $thumbUnixPath = FileProcessor::getThumbName($itemPath, 'TN');
                 if (!is_file($thumbUnixPath)) {
                     Log::debug("No thumb found for image: '$thumbUnixPath' from '$itemPath'");
                     continue;

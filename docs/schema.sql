@@ -44,15 +44,17 @@ CREATE TABLE `midmem_users`
     `id`                int(10) unsigned NOT NULL AUTO_INCREMENT,
     `username`          varchar(64)      NOT NULL COMMENT 'Used for logging in.',
     `password_hash`     varchar(255)     NOT NULL COMMENT 'From PHP method password_hash().',
-    `access_level`      int(10) unsigned NOT NULL                    DEFAULT 0 COMMENT 'See UserAccess.php enum',
-    `is_disabled`       tinyint(1)       NOT NULL                    DEFAULT 0 COMMENT 'Bool, prevents user login.',
-    `last_login`        datetime                                     DEFAULT NULL,
-    `failed_attempts`   int(10) unsigned NOT NULL                    DEFAULT 0 COMMENT 'Number of failed logins.',
-    `last_failed_login` datetime                                     DEFAULT NULL,
-    `lockout_until`     datetime                                     DEFAULT NULL,
-    `image_type`        enum ('ice', 'original', 'thumbnail', 'web') DEFAULT 'web' COMMENT 'Preferred image type.',
-    `created_at`        datetime         NOT NULL                    DEFAULT current_timestamp(),
-    `updated_at`        datetime         NOT NULL                    DEFAULT current_timestamp()
+    `access_level`      int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'See UserAccess.php enum',
+    `is_disabled`       tinyint(1)       NOT NULL DEFAULT 0 COMMENT 'Bool, prevents user login.',
+    `last_login`        datetime                  DEFAULT NULL,
+    `failed_attempts`   int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Number of failed logins.',
+    `last_failed_login` datetime                  DEFAULT NULL,
+    `lockout_until`     datetime                  DEFAULT NULL,
+    `image_type`        enum (
+        'ice', 'original', 'thumbnail', 'web', 'back'
+        )                                         DEFAULT 'web' COMMENT 'Preferred image type.',
+    `created_at`        datetime         NOT NULL DEFAULT current_timestamp(),
+    `updated_at`        datetime         NOT NULL DEFAULT current_timestamp()
         ON UPDATE current_timestamp(),
     PRIMARY KEY (`id`),
     UNIQUE KEY `username` (`username`)
