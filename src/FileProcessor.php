@@ -279,7 +279,7 @@ class FileProcessor
         // Scale further to max width if still too large.
         if ($newWidth > $maxWidth) {
             $newWidth = $maxWidth;
-            $newHeight = floor(self::$origWidth * ($newWidth / self::$origWidth));
+            $newHeight = floor(self::$origHeight * ($newWidth / self::$origWidth));
         }
         Log::debug(
             "vars: suffix = $suffix, origWidth = " . self::$origWidth . ', origHeight = ' . self::$origHeight
