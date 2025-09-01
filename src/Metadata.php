@@ -250,10 +250,13 @@ class Metadata
                 'filtered' => $row[self::COL_ICE],
             ];
             // Convert "Directory" csv column to unix path. Clean up slashes and dots.
-            $unixPath = Path::join(dirname($unixFilePath), preg_replace(['#[/\\\]+#', '#\.\.+#'], ['/', '.'], $row[6]));
+            $realPath = realpath(dirname($unixFilePath));
+            $unixPath = Path::join($realPath, preg_replace(['#[/\\\]+#', '#\.\.+#'], ['/', '.'], $row[6]));
             // For safety, ensure we don't create anything outside the base path.
             if (!str_starts_with($unixPath, Path::$imgBaseUnixPath)) {
-                Log::error("Target outside base path from $unixFilePath + $row[6]", $unixPath);
+                Log::error(
+                    'Target not in base (' . ${Path::$imgBaseUnixPath} . ") from $unixFilePath + $row[6]", $unixPath
+                );
                 continue;
             }
             // Create the entry for the directory if it doesn't exist.
