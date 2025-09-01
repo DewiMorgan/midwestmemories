@@ -4,16 +4,7 @@ This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
 By priority:
 
-* DONE: (major): I see both `/Auora/Carrie's Photos/Blue/` (has files) and `/Carrie's Photos/Blue/` (empty) in left-bar.
-    * This is because it is creating the index files without the Auora prefix.
-    * Fix is probably to create index files relative to the folder they're in.
-
-* DONE: (minor, blocker): prefix/suffix inconsistency: `tn_`, `web_`, `-ICE`, `-B`.
-    * Use: `.ext`, `-ICE.ext`, `-B.ext`, `-TN.jpg`, `-WEB.jpg`, `-B-WEB.jpg`?
-    * Should this be two dropdowns? "Type" and "Format"?
-
-* DONE: (major): Doesn't generate "web" version yet.
-
+* (major): BUG: INI files need quote marks to be escaped.
 * (major): BUG: once they select ICE, they can't switch to other types.
 * (minor): Doesn't handle "Back" images like ICE images yet. Should I? Or treat front & back as separate images?
 * (minor): no fallback for nonexistent images. "ICE" or "back" for images that lack them, shows no image.
@@ -25,7 +16,6 @@ By priority:
 * Get folder-level details showing.
 * Faster page loads (smaller initial images?)
 
-* DONE: API often gets 502 errors. It should just retry.
 * Make cookies page: we use 1 essential cookie for the session id.
 * Make privacy page: List what DB stores, how to remove it, how photos/comments are stored, and who can see them.
 * Bug: Clicking dot doesn't cause folding.

@@ -3,6 +3,19 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/08/31 Sun
+
+## 2025/08/24 Sun
+
+* DONE: (major): I see both `/Auora/Carrie's Photos/Blue/` (has files) and `/Carrie's Photos/Blue/` (empty) in left-bar.
+    * This is because it is creating the index files without the Auora prefix.
+    * Fix is probably to create index files relative to the folder they're in.
+* DONE: (minor, blocker): prefix/suffix inconsistency: `tn_`, `web_`, `-ICE`, `-B`.
+    * Use: `.ext`, `-ICE.ext`, `-B.ext`, `-TN.jpg`, `-WEB.jpg`, `-B-WEB.jpg`?
+    * Should this be two dropdowns? "Type" and "Format"?
+* DONE: (major): Doesn't generate "web" version yet.
+* DONE: API often gets 502 errors. It should just retry.
+
 ## 2025/08/10 Sun
 
 * DONE: Verify CSVs get reparsed after being updated.
