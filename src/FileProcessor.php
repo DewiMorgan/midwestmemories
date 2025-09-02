@@ -236,8 +236,9 @@ class FileProcessor
             return false;
         }
 
-        $tnResult = self::makeOneThumb('TN');
+        # Process from largest to smallest, as the previous image is used as the source for the next, as a speedup hack.
         $webResult = self::makeOneThumb('WEB');
+        $tnResult = self::makeOneThumb('TN');
         return $tnResult && $webResult;
     }
 
@@ -323,6 +324,11 @@ class FileProcessor
             "vars: suffix = $suffix, origWidth = " . self::$origWidth . ', origHeight = ' . self::$origHeight
             . ", newWidth = $newWidth, newHeight = $newHeight, dest = $dest."
         );
+
+        // Speedup hack: if we generate multiple images (WEB + TN), so long as we do them from largest to smallest,
+        // we can use the previous image as the source for the next, avoiding re-processing the huge original.
+        self::$sourceImage = $virtualImage;
+
         return true;
     }
 }
