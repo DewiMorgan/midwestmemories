@@ -5,6 +5,10 @@ which might not be when they were actually implemented/committed.
 
 ## 2025/08/31 Sun
 
+* FIXED: (major): BUG: INI files need quote marks to be escaped.
+* DONE: Make filtered images viewable. Remember a session variable "image-type"?
+* DONE: Faster page loads (smaller initial images?)
+
 ## 2025/08/24 Sun
 
 * DONE: (major): I see both `/Auora/Carrie's Photos/Blue/` (has files) and `/Carrie's Photos/Blue/` (empty) in left-bar.

@@ -33,6 +33,17 @@ namespace MidwestMemories;
 
     ?>
     <img src="<?= $u_linkUrl ?>" alt="<?= $h_altText ?>" class="file">
+    <div class="lds-roller">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    <img src="/raw/brokenimage.png" alt="Broken Image" class="broken-image">
 
     <!-- Image Type Selector -->
     <div class="image-type-selector" style="margin: 10px 0;">

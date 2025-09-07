@@ -1,4 +1,4 @@
-/* Version: 5 */
+/* Version: 6 */
 
 
 /* Source: Api.js */
@@ -614,24 +614,24 @@ window.ImageTypes = class {
             return;
         }
 
-        // Store the current image element.
+        // Store the current image element
         this.imageElement = document.querySelector('img.file');
         if (!this.imageElement) {
             console.error('Could not find image element with class "file"');
             return;
         }
 
-        // Store the original image URL.
+        // Store the original image URL
         this.originalImageUrl = this.imageElement.src;
 
-        // Set the current value.
+        // Set the current value
         if (currentType) {
             dropdown.value = currentType;
-            // Ensure the current image URL matches the selected type.
+            // Ensure the current image URL matches the selected type
             this.updateImageUrl(currentType);
         }
 
-        // Add change event listener.
+        // Add change event listener
         dropdown.addEventListener('change', (event) => {
             const newType = event.target.value;
             this.updateImageUrl(newType);
@@ -648,32 +648,73 @@ window.ImageTypes = class {
             return;
         }
 
+        // Get references to DOM elements
+        const spinner = document.querySelector('.lds-roller');
+        const brokenImage = document.querySelector('.broken-image');
+
+        // Show spinner and hide other elements
+        if (spinner) {
+            spinner.style.display = 'block';
+        }
+        this.imageElement.style.display = 'none';
+        if (brokenImage) {
+            brokenImage.style.display = 'none';
+        }
+
         const url = new URL(this.imageElement.src);
         const pathParts = url.pathname.split('/');
         let filename = pathParts.pop();
 
-        // Remove any existing prefixes/suffixes to get the base filename.
-        filename = filename.replace(/-(WEB|TN|ICE)(?=\.[^.]+)$/, '');
+        // Remove any existing prefixes/suffixes to get the base filename
+        filename = filename.replace(/|-(?:ICE|WEB|TN|B)(?:\.[^.]+)?$/, '');
 
-        // Apply the appropriate transformation based on the image type.
+        // Apply the appropriate transformation based on the image type
         switch (imageType) {
+            case 'back':
+                filename = filename.replace(/\.[^.]+$/, '-B.jpg');
+                break;
             case 'web':
-                filename = filename.replace(/(?=\.[^.]+$)/, '-WEB');
+                filename = filename.replace(/\.[^.]+$/, '-WEB.jpg');
                 break;
             case 'thumbnail':
-                filename = filename.replace(/(?=\.[^.]+$)/, '-TN');
+                filename = filename.replace(/\.[^.]+$/, '-TN.jpg');
                 break;
             case 'ice':
-                filename = filename.replace(/(?=\.[^.]+$)/, '-ICE');
-            // 'original' type uses the filename as-is.
+                filename = filename.replace(/\.[^.]+$/, '-ICE.jpg');
+                break;
+            case 'original':
+                filename = filename.replace(/\.[^.]+$/, '.jpg');
         }
 
-        // Reconstruct the URL with the new filename.
+        // Reconstruct the URL with the new filename
         pathParts.push(filename);
         url.pathname = pathParts.join('/');
 
-        // Update the image source.
-        this.imageElement.src = url.toString();
+        // Create a new image to test loading
+        const newImage = new Image();
+        newImage.onload = () => {
+            // Update the actual image source
+            this.imageElement.src = url.toString();
+            this.imageElement.style.display = 'block';
+            if (spinner) {
+                spinner.style.display = 'none';
+            }
+        };
+
+        newImage.onerror = () => {
+            console.error('Failed to load image:', url.toString());
+            if (brokenImage) {
+                brokenImage.style.display = 'block';
+            }
+            if (spinner) {
+                spinner.style.display = 'none';
+            }
+            // Revert to original source on error
+            this.imageElement.src = this.originalImageUrl;
+        };
+
+        // Start loading the new image
+        newImage.src = url.toString();
     }
 
     /**
@@ -1069,3 +1110,4 @@ window.TreeView = class {
         listItem.classList.remove('selected');
     }
 };
+

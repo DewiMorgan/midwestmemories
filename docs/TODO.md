@@ -4,17 +4,16 @@ This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
 By priority:
 
-* (major): BUG: INI files need quote marks to be escaped.
 * (major): BUG: once they select ICE, they can't switch to other types.
+* (major): BUG: selecting image types doesn't instantly switch.
+* A spinner while loading images would be nice.
 * (minor): Doesn't handle "Back" images like ICE images yet. Should I? Or treat front & back as separate images?
 * (minor): no fallback for nonexistent images. "ICE" or "back" for images that lack them, shows no image.
 * (minor, irrelevant to existing files): looks for original file extension for generated images, instead of .jpg.
 * (very minor, future enhancement): Tree loads slowly with 1370 entries, will get worse. Options:
     * Static Cache from admin page's file-processing; fill by API; only list folders, not images.
 
-* Make filtered images viewable. Remember a session variable "image-type"?
 * Get folder-level details showing.
-* Faster page loads (smaller initial images?)
 
 * Make cookies page: we use 1 essential cookie for the session id.
 * Make privacy page: List what DB stores, how to remove it, how photos/comments are stored, and who can see them.
