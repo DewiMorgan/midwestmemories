@@ -63,8 +63,8 @@ window.ImageTypes = class {
         const pathParts = url.pathname.split('/');
         let filename = pathParts.pop();
 
-        // Remove any existing prefixes/suffixes to get the base filename
-        filename = filename.replace(/|-(?:ICE|WEB|TN|B)(?:\.[^.]+)?$/, '');
+        // Remove any existing prefixes/suffixes to get the base filename (e.g., "image-ICE.jpg" -> "image.jpg")
+        filename = filename.replace(/-(?:ICE|WEB|TN|B)(\.[^.]+)$/, '$1');
 
         // Apply the appropriate transformation based on the image type
         switch (imageType) {
