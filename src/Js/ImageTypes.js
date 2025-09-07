@@ -52,7 +52,7 @@ window.ImageTypes = class {
 
         // Show spinner and hide other elements
         if (spinner) {
-            spinner.style.display = 'block';
+            spinner.style.display = 'inline-block';
         }
         this.imageElement.style.display = 'none';
         if (brokenImage) {
@@ -93,7 +93,7 @@ window.ImageTypes = class {
         newImage.onload = () => {
             // Update the actual image source
             this.imageElement.src = url.toString();
-            this.imageElement.style.display = 'block';
+            this.imageElement.style.display = 'inline-block';
             if (spinner) {
                 spinner.style.display = 'none';
             }
@@ -102,7 +102,7 @@ window.ImageTypes = class {
         newImage.onerror = () => {
             console.error('Failed to load image:', url.toString());
             if (brokenImage) {
-                brokenImage.style.display = 'block';
+                brokenImage.style.display = 'inline-block';
             }
             if (spinner) {
                 spinner.style.display = 'none';

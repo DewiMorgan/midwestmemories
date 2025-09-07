@@ -149,10 +149,9 @@ figcaption {
     color: #333;
 }
 
-/* Loading spinner, via https://loading.io/ */
+/* Broken image indicator. */
 .broken-image {
-    /* display: none; */ /* Starts out hidden. */
-    display: inline-block;
+    display: none; /* Starts out hidden. */
 }
 
 /* Loading spinner, via https://loading.io/. */
