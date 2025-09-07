@@ -161,12 +161,17 @@ figcaption {
     box-sizing: border-box;
 }
 
-.lds-roller {
-    /* display: none; */ /* Starts out hidden. */
+.lds-roller-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0 auto;
+    width: 100%;
+    min-height: 80px; /* Match the height of the spinner */
+}
+
+.lds-roller {
+    /* display: none; */ /* Starts out hidden. */
+    display: inline-block;
     position: relative;
     width: 80px;
     height: 80px;

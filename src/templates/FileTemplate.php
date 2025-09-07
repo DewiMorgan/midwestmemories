@@ -33,15 +33,17 @@ namespace MidwestMemories;
 
     ?>
     <img src="<?= $u_linkUrl ?>" alt="<?= $h_altText ?>" class="file">
-    <div class="lds-roller">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+    <div class="lds-roller-container">
+        <div class="lds-roller">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
     </div>
     <img src="/raw/brokenimage.png" alt="Broken Image" class="broken-image">
 
