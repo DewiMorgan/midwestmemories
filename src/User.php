@@ -107,6 +107,7 @@ class User extends Singleton
         // We can also completely clobber the session, but that will break things like CSRF, too.
         // $_SESSION = [];
         // session_destroy();
+        Log::debug('OK: 403 User logged out.');
         return ['status' => 403, 'data' => 'Error: access denied'];
     }
 
@@ -189,12 +190,14 @@ class User extends Singleton
         $password = $params['password'] ?? '';
 
         if ($username === '' || $password === '') {
+            Log::warn("Error (400): Empty username ($username) and/or password (not logged).");
             return ['status' => 400, 'data' => 'Error: Missing username or password'];
         }
 
         // Check for existing user
         $existing = Db::sqlGetRow('SELECT `id` FROM `' . Table::users() . '` WHERE `username` = ?', 's', $username);
         if ($existing) {
+            Log::warn("Error (409): Can't add user ($username): already exists as", $existing);
             return ['status' => 409, 'data' => 'Error: Conflict. User already exists: ' . var_export($existing, true)];
         }
 
@@ -211,6 +214,7 @@ class User extends Singleton
         );
 
         if (!$ok) {
+            Log::debug("Error (422): insert into users sql to add user '$username' returned null.");
             return ['status' => 422, 'data' => 'Error: Unprocessable content. Could not add user'];
         }
 
@@ -228,12 +232,14 @@ class User extends Singleton
         $password = $params['password'] ?? '';
 
         if ($username === '' || $password === '') {
+            Log::warn("Error (400): Empty username ($username) and/or password (not logged) to change password.");
             return ['status' => 400, 'data' => 'Error: Missing username or new password for changing password'];
         }
 
         // Confirm user exists
         $user = Db::sqlGetRow('SELECT `id` FROM `' . Table::users() . '` WHERE `username` = ?', 's', $username);
         if (!$user) {
+            Log::warn("Error (404): select from users to change password for '$username' returned null");
             return ['status' => 404, 'data' => 'Error: User not found for change password'];
         }
 
@@ -247,6 +253,7 @@ class User extends Singleton
         );
 
         if (!$ok) {
+            Log::warn('Error (500): Update users sql to update password returned null.');
             return ['status' => 500, 'data' => 'Error: Failed to update password'];
         }
 
@@ -263,12 +270,14 @@ class User extends Singleton
         $username = trim($params['username'] ?? '');
 
         if ($username === '') {
+            Log::error('Error (400): Empty username to disable user.');
             return ['status' => 400, 'data' => 'Error: Missing username for deletion'];
         }
 
         // Check if user exists.
         $user = Db::sqlGetRow('SELECT `id` FROM `' . Table::users() . '` WHERE `username` = ?', 's', $username);
         if (!$user) {
+            Log::error("Error (404): Select from users table to disable user '$username' returned null.");
             return ['status' => 404, 'data' => 'Error: User not found for deletion'];
         }
 
@@ -280,6 +289,7 @@ class User extends Singleton
         );
 
         if (!$ok) {
+            Log::error('Error (500): Update users table to disable user returned null.');
             return ['status' => 500, 'data' => 'Error: Failed to disable user'];
         }
 
@@ -302,6 +312,7 @@ class User extends Singleton
         );
 
         if (!$rows) {
+            Log::error('Error (500): Select from users table to get list returned null.');
             return ['status' => 500, 'data' => 'Error: Failed to fetch users'];
         }
 
@@ -336,6 +347,7 @@ class User extends Singleton
         $imageType = trim($params['image_type'] ?? '');
         $enumType = ImageTypes::tryFrom($imageType);
         if ($enumType === null) {
+            Log::warn("Error (400): Image type '$imageType' not in ImageTypes list.");
             return ['status' => 400, 'data' => 'Error: Invalid Image Type'];
         }
         $ok = Db::sqlExec(
@@ -344,6 +356,7 @@ class User extends Singleton
             $enumType->value
         );
         if (!$ok) {
+            Log::warn('Error (500): Update users sql to update image type returned null.');
             return ['status' => 500, 'data' => 'Error: Failed to update image type'];
         }
         return ['status' => 200, 'data' => 'OK'];

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use MidwestMemories\Db;
 use MidwestMemories\Enum\UserAccess;
+use MidwestMemories\Log;
 use MidwestMemories\Table;
 
 /**
@@ -159,9 +160,12 @@ class TestHelper
         if ($body === false) {
             $body = json_encode(curl_error($ch));
         }
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $httpCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
         curl_close($ch);
 
+        if (200 !== $httpCode) {
+            Log::warn("Curl error ($httpCode): $body");
+        }
         return ['status' => $httpCode, 'data' => $body];
     }
 
