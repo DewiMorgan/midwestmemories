@@ -15,4 +15,5 @@ enum ImageTypes: string
     case ORIGINAL = 'original';
     case THUMBNAIL = 'thumbnail';
     case WEB = 'web';
+    case BACK = 'back';
 }
