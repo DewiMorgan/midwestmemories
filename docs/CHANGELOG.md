@@ -6,6 +6,7 @@ which might not be when they were actually implemented/committed.
 ## 2025/09/14 Sun
 
 * Link between admin and regular pages.
+* Remove deprecated onLoad from body tag.
 
 ## 2025/09/07 Sun
 

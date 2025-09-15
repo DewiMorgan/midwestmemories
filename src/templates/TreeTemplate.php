@@ -44,7 +44,7 @@ $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
         // This is the treeview component.
         echo '<ul>';
         echo "<li class='folder'><a href='/?i=1' class='path-link'>Home</a></li>";
-        Path::buildTree($root, IndexGateway::$requestUnixPath);
+        Path::buildTree(IndexGateway::$requestUnixPath);
         echo '</ul>';
         ?>
         <div id="debug"><!-- Debug info for iOS goes here as it lacks a real console. --></div>
@@ -60,7 +60,7 @@ $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
 
         // Initialize the TreeView.
         function setupTemplate() {
-            console.log("Fetching comments...");
+            console.log("Updating tree details...");
             const tv = TreeView.init();
             tv.openLinkInline('<?= $u_linkUrl ?>');
         }
