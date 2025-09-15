@@ -3,6 +3,18 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/09/14 Sun
+
+* Link between admin and regular pages.
+
+## 2025/09/07 Sun
+
+* (major): BUG: once they select ICE, they can't switch to other types.
+* (major): BUG: selecting image types doesn't instantly switch.
+* A spinner while loading images would be nice.
+* (minor): Doesn't handle "Back" images like ICE images yet. Should I? Or treat front & back as separate images?
+* (minor): no fallback for nonexistent images. "ICE" or "back" for images that lack them, shows no image.
+
 ## 2025/08/31 Sun
 
 * FIXED: (major): BUG: INI files need quote marks to be escaped.

@@ -5,8 +5,6 @@ declare(strict_types=1);
 
 namespace MidwestMemories;
 
-use MidwestMemories\Enum\Key;
-
 $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
 ?>
 <!DOCTYPE html>
@@ -26,15 +24,19 @@ $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
     <link rel="stylesheet" href="/raw/user.css">
     <script src="/raw/user.js?v=<?= Path::getScriptVersion(Path::join(__DIR__, '../raw/user.js')) ?>"></script>
 </head>
-<body onload="setupTemplate()">
+<body>
 <div class="flex-container" id="parent-container">
     <div class="tree-view left-column">
         Welcome, <?= htmlspecialchars(User::getInstance()->username) ?>!
+        <?php
+        if (User::getInstance()->isAdmin) {
+            echo('<a href="/admin.php">(Admin)</a>');
+        }
+        ?>
         <form method="post" style="display: inline;">
             <input type="hidden" name="action" value="logout">
             <button type="submit" style="margin-left: 10px;">Logout</button>
         </form>
-
         <?php
         // Set the root directory to display in the tree view.
         $root = Path::$imgBaseUnixPath;
@@ -53,6 +55,9 @@ $isLiveSite = str_contains(__DIR__, 'midwestmemoriesfamily');
     $u_linkUrl = Path::unixPathToUrl($_REQUEST['path'] ?? '/', Path::LINK_INLINE);
     ?>
     <script>
+        // Launch once the DOM has been parsed.
+        document.addEventListener("DOMContentLoaded", setupTemplate);
+
         // Initialize the TreeView.
         function setupTemplate() {
             console.log("Fetching comments...");

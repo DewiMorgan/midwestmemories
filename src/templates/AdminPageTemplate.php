@@ -54,6 +54,7 @@ declare(strict_types=1);
 <hr>
 
 <h2>Admin Actions</h2>
+<p><a href="/index.php">Go to homepage</a></p>
 <button onclick="initializeCursor()">Initialize Cursor</button>
 <br>
 </body>
