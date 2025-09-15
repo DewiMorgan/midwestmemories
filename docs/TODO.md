@@ -3,6 +3,12 @@
 This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
 By priority:
+
+* Make admin page call cacheTree().
+* Tree loads slowly with 1370 entries, will get worse. Options:
+    * Static Cache from admin page's file-processing; fill by API; only list folders, not images.
+    * JS to select current folder, instead of processing by PHP? Only if it is slow, though.
+
 * Get folder-level details showing.
 * Make cookies page: we use 1 essential cookie for the session id.
 * Make privacy page: List what DB stores, how to remove it, how photos/comments are stored, and who can see them.
@@ -36,8 +42,6 @@ By priority:
     * Increase PHP 8 feature usage: readonly properties and promoted properties.
     * Allow users to add more info texts.
 * (minor, irrelevant to existing files): looks for original file extension for generated images, instead of .jpg.
-* (very minor, future enhancement): Tree loads slowly with 1370 entries, will get worse. Options:
-    * Static Cache from admin page's file-processing; fill by API; only list folders, not images.
 
 * Get it usable on a phone.
 * Search template?
