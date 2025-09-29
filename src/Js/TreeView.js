@@ -161,13 +161,22 @@ window.TreeView = class {
         console.log("Onclick link.");
         // Prevent link from navigating.
         e.preventDefault();
+        const targetUrl = e.currentTarget.href;
+        this.openTreeLink(targetUrl);
+    };
 
+    /**
+     * Handle the opening of a link from the navigation tree.
+     * This includes expanding the selected branch, selecting the correct link, and collapsing any other open branches.
+     * It also handles loading the file.
+     * @param targetUrl
+     */
+    openTreeLink(targetUrl) {
         // Remove 'selected' from any previously selected li and apply to current.
         const selectedItems = document.querySelectorAll('li.selected');
         selectedItems.forEach(this.removeSelectedClass);
 
         // Can't just use this.parent, as it might be from a link in a template.
-        const targetUrl = e.currentTarget.href;
         const selectedParent = document.querySelector(`li > a[href="${targetUrl}"]`)?.parentElement;
 
         if (selectedParent) {
@@ -180,10 +189,9 @@ window.TreeView = class {
             }
         }
 
-        const attr = e.currentTarget.getAttribute("href");
         // noinspection JSIgnoredPromiseFromCall
-        this.openLinkInline(attr);
-    };
+        this.openLinkInline(targetUrl);
+    }
 
     /**
      * Handle navigation via browser back/forward buttons.

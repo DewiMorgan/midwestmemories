@@ -120,6 +120,15 @@ class EndpointRegistry
                     200 => ['success' => true, 'data' => ParamTypes::OK],
                 ]
             ],
+            // Cach refresi is the last part of the post-processing workflow. Maybe not the best endpoint.
+            EndpointKey::PUT_PROCESS => [
+                'auth' => 'admin',
+                'params' => [],
+                'callback' => FileProcessor::cacheFileTree(...),
+                'responseType' => [
+                    200 => ['success' => true, 'data' => ParamTypes::OK],
+                ]
+            ],
             EndpointKey::GET_USER => [
                 'auth' => 'admin',
                 'params' => [],

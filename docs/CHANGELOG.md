@@ -3,6 +3,13 @@
 Newest items at top. The date indicates when they were removed from the README's ToDo-list to this file,
 which might not be when they were actually implemented/committed.
 
+## 2025/09/28 Sun
+
+* Tree loads slowly with 1370 entries, will get worse. Cache it.
+* JS to select current folder, instead of processing by PHP.
+* Make admin page call cacheTree().
+
+
 ## 2025/09/14 Sun
 
 * Link between admin and regular pages.

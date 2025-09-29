@@ -296,105 +296,60 @@ class Path
 
     /**
      * Build and cache the directory tree structure.
-     * @return void
+     * @return bool success.
      */
-    public static function cacheTree(): void
+    public static function cacheTree(): bool
     {
         $result = self::recurseTree(self::$imgBaseUnixPath);
         $cacheFile = self::join(self::$imgBaseUnixPath, self::TREE_CACHE_FILE);
-        if (false === file_put_contents($cacheFile, serialize($result))) {
+        if (false === file_put_contents($cacheFile, $result)) {
             Log::debug('Failed to cache tree');
+            return false;
         }
+        return true;
     }
 
     /**
-     * Recursively builds the directory tree structure.
+     * Recursively builds the directory tree structure as a series of li items.
      *
      * @param string $baseDir The folder being read at each recursion level. Initially the root of the tree.
-     * @return array the tree structure as a hash of records like:
-     *      '<name>' => true - for files
-     *      '<name>' => [...] - for folders, where `children` is an array of the same structure.
+     * @return string the tree structure as a list of records like, for folders:
+     *      <li class='folder collapsed'><span class='expand-collapse'>📁</span>
+     *      <a href='LINK_URL' class='path-link'>LINK_TEXT</a><ul> ... recurse ... </ul></li>
+     * or for files:
+     *     <li class='file'><a href='LINK_URL' class='path-link'>LINK_TEXT</a></li>
      */
-    private static function recurseTree(string $baseDir): array
+    private static function recurseTree(string $baseDir): string
     {
+        // This gets the items correctly sorted already.
         $items = self::getDirItems($baseDir);
-        $result = [];
+        $entry = '';
 
         foreach ($items as $item) {
+            $h_item = htmlspecialchars($item['name']);
+            $u_linkUrl = $item['unixPath'] . '?i=' . Path::LINK_INLINE;
+
             if ($item['isDir']) {
-                $entry = self::recurseTree($item['unixPath']);
+                $entry .= "<li class='folder collapsed'>";
+                $entry .= "<span class='expand-collapse'>" . self::ICON_COLLAPSED . '</span>';
+                $entry .= " <a href='$u_linkUrl' class='path-link'>$h_item</a>";
+                $entry .= "<ul>\n";
+                $entry .= self::recurseTree($item['unixPath']);
+                $entry .= "</ul></li>\n";
             } else {
-                $entry = true;
+                $entry .= "<li class='file'><a href='$u_linkUrl' class='path-link'>$h_item</a></li>\n";
             }
-
-            $result[$item['name']] = $entry;
         }
 
-        return $result;
+        return $entry;
     }
 
     /**
-     * Render the collapsable HTML tree from the cached directory structure.
-     * @Param string $targetUnixPath The path to the user's selected item.
+     * Render the collapsable HTML nav tree from the cache.
      */
-    public static function buildTree(string $targetUnixPath = ''): void
+    public static function buildTree(): void
     {
-        // There's no point in rendering the tree if the target path doesn't exist.
-        if (empty($targetUnixPath)) {
-            $targetUnixPath = self::$imgBaseUnixPath;
-        }
-        $realTargetPath = realpath($targetUnixPath);
-        if (false === $realTargetPath) {
-            Log::debug('Target path was not found', $targetUnixPath);
-            http_response_code(404); // Not found.
-            die(1);
-        }
-
-        // Get the cached tree and render it with the selected path expanded.
-        $tree = unserialize(file_get_contents(self::TREE_CACHE_FILE), ['allowed_classes' => false]);
-        self::renderTree($tree, $targetUnixPath);
-    }
-
-    /**
-     * Render the tree from cached structure.
-     * @Param array $tree The tree structure to render.
-     * @Param string $targetUnixPath The path to the selected item.
-     * @Param string $relativePath The item's path relative to the root of the tree.
-     */
-    private static function renderTree(array $tree, string $targetUnixPath, string $relativePath = ''): void
-    {
-        $files = '';
-        foreach ($tree as $itemName => $item) {
-            $itemPath = $relativePath ? self::join($relativePath, $itemName) : $itemName;
-            $itemUnixPath = self::join(self::$imgBaseUnixPath, $itemPath);
-
-            $h_item = htmlspecialchars($itemName);
-            $u_linkUrl = $itemPath . '?i=' . Path::LINK_INLINE;
-            $h_selectClass = ($itemUnixPath === $targetUnixPath) ? 'selected' : '';
-
-            // Folders are represented by sub-arrays in the tree structure. Omit empty folders.
-            if (is_array($item) && !empty($item)) {
-                if (str_starts_with($itemUnixPath, $targetUnixPath)) {
-                    $h_expandClass = 'expanded';
-                    $h_expandIcon = self::ICON_EXPANDED;
-                } else {
-                    $h_expandClass = 'collapsed';
-                    $h_expandIcon = self::ICON_COLLAPSED;
-                }
-
-                echo "<li class='folder $h_expandClass $h_selectClass'>";
-                echo "<span class='expand-collapse'>$h_expandIcon</span>";
-                echo " <a href='$u_linkUrl' class='path-link'>$h_item</a>";
-                echo "<ul>\n";
-                self::renderTree($item, $targetUnixPath, $itemPath);
-                echo "</ul></li>\n";
-            } else {
-                $files .= "<li class='file $h_selectClass'>"
-                    . "<a href='$u_linkUrl' class='path-link'>$h_item</a>"
-                    . "</li>\n";
-            }
-        }
-        echo $files;
+        readfile(self::TREE_CACHE_FILE);
     }
 
     /**

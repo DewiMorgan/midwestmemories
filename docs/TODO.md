@@ -4,10 +4,6 @@ This is the stuff I'm actually working on, as steps towards the ultimate goal.
 
 By priority:
 
-* Make admin page call cacheTree().
-* Tree loads slowly with 1370 entries, will get worse. Options:
-    * Static Cache from admin page's file-processing; fill by API; only list folders, not images.
-    * JS to select current folder, instead of processing by PHP? Only if it is slow, though.
 
 * Get folder-level details showing.
 * Make cookies page: we use 1 essential cookie for the session id.

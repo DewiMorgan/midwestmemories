@@ -25,6 +25,7 @@ enum EndpointKey: string
     case POST_IMAGE_TYPE = 'POST#image_type';
     case POST_LOGIN = 'POST#login';
     case POST_PROCESS = 'POST#process';
+    case PUT_PROCESS = 'PUT#process';
     case POST_USER = 'POST#user';
     case PUT_COMMENT = 'PUT#comment';
     case PUT_USER = 'PUT#user';

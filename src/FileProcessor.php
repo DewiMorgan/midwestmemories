@@ -57,6 +57,18 @@ class FileProcessor
     }
 
     /**
+     * Endpoint: PUT `/api/v1.0/process`. Cache the newly updated tree of processed files.
+     * @return array ['status'=>200 or 500, 'data'=>"OK" or "Error: ..."], depending on the result.
+     */
+    public static function cacheFileTree(): array
+    {
+        $success = Path::cacheTree();
+        $data = $success ? 'OK' : 'Error: failed to regenerate tree cache';
+        $status = $success ? 200 : 500;
+        return ['status' => $status, 'data' => $data];
+    }
+
+    /**
      * Convert large PNG files to more-compressed jpgs.
      * ToDo: How should this be reflected in the DB?
      * @param string $unixPath Full path to original file.
