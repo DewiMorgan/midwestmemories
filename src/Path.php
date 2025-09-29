@@ -329,7 +329,7 @@ class Path
         foreach ($items as $item) {
             $h_item = htmlspecialchars($item['name']);
             $fileUrl = Path::unixToWebPath($item['unixPath']);
-            $u_linkUrl = $fileUrl . '?i=' . Path::LINK_INLINE;
+            $u_linkUrl = str_replace('%2F', '/', urlencode($fileUrl)) . '?i=' . Path::LINK_INLINE;
 
             if ($item['isDir']) {
                 $entry .= "<li class='folder collapsed'>";
