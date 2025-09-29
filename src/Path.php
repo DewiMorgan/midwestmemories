@@ -350,7 +350,9 @@ class Path
      */
     public static function buildTree(): void
     {
-        readfile(self::TREE_CACHE_FILE);
+        $cacheFile = self::join(self::$imgBaseUnixPath, self::TREE_CACHE_FILE);
+        $result = readfile($cacheFile);
+        Log::debug("Loaded tree cache from: '$cacheFile'", $result);
     }
 
     /**
