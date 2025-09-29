@@ -94,5 +94,12 @@ window.Dropbox = class {
         await Dropbox.handleFileTask('Downloading', '/api/v1.0/download');
         // Generate queued thumbnails.
         await Dropbox.handleFileTask('Postprocessing', '/api/v1.0/process');
+        // Regenerate file tree cache.
+        try {
+            await Api.fetchApiData('/api/v1.0/process', 'PUT', 'string');
+            Log.message(`= Rebuild cache succeeded.`);
+        } catch (error) {
+            Log.message(`= Rebuild cache failed: ${error}`);
+        }
     }
 };

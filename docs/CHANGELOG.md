@@ -9,7 +9,6 @@ which might not be when they were actually implemented/committed.
 * JS to select current folder, instead of processing by PHP.
 * Make admin page call cacheTree().
 
-
 ## 2025/09/14 Sun
 
 * Link between admin and regular pages.
