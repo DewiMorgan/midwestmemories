@@ -303,9 +303,10 @@ class Path
         $result = self::recurseTree(self::$imgBaseUnixPath);
         $cacheFile = self::join(self::$imgBaseUnixPath, self::TREE_CACHE_FILE);
         if (false === file_put_contents($cacheFile, $result)) {
-            Log::debug('Failed to cache tree');
+            Log::error('Failed to cache tree');
             return false;
         }
+        Log::debug("Built tree cache at: '$cacheFile'.");
         return true;
     }
 
