@@ -328,7 +328,8 @@ class Path
 
         foreach ($items as $item) {
             $h_item = htmlspecialchars($item['name']);
-            $u_linkUrl = $item['unixPath'] . '?i=' . Path::LINK_INLINE;
+            $fileUrl = Path::unixToWebPath($item['unixPath']);
+            $u_linkUrl = $fileUrl . '?i=' . Path::LINK_INLINE;
 
             if ($item['isDir']) {
                 $entry .= "<li class='folder collapsed'>";
@@ -348,7 +349,7 @@ class Path
     /**
      * Render the collapsable HTML nav tree from the cache.
      */
-    public static function buildTree(): void
+    public static function showTree(): void
     {
         $cacheFile = self::join(self::$imgBaseUnixPath, self::TREE_CACHE_FILE);
         $result = readfile($cacheFile);
